@@ -1,0 +1,66 @@
+{
+  "test_platform": "payfast.io",
+  "test_timestamp": "2025-10-23T09:11:00.196850",
+  "va_result": {
+    "platform_name": "payfast.io",
+    "final_score": 100,
+    "page_content": "\n\n\n\n\n\n\n\nsecure online payment gateway in south africa | payfast by network\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nskip to content \n\n\n\nhelp centre\ndev docs\n\n\n \n\n\n\n\nsearch for:\n\n\n\n\n\n\n\n\n \n\n\n\n\n\n\n\n \n\n\ncontact us\nlog in\nsign me up\nsearch\n\n\n \n\n\n\n\n\n\nmenu \n\n\n\n\n\n\n\n\n\n\nmenu \nsolutions\n\npoint-of-sale deviceaccept contactless payments in store\nresources\ngatewaypaygate offers your business a fully supported payment gateway\necommercereceive payments instantly on your online store\ninvoicingallow your customers to pay your invoices online\nevent ticketingsell event tickets on a platform or your website\naccepting donationsraise funds online and benefit from reduced fees\n\n\nfeatures\n\npayment methodsenable 18+ different payment methods\nonsite paymentsenable an onsite checkout experience\nsubscriptionsschedule payments at regular intervals\npayment requestaccept payments via email\ntokenizationaccept recurring credit card payments\nmerchant refundrefund your customers directly\nmulti-currency pricingaccept payments in almost any currency\nimmediate payoutaccess your funds within minutes\npayfast by network appmanage your business on the go\nsplit paymentsinstantly split a payment with a 3rd party\neasy advanceaccess business funding\npaybillgateway e-billing\npaybatchgateway batched payments\n\n\nintegration\n\npluginschoose from 70+ existing platforms\npay now buttonsadd payment buttons wherever you need them\ncustom integrationcreate a custom integration with payfast\nintegration supportget in touch for integration assistance\nsubmit plugin solutionlist your plugin on our website\naggregation dev docs\ngateway dev docs\ngetting started\napi integration\nsplit payments\ntesting and tools\ndeveloper faq\n\n\nfees\nresources\n\nresourcespayfast resources to help your business\nblogthe latest payfast news and updates\nfaqsmost popular faqs answered\nhelp centrefind answers to all your payfast questions\ncase studieshow businesses of all sizes are using payfast\npress releasespayfast in the ne",
+    "page_title": "Secure Online Payment Gateway in South Africa | Payfast by Network",
+    "url_accessed": "https://payfast.io",
+    "status_code": 200,
+    "verification_timestamp": "2025-10-23T09:11:00.196280",
+    "verifier": "DialogVA-VerificationExpert",
+    "criteria_results": {
+      "us_market": "PASS",
+      "self_register": "PASS",
+      "payment_receiving": "PASS",
+      "integration": "PASS"
+    },
+    "real_verification": true,
+    "is_new_platform": true,
+    "access_method": "策略1_超时10s",
+    "applied_learning": 0
+  },
+  "aa_analysis": {
+    "is_false_positive": true,
+    "error_type": "fast_patterns",
+    "confidence": 0.9,
+    "reason": "AA深入调研 + 模式分析: 调研未发现明确的支付业务证据，且包含1个风险指示词",
+    "research_details": {
+      "platform_name": "payfast.io",
+      "main_business": "unknown",
+      "is_verified_payment_platform": false,
+      "business_description": "调研未发现明确的支付业务证据",
+      "evidence_sources": [],
+      "qa_documentation": {
+        "payment_related_questions": 0,
+        "total_questions": 0,
+        "evidence_found": []
+      },
+      "help_documentation": {
+        "payment_topics_found": [],
+        "integration_guides": 0,
+        "evidence_found": []
+      },
+      "about_us_info": {
+        "company_type": "",
+        "founded_year": "",
+        "business_focus": [],
+        "evidence_found": []
+      },
+      "pricing_info": {
+        "payment_fees_structure": "",
+        "transaction_fees": [],
+        "evidence_found": []
+      },
+      "api_documentation": {
+        "payment_endpoints": [],
+        "webhook_support": false,
+        "evidence_found": []
+      },
+      "research_confidence": 0.0
+    }
+  },
+  "final_decision": "REJECTED",
+  "test_version": "AA-Deep-Research-v1.0"
+}

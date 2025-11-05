@@ -1,0 +1,82 @@
+{
+  "analysis_time": "2025-10-23T10:52:37.898623",
+  "total_platforms": 8,
+  "findings": {
+    "payfast.co": {
+      "type": "network_failure",
+      "dns_status": "failed",
+      "issue": "域名不存在或已过期",
+      "solution": "从候选列表中移除"
+    },
+    "quickpay.com": {
+      "type": "network_failure",
+      "dns_status": "success",
+      "ip_address": "207.228.1.227",
+      "platform_type": "快速支付类",
+      "issue": "域名解析正常但Web服务不可用",
+      "solution": "验证平台是否仍在运营"
+    },
+    "quickpay.io": {
+      "type": "network_failure",
+      "dns_status": "failed",
+      "issue": "域名不存在或已过期",
+      "solution": "从候选列表中移除"
+    },
+    "easypay.com": {
+      "type": "network_failure",
+      "dns_status": "failed",
+      "issue": "域名不存在或已过期",
+      "solution": "从候选列表中移除"
+    },
+    "paypro.io": {
+      "type": "network_failure",
+      "dns_status": "failed",
+      "issue": "域名不存在或已过期",
+      "solution": "从候选列表中移除"
+    },
+    "fast.com": {
+      "type": "criteria_failure",
+      "dns_status": "success",
+      "ip_address": "23.205.6.155",
+      "platform_type": "CDN/网络服务",
+      "issue": "不是支付平台，是Verizon的CDN服务",
+      "solution": "从候选列表中移除，不是目标平台"
+    },
+    "easypay.io": {
+      "type": "criteria_failure",
+      "dns_status": "success",
+      "ip_address": "104.21.53.21",
+      "platform_type": "简易支付服务",
+      "issue": "可能不符合美国市场或其他验证标准",
+      "solution": "深入验证平台性质或寻找替代平台"
+    },
+    "paypro.com": {
+      "type": "criteria_failure",
+      "dns_status": "success",
+      "ip_address": "178.22.57.222",
+      "platform_type": "专业支付服务",
+      "issue": "可能不符合美国市场服务要求",
+      "solution": "验证其美国市场业务或替换"
+    }
+  },
+  "solutions": {
+    "immediate_actions": [
+      "移除无效域名: payfast.co",
+      "移除无效域名: quickpay.io",
+      "移除无效域名: easypay.com",
+      "移除无效域名: paypro.io"
+    ],
+    "system_improvements": [
+      "添加域名存在性预检查机制",
+      "改进平台类型识别算法",
+      "建立平台分类系统",
+      "添加备用验证策略"
+    ],
+    "platform_updates": [
+      "清理候选平台列表中的无效域名",
+      "添加更多经过验证的真实支付平台",
+      "建立动态平台候选池",
+      "按平台类型分类管理"
+    ]
+  }
+}

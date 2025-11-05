@@ -1,0 +1,675 @@
+{
+  "cycle_number": 10,
+  "cycle_start_time": "2025-10-22T21:59:48.891724",
+  "cycle_end_time": "2025-10-22T22:09:32.434584",
+  "platforms_verified": 7,
+  "summary": {
+    "perfect_platforms": 0,
+    "excellent_platforms": 0,
+    "good_platforms": 3,
+    "needs_improvement": 4,
+    "bank_features_count": 2,
+    "dual_features_count": 0,
+    "average_score": 26.428571428571427
+  },
+  "top_platforms": [
+    {
+      "platform_name": "venmo.com",
+      "url": "https://www.venmo.com",
+      "page_title": "Pay Friends | Payments App | Venmo",
+      "verification_time": "2025-10-22T22:09:05.934905",
+      "us_market_analysis": {
+        "ach_keyword_count": 7,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 3,
+        "total_indicators": 10,
+        "passed": true
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 11,
+        "signup_elements_count": 4,
+        "enterprise_keyword_count": 0,
+        "passed": true
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 5,
+        "sending_keyword_count": 1,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 0,
+        "api_docs_count": 0,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 16,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": true,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 16,
+        "passed": true,
+        "feature_type": "💳信用卡/Apple Pay"
+      },
+      "final_score": 55,
+      "criteria_met": [
+        "🇺🇸美国市场服务",
+        "🔑自注册功能",
+        "🏦银行功能"
+      ],
+      "recommendation": "⚠️可考虑使用 - 良好平台",
+      "cycle_number": 10
+    },
+    {
+      "platform_name": "dlocal.com",
+      "url": "https://www.dlocal.com",
+      "page_title": "dLocal: Your global payments partner across emerging markets",
+      "verification_time": "2025-10-22T22:09:16.860352",
+      "us_market_analysis": {
+        "ach_keyword_count": 15,
+        "has_us_pages": true,
+        "deep_us_keyword_count": 4,
+        "total_indicators": 29,
+        "passed": true
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 6,
+        "signup_elements_count": 3,
+        "enterprise_keyword_count": 5,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 14,
+        "sending_keyword_count": 0,
+        "passed": true
+      },
+      "integration_analysis": {
+        "api_keyword_count": 19,
+        "api_docs_count": 15,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 6,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 1,
+        "has_credit_card_support": true,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 7,
+        "passed": true,
+        "feature_type": "💳信用卡/Apple Pay"
+      },
+      "final_score": 55,
+      "criteria_met": [
+        "🇺🇸美国市场服务",
+        "💰收款能力",
+        "🏦银行功能"
+      ],
+      "recommendation": "⚠️可考虑使用 - 良好平台",
+      "cycle_number": 10
+    },
+    {
+      "platform_name": "payhip.com",
+      "url": "https://www.payhip.com",
+      "page_title": "Payhip - Create a free website and sell online",
+      "verification_time": "2025-10-22T22:09:29.240913",
+      "us_market_analysis": {
+        "ach_keyword_count": 16,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 8,
+        "total_indicators": 24,
+        "passed": true
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 5,
+        "signup_elements_count": 4,
+        "enterprise_keyword_count": 0,
+        "passed": true
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 0,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 2,
+        "api_docs_count": 0,
+        "embedded_keyword_count": 2,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 0,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 50,
+      "criteria_met": [
+        "🇺🇸美国市场服务",
+        "🔑自注册功能"
+      ],
+      "recommendation": "⚠️可考虑使用 - 良好平台",
+      "cycle_number": 10
+    },
+    {
+      "platform_name": "fiverr.com",
+      "url": "https://www.fiverr.com",
+      "page_title": "Fiverr | Freelance services marketplace | Find top global talent",
+      "verification_time": "2025-10-22T22:09:24.028112",
+      "us_market_analysis": {
+        "ach_keyword_count": 13,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 13,
+        "total_indicators": 26,
+        "passed": true
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 2,
+        "signup_elements_count": 2,
+        "enterprise_keyword_count": 1,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 1,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 0,
+        "api_docs_count": 0,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 0,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 25,
+      "criteria_met": [
+        "🇺🇸美国市场服务"
+      ],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 10
+    },
+    {
+      "platform_name": "2checkout.com",
+      "url": "https://www.2checkout.com",
+      "page_title": "无标题",
+      "verification_time": "2025-10-22T22:08:56.834771",
+      "us_market_analysis": {
+        "ach_keyword_count": 0,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 0,
+        "total_indicators": 0,
+        "passed": false
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 0,
+        "signup_elements_count": 0,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 0,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 0,
+        "api_docs_count": 0,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 0,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 0,
+      "criteria_met": [],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 10
+    },
+    {
+      "platform_name": "substack.com",
+      "url": "https://www.substack.com",
+      "page_title": "Home | Substack",
+      "verification_time": "2025-10-22T22:09:11.307326",
+      "us_market_analysis": {
+        "ach_keyword_count": 0,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 0,
+        "total_indicators": 0,
+        "passed": false
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 3,
+        "signup_elements_count": 1,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 1,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 0,
+        "api_docs_count": 0,
+        "embedded_keyword_count": 2,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 0,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 0,
+      "criteria_met": [],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 10
+    },
+    {
+      "platform_name": "clarity.fm",
+      "url": "https://www.clarity.fm",
+      "page_title": "Clarity — On Demand Business Advice",
+      "verification_time": "2025-10-22T22:09:20.858625",
+      "us_market_analysis": {
+        "ach_keyword_count": 0,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 0,
+        "total_indicators": 0,
+        "passed": false
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 0,
+        "signup_elements_count": 0,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 0,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 0,
+        "api_docs_count": 0,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 0,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 0,
+      "criteria_met": [],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 10
+    }
+  ],
+  "detailed_results": [
+    {
+      "platform_name": "2checkout.com",
+      "url": "https://www.2checkout.com",
+      "page_title": "无标题",
+      "verification_time": "2025-10-22T22:08:56.834771",
+      "us_market_analysis": {
+        "ach_keyword_count": 0,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 0,
+        "total_indicators": 0,
+        "passed": false
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 0,
+        "signup_elements_count": 0,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 0,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 0,
+        "api_docs_count": 0,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 0,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 0,
+      "criteria_met": [],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 10
+    },
+    {
+      "platform_name": "venmo.com",
+      "url": "https://www.venmo.com",
+      "page_title": "Pay Friends | Payments App | Venmo",
+      "verification_time": "2025-10-22T22:09:05.934905",
+      "us_market_analysis": {
+        "ach_keyword_count": 7,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 3,
+        "total_indicators": 10,
+        "passed": true
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 11,
+        "signup_elements_count": 4,
+        "enterprise_keyword_count": 0,
+        "passed": true
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 5,
+        "sending_keyword_count": 1,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 0,
+        "api_docs_count": 0,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 16,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": true,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 16,
+        "passed": true,
+        "feature_type": "💳信用卡/Apple Pay"
+      },
+      "final_score": 55,
+      "criteria_met": [
+        "🇺🇸美国市场服务",
+        "🔑自注册功能",
+        "🏦银行功能"
+      ],
+      "recommendation": "⚠️可考虑使用 - 良好平台",
+      "cycle_number": 10
+    },
+    {
+      "platform_name": "substack.com",
+      "url": "https://www.substack.com",
+      "page_title": "Home | Substack",
+      "verification_time": "2025-10-22T22:09:11.307326",
+      "us_market_analysis": {
+        "ach_keyword_count": 0,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 0,
+        "total_indicators": 0,
+        "passed": false
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 3,
+        "signup_elements_count": 1,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 1,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 0,
+        "api_docs_count": 0,
+        "embedded_keyword_count": 2,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 0,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 0,
+      "criteria_met": [],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 10
+    },
+    {
+      "platform_name": "dlocal.com",
+      "url": "https://www.dlocal.com",
+      "page_title": "dLocal: Your global payments partner across emerging markets",
+      "verification_time": "2025-10-22T22:09:16.860352",
+      "us_market_analysis": {
+        "ach_keyword_count": 15,
+        "has_us_pages": true,
+        "deep_us_keyword_count": 4,
+        "total_indicators": 29,
+        "passed": true
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 6,
+        "signup_elements_count": 3,
+        "enterprise_keyword_count": 5,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 14,
+        "sending_keyword_count": 0,
+        "passed": true
+      },
+      "integration_analysis": {
+        "api_keyword_count": 19,
+        "api_docs_count": 15,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 6,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 1,
+        "has_credit_card_support": true,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 7,
+        "passed": true,
+        "feature_type": "💳信用卡/Apple Pay"
+      },
+      "final_score": 55,
+      "criteria_met": [
+        "🇺🇸美国市场服务",
+        "💰收款能力",
+        "🏦银行功能"
+      ],
+      "recommendation": "⚠️可考虑使用 - 良好平台",
+      "cycle_number": 10
+    },
+    {
+      "platform_name": "clarity.fm",
+      "url": "https://www.clarity.fm",
+      "page_title": "Clarity — On Demand Business Advice",
+      "verification_time": "2025-10-22T22:09:20.858625",
+      "us_market_analysis": {
+        "ach_keyword_count": 0,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 0,
+        "total_indicators": 0,
+        "passed": false
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 0,
+        "signup_elements_count": 0,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 0,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 0,
+        "api_docs_count": 0,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 0,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 0,
+      "criteria_met": [],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 10
+    },
+    {
+      "platform_name": "fiverr.com",
+      "url": "https://www.fiverr.com",
+      "page_title": "Fiverr | Freelance services marketplace | Find top global talent",
+      "verification_time": "2025-10-22T22:09:24.028112",
+      "us_market_analysis": {
+        "ach_keyword_count": 13,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 13,
+        "total_indicators": 26,
+        "passed": true
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 2,
+        "signup_elements_count": 2,
+        "enterprise_keyword_count": 1,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 1,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 0,
+        "api_docs_count": 0,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 0,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 25,
+      "criteria_met": [
+        "🇺🇸美国市场服务"
+      ],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 10
+    },
+    {
+      "platform_name": "payhip.com",
+      "url": "https://www.payhip.com",
+      "page_title": "Payhip - Create a free website and sell online",
+      "verification_time": "2025-10-22T22:09:29.240913",
+      "us_market_analysis": {
+        "ach_keyword_count": 16,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 8,
+        "total_indicators": 24,
+        "passed": true
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 5,
+        "signup_elements_count": 4,
+        "enterprise_keyword_count": 0,
+        "passed": true
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 0,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 2,
+        "api_docs_count": 0,
+        "embedded_keyword_count": 2,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 0,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 50,
+      "criteria_met": [
+        "🇺🇸美国市场服务",
+        "🔑自注册功能"
+      ],
+      "recommendation": "⚠️可考虑使用 - 良好平台",
+      "cycle_number": 10
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+# BMad安全增强 - 敏感文件保护
+# API密钥和令牌
+*.key
+*.token
+*.secret
+*.pem
+*.p12
+*.pfx
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# 配置文件（可能包含敏感信息）
+config/production.json
+config/staging.json
+config/secrets.json
+
+# 日志文件
+*.log
+logs/
+
+# 备份文件
+*.backup
+*.bak
+backup/
+
+# BMad安全文件
+bmad_security/backups/
+bmad_security/secrets/

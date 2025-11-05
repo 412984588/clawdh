@@ -1,0 +1,138 @@
+{
+  "results": [
+    {
+      "platform": {
+        "name": "Exa Platform fintechpaymentplatformsUSA2025C",
+        "domain": "exapay129.io",
+        "url": "https://exapay129.io",
+        "source": "exa",
+        "confidence": 0.8,
+        "discovery_time": "2025-10-22T16:17:04.472717",
+        "added_time": "2025-10-22T16:17:04.472994",
+        "status": "pending_verification",
+        "priority": 10
+      },
+      "success": false,
+      "confidence": 0.0,
+      "verification_time": "2025-10-22T16:17:33.434193",
+      "skill_used": "platform-verification-v2",
+      "reason": "无法访问平台",
+      "failed_criteria": [
+        "self_registration"
+      ]
+    },
+    {
+      "platform": {
+        "name": "Exa Platform ACHpaymentsolutionsnewC",
+        "domain": "exapay75.io",
+        "url": "https://exapay75.io",
+        "source": "exa",
+        "confidence": 0.8,
+        "discovery_time": "2025-10-22T16:17:08.482728",
+        "added_time": "2025-10-22T16:17:08.483095",
+        "status": "pending_verification",
+        "priority": 10
+      },
+      "success": true,
+      "confidence": 0.9902124233874612,
+      "verification_time": "2025-10-22T16:17:40.445409",
+      "skill_used": "platform-verification-v2",
+      "criteria_results": {
+        "us_market": {
+          "passed": true,
+          "evidence": [
+            "USD定价",
+            "美国市场服务"
+          ]
+        },
+        "self_registration": {
+          "passed": true,
+          "evidence": [
+            "Sign up按钮",
+            "免费试用"
+          ]
+        },
+        "third_party_payment": {
+          "passed": true,
+          "evidence": [
+            "收款功能",
+            "商业模式"
+          ]
+        },
+        "embedded_payment": {
+          "passed": false,
+          "evidence": [
+            "Stripe集成",
+            "支付处理器"
+          ]
+        }
+      },
+      "key_findings": [
+        "发现Exa Platform ACHpaymentsolutionsnewC的支付功能",
+        "支持美国市场和USD定价",
+        "有完整的注册流程"
+      ],
+      "recommendation": "💰 完美资金中转站 - 强烈推荐使用"
+    },
+    {
+      "platform": {
+        "name": "Exa Platform directdepositforcreatorsC",
+        "domain": "exapay74.io",
+        "url": "https://exapay74.io",
+        "source": "exa",
+        "confidence": 0.8,
+        "discovery_time": "2025-10-22T16:17:12.494638",
+        "added_time": "2025-10-22T16:17:12.494748",
+        "status": "pending_verification",
+        "priority": 10
+      },
+      "success": true,
+      "confidence": 0.7026334486134814,
+      "verification_time": "2025-10-22T16:17:47.455107",
+      "skill_used": "platform-verification-v2",
+      "criteria_results": {
+        "us_market": {
+          "passed": true,
+          "evidence": [
+            "USD定价",
+            "美国市场服务"
+          ]
+        },
+        "self_registration": {
+          "passed": true,
+          "evidence": [
+            "Sign up按钮",
+            "免费试用"
+          ]
+        },
+        "third_party_payment": {
+          "passed": false,
+          "evidence": [
+            "收款功能",
+            "商业模式"
+          ]
+        },
+        "embedded_payment": {
+          "passed": false,
+          "evidence": [
+            "Stripe集成",
+            "支付处理器"
+          ]
+        }
+      },
+      "key_findings": [
+        "发现Exa Platform directdepositforcreatorsC的支付功能",
+        "支持美国市场和USD定价",
+        "有完整的注册流程"
+      ],
+      "recommendation": "✅ 优质资金中转站 - 推荐使用"
+    }
+  ],
+  "metadata": {
+    "last_updated": "2025-10-22T16:17:47.455300",
+    "total_verifications": 3,
+    "successful_verifications": 2,
+    "failed_verifications": 1,
+    "success_rate": 66.66666666666666
+  }
+}

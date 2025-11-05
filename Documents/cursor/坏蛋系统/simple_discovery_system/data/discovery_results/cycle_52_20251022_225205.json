@@ -1,0 +1,383 @@
+{
+  "cycle_number": 52,
+  "cycle_start_time": "2025-10-22T21:59:48.891724",
+  "cycle_end_time": "2025-10-22T22:52:05.363452",
+  "platforms_verified": 4,
+  "summary": {
+    "perfect_platforms": 0,
+    "excellent_platforms": 0,
+    "good_platforms": 0,
+    "needs_improvement": 4,
+    "bank_features_count": 0,
+    "dual_features_count": 0,
+    "average_score": 6.25
+  },
+  "top_platforms": [
+    {
+      "platform_name": "fresha.com",
+      "url": "https://www.fresha.com",
+      "page_title": "Fresha - Instantly book salons and spas nearby",
+      "verification_time": "2025-10-22T22:50:53.563642",
+      "us_market_analysis": {
+        "ach_keyword_count": 14,
+        "has_us_pages": true,
+        "deep_us_keyword_count": 3,
+        "total_indicators": 27,
+        "passed": true
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 0,
+        "signup_elements_count": 0,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 0,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 0,
+        "api_docs_count": 0,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 0,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 25,
+      "criteria_met": [
+        "🇺🇸美国市场服务"
+      ],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 52
+    },
+    {
+      "platform_name": "booksy.com",
+      "url": "https://www.booksy.com",
+      "page_title": "Booksy - hair stylists, barbers, beauticians... book appointments online!",
+      "verification_time": "2025-10-22T22:51:02.919725",
+      "us_market_analysis": {
+        "ach_keyword_count": 1,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 0,
+        "total_indicators": 1,
+        "passed": false
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 0,
+        "signup_elements_count": 0,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 1,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 0,
+        "api_docs_count": 0,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 1,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 1,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 0,
+      "criteria_met": [],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 52
+    },
+    {
+      "platform_name": "gitlab.com",
+      "url": "https://www.gitlab.com",
+      "page_title": "The most-comprehensive AI-powered DevSecOps platform",
+      "verification_time": "2025-10-22T22:51:18.117467",
+      "us_market_analysis": {
+        "ach_keyword_count": 3,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 0,
+        "total_indicators": 3,
+        "passed": false
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 4,
+        "signup_elements_count": 2,
+        "enterprise_keyword_count": 2,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 7,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 7,
+        "api_docs_count": 6,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 0,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 0,
+      "criteria_met": [],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 52
+    },
+    {
+      "platform_name": "2checkout.com",
+      "url": "https://www.2checkout.com",
+      "page_title": "无标题",
+      "verification_time": "2025-10-22T22:51:22.948705",
+      "us_market_analysis": {
+        "ach_keyword_count": 0,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 0,
+        "total_indicators": 0,
+        "passed": false
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 0,
+        "signup_elements_count": 0,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 0,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 0,
+        "api_docs_count": 0,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 0,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 0,
+      "criteria_met": [],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 52
+    }
+  ],
+  "detailed_results": [
+    {
+      "platform_name": "fresha.com",
+      "url": "https://www.fresha.com",
+      "page_title": "Fresha - Instantly book salons and spas nearby",
+      "verification_time": "2025-10-22T22:50:53.563642",
+      "us_market_analysis": {
+        "ach_keyword_count": 14,
+        "has_us_pages": true,
+        "deep_us_keyword_count": 3,
+        "total_indicators": 27,
+        "passed": true
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 0,
+        "signup_elements_count": 0,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 0,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 0,
+        "api_docs_count": 0,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 0,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 25,
+      "criteria_met": [
+        "🇺🇸美国市场服务"
+      ],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 52
+    },
+    {
+      "platform_name": "booksy.com",
+      "url": "https://www.booksy.com",
+      "page_title": "Booksy - hair stylists, barbers, beauticians... book appointments online!",
+      "verification_time": "2025-10-22T22:51:02.919725",
+      "us_market_analysis": {
+        "ach_keyword_count": 1,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 0,
+        "total_indicators": 1,
+        "passed": false
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 0,
+        "signup_elements_count": 0,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 1,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 0,
+        "api_docs_count": 0,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 1,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 1,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 0,
+      "criteria_met": [],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 52
+    },
+    {
+      "platform_name": "gitlab.com",
+      "url": "https://www.gitlab.com",
+      "page_title": "The most-comprehensive AI-powered DevSecOps platform",
+      "verification_time": "2025-10-22T22:51:18.117467",
+      "us_market_analysis": {
+        "ach_keyword_count": 3,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 0,
+        "total_indicators": 3,
+        "passed": false
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 4,
+        "signup_elements_count": 2,
+        "enterprise_keyword_count": 2,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 7,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 7,
+        "api_docs_count": 6,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 0,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 0,
+      "criteria_met": [],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 52
+    },
+    {
+      "platform_name": "2checkout.com",
+      "url": "https://www.2checkout.com",
+      "page_title": "无标题",
+      "verification_time": "2025-10-22T22:51:22.948705",
+      "us_market_analysis": {
+        "ach_keyword_count": 0,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 0,
+        "total_indicators": 0,
+        "passed": false
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 0,
+        "signup_elements_count": 0,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 0,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 0,
+        "api_docs_count": 0,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 0,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 0,
+      "criteria_met": [],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 52
+    }
+  ]
+}

@@ -1,0 +1,205 @@
+{
+  "cycle_number": 39,
+  "cycle_start_time": "2025-10-22T21:59:48.891724",
+  "cycle_end_time": "2025-10-22T22:38:01.149667",
+  "platforms_verified": 2,
+  "summary": {
+    "perfect_platforms": 0,
+    "excellent_platforms": 0,
+    "good_platforms": 1,
+    "needs_improvement": 1,
+    "bank_features_count": 0,
+    "dual_features_count": 0,
+    "average_score": 25.0
+  },
+  "top_platforms": [
+    {
+      "platform_name": "worldpay.com",
+      "url": "https://www.worldpay.com",
+      "page_title": "Worldpay: Unleash Your Payments Potential",
+      "verification_time": "2025-10-22T22:37:56.329234",
+      "us_market_analysis": {
+        "ach_keyword_count": 4,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 2,
+        "total_indicators": 6,
+        "passed": true
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 1,
+        "signup_elements_count": 1,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 7,
+        "sending_keyword_count": 1,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 3,
+        "api_docs_count": 2,
+        "embedded_keyword_count": 5,
+        "passed": true
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 1,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 1,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 50,
+      "criteria_met": [
+        "🇺🇸美国市场服务",
+        "🔗集成能力"
+      ],
+      "recommendation": "⚠️可考虑使用 - 良好平台",
+      "cycle_number": 39
+    },
+    {
+      "platform_name": "booksy.com",
+      "url": "https://www.booksy.com",
+      "page_title": "Booksy - hair stylists, barbers, beauticians... book appointments online!",
+      "verification_time": "2025-10-22T22:37:49.996344",
+      "us_market_analysis": {
+        "ach_keyword_count": 1,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 0,
+        "total_indicators": 1,
+        "passed": false
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 0,
+        "signup_elements_count": 0,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 1,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 0,
+        "api_docs_count": 0,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 1,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 1,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 0,
+      "criteria_met": [],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 39
+    }
+  ],
+  "detailed_results": [
+    {
+      "platform_name": "booksy.com",
+      "url": "https://www.booksy.com",
+      "page_title": "Booksy - hair stylists, barbers, beauticians... book appointments online!",
+      "verification_time": "2025-10-22T22:37:49.996344",
+      "us_market_analysis": {
+        "ach_keyword_count": 1,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 0,
+        "total_indicators": 1,
+        "passed": false
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 0,
+        "signup_elements_count": 0,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 1,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 0,
+        "api_docs_count": 0,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 1,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 1,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 0,
+      "criteria_met": [],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 39
+    },
+    {
+      "platform_name": "worldpay.com",
+      "url": "https://www.worldpay.com",
+      "page_title": "Worldpay: Unleash Your Payments Potential",
+      "verification_time": "2025-10-22T22:37:56.329234",
+      "us_market_analysis": {
+        "ach_keyword_count": 4,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 2,
+        "total_indicators": 6,
+        "passed": true
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 1,
+        "signup_elements_count": 1,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 7,
+        "sending_keyword_count": 1,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 3,
+        "api_docs_count": 2,
+        "embedded_keyword_count": 5,
+        "passed": true
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 1,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 1,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 50,
+      "criteria_met": [
+        "🇺🇸美国市场服务",
+        "🔗集成能力"
+      ],
+      "recommendation": "⚠️可考虑使用 - 良好平台",
+      "cycle_number": 39
+    }
+  ]
+}

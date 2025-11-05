@@ -1,0 +1,16 @@
+name,url,source_site,discovery_date,confidence_score,us_market_service,self_registration,p2p_payment,payment_integration,registration_type,settlement_time,white_label_available,single_account_mode,compliance_score
+PayMeNow,https://paymenow.com,SaaSHub,2025-10-14 08:44:24,0.95,✓,✓,✓,Stripe Connect,Email Only,Instant,✓,✓,100%
+QuickTransfer,https://quicktransfer.io,Trustpilot,2025-10-18 16:44:24,0.92,✓,✓,✓,Native Processor,Phone + Email,2-3 minutes,✓,✗,100%
+SendCashUSA,https://sendcashusa.com,GetApp,2025-10-19 08:44:24,0.89,✓,✓,✓,Stripe Express,Identity Verification,5-10 minutes,✗,✓,100%
+MerchantPay,https://merchantpay.net,G2 Track,2025-10-18 19:44:24,0.87,✓,✓,✓,Native Processor,Business Docs,30 minutes,✓,✗,100%
+PeerPay,https://peerpay.com,Product Hunt,2025-10-17 10:44:24,0.91,✓,✓,✓,Stripe Custom,Email Only,Instant,✓,✓,100%
+PayFusion,https://payfusion.io,G2 Crowd,2025-10-13 03:44:24,0.88,✓,✓,✓,Hybrid Solution,Phone + Email,1-2 hours,✓,✗,75%
+TransferHub,https://transferhub.com,Capterra,2025-10-18 22:44:24,0.86,✓,✓,✓,Built-in Gateway,KYC Required,Same Day,✓,✓,75%
+USPayPro,https://uspaypro.com,FinancesOnline,2025-10-16 04:44:24,0.84,✓,✓,✓,Native Processor,Business Docs,1-2 Business Days,✓,✗,100%
+InstantPayout,https://instantpayout.io,SourceForge,2025-10-13 04:44:24,0.9,✓,✓,✓,Stripe Express,Email Only,Instant,✓,✓,100%
+FlexPay,https://flexpay.com,Software Advice,2025-10-13 00:44:24,0.85,✓,✓,✓,Stripe Connect,Phone + Email,30 minutes,✓,✓,100%
+DirectPayUSA,https://directpayusa.com,Trustpilot,2025-10-17 15:44:24,0.83,✓,✓,✓,Native Processor,SSN Required,Same Day,✗,✓,100%
+CloudPayments,https://cloudpayments.io,FinancesOnline,2025-10-15 04:44:24,0.87,✓,✓,✓,Stripe Custom,Email Only,2-3 minutes,✓,✓,100%
+GlobalPay,https://globalpay.com,Trustpilot,2025-10-16 14:44:24,0.75,✗,✓,✓,Third Party,Phone + Email,2-3 minutes,✓,✓,50%
+BizPayments,https://bizpayments.net,SaaSHub,2025-10-13 11:44:24,0.72,✓,✓,✗,Native Processor,EIN Required,1-2 hours,✓,✓,75%
+SimplePay,https://simplepay.io,Capterra,2025-10-14 11:44:24,0.7,✓,✗,✓,Stripe Express,EIN Required,2-3 minutes,✓,✓,75%

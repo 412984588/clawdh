@@ -1,0 +1,70 @@
+{
+  "data_sources": [
+    {
+      "name": "Stripe Connect目录",
+      "type": "支付处理器目录",
+      "priority": 1,
+      "status": "待使用",
+      "url": "https://stripe.com/connect/partners",
+      "last_used": null,
+      "platform_count": 0
+    },
+    {
+      "name": "PayPal Partners目录",
+      "type": "支付处理器目录",
+      "priority": 1,
+      "status": "待使用",
+      "url": "https://www.paypal.com/partners",
+      "last_used": null,
+      "platform_count": 0
+    },
+    {
+      "name": "Patreon替代品列表",
+      "type": "创作者平台聚合器",
+      "priority": 2,
+      "status": "待使用",
+      "url": "待搜索",
+      "last_used": null,
+      "platform_count": 0
+    },
+    {
+      "name": "Substack竞争者分析",
+      "type": "创作者平台聚合器",
+      "priority": 2,
+      "status": "待使用",
+      "url": "待搜索",
+      "last_used": null,
+      "platform_count": 0
+    },
+    {
+      "name": "众筹平台数据库",
+      "type": "众筹平台数据库",
+      "priority": 3,
+      "status": "待使用",
+      "url": "待搜索",
+      "last_used": null,
+      "platform_count": 0
+    },
+    {
+      "name": "GitHub支付相关项目",
+      "type": "开发者工具库",
+      "priority": 5,
+      "status": "待使用",
+      "url": "https://github.com",
+      "last_used": null,
+      "platform_count": 0
+    },
+    {
+      "name": "Product Hunt支付应用",
+      "type": "社区挖掘",
+      "priority": 7,
+      "status": "待使用",
+      "url": "https://producthunt.com",
+      "last_used": null,
+      "platform_count": 0
+    }
+  ],
+  "last_updated": "2025-11-01",
+  "total_sources": 7,
+  "version": "1.0"
+}

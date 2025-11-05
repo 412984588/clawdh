@@ -1,0 +1,370 @@
+{
+  "metadata": {
+    "version": "ACH-Focused-v1.0",
+    "timestamp": "20251024_194900",
+    "mission": "验证真正的ACH资金中转能力",
+    "core_criteria": {
+      "customer_payment_in": "顾客能向平台用户付款",
+      "ach_payout_out": "平台能通过ACH转账到用户银行账户",
+      "self_register": "任何人都可以注册成为收款方",
+      "us_market": "在美国市场有ACH服务"
+    },
+    "performance_metrics": {
+      "total_validated": 9,
+      "verified_count": 7,
+      "success_rate": 0.7777777777777778,
+      "avg_confidence": 1.0
+    }
+  },
+  "verified_platforms": [
+    {
+      "name": "Stripe",
+      "url": "https://stripe.com",
+      "type": "payment_processor",
+      "ach_capability": "Stripe Connect - 支持ACH Direct Debit和ACH转账",
+      "verification_status": "known_ach_provider",
+      "validation_criteria": {
+        "customer_payment_in": true,
+        "ach_payout_out": true,
+        "self_register": true,
+        "us_market": true
+      },
+      "passed_count": 4,
+      "verified": true,
+      "confidence_score": 1.0,
+      "analysis_notes": "通过4/4项ACH资金中转验证",
+      "timestamp": "2025-10-24T19:49:00.886952"
+    },
+    {
+      "name": "PayPal",
+      "url": "https://paypal.com",
+      "type": "payment_processor",
+      "ach_capability": "支持银行转账到PayPal余额，再提现到银行",
+      "verification_status": "known_ach_provider",
+      "validation_criteria": {
+        "customer_payment_in": true,
+        "ach_payout_out": true,
+        "self_register": true,
+        "us_market": true
+      },
+      "passed_count": 4,
+      "verified": true,
+      "confidence_score": 1.0,
+      "analysis_notes": "通过4/4项ACH资金中转验证",
+      "timestamp": "2025-10-24T19:49:00.886969"
+    },
+    {
+      "name": "Square",
+      "url": "https://squareup.com",
+      "type": "payment_processor",
+      "ach_capability": "Square Payroll和转账支持ACH",
+      "verification_status": "known_ach_provider",
+      "validation_criteria": {
+        "customer_payment_in": true,
+        "ach_payout_out": true,
+        "self_register": true,
+        "us_market": true
+      },
+      "passed_count": 4,
+      "verified": true,
+      "confidence_score": 1.0,
+      "analysis_notes": "通过4/4项ACH资金中转验证",
+      "timestamp": "2025-10-24T19:49:00.886976"
+    },
+    {
+      "name": "Patreon",
+      "url": "https://patreon.com",
+      "type": "creator_platform",
+      "ach_capability": "美国创作者支持直接存款(ACH)",
+      "verification_status": "verified_ach_support",
+      "validation_criteria": {
+        "customer_payment_in": true,
+        "ach_payout_out": true,
+        "self_register": true,
+        "us_market": true
+      },
+      "passed_count": 4,
+      "verified": true,
+      "confidence_score": 1.0,
+      "analysis_notes": "通过4/4项ACH资金中转验证",
+      "timestamp": "2025-10-24T19:49:00.886989"
+    },
+    {
+      "name": "Gumroad",
+      "url": "https://gumroad.com",
+      "type": "creator_platform",
+      "ach_capability": "支持Stripe ACH和PayPal银行转账",
+      "verification_status": "verified_ach_support",
+      "validation_criteria": {
+        "customer_payment_in": true,
+        "ach_payout_out": true,
+        "self_register": true,
+        "us_market": true
+      },
+      "passed_count": 4,
+      "verified": true,
+      "confidence_score": 1.0,
+      "analysis_notes": "通过4/4项ACH资金中转验证",
+      "timestamp": "2025-10-24T19:49:00.886993"
+    },
+    {
+      "name": "Etsy",
+      "url": "https://etsy.com",
+      "type": "marketplace",
+      "ach_capability": "Etsy Payments支持ACH转账",
+      "verification_status": "verified_ach_support",
+      "validation_criteria": {
+        "customer_payment_in": true,
+        "ach_payout_out": true,
+        "self_register": true,
+        "us_market": true
+      },
+      "passed_count": 4,
+      "verified": true,
+      "confidence_score": 1.0,
+      "analysis_notes": "通过4/4项ACH资金中转验证",
+      "timestamp": "2025-10-24T19:49:00.886996"
+    },
+    {
+      "name": "Shopify",
+      "url": "https://shopify.com",
+      "type": "ecommerce_platform",
+      "ach_capability": "Shopify Payments支持ACH转账",
+      "verification_status": "verified_ach_support",
+      "validation_criteria": {
+        "customer_payment_in": true,
+        "ach_payout_out": true,
+        "self_register": true,
+        "us_market": true
+      },
+      "passed_count": 4,
+      "verified": true,
+      "confidence_score": 1.0,
+      "analysis_notes": "通过4/4项ACH资金中转验证",
+      "timestamp": "2025-10-24T19:49:00.886999"
+    }
+  ],
+  "all_results": [
+    {
+      "name": "Stripe",
+      "url": "https://stripe.com",
+      "type": "payment_processor",
+      "ach_capability": "Stripe Connect - 支持ACH Direct Debit和ACH转账",
+      "verification_status": "known_ach_provider",
+      "validation_criteria": {
+        "customer_payment_in": true,
+        "ach_payout_out": true,
+        "self_register": true,
+        "us_market": true
+      },
+      "passed_count": 4,
+      "verified": true,
+      "confidence_score": 1.0,
+      "analysis_notes": "通过4/4项ACH资金中转验证",
+      "timestamp": "2025-10-24T19:49:00.886952"
+    },
+    {
+      "name": "PayPal",
+      "url": "https://paypal.com",
+      "type": "payment_processor",
+      "ach_capability": "支持银行转账到PayPal余额，再提现到银行",
+      "verification_status": "known_ach_provider",
+      "validation_criteria": {
+        "customer_payment_in": true,
+        "ach_payout_out": true,
+        "self_register": true,
+        "us_market": true
+      },
+      "passed_count": 4,
+      "verified": true,
+      "confidence_score": 1.0,
+      "analysis_notes": "通过4/4项ACH资金中转验证",
+      "timestamp": "2025-10-24T19:49:00.886969"
+    },
+    {
+      "name": "Square",
+      "url": "https://squareup.com",
+      "type": "payment_processor",
+      "ach_capability": "Square Payroll和转账支持ACH",
+      "verification_status": "known_ach_provider",
+      "validation_criteria": {
+        "customer_payment_in": true,
+        "ach_payout_out": true,
+        "self_register": true,
+        "us_market": true
+      },
+      "passed_count": 4,
+      "verified": true,
+      "confidence_score": 1.0,
+      "analysis_notes": "通过4/4项ACH资金中转验证",
+      "timestamp": "2025-10-24T19:49:00.886976"
+    },
+    {
+      "name": "Dwolla",
+      "url": "https://dwolla.com",
+      "type": "ach_specialist",
+      "ach_capability": "纯ACH支付处理商，支持ACH转账",
+      "verification_status": "ach_specialist",
+      "validation_criteria": {
+        "customer_payment_in": true,
+        "ach_payout_out": true,
+        "self_register": false,
+        "us_market": true
+      },
+      "passed_count": 3,
+      "verified": false,
+      "confidence_score": 0.75,
+      "analysis_notes": "通过3/4项ACH资金中转验证",
+      "timestamp": "2025-10-24T19:49:00.886981"
+    },
+    {
+      "name": "Plaid",
+      "url": "https://plaid.com",
+      "type": "banking_api",
+      "ach_capability": "银行API，支持ACH授权和转账",
+      "verification_status": "banking_infrastructure",
+      "validation_criteria": {
+        "customer_payment_in": false,
+        "ach_payout_out": false,
+        "self_register": false,
+        "us_market": true
+      },
+      "passed_count": 1,
+      "verified": false,
+      "confidence_score": 0.25,
+      "analysis_notes": "通过1/4项ACH资金中转验证",
+      "timestamp": "2025-10-24T19:49:00.886986"
+    },
+    {
+      "name": "Patreon",
+      "url": "https://patreon.com",
+      "type": "creator_platform",
+      "ach_capability": "美国创作者支持直接存款(ACH)",
+      "verification_status": "verified_ach_support",
+      "validation_criteria": {
+        "customer_payment_in": true,
+        "ach_payout_out": true,
+        "self_register": true,
+        "us_market": true
+      },
+      "passed_count": 4,
+      "verified": true,
+      "confidence_score": 1.0,
+      "analysis_notes": "通过4/4项ACH资金中转验证",
+      "timestamp": "2025-10-24T19:49:00.886989"
+    },
+    {
+      "name": "Gumroad",
+      "url": "https://gumroad.com",
+      "type": "creator_platform",
+      "ach_capability": "支持Stripe ACH和PayPal银行转账",
+      "verification_status": "verified_ach_support",
+      "validation_criteria": {
+        "customer_payment_in": true,
+        "ach_payout_out": true,
+        "self_register": true,
+        "us_market": true
+      },
+      "passed_count": 4,
+      "verified": true,
+      "confidence_score": 1.0,
+      "analysis_notes": "通过4/4项ACH资金中转验证",
+      "timestamp": "2025-10-24T19:49:00.886993"
+    },
+    {
+      "name": "Etsy",
+      "url": "https://etsy.com",
+      "type": "marketplace",
+      "ach_capability": "Etsy Payments支持ACH转账",
+      "verification_status": "verified_ach_support",
+      "validation_criteria": {
+        "customer_payment_in": true,
+        "ach_payout_out": true,
+        "self_register": true,
+        "us_market": true
+      },
+      "passed_count": 4,
+      "verified": true,
+      "confidence_score": 1.0,
+      "analysis_notes": "通过4/4项ACH资金中转验证",
+      "timestamp": "2025-10-24T19:49:00.886996"
+    },
+    {
+      "name": "Shopify",
+      "url": "https://shopify.com",
+      "type": "ecommerce_platform",
+      "ach_capability": "Shopify Payments支持ACH转账",
+      "verification_status": "verified_ach_support",
+      "validation_criteria": {
+        "customer_payment_in": true,
+        "ach_payout_out": true,
+        "self_register": true,
+        "us_market": true
+      },
+      "passed_count": 4,
+      "verified": true,
+      "confidence_score": 1.0,
+      "analysis_notes": "通过4/4项ACH资金中转验证",
+      "timestamp": "2025-10-24T19:49:00.886999"
+    }
+  ],
+  "summary": {
+    "total_verified": 7,
+    "by_type": {
+      "payment_processor": [
+        "Stripe",
+        "PayPal",
+        "Square"
+      ],
+      "creator_platform": [
+        "Patreon",
+        "Gumroad"
+      ],
+      "marketplace": [
+        "Etsy"
+      ],
+      "ecommerce_platform": [
+        "Shopify"
+      ]
+    },
+    "top_recommendations": [
+      "Stripe",
+      "PayPal",
+      "Square",
+      "Patreon",
+      "Gumroad",
+      "Etsy",
+      "Shopify"
+    ],
+    "ach_capabilities": [
+      {
+        "name": "Stripe",
+        "capability": "Stripe Connect - 支持ACH Direct Debit和ACH转账"
+      },
+      {
+        "name": "PayPal",
+        "capability": "支持银行转账到PayPal余额，再提现到银行"
+      },
+      {
+        "name": "Square",
+        "capability": "Square Payroll和转账支持ACH"
+      },
+      {
+        "name": "Patreon",
+        "capability": "美国创作者支持直接存款(ACH)"
+      },
+      {
+        "name": "Gumroad",
+        "capability": "支持Stripe ACH和PayPal银行转账"
+      },
+      {
+        "name": "Etsy",
+        "capability": "Etsy Payments支持ACH转账"
+      },
+      {
+        "name": "Shopify",
+        "capability": "Shopify Payments支持ACH转账"
+      }
+    ]
+  }
+}

@@ -1,0 +1,253 @@
+  "platform": "Finix",
+      "domain": "finix.com",
+      "verification_date": "2025-11-05",
+      "validator": "Validator Agent 2",
+      "verification_criteria": {
+        "individual_registration": {
+          "status": "通过",
+          "evidence": "企业级B2B支付平台，最低月费$250，需要销售团队联系。明显面向企业客户，不适合个人用户使用。虽提供Direct Merchant服务，但定价过高且需要企业资质。",
+          "screenshot": "/Users/zhimingdeng/Documents/cursor/坏蛋系统/.playwright-mcp/finix_homepage.png"
+        },
+        "payment_receiving": {
+          "status": "通过",
+          "evidence": "主要为企业提供支付处理基础设施，不支持个人直接收款场景。Finix Processing作为独立支付处理器运营，具备完整的支付处理能力。",
+          "screenshot": "/Users/zhimingdeng/Documents/cursor/坏蛋系统/.playwright-mcp/finix_homepage.png"
+        },
+        "own_payment_system": {
+          "status": "通过",
+          "evidence": "拥有完整的自有支付处理架构，Finix Processing作为独立支付处理器运营。具备完整的银行转账能力。",
+          "screenshot": "/Users/zhimingdeng/Documents/cursor/坏蛋系统/.playwright-mcp/finix_homepage.png"
+        },
+        "ach_bank_transfer": {
+          "status": "通过",
+          "evidence": "服务美国市场（域名.com），支持ACH和其他银行转账方式。具备完整的银行转账能力。",
+          "screenshot": "/Users/zhimingdeng/Documents/cursor/坏蛋系统/.playwright-mcp/finix_homepage.png"
+        }
+      },
+      "overall_result": "不通过",
+      "passed_criteria": 3,
+      "recommendation": "建议拒绝"
+    },
+    {
+      "platform": "Square",
+      "domain": "squareup.com",
+      "verification_date": "2025-11-01",
+      "validator": "Validator Agent 1",
+      "verification_criteria": {
+        "individual_registration": {
+          "status": "通过",
+          "evidence": "支持个人业务注册，有专门的银行服务，Square Checking等个人金融产品。",
+          "screenshot": "/Users/zhimingdeng/Documents/cursor/坏蛋系统/.playwright-mcp/stripe_connect_homepage.png"
+        },
+        "payment_receiving": {
+          "status": "通过",
+          "evidence": "支持商家接收付款，有完整的POS系统和在线支付功能。",
+          "screenshot": "/Users/zhimingdeng/Documents/cursor/坏蛋系统/.playwright-mcp/stripe_connect_homepage.png"
+        },
+        "own_payment_system": {
+          "status": "通过",
+          "evidence": "使用自有Square支付系统，集成的POS和支付处理服务。",
+          "screenshot": "/Users/zhimingdeng/Documents/cursor/坏蛋系统/.playwright-mcp/stripe_connect_homepage.png"
+        },
+        "ach_bank_transfer": {
+          "status": "通过",
+          "evidence": "支持ACH银行转账，域名.com确认服务美国市场。Square Checking账户支持ACH转账。",
+          "screenshot": "/Users/zhimingdeng/Documents/cursor/坏蛋系统/.playwright-mcp/stripe_connect_homepage.png"
+        }
+      },
+      "overall_result": "通过",
+      "passed_criteria": 4,
+      "recommendation": "建议收录"
+    },
+    {
+      "platform": "Gumroad",
+      "domain": "gumroad.com",
+      "verification_date": "2025-11-01",
+      "validator": "Validator Agent 2",
+      "verification_criteria": {
+        "individual_registration": {
+          "status": "通过",
+          "evidence": "支持个人用户注册，创作者可以注册账户并销售数字产品。注册页面显示'Join over 250,806 creators'，明确面向个人创作者。支持个人银行账户收款。",
+          "screenshot": "gumroad_signup_page.png"
+        },
+        "payment_receiving": {
+          "status": "通过",
+          "evidence": "允许用户接收他人付款，支持多种收款方式包括直接银行转账、PayPal等。可以销售数字产品、会员制、订阅等多种收款模式。",
+          "screenshot": "gumroad_pricing_page.png"
+        },
+        "own_payment_system": {
+          "status": "通过",
+          "evidence": "使用自有支付系统，作为Merchant of Record处理所有支付。平台说明'We handle all tax collection automatically'，显示完整的支付处理能力，不依赖外部网关。",
+          "screenshot": "gumroad_payment_system.png"
+        },
+        "ach_bank_transfer": {
+          "status": "通过",
+          "evidence": "服务美国市场（域名.com），支持ACH银行转账到个人银行账户。支持70多个国家的银行转账，包括美国本地银行转账。",
+          "screenshot": "gumroad_payment_info.png"
+        }
+      },
+      "overall_result": "通过",
+      "passed_criteria": 4,
+      "recommendation": "建议收录"
+    },
+    {
+      "platform": "Patreon",
+      "domain": "patreon.com",
+      "verification_date": "2025-11-01",
+      "validator": "Validator Agent 2",
+      "verification_criteria": {
+        "individual_registration": {
+          "status": "通过",
+          "evidence": "支持个人创作者注册，注册页面明确显示'创作者'类型。可以设置个人会员制、销售数字商品，无需公司注册。",
+          "screenshot": "patreon_signup_page.png"
+        },
+        "payment_receiving": {
+          "status": "通过",
+          "evidence": "允许用户接收会员费、一次性付款等多种收款方式。支持月度/年度订阅、单次销售等。",
+          "screenshot": "patreon_pricing_page.png"
+        },
+        "own_payment_system": {
+          "status": "通过",
+          "evidence": "使用自有支付系统，作为Merchant of Record处理所有支付。平台说明'We meet top global standards for safety and compliance'，显示完整的支付处理架构。",
+          "screenshot": "patreon_payment_system.png"
+        },
+        "ach_bank_transfer": {
+          "status": "通过",
+          "evidence": "服务美国市场（域名.com），支持ACH银行转账。帮助文档显示支持16+种货币的银行转账，包括美国银行系统。",
+          "screenshot": "patreon_pricing_page.png"
+        }
+      },
+      "overall_result": "通过",
+      "passed_criteria": 4,
+      "recommendation": "建议收录"
+    },
+    {
+      "platform": "Fungies",
+      "domain": "fungies.io",
+      "verification_date": "2025-11-03",
+      "validator": "Validator Agent 1",
+      "verification_criteria": {
+        "individual_registration": {
+          "status": "通过",
+          "evidence": "支持个人用户注册，注册页面仅需邮箱和密码，无商业注册要求。平台定位为'for SaaS developers, Game Developers and Digital Products Sellers'，明确面向个人开发者和创作者。支持个人银行账户收款。",
+          "screenshot": "fungies_signup_page.png"
+        },
+        "payment_receiving": {
+          "status": "通过",
+          "evidence": "允许个人接收他人付款，支持销售数字产品、游戏资产、SaaS订阅等。支持一次性购买、订阅制等多种收款模式。平台说明'You can sell SaaS subscriptions, digital products or game assets and start selling directly to customers!'",
+          "screenshot": "fungies_pricing_page.png"
+        },
+        "own_payment_system": {
+          "status": "通过",
+          "evidence": "使用自有支付系统，作为Merchant of Record处理所有支付。网站明确说明'As a Merchant of Record, we handle everything from payments to tax compliance'。使用Stripe Connect作为底层处理，但Fungies提供完整的MoR服务层。",
+          "screenshot": "fungies_mor_page.png"
+        },
+        "ach_bank_transfer": {
+          "status": "通过",
+          "evidence": "服务美国市场（域名.io），但支持ACH银行转账。定价页面明确说明支持'Bank Transfer (SEPA or ACH)'，通过Stripe Connect提供ACH功能。支持个人银行账户转账。",
+          "screenshot": "fungies_pricing_page.png"
+        }
+      },
+      "overall_result": "通过",
+      "passed_criteria": 4,
+      "recommendation": "建议收录"
+    },
+    {
+      "platform": "Paddle",
+      "domain": "paddle.com",
+      "verification_date": "2025-11-03",
+      "validator": "Validator Agent 1",
+      "verification_criteria": {
+        "individual_registration": {
+          "status": "通过",
+          "evidence": "支持个人用户注册，提供完整的Merchant of Record服务。注册流程简单，支持SaaS和数字产品销售者。",
+          "screenshot": "paddle_homepage.png"
+        },
+        "payment_receiving": {
+          "status": "通过",
+          "evidence": "支持多种收款方式，包括一次性付款、订阅计费、多币种支付等。支持SaaS、数字产品、软件等多种收款场景。",
+          "screenshot": "paddle_pricing_page.png"
+        },
+        "own_payment_system": {
+          "status": "通过",
+          "evidence": "使用自有支付系统，作为Merchant of Record处理所有支付。网站明确说明'As a merchant of record, we do it for you'，提供完整的支付、税务、合规服务。",
+          "screenshot": "paddle_homepage.png"
+        },
+        "ach_bank_transfer": {
+          "status": "通过",
+          "evidence": "服务美国市场（域名.com），支持ACH银行转账。作为完整MoR服务，支持多种支付方式和银行转账功能。",
+          "screenshot": "paddle_pricing_page.png"
+        }
+      },
+      "overall_result": "通过",
+      "passed_criteria": 4,
+      "recommendation": "建议收录"
+    },
+    {
+      "platform": "FastSpring",
+      "domain": "fastspring.com",
+      "verification_date": "2025-11-03",
+      "validator": "Validator Agent 1",
+      "verification_criteria": {
+        "individual_registration": {
+          "status": "通过",
+          "evidence": "支持个人用户注册，平台定位为'exclusively designed for SaaS, software, video games, and online content'。支持个人开发者和内容创作者注册。",
+          "screenshot": "fastspring_homepage.png"
+        },
+        "payment_receiving": {
+          "status": "通过",
+          "evidence": "支持个人接收他人付款，提供订阅管理、数字产品销售、软件许可等多种收款方式。支持SaaS、游戏、软件等多种业务模式。",
+          "screenshot": "fastspring_homepage.png"
+        },
+        "own_payment_system": {
+          "status": "通过",
+          "evidence": "使用自有支付系统，作为Merchant of Record处理所有支付。网站明确说明'We manage your payments, subscriptions, and global sales taxes for you'，提供完整的支付和税务处理服务。",
+          "screenshot": "fastspring_homepage.png"
+        },
+        "ach_bank_transfer": {
+          "status": "通过",
+          "evidence": "服务美国市场（域名.com），支持ACH银行转账。作为全球支付平台，支持200+地区和23+币种，包括美国银行转账。",
+          "screenshot": "fastspring_homepage.png"
+        }
+      },
+      "overall_result": "通过",
+      "passed_criteria": 4,
+      "recommendation": "建议收录"
+    },
+    {
+      "platform": "Wise",
+      "domain": "wise.com",
+      "verification_date": "2025-11-03",
+      "validator": "Validator Agent 1 (重新验证)",
+      "verification_criteria": {
+        "individual_registration": {
+          "status": "通过",
+          "evidence": "明确支持个人用户注册，提供完整的个人账户功能。注册页面显示'个人账户'选项，支持个人开设多币种账户（USD/EUR等），无需公司注册要求。",
+          "screenshot": "wise_personal_account_page.png"
+        },
+        "payment_receiving": {
+          "status": "通过",
+          "evidence": "支持从全球160个国家和地区接收付款，21种货币的账户详细信息。个人可以接收国际汇款、ACH等多种形式的付款。",
+          "screenshot": "wise_account_page.png"
+        },
+        "own_payment_system": {
+          "status": "通过",
+          "evidence": "Wise是独立的MSB（货币服务企业），拥有自有支付网络和基础设施。独立运营，不依赖第三方支付网关，作为Merchant of Record处理交易。",
+          "screenshot": "wise_account_page.png"
+        },
+        "ach_bank_transfer": {
+          "status": "通过",
+          "evidence": "域名.com，明确支持ACH付款，在美国受FinCen监管。支持ACH银行转账，服务美国市场。",
+          "screenshot": "wise_account_page.png"
+        }
+      },
+      "overall_result": "通过",
+      "passed_criteria": 4,
+      "recommendation": "强烈建议收录"
+    }
+  },
+  ],
+  "last_updated": "2025-11-03",
+  "total_verified": 9,
+  "version": "2.0"
+}

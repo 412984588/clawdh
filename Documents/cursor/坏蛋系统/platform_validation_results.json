@@ -1,0 +1,2203 @@
+{
+  "metadata": {
+    "version": "IntelligentCoordinator v3.0",
+    "total_results": 3,
+    "cumulative_verified": 3,
+    "cumulative_success_rate": 1.0,
+    "last_cycle": 58
+  },
+  "cycles": [
+    {
+      "cycle": 1,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Etsy",
+          "domain": "etsy.com",
+          "confidence": 0.89
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        }
+      ],
+      "high_potential": 1,
+      "validated": 0,
+      "timestamp": "2025-10-27T15:51:32.015729",
+      "success_rate": 0.0
+    },
+    {
+      "cycle": 1,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Etsy",
+          "domain": "etsy.com",
+          "confidence": 0.89
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        }
+      ],
+      "high_potential": 1,
+      "validated": 0,
+      "timestamp": "2025-10-27T15:56:49.680092",
+      "success_rate": 0.0
+    },
+    {
+      "cycle": 1,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Etsy",
+          "domain": "etsy.com",
+          "confidence": 0.89
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        }
+      ],
+      "high_potential": 1,
+      "validated": 0,
+      "timestamp": "2025-10-27T15:57:33.811594",
+      "success_rate": 0.0
+    },
+    {
+      "cycle": 1,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Etsy",
+          "domain": "etsy.com",
+          "confidence": 0.89
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        }
+      ],
+      "high_potential": 1,
+      "validated": 0,
+      "timestamp": "2025-10-27T15:59:13.451309",
+      "success_rate": 0.0
+    },
+    {
+      "cycle": 2,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        }
+      ],
+      "high_potential": 0,
+      "validated": 0,
+      "timestamp": "2025-10-27T15:59:20.428578",
+      "success_rate": 0.0
+    },
+    {
+      "cycle": 1,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Etsy",
+          "domain": "etsy.com",
+          "confidence": 0.89
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        },
+        {
+          "name": "Selt",
+          "domain": "selt.co",
+          "confidence": 0.83
+        },
+        {
+          "name": "Shopifyle",
+          "domain": "shopifyle.com",
+          "confidence": 0.71
+        },
+        {
+          "name": "Ghost",
+          "domain": "ghost.org",
+          "confidence": 0.81
+        }
+      ],
+      "high_potential": 3,
+      "validated": 0,
+      "timestamp": "2025-10-27T16:00:34.940152",
+      "success_rate": 0.0
+    },
+    {
+      "cycle": 2,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        },
+        {
+          "name": "Buy Me a Coffee",
+          "domain": "buymeacoffee.com",
+          "confidence": 0.94
+        },
+        {
+          "name": "Ghost",
+          "domain": "ghost.org",
+          "confidence": 0.84
+        },
+        {
+          "name": "Squarespace",
+          "domain": "squarespace.com",
+          "confidence": 0.88
+        }
+      ],
+      "high_potential": 0,
+      "validated": 0,
+      "timestamp": "2025-10-27T16:00:43.460458",
+      "success_rate": 0.0
+    },
+    {
+      "cycle": 3,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        },
+        {
+          "name": "Buy Me a Coffee",
+          "domain": "buymeacoffee.com",
+          "confidence": 0.94
+        },
+        {
+          "name": "Revue",
+          "domain": "revue.co",
+          "confidence": 0.76
+        },
+        {
+          "name": "Squarespace",
+          "domain": "squarespace.com",
+          "confidence": 0.88
+        }
+      ],
+      "high_potential": 1,
+      "validated": 0,
+      "timestamp": "2025-10-27T16:00:52.423424",
+      "success_rate": 0.0
+    },
+    {
+      "cycle": 4,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        },
+        {
+          "name": "Ghost",
+          "domain": "ghost.org",
+          "confidence": 0.81
+        }
+      ],
+      "high_potential": 0,
+      "validated": 0,
+      "timestamp": "2025-10-27T16:01:00.935031",
+      "success_rate": 0.0
+    },
+    {
+      "cycle": 5,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        },
+        {
+          "name": "Wix",
+          "domain": "wix.com",
+          "confidence": 0.85
+        }
+      ],
+      "high_potential": 0,
+      "validated": 0,
+      "timestamp": "2025-10-27T16:01:10.374007",
+      "success_rate": 0.0
+    },
+    {
+      "cycle": 6,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        },
+        {
+          "name": "Buy Me a Coffee",
+          "domain": "buymeacoffee.com",
+          "confidence": 0.94
+        },
+        {
+          "name": "Ghost",
+          "domain": "ghost.org",
+          "confidence": 0.84
+        },
+        {
+          "name": "BigCommerce",
+          "domain": "bigcommerce.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "Big Cartel",
+          "domain": "bigcartel.com",
+          "confidence": 0.73
+        }
+      ],
+      "high_potential": 0,
+      "validated": 0,
+      "timestamp": "2025-10-27T16:01:20.076326",
+      "success_rate": 0.0
+    },
+    {
+      "cycle": 7,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        },
+        {
+          "name": "Ko-fi",
+          "domain": "ko-fi.com",
+          "confidence": 0.91
+        },
+        {
+          "name": "Ghost",
+          "domain": "ghost.org",
+          "confidence": 0.84
+        },
+        {
+          "name": "BigCommerce",
+          "domain": "bigcommerce.com",
+          "confidence": 0.82
+        }
+      ],
+      "high_potential": 1,
+      "validated": 0,
+      "timestamp": "2025-10-27T16:01:29.265831",
+      "success_rate": 0.0
+    },
+    {
+      "cycle": 8,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        },
+        {
+          "name": "Ghost",
+          "domain": "ghost.org",
+          "confidence": 0.81
+        }
+      ],
+      "high_potential": 0,
+      "validated": 0,
+      "timestamp": "2025-10-27T16:01:36.528979",
+      "success_rate": 0.0
+    },
+    {
+      "cycle": 9,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        },
+        {
+          "name": "Buy Me a Coffee",
+          "domain": "buymeacoffee.com",
+          "confidence": 0.94
+        }
+      ],
+      "high_potential": 0,
+      "validated": 0,
+      "timestamp": "2025-10-27T16:01:43.614082",
+      "success_rate": 0.0
+    },
+    {
+      "cycle": 10,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        },
+        {
+          "name": "Wix",
+          "domain": "wix.com",
+          "confidence": 0.85
+        }
+      ],
+      "high_potential": 0,
+      "validated": 0,
+      "timestamp": "2025-10-27T16:01:50.190031",
+      "success_rate": 0.0
+    },
+    {
+      "cycle": 1,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Etsy",
+          "domain": "etsy.com",
+          "confidence": 0.89
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        },
+        {
+          "name": "Selt",
+          "domain": "selt.co",
+          "confidence": 0.83
+        },
+        {
+          "name": "Buy Me a Coffee",
+          "domain": "buymeacoffee.com",
+          "confidence": 0.94
+        },
+        {
+          "name": "Beehiiv",
+          "domain": "beehiiv.com",
+          "confidence": 0.78
+        },
+        {
+          "name": "Shopifyle",
+          "domain": "shopifyle.com",
+          "confidence": 0.71
+        }
+      ],
+      "high_potential": 3,
+      "validated": 0,
+      "timestamp": "2025-10-27T16:03:05.736222",
+      "success_rate": 0.0
+    },
+    {
+      "cycle": 2,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        },
+        {
+          "name": "Ghost",
+          "domain": "ghost.org",
+          "confidence": 0.84
+        },
+        {
+          "name": "Ghost",
+          "domain": "ghost.org",
+          "confidence": 0.81
+        }
+      ],
+      "high_potential": 0,
+      "validated": 0,
+      "timestamp": "2025-10-27T16:03:14.459452",
+      "success_rate": 0.0
+    },
+    {
+      "cycle": 3,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        },
+        {
+          "name": "Ko-fi",
+          "domain": "ko-fi.com",
+          "confidence": 0.91
+        },
+        {
+          "name": "Ghost",
+          "domain": "ghost.org",
+          "confidence": 0.81
+        }
+      ],
+      "high_potential": 1,
+      "validated": 0,
+      "timestamp": "2025-10-27T16:03:23.492580",
+      "success_rate": 0.0
+    },
+    {
+      "cycle": 4,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        },
+        {
+          "name": "Revue",
+          "domain": "revue.co",
+          "confidence": 0.76
+        },
+        {
+          "name": "Big Cartel",
+          "domain": "bigcartel.com",
+          "confidence": 0.73
+        }
+      ],
+      "high_potential": 1,
+      "validated": 0,
+      "timestamp": "2025-10-27T16:03:33.085254",
+      "success_rate": 0.0
+    },
+    {
+      "cycle": 5,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        },
+        {
+          "name": "Buy Me a Coffee",
+          "domain": "buymeacoffee.com",
+          "confidence": 0.94
+        },
+        {
+          "name": "Big Cartel",
+          "domain": "bigcartel.com",
+          "confidence": 0.73
+        }
+      ],
+      "high_potential": 0,
+      "validated": 0,
+      "timestamp": "2025-10-27T16:03:41.988325",
+      "success_rate": 0.0
+    },
+    {
+      "cycle": 6,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        },
+        {
+          "name": "Ghost",
+          "domain": "ghost.org",
+          "confidence": 0.81
+        }
+      ],
+      "high_potential": 0,
+      "validated": 0,
+      "timestamp": "2025-10-27T16:03:49.702751",
+      "success_rate": 0.0
+    },
+    {
+      "cycle": 7,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        },
+        {
+          "name": "Beehiiv",
+          "domain": "beehiiv.com",
+          "confidence": 0.78
+        },
+        {
+          "name": "BigCommerce",
+          "domain": "bigcommerce.com",
+          "confidence": 0.82
+        }
+      ],
+      "high_potential": 0,
+      "validated": 0,
+      "timestamp": "2025-10-27T16:03:58.564150",
+      "success_rate": 0.0
+    },
+    {
+      "cycle": 8,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        },
+        {
+          "name": "Wix",
+          "domain": "wix.com",
+          "confidence": 0.85
+        }
+      ],
+      "high_potential": 0,
+      "validated": 0,
+      "timestamp": "2025-10-27T16:04:06.307865",
+      "success_rate": 0.0
+    },
+    {
+      "cycle": 1,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Etsy",
+          "domain": "etsy.com",
+          "confidence": 0.89
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        },
+        {
+          "name": "Selt",
+          "domain": "selt.co",
+          "confidence": 0.83
+        },
+        {
+          "name": "Buy Me a Coffee",
+          "domain": "buymeacoffee.com",
+          "confidence": 0.94
+        },
+        {
+          "name": "Ghost",
+          "domain": "ghost.org",
+          "confidence": 0.81
+        }
+      ],
+      "high_potential": 2,
+      "validated": 0,
+      "timestamp": "2025-10-27T16:14:21.168803",
+      "success_rate": 0.0
+    },
+    {
+      "cycle": 2,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        },
+        {
+          "name": "Ko-fi",
+          "domain": "ko-fi.com",
+          "confidence": 0.91
+        },
+        {
+          "name": "Shopifyle",
+          "domain": "shopifyle.com",
+          "confidence": 0.71
+        }
+      ],
+      "high_potential": 2,
+      "validated": 0,
+      "timestamp": "2025-10-27T16:14:29.980496",
+      "success_rate": 0.0
+    },
+    {
+      "cycle": 3,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        },
+        {
+          "name": "Ghost",
+          "domain": "ghost.org",
+          "confidence": 0.84
+        }
+      ],
+      "high_potential": 0,
+      "validated": 0,
+      "timestamp": "2025-10-27T16:14:37.435399",
+      "success_rate": 0.0
+    },
+    {
+      "cycle": 4,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        },
+        {
+          "name": "Ghost",
+          "domain": "ghost.org",
+          "confidence": 0.84
+        },
+        {
+          "name": "Squarespace",
+          "domain": "squarespace.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Big Cartel",
+          "domain": "bigcartel.com",
+          "confidence": 0.73
+        }
+      ],
+      "high_potential": 0,
+      "validated": 0,
+      "timestamp": "2025-10-27T16:14:45.799626",
+      "success_rate": 0.0
+    },
+    {
+      "cycle": 5,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        },
+        {
+          "name": "Squarespace",
+          "domain": "squarespace.com",
+          "confidence": 0.88
+        }
+      ],
+      "high_potential": 0,
+      "validated": 0,
+      "timestamp": "2025-10-27T16:14:53.162954",
+      "success_rate": 0.0
+    },
+    {
+      "cycle": 6,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        },
+        {
+          "name": "Buy Me a Coffee",
+          "domain": "buymeacoffee.com",
+          "confidence": 0.94
+        },
+        {
+          "name": "Squarespace",
+          "domain": "squarespace.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Big Cartel",
+          "domain": "bigcartel.com",
+          "confidence": 0.73
+        }
+      ],
+      "high_potential": 0,
+      "validated": 0,
+      "timestamp": "2025-10-27T16:15:01.778359",
+      "success_rate": 0.0
+    },
+    {
+      "cycle": 7,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        },
+        {
+          "name": "Buy Me a Coffee",
+          "domain": "buymeacoffee.com",
+          "confidence": 0.94
+        },
+        {
+          "name": "Beehiiv",
+          "domain": "beehiiv.com",
+          "confidence": 0.78
+        }
+      ],
+      "high_potential": 0,
+      "validated": 0,
+      "timestamp": "2025-10-27T16:15:09.885094",
+      "success_rate": 0.0
+    },
+    {
+      "cycle": 8,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        },
+        {
+          "name": "Ghost",
+          "domain": "ghost.org",
+          "confidence": 0.81
+        }
+      ],
+      "high_potential": 0,
+      "validated": 0,
+      "timestamp": "2025-10-27T16:15:17.348569",
+      "success_rate": 0.0
+    },
+    {
+      "cycle": 9,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        },
+        {
+          "name": "Ghost",
+          "domain": "ghost.org",
+          "confidence": 0.81
+        }
+      ],
+      "high_potential": 0,
+      "validated": 0,
+      "timestamp": "2025-10-27T16:15:23.738494",
+      "success_rate": 0.0
+    },
+    {
+      "cycle": 10,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        },
+        {
+          "name": "Buy Me a Coffee",
+          "domain": "buymeacoffee.com",
+          "confidence": 0.94
+        },
+        {
+          "name": "Beehiiv",
+          "domain": "beehiiv.com",
+          "confidence": 0.78
+        }
+      ],
+      "high_potential": 0,
+      "validated": 0,
+      "timestamp": "2025-10-27T16:15:31.007041",
+      "success_rate": 0.0
+    },
+    {
+      "cycle": 1,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Etsy",
+          "domain": "etsy.com",
+          "confidence": 0.89
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        },
+        {
+          "name": "Selt",
+          "domain": "selt.co",
+          "confidence": 0.83
+        },
+        {
+          "name": "Buy Me a Coffee",
+          "domain": "buymeacoffee.com",
+          "confidence": 0.94
+        },
+        {
+          "name": "Big Cartel",
+          "domain": "bigcartel.com",
+          "confidence": 0.73
+        }
+      ],
+      "high_potential": 2,
+      "validated": 1,
+      "timestamp": "2025-10-27T16:16:43.303181",
+      "success_rate": 1.0
+    },
+    {
+      "cycle": 2,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        },
+        {
+          "name": "Revue",
+          "domain": "revue.co",
+          "confidence": 0.76
+        },
+        {
+          "name": "Ghost",
+          "domain": "ghost.org",
+          "confidence": 0.81
+        }
+      ],
+      "high_potential": 1,
+      "validated": 0,
+      "timestamp": "2025-10-27T16:16:51.964637",
+      "success_rate": 1.0
+    },
+    {
+      "cycle": 3,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        },
+        {
+          "name": "Ghost",
+          "domain": "ghost.org",
+          "confidence": 0.84
+        },
+        {
+          "name": "Squarespace",
+          "domain": "squarespace.com",
+          "confidence": 0.88
+        }
+      ],
+      "high_potential": 0,
+      "validated": 0,
+      "timestamp": "2025-10-27T16:16:59.863224",
+      "success_rate": 1.0
+    },
+    {
+      "cycle": 4,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        },
+        {
+          "name": "Ko-fi",
+          "domain": "ko-fi.com",
+          "confidence": 0.91
+        },
+        {
+          "name": "Big Cartel",
+          "domain": "bigcartel.com",
+          "confidence": 0.73
+        }
+      ],
+      "high_potential": 1,
+      "validated": 1,
+      "timestamp": "2025-10-27T16:17:09.126326",
+      "success_rate": 1.0
+    },
+    {
+      "cycle": 5,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        },
+        {
+          "name": "Ghost",
+          "domain": "ghost.org",
+          "confidence": 0.81
+        }
+      ],
+      "high_potential": 0,
+      "validated": 0,
+      "timestamp": "2025-10-27T16:17:17.316430",
+      "success_rate": 1.0
+    },
+    {
+      "cycle": 6,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        },
+        {
+          "name": "Ghost",
+          "domain": "ghost.org",
+          "confidence": 0.81
+        }
+      ],
+      "high_potential": 0,
+      "validated": 0,
+      "timestamp": "2025-10-27T16:17:24.740198",
+      "success_rate": 1.0
+    },
+    {
+      "cycle": 7,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        },
+        {
+          "name": "Big Cartel",
+          "domain": "bigcartel.com",
+          "confidence": 0.73
+        },
+        {
+          "name": "Ghost",
+          "domain": "ghost.org",
+          "confidence": 0.81
+        }
+      ],
+      "high_potential": 0,
+      "validated": 0,
+      "timestamp": "2025-10-27T16:17:33.779767",
+      "success_rate": 1.0
+    },
+    {
+      "cycle": 8,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        },
+        {
+          "name": "Ghost",
+          "domain": "ghost.org",
+          "confidence": 0.81
+        }
+      ],
+      "high_potential": 0,
+      "validated": 0,
+      "timestamp": "2025-10-27T16:17:41.537055",
+      "success_rate": 1.0
+    },
+    {
+      "cycle": 9,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        },
+        {
+          "name": "Beehiiv",
+          "domain": "beehiiv.com",
+          "confidence": 0.78
+        },
+        {
+          "name": "Wix",
+          "domain": "wix.com",
+          "confidence": 0.85
+        }
+      ],
+      "high_potential": 0,
+      "validated": 0,
+      "timestamp": "2025-10-27T16:17:49.803847",
+      "success_rate": 1.0
+    },
+    {
+      "cycle": 10,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        },
+        {
+          "name": "Ghost",
+          "domain": "ghost.org",
+          "confidence": 0.81
+        }
+      ],
+      "high_potential": 0,
+      "validated": 0,
+      "timestamp": "2025-10-27T16:17:57.310115",
+      "success_rate": 1.0
+    },
+    {
+      "cycle": 1,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Etsy",
+          "domain": "etsy.com",
+          "confidence": 0.89
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        },
+        {
+          "name": "Selt",
+          "domain": "selt.co",
+          "confidence": 0.83
+        },
+        {
+          "name": "Buy Me a Coffee",
+          "domain": "buymeacoffee.com",
+          "confidence": 0.94
+        },
+        {
+          "name": "BigCommerce",
+          "domain": "bigcommerce.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "Shopifyle",
+          "domain": "shopifyle.com",
+          "confidence": 0.71
+        }
+      ],
+      "high_potential": 3,
+      "validated": 2,
+      "timestamp": "2025-10-27T16:18:45.029961",
+      "success_rate": 1.0
+    },
+    {
+      "cycle": 1,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Etsy",
+          "domain": "etsy.com",
+          "confidence": 0.89
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        },
+        {
+          "name": "Selt",
+          "domain": "selt.co",
+          "confidence": 0.83
+        }
+      ],
+      "high_potential": 2,
+      "validated": 1,
+      "timestamp": "2025-10-27T16:18:50.814396",
+      "success_rate": 1.0
+    },
+    {
+      "cycle": 2,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        },
+        {
+          "name": "Buy Me a Coffee",
+          "domain": "buymeacoffee.com",
+          "confidence": 0.94
+        },
+        {
+          "name": "Ghost",
+          "domain": "ghost.org",
+          "confidence": 0.84
+        },
+        {
+          "name": "Wix",
+          "domain": "wix.com",
+          "confidence": 0.85
+        }
+      ],
+      "high_potential": 0,
+      "validated": 0,
+      "timestamp": "2025-10-27T16:18:54.115332",
+      "success_rate": 1.0
+    },
+    {
+      "cycle": 2,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        }
+      ],
+      "high_potential": 0,
+      "validated": 0,
+      "timestamp": "2025-10-27T16:18:57.950775",
+      "success_rate": 1.0
+    },
+    {
+      "cycle": 3,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        },
+        {
+          "name": "Ko-fi",
+          "domain": "ko-fi.com",
+          "confidence": 0.91
+        },
+        {
+          "name": "BigCommerce",
+          "domain": "bigcommerce.com",
+          "confidence": 0.82
+        }
+      ],
+      "high_potential": 1,
+      "validated": 1,
+      "timestamp": "2025-10-27T16:19:03.210050",
+      "success_rate": 1.0
+    },
+    {
+      "cycle": 3,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        }
+      ],
+      "high_potential": 0,
+      "validated": 0,
+      "timestamp": "2025-10-27T16:19:03.987765",
+      "success_rate": 1.0
+    },
+    {
+      "cycle": 4,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        },
+        {
+          "name": "Revue",
+          "domain": "revue.co",
+          "confidence": 0.76
+        }
+      ],
+      "high_potential": 1,
+      "validated": 0,
+      "timestamp": "2025-10-27T16:19:10.808622",
+      "success_rate": 1.0
+    },
+    {
+      "cycle": 4,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        }
+      ],
+      "high_potential": 0,
+      "validated": 0,
+      "timestamp": "2025-10-27T16:19:11.551295",
+      "success_rate": 1.0
+    },
+    {
+      "cycle": 5,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        }
+      ],
+      "high_potential": 0,
+      "validated": 0,
+      "timestamp": "2025-10-27T16:19:17.696387",
+      "success_rate": 1.0
+    },
+    {
+      "cycle": 5,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        },
+        {
+          "name": "Beehiiv",
+          "domain": "beehiiv.com",
+          "confidence": 0.78
+        }
+      ],
+      "high_potential": 0,
+      "validated": 0,
+      "timestamp": "2025-10-27T16:19:18.311728",
+      "success_rate": 1.0
+    },
+    {
+      "cycle": 6,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        },
+        {
+          "name": "Ghost",
+          "domain": "ghost.org",
+          "confidence": 0.81
+        }
+      ],
+      "high_potential": 0,
+      "validated": 0,
+      "timestamp": "2025-10-27T16:19:25.234479",
+      "success_rate": 1.0
+    },
+    {
+      "cycle": 7,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        },
+        {
+          "name": "Ghost",
+          "domain": "ghost.org",
+          "confidence": 0.81
+        }
+      ],
+      "high_potential": 0,
+      "validated": 0,
+      "timestamp": "2025-10-27T16:19:32.717140",
+      "success_rate": 1.0
+    },
+    {
+      "cycle": 8,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        },
+        {
+          "name": "Beehiiv",
+          "domain": "beehiiv.com",
+          "confidence": 0.78
+        },
+        {
+          "name": "Ghost",
+          "domain": "ghost.org",
+          "confidence": 0.81
+        }
+      ],
+      "high_potential": 0,
+      "validated": 0,
+      "timestamp": "2025-10-27T16:19:39.702052",
+      "success_rate": 1.0
+    },
+    {
+      "cycle": 9,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        },
+        {
+          "name": "BigCommerce",
+          "domain": "bigcommerce.com",
+          "confidence": 0.82
+        }
+      ],
+      "high_potential": 0,
+      "validated": 0,
+      "timestamp": "2025-10-27T16:19:48.523240",
+      "success_rate": 1.0
+    },
+    {
+      "cycle": 10,
+      "discovery_candidates": [
+        {
+          "name": "ConvertKit",
+          "domain": "convertkit.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "AWeber",
+          "domain": "aweber.com",
+          "confidence": 0.82
+        },
+        {
+          "name": "MailerLite",
+          "domain": "mailerlite.com",
+          "confidence": 0.88
+        },
+        {
+          "name": "Shopify",
+          "domain": "shopify.com",
+          "confidence": 0.92
+        },
+        {
+          "name": "Wix",
+          "domain": "wix.com",
+          "confidence": 0.85
+        },
+        {
+          "name": "Ghost",
+          "domain": "ghost.org",
+          "confidence": 0.81
+        }
+      ],
+      "high_potential": 0,
+      "validated": 0,
+      "timestamp": "2025-10-27T16:19:55.498287",
+      "success_rate": 1.0
+    }
+  ]
+}

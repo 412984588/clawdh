@@ -1,0 +1,8 @@
+chargebee.com
+paddle.com
+lemonsqueezy.com
+gumroad.com
+buy.stripe.com
+razorpay.com
+mollie.com
+adyen.com

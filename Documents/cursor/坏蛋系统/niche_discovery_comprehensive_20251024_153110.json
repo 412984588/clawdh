@@ -1,0 +1,79 @@
+{
+  "discovery_time": "2025-10-24T15:31:10.224474",
+  "summary": {
+    "total_categories": 5,
+    "total_platforms": 0,
+    "total_verified": 0,
+    "overall_success_rate": 0,
+    "top_categories": [
+      [
+        "创作者经济",
+        {
+          "total": 0,
+          "verified": 0,
+          "success_rate": 0,
+          "avg_confidence": 0,
+          "ach_available": 0
+        }
+      ],
+      [
+        "B2B支付",
+        {
+          "total": 0,
+          "verified": 0,
+          "success_rate": 0,
+          "avg_confidence": 0,
+          "ach_available": 0
+        }
+      ],
+      [
+        "传统支付网关",
+        {
+          "total": 0,
+          "verified": 0,
+          "success_rate": 0,
+          "avg_confidence": 0,
+          "ach_available": 0
+        }
+      ]
+    ]
+  },
+  "category_details": {
+    "创作者经济": {
+      "total": 0,
+      "verified": 0,
+      "success_rate": 0,
+      "avg_confidence": 0,
+      "ach_available": 0
+    },
+    "B2B支付": {
+      "total": 0,
+      "verified": 0,
+      "success_rate": 0,
+      "avg_confidence": 0,
+      "ach_available": 0
+    },
+    "传统支付网关": {
+      "total": 0,
+      "verified": 0,
+      "success_rate": 0,
+      "avg_confidence": 0,
+      "ach_available": 0
+    },
+    "电商解决方案": {
+      "total": 0,
+      "verified": 0,
+      "success_rate": 0,
+      "avg_confidence": 0,
+      "ach_available": 0
+    },
+    "社群经济": {
+      "total": 0,
+      "verified": 0,
+      "success_rate": 0,
+      "avg_confidence": 0,
+      "ach_available": 0
+    }
+  },
+  "top_platforms": []
+}

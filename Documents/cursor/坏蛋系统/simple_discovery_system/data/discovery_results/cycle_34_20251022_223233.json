@@ -1,0 +1,487 @@
+{
+  "cycle_number": 34,
+  "cycle_start_time": "2025-10-22T21:59:48.891724",
+  "cycle_end_time": "2025-10-22T22:32:33.286459",
+  "platforms_verified": 5,
+  "summary": {
+    "perfect_platforms": 0,
+    "excellent_platforms": 0,
+    "good_platforms": 1,
+    "needs_improvement": 4,
+    "bank_features_count": 0,
+    "dual_features_count": 0,
+    "average_score": 25.0
+  },
+  "top_platforms": [
+    {
+      "platform_name": "bill.com",
+      "url": "https://www.bill.com",
+      "page_title": "BILL | Financial Operations Platform for Businesses & Firms",
+      "verification_time": "2025-10-22T22:32:05.889107",
+      "us_market_analysis": {
+        "ach_keyword_count": 12,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 4,
+        "total_indicators": 16,
+        "passed": true
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 6,
+        "signup_elements_count": 4,
+        "enterprise_keyword_count": 0,
+        "passed": true
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 5,
+        "sending_keyword_count": 1,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 20,
+        "api_docs_count": 8,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 1,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 1,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 50,
+      "criteria_met": [
+        "🇺🇸美国市场服务",
+        "🔑自注册功能"
+      ],
+      "recommendation": "⚠️可考虑使用 - 良好平台",
+      "cycle_number": 34
+    },
+    {
+      "platform_name": "gofundme.com",
+      "url": "https://www.gofundme.com",
+      "page_title": "GoFundMe | The #1 Crowdfunding and Fundraising Platform",
+      "verification_time": "2025-10-22T22:31:58.099275",
+      "us_market_analysis": {
+        "ach_keyword_count": 2,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 1,
+        "total_indicators": 3,
+        "passed": false
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 3,
+        "signup_elements_count": 2,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 11,
+        "sending_keyword_count": 0,
+        "passed": true
+      },
+      "integration_analysis": {
+        "api_keyword_count": 0,
+        "api_docs_count": 0,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 0,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 25,
+      "criteria_met": [
+        "💰收款能力"
+      ],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 34
+    },
+    {
+      "platform_name": "zohoinvoice.com",
+      "url": "https://www.zohoinvoice.com",
+      "page_title": "Free invoice maker for small businesses | Zoho Invoice",
+      "verification_time": "2025-10-22T22:32:09.065217",
+      "us_market_analysis": {
+        "ach_keyword_count": 3,
+        "has_us_pages": true,
+        "deep_us_keyword_count": 0,
+        "total_indicators": 13,
+        "passed": true
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 3,
+        "signup_elements_count": 2,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 2,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 7,
+        "api_docs_count": 2,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 0,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 25,
+      "criteria_met": [
+        "🇺🇸美国市场服务"
+      ],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 34
+    },
+    {
+      "platform_name": "appfolio.com",
+      "url": "https://www.appfolio.com",
+      "page_title": "AppFolio: Move Beyond Property Management Software",
+      "verification_time": "2025-10-22T22:32:24.927066",
+      "us_market_analysis": {
+        "ach_keyword_count": 4,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 1,
+        "total_indicators": 5,
+        "passed": true
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 1,
+        "signup_elements_count": 0,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 1,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 4,
+        "api_docs_count": 0,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 0,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 25,
+      "criteria_met": [
+        "🇺🇸美国市场服务"
+      ],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 34
+    },
+    {
+      "platform_name": "booksy.com",
+      "url": "https://www.booksy.com",
+      "page_title": "Booksy - hair stylists, barbers, beauticians... book appointments online!",
+      "verification_time": "2025-10-22T22:32:28.994337",
+      "us_market_analysis": {
+        "ach_keyword_count": 1,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 0,
+        "total_indicators": 1,
+        "passed": false
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 0,
+        "signup_elements_count": 0,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 1,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 0,
+        "api_docs_count": 0,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 1,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 1,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 0,
+      "criteria_met": [],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 34
+    }
+  ],
+  "detailed_results": [
+    {
+      "platform_name": "gofundme.com",
+      "url": "https://www.gofundme.com",
+      "page_title": "GoFundMe | The #1 Crowdfunding and Fundraising Platform",
+      "verification_time": "2025-10-22T22:31:58.099275",
+      "us_market_analysis": {
+        "ach_keyword_count": 2,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 1,
+        "total_indicators": 3,
+        "passed": false
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 3,
+        "signup_elements_count": 2,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 11,
+        "sending_keyword_count": 0,
+        "passed": true
+      },
+      "integration_analysis": {
+        "api_keyword_count": 0,
+        "api_docs_count": 0,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 0,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 25,
+      "criteria_met": [
+        "💰收款能力"
+      ],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 34
+    },
+    {
+      "platform_name": "bill.com",
+      "url": "https://www.bill.com",
+      "page_title": "BILL | Financial Operations Platform for Businesses & Firms",
+      "verification_time": "2025-10-22T22:32:05.889107",
+      "us_market_analysis": {
+        "ach_keyword_count": 12,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 4,
+        "total_indicators": 16,
+        "passed": true
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 6,
+        "signup_elements_count": 4,
+        "enterprise_keyword_count": 0,
+        "passed": true
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 5,
+        "sending_keyword_count": 1,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 20,
+        "api_docs_count": 8,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 1,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 1,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 50,
+      "criteria_met": [
+        "🇺🇸美国市场服务",
+        "🔑自注册功能"
+      ],
+      "recommendation": "⚠️可考虑使用 - 良好平台",
+      "cycle_number": 34
+    },
+    {
+      "platform_name": "zohoinvoice.com",
+      "url": "https://www.zohoinvoice.com",
+      "page_title": "Free invoice maker for small businesses | Zoho Invoice",
+      "verification_time": "2025-10-22T22:32:09.065217",
+      "us_market_analysis": {
+        "ach_keyword_count": 3,
+        "has_us_pages": true,
+        "deep_us_keyword_count": 0,
+        "total_indicators": 13,
+        "passed": true
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 3,
+        "signup_elements_count": 2,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 2,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 7,
+        "api_docs_count": 2,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 0,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 25,
+      "criteria_met": [
+        "🇺🇸美国市场服务"
+      ],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 34
+    },
+    {
+      "platform_name": "appfolio.com",
+      "url": "https://www.appfolio.com",
+      "page_title": "AppFolio: Move Beyond Property Management Software",
+      "verification_time": "2025-10-22T22:32:24.927066",
+      "us_market_analysis": {
+        "ach_keyword_count": 4,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 1,
+        "total_indicators": 5,
+        "passed": true
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 1,
+        "signup_elements_count": 0,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 1,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 4,
+        "api_docs_count": 0,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 0,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 25,
+      "criteria_met": [
+        "🇺🇸美国市场服务"
+      ],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 34
+    },
+    {
+      "platform_name": "booksy.com",
+      "url": "https://www.booksy.com",
+      "page_title": "Booksy - hair stylists, barbers, beauticians... book appointments online!",
+      "verification_time": "2025-10-22T22:32:28.994337",
+      "us_market_analysis": {
+        "ach_keyword_count": 1,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 0,
+        "total_indicators": 1,
+        "passed": false
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 0,
+        "signup_elements_count": 0,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 1,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 0,
+        "api_docs_count": 0,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 1,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 1,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 0,
+      "criteria_met": [],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 34
+    }
+  ]
+}

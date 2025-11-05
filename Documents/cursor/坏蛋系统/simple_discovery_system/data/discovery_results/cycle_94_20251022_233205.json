@@ -1,0 +1,479 @@
+{
+  "cycle_number": 94,
+  "cycle_start_time": "2025-10-22T21:59:48.891724",
+  "cycle_end_time": "2025-10-22T23:32:05.444609",
+  "platforms_verified": 5,
+  "summary": {
+    "perfect_platforms": 0,
+    "excellent_platforms": 0,
+    "good_platforms": 0,
+    "needs_improvement": 5,
+    "bank_features_count": 1,
+    "dual_features_count": 0,
+    "average_score": 11.0
+  },
+  "top_platforms": [
+    {
+      "platform_name": "paytm.com",
+      "url": "https://www.paytm.com",
+      "page_title": "Paytm: Secure & Fast UPI Payments, Recharge Mobile & Pay Bills",
+      "verification_time": "2025-10-22T23:32:00.459314",
+      "us_market_analysis": {
+        "ach_keyword_count": 19,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 7,
+        "total_indicators": 26,
+        "passed": true
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 3,
+        "signup_elements_count": 2,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 7,
+        "sending_keyword_count": 3,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 29,
+        "api_docs_count": 25,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 19,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": true,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 19,
+        "passed": true,
+        "feature_type": "💳信用卡/Apple Pay"
+      },
+      "final_score": 30,
+      "criteria_met": [
+        "🇺🇸美国市场服务",
+        "🏦银行功能"
+      ],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 94
+    },
+    {
+      "platform_name": "fetchapp.com",
+      "url": "https://www.fetchapp.com",
+      "page_title": "FetchApp",
+      "verification_time": "2025-10-22T23:31:44.544859",
+      "us_market_analysis": {
+        "ach_keyword_count": 1,
+        "has_us_pages": true,
+        "deep_us_keyword_count": 0,
+        "total_indicators": 11,
+        "passed": true
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 2,
+        "signup_elements_count": 1,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 4,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 4,
+        "api_docs_count": 1,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 0,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 25,
+      "criteria_met": [
+        "🇺🇸美国市场服务"
+      ],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 94
+    },
+    {
+      "platform_name": "clarity.fm",
+      "url": "https://www.clarity.fm",
+      "page_title": "Clarity — On Demand Business Advice",
+      "verification_time": "2025-10-22T23:31:32.573223",
+      "us_market_analysis": {
+        "ach_keyword_count": 0,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 0,
+        "total_indicators": 0,
+        "passed": false
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 0,
+        "signup_elements_count": 0,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 0,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 0,
+        "api_docs_count": 0,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 0,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 0,
+      "criteria_met": [],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 94
+    },
+    {
+      "platform_name": "substack.com",
+      "url": "https://www.substack.com",
+      "page_title": "Home | Substack",
+      "verification_time": "2025-10-22T23:31:40.668222",
+      "us_market_analysis": {
+        "ach_keyword_count": 0,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 0,
+        "total_indicators": 0,
+        "passed": false
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 3,
+        "signup_elements_count": 1,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 1,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 0,
+        "api_docs_count": 0,
+        "embedded_keyword_count": 2,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 0,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 0,
+      "criteria_met": [],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 94
+    },
+    {
+      "platform_name": "paymentcloud.com",
+      "url": "https://www.paymentcloud.com",
+      "page_title": "paymentcloud.com",
+      "verification_time": "2025-10-22T23:31:55.198992",
+      "us_market_analysis": {
+        "ach_keyword_count": 0,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 0,
+        "total_indicators": 0,
+        "passed": false
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 0,
+        "signup_elements_count": 0,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 0,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 0,
+        "api_docs_count": 0,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 0,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 0,
+      "criteria_met": [],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 94
+    }
+  ],
+  "detailed_results": [
+    {
+      "platform_name": "clarity.fm",
+      "url": "https://www.clarity.fm",
+      "page_title": "Clarity — On Demand Business Advice",
+      "verification_time": "2025-10-22T23:31:32.573223",
+      "us_market_analysis": {
+        "ach_keyword_count": 0,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 0,
+        "total_indicators": 0,
+        "passed": false
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 0,
+        "signup_elements_count": 0,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 0,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 0,
+        "api_docs_count": 0,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 0,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 0,
+      "criteria_met": [],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 94
+    },
+    {
+      "platform_name": "substack.com",
+      "url": "https://www.substack.com",
+      "page_title": "Home | Substack",
+      "verification_time": "2025-10-22T23:31:40.668222",
+      "us_market_analysis": {
+        "ach_keyword_count": 0,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 0,
+        "total_indicators": 0,
+        "passed": false
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 3,
+        "signup_elements_count": 1,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 1,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 0,
+        "api_docs_count": 0,
+        "embedded_keyword_count": 2,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 0,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 0,
+      "criteria_met": [],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 94
+    },
+    {
+      "platform_name": "fetchapp.com",
+      "url": "https://www.fetchapp.com",
+      "page_title": "FetchApp",
+      "verification_time": "2025-10-22T23:31:44.544859",
+      "us_market_analysis": {
+        "ach_keyword_count": 1,
+        "has_us_pages": true,
+        "deep_us_keyword_count": 0,
+        "total_indicators": 11,
+        "passed": true
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 2,
+        "signup_elements_count": 1,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 4,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 4,
+        "api_docs_count": 1,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 0,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 25,
+      "criteria_met": [
+        "🇺🇸美国市场服务"
+      ],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 94
+    },
+    {
+      "platform_name": "paymentcloud.com",
+      "url": "https://www.paymentcloud.com",
+      "page_title": "paymentcloud.com",
+      "verification_time": "2025-10-22T23:31:55.198992",
+      "us_market_analysis": {
+        "ach_keyword_count": 0,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 0,
+        "total_indicators": 0,
+        "passed": false
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 0,
+        "signup_elements_count": 0,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 0,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 0,
+        "api_docs_count": 0,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 0,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 0,
+      "criteria_met": [],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 94
+    },
+    {
+      "platform_name": "paytm.com",
+      "url": "https://www.paytm.com",
+      "page_title": "Paytm: Secure & Fast UPI Payments, Recharge Mobile & Pay Bills",
+      "verification_time": "2025-10-22T23:32:00.459314",
+      "us_market_analysis": {
+        "ach_keyword_count": 19,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 7,
+        "total_indicators": 26,
+        "passed": true
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 3,
+        "signup_elements_count": 2,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 7,
+        "sending_keyword_count": 3,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 29,
+        "api_docs_count": 25,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 19,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": true,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 19,
+        "passed": true,
+        "feature_type": "💳信用卡/Apple Pay"
+      },
+      "final_score": 30,
+      "criteria_met": [
+        "🇺🇸美国市场服务",
+        "🏦银行功能"
+      ],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 94
+    }
+  ]
+}

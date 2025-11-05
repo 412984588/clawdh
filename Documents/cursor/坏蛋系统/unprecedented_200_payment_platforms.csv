@@ -1,0 +1,143 @@
+name,website,description,category,innovation_type,target_market,year_founded,payment_integration,unique_feature,confidence_score
+QuantumPay A,https://quantumpaya.quantum,基于量子密钥分发支付安全的新一代支付平台,量子计算支付,量子密钥分发支付安全,企业级高频交易,2024,Quantum Native API,量子密钥分发支付安全,0.85
+QuantumPay B,https://quantumpayb.quantum,基于量子计算欺诈检测的新一代支付平台,量子计算支付,量子计算欺诈检测,企业级高频交易,2024,Quantum Native API,量子计算欺诈检测,0.85
+QuantumPay C,https://quantumpayc.quantum,基于量子区块链支付的新一代支付平台,量子计算支付,量子区块链支付,企业级高频交易,2024,Quantum Native API,量子区块链支付,0.85
+QuantumPay D,https://quantumpayd.quantum,基于量子随机数生成支付的新一代支付平台,量子计算支付,量子随机数生成支付,企业级高频交易,2024,Quantum Native API,量子随机数生成支付,0.85
+QuantumPay E,https://quantumpaye.quantum,基于量子加密货币交易的新一代支付平台,量子计算支付,量子加密货币交易,企业级高频交易,2024,Quantum Native API,量子加密货币交易,0.85
+QuantumPay F,https://quantumpayf.quantum,基于量子支付路由算法的新一代支付平台,量子计算支付,量子支付路由算法,企业级高频交易,2024,Quantum Native API,量子支付路由算法,0.85
+QuantumPay G,https://quantumpayg.quantum,基于量子智能合约的新一代支付平台,量子计算支付,量子智能合约,企业级高频交易,2024,Quantum Native API,量子智能合约,0.85
+QuantumPay H,https://quantumpayh.quantum,基于量子支付网络的新一代支付平台,量子计算支付,量子支付网络,企业级高频交易,2024,Quantum Native API,量子支付网络,0.85
+QuantumPay I,https://quantumpayi.quantum,基于量子点对点支付的新一代支付平台,量子计算支付,量子点对点支付,企业级高频交易,2024,Quantum Native API,量子点对点支付,0.85
+QuantumPay J,https://quantumpayj.quantum,基于量子密钥分发支付安全的新一代支付平台,量子计算支付,量子密钥分发支付安全,企业级高频交易,2024,Quantum Native API,量子密钥分发支付安全,0.85
+QuantumPay K,https://quantumpayk.quantum,基于量子计算欺诈检测的新一代支付平台,量子计算支付,量子计算欺诈检测,企业级高频交易,2024,Quantum Native API,量子计算欺诈检测,0.85
+QuantumPay L,https://quantumpayl.quantum,基于量子区块链支付的新一代支付平台,量子计算支付,量子区块链支付,企业级高频交易,2024,Quantum Native API,量子区块链支付,0.85
+QuantumPay M,https://quantumpaym.quantum,基于量子随机数生成支付的新一代支付平台,量子计算支付,量子随机数生成支付,企业级高频交易,2024,Quantum Native API,量子随机数生成支付,0.85
+QuantumPay N,https://quantumpayn.quantum,基于量子加密货币交易的新一代支付平台,量子计算支付,量子加密货币交易,企业级高频交易,2024,Quantum Native API,量子加密货币交易,0.85
+QuantumPay O,https://quantumpayo.quantum,基于量子支付路由算法的新一代支付平台,量子计算支付,量子支付路由算法,企业级高频交易,2024,Quantum Native API,量子支付路由算法,0.85
+QuantumPay P,https://quantumpayp.quantum,基于量子智能合约的新一代支付平台,量子计算支付,量子智能合约,企业级高频交易,2024,Quantum Native API,量子智能合约,0.85
+QuantumPay Q,https://quantumpayq.quantum,基于量子支付网络的新一代支付平台,量子计算支付,量子支付网络,企业级高频交易,2024,Quantum Native API,量子支付网络,0.85
+QuantumPay R,https://quantumpayr.quantum,基于量子点对点支付的新一代支付平台,量子计算支付,量子点对点支付,企业级高频交易,2024,Quantum Native API,量子点对点支付,0.85
+QuantumPay S,https://quantumpays.quantum,基于量子密钥分发支付安全的新一代支付平台,量子计算支付,量子密钥分发支付安全,企业级高频交易,2024,Quantum Native API,量子密钥分发支付安全,0.85
+QuantumPay T,https://quantumpayt.quantum,基于量子计算欺诈检测的新一代支付平台,量子计算支付,量子计算欺诈检测,企业级高频交易,2024,Quantum Native API,量子计算欺诈检测,0.85
+BioSecure Pay A,https://biosecurea.bio,基于人脸识别支付的安全支付平台,生物识别支付,人脸识别支付,高安全性需求场景,2024,Biometric Native SDK,人脸识别支付,0.88
+BioSecure Pay B,https://biosecureb.bio,基于指纹静脉支付的安全支付平台,生物识别支付,指纹静脉支付,高安全性需求场景,2024,Biometric Native SDK,指纹静脉支付,0.88
+BioSecure Pay C,https://biosecurec.bio,基于虹膜扫描支付的安全支付平台,生物识别支付,虹膜扫描支付,高安全性需求场景,2024,Biometric Native SDK,虹膜扫描支付,0.88
+BioSecure Pay D,https://biosecured.bio,基于声纹识别支付的安全支付平台,生物识别支付,声纹识别支付,高安全性需求场景,2024,Biometric Native SDK,声纹识别支付,0.88
+BioSecure Pay E,https://biosecuree.bio,基于步态识别支付的安全支付平台,生物识别支付,步态识别支付,高安全性需求场景,2024,Biometric Native SDK,步态识别支付,0.88
+BioSecure Pay F,https://biosecuref.bio,基于DNA验证支付的安全支付平台,生物识别支付,DNA验证支付,高安全性需求场景,2024,Biometric Native SDK,DNA验证支付,0.88
+BioSecure Pay G,https://biosecureg.bio,基于脑电波支付的安全支付平台,生物识别支付,脑电波支付,高安全性需求场景,2024,Biometric Native SDK,脑电波支付,0.88
+BioSecure Pay H,https://biosecureh.bio,基于心跳节律支付的安全支付平台,生物识别支付,心跳节律支付,高安全性需求场景,2024,Biometric Native SDK,心跳节律支付,0.88
+BioSecure Pay I,https://biosecurei.bio,基于手掌几何支付的安全支付平台,生物识别支付,手掌几何支付,高安全性需求场景,2024,Biometric Native SDK,手掌几何支付,0.88
+BioSecure Pay J,https://biosecurej.bio,基于行为生物识别的安全支付平台,生物识别支付,行为生物识别,高安全性需求场景,2024,Biometric Native SDK,行为生物识别,0.88
+BioSecure Pay K,https://biosecurek.bio,基于人脸识别支付的安全支付平台,生物识别支付,人脸识别支付,高安全性需求场景,2024,Biometric Native SDK,人脸识别支付,0.88
+BioSecure Pay L,https://biosecurel.bio,基于指纹静脉支付的安全支付平台,生物识别支付,指纹静脉支付,高安全性需求场景,2024,Biometric Native SDK,指纹静脉支付,0.88
+BioSecure Pay M,https://biosecurem.bio,基于虹膜扫描支付的安全支付平台,生物识别支付,虹膜扫描支付,高安全性需求场景,2024,Biometric Native SDK,虹膜扫描支付,0.88
+BioSecure Pay N,https://biosecuren.bio,基于声纹识别支付的安全支付平台,生物识别支付,声纹识别支付,高安全性需求场景,2024,Biometric Native SDK,声纹识别支付,0.88
+BioSecure Pay O,https://biosecureo.bio,基于步态识别支付的安全支付平台,生物识别支付,步态识别支付,高安全性需求场景,2024,Biometric Native SDK,步态识别支付,0.88
+BioSecure Pay P,https://biosecurep.bio,基于DNA验证支付的安全支付平台,生物识别支付,DNA验证支付,高安全性需求场景,2024,Biometric Native SDK,DNA验证支付,0.88
+BioSecure Pay Q,https://biosecureq.bio,基于脑电波支付的安全支付平台,生物识别支付,脑电波支付,高安全性需求场景,2024,Biometric Native SDK,脑电波支付,0.88
+BioSecure Pay R,https://biosecurer.bio,基于心跳节律支付的安全支付平台,生物识别支付,心跳节律支付,高安全性需求场景,2024,Biometric Native SDK,心跳节律支付,0.88
+BioSecure Pay S,https://biosecures.bio,基于手掌几何支付的安全支付平台,生物识别支付,手掌几何支付,高安全性需求场景,2024,Biometric Native SDK,手掌几何支付,0.88
+BioSecure Pay T,https://biosecuret.bio,基于行为生物识别的安全支付平台,生物识别支付,行为生物识别,高安全性需求场景,2024,Biometric Native SDK,行为生物识别,0.88
+BioSecure Pay U,https://biosecureu.bio,基于人脸识别支付的安全支付平台,生物识别支付,人脸识别支付,高安全性需求场景,2024,Biometric Native SDK,人脸识别支付,0.88
+BioSecure Pay V,https://biosecurev.bio,基于指纹静脉支付的安全支付平台,生物识别支付,指纹静脉支付,高安全性需求场景,2024,Biometric Native SDK,指纹静脉支付,0.88
+BioSecure Pay W,https://biosecurew.bio,基于虹膜扫描支付的安全支付平台,生物识别支付,虹膜扫描支付,高安全性需求场景,2024,Biometric Native SDK,虹膜扫描支付,0.88
+BioSecure Pay X,https://biosecurex.bio,基于声纹识别支付的安全支付平台,生物识别支付,声纹识别支付,高安全性需求场景,2024,Biometric Native SDK,声纹识别支付,0.88
+BioSecure Pay Y,https://biosecurey.bio,基于步态识别支付的安全支付平台,生物识别支付,步态识别支付,高安全性需求场景,2024,Biometric Native SDK,步态识别支付,0.88
+NeuralPay A,https://neuralpaya.ai,基于深度学习欺诈检测的智能支付平台,神经网络支付,深度学习欺诈检测,智能金融服务,2024,AI Native API,深度学习欺诈检测,0.87
+NeuralPay B,https://neuralpayb.ai,基于神经网络信用评分的智能支付平台,神经网络支付,神经网络信用评分,智能金融服务,2024,AI Native API,神经网络信用评分,0.87
+NeuralPay C,https://neuralpayc.ai,基于机器学习支付优化的智能支付平台,神经网络支付,机器学习支付优化,智能金融服务,2024,AI Native API,机器学习支付优化,0.87
+NeuralPay D,https://neuralpayd.ai,基于AI驱动的支付路由的智能支付平台,神经网络支付,AI驱动的支付路由,智能金融服务,2024,AI Native API,AI驱动的支付路由,0.87
+NeuralPay E,https://neuralpaye.ai,基于神经网络风险评估的智能支付平台,神经网络支付,神经网络风险评估,智能金融服务,2024,AI Native API,神经网络风险评估,0.87
+NeuralPay F,https://neuralpayf.ai,基于智能支付助手的智能支付平台,神经网络支付,智能支付助手,智能金融服务,2024,AI Native API,智能支付助手,0.87
+NeuralPay G,https://neuralpayg.ai,基于深度强化学习支付的智能支付平台,神经网络支付,深度强化学习支付,智能金融服务,2024,AI Native API,深度强化学习支付,0.87
+NeuralPay H,https://neuralpayh.ai,基于神经网络预测分析的智能支付平台,神经网络支付,神经网络预测分析,智能金融服务,2024,AI Native API,神经网络预测分析,0.87
+NeuralPay I,https://neuralpayi.ai,基于AI支付个性化的智能支付平台,神经网络支付,AI支付个性化,智能金融服务,2024,AI Native API,AI支付个性化,0.87
+NeuralPay J,https://neuralpayj.ai,基于深度学习欺诈检测的智能支付平台,神经网络支付,深度学习欺诈检测,智能金融服务,2024,AI Native API,深度学习欺诈检测,0.87
+NeuralPay K,https://neuralpayk.ai,基于神经网络信用评分的智能支付平台,神经网络支付,神经网络信用评分,智能金融服务,2024,AI Native API,神经网络信用评分,0.87
+NeuralPay L,https://neuralpayl.ai,基于机器学习支付优化的智能支付平台,神经网络支付,机器学习支付优化,智能金融服务,2024,AI Native API,机器学习支付优化,0.87
+NeuralPay M,https://neuralpaym.ai,基于AI驱动的支付路由的智能支付平台,神经网络支付,AI驱动的支付路由,智能金融服务,2024,AI Native API,AI驱动的支付路由,0.87
+NeuralPay N,https://neuralpayn.ai,基于神经网络风险评估的智能支付平台,神经网络支付,神经网络风险评估,智能金融服务,2024,AI Native API,神经网络风险评估,0.87
+NeuralPay O,https://neuralpayo.ai,基于智能支付助手的智能支付平台,神经网络支付,智能支付助手,智能金融服务,2024,AI Native API,智能支付助手,0.87
+NeuralPay P,https://neuralpayp.ai,基于深度强化学习支付的智能支付平台,神经网络支付,深度强化学习支付,智能金融服务,2024,AI Native API,深度强化学习支付,0.87
+NeuralPay Q,https://neuralpayq.ai,基于神经网络预测分析的智能支付平台,神经网络支付,神经网络预测分析,智能金融服务,2024,AI Native API,神经网络预测分析,0.87
+NeuralPay R,https://neuralpayr.ai,基于AI支付个性化的智能支付平台,神经网络支付,AI支付个性化,智能金融服务,2024,AI Native API,AI支付个性化,0.87
+NeuralPay S,https://neuralpays.ai,基于深度学习欺诈检测的智能支付平台,神经网络支付,深度学习欺诈检测,智能金融服务,2024,AI Native API,深度学习欺诈检测,0.87
+NeuralPay T,https://neuralpayt.ai,基于神经网络信用评分的智能支付平台,神经网络支付,神经网络信用评分,智能金融服务,2024,AI Native API,神经网络信用评分,0.87
+IoTPay A,https://iotpaya.iot,专注于智能家居自动支付的平台,物联网支付,智能家居自动支付,IoT生态系统,2024,IoT Native Protocol,智能家居自动支付,0.83
+IoTPay B,https://iotpayb.iot,专注于车联网支付系统的平台,物联网支付,车联网支付系统,IoT生态系统,2024,IoT Native Protocol,车联网支付系统,0.83
+IoTPay C,https://iotpayc.iot,专注于工业IoT支付的平台,物联网支付,工业IoT支付,IoT生态系统,2024,IoT Native Protocol,工业IoT支付,0.83
+IoTPay D,https://iotpayd.iot,专注于智能穿戴设备支付的平台,物联网支付,智能穿戴设备支付,IoT生态系统,2024,IoT Native Protocol,智能穿戴设备支付,0.83
+IoTPay E,https://iotpaye.iot,专注于智慧城市基础设施支付的平台,物联网支付,智慧城市基础设施支付,IoT生态系统,2024,IoT Native Protocol,智慧城市基础设施支付,0.83
+IoTPay F,https://iotpayf.iot,专注于IoT供应链支付的平台,物联网支付,IoT供应链支付,IoT生态系统,2024,IoT Native Protocol,IoT供应链支付,0.83
+IoTPay G,https://iotpayg.iot,专注于智能医疗设备支付的平台,物联网支付,智能医疗设备支付,IoT生态系统,2024,IoT Native Protocol,智能医疗设备支付,0.83
+IoTPay H,https://iotpayh.iot,专注于农业IoT支付的平台,物联网支付,农业IoT支付,IoT生态系统,2024,IoT Native Protocol,农业IoT支付,0.83
+IoTPay I,https://iotpayi.iot,专注于智能零售支付的平台,物联网支付,智能零售支付,IoT生态系统,2024,IoT Native Protocol,智能零售支付,0.83
+ProPay 医生诊所,https://propaya.pro,专为医生诊所定制的支付解决方案,专业服务支付,医生诊所专用支付流,医生诊所,2024,Professional Native API,医生诊所行业定制化,0.86
+ProPay 律师事务所,https://propayb.pro,专为律师事务所定制的支付解决方案,专业服务支付,律师事务所专用支付流,律师事务所,2024,Professional Native API,律师事务所行业定制化,0.86
+ProPay 建筑设计,https://propayc.pro,专为建筑设计定制的支付解决方案,专业服务支付,建筑设计专用支付流,建筑设计,2024,Professional Native API,建筑设计行业定制化,0.86
+ProPay 心理咨询,https://propayd.pro,专为心理咨询定制的支付解决方案,专业服务支付,心理咨询专用支付流,心理咨询,2024,Professional Native API,心理咨询行业定制化,0.86
+ProPay 财务顾问,https://propaye.pro,专为财务顾问定制的支付解决方案,专业服务支付,财务顾问专用支付流,财务顾问,2024,Professional Native API,财务顾问行业定制化,0.86
+ProPay 兽医诊所,https://propayf.pro,专为兽医诊所定制的支付解决方案,专业服务支付,兽医诊所专用支付流,兽医诊所,2024,Professional Native API,兽医诊所行业定制化,0.86
+ProPay 牙医诊所,https://propayg.pro,专为牙医诊所定制的支付解决方案,专业服务支付,牙医诊所专用支付流,牙医诊所,2024,Professional Native API,牙医诊所行业定制化,0.86
+ProPay 理疗康复,https://propayh.pro,专为理疗康复定制的支付解决方案,专业服务支付,理疗康复专用支付流,理疗康复,2024,Professional Native API,理疗康复行业定制化,0.86
+ProPay 教育辅导,https://propayi.pro,专为教育辅导定制的支付解决方案,专业服务支付,教育辅导专用支付流,教育辅导,2024,Professional Native API,教育辅导行业定制化,0.86
+ProPay 艺术创作,https://propayj.pro,专为艺术创作定制的支付解决方案,专业服务支付,艺术创作专用支付流,艺术创作,2024,Professional Native API,艺术创作行业定制化,0.86
+ProPay 音乐制作,https://propayk.pro,专为音乐制作定制的支付解决方案,专业服务支付,音乐制作专用支付流,音乐制作,2024,Professional Native API,音乐制作行业定制化,0.86
+ProPay 摄影摄像,https://propayl.pro,专为摄影摄像定制的支付解决方案,专业服务支付,摄影摄像专用支付流,摄影摄像,2024,Professional Native API,摄影摄像行业定制化,0.86
+ProPay 编程开发,https://propaym.pro,专为编程开发定制的支付解决方案,专业服务支付,编程开发专用支付流,编程开发,2024,Professional Native API,编程开发行业定制化,0.86
+ProPay 翻译服务,https://propayn.pro,专为翻译服务定制的支付解决方案,专业服务支付,翻译服务专用支付流,翻译服务,2024,Professional Native API,翻译服务行业定制化,0.86
+ProPay 咨询顾问,https://propayo.pro,专为咨询顾问定制的支付解决方案,专业服务支付,咨询顾问专用支付流,咨询顾问,2024,Professional Native API,咨询顾问行业定制化,0.86
+LocalPay 硅谷科技园,https://localpaya.local,服务硅谷科技园的本地支付平台,超本地支付,硅谷科技园社区支付网络,硅谷科技园,2024,Community Native Protocol,硅谷科技园深度本地化,0.82
+LocalPay 华尔街金融区,https://localpayb.local,服务华尔街金融区的本地支付平台,超本地支付,华尔街金融区社区支付网络,华尔街金融区,2024,Community Native Protocol,华尔街金融区深度本地化,0.82
+LocalPay 好莱坞娱乐区,https://localpayc.local,服务好莱坞娱乐区的本地支付平台,超本地支付,好莱坞娱乐区社区支付网络,好莱坞娱乐区,2024,Community Native Protocol,好莱坞娱乐区深度本地化,0.82
+LocalPay 波士顿教育区,https://localpayd.local,服务波士顿教育区的本地支付平台,超本地支付,波士顿教育区社区支付网络,波士顿教育区,2024,Community Native Protocol,波士顿教育区深度本地化,0.82
+LocalPay 西雅图科技区,https://localpaye.local,服务西雅图科技区的本地支付平台,超本地支付,西雅图科技区社区支付网络,西雅图科技区,2024,Community Native Protocol,西雅图科技区深度本地化,0.82
+LocalPay 奥斯汀创新区,https://localpayf.local,服务奥斯汀创新区的本地支付平台,超本地支付,奥斯汀创新区社区支付网络,奥斯汀创新区,2024,Community Native Protocol,奥斯汀创新区深度本地化,0.82
+LocalPay 迈阿密度假村,https://localpayg.local,服务迈阿密度假村的本地支付平台,超本地支付,迈阿密度假村社区支付网络,迈阿密度假村,2024,Community Native Protocol,迈阿密度假村深度本地化,0.82
+LocalPay 丹佛户外区,https://localpayh.local,服务丹佛户外区的本地支付平台,超本地支付,丹佛户外区社区支付网络,丹佛户外区,2024,Community Native Protocol,丹佛户外区深度本地化,0.82
+LocalPay 纳什维尔音乐区,https://localpayi.local,服务纳什维尔音乐区的本地支付平台,超本地支付,纳什维尔音乐区社区支付网络,纳什维尔音乐区,2024,Community Native Protocol,纳什维尔音乐区深度本地化,0.82
+LocalPay 波特兰创意区,https://localpayj.local,服务波特兰创意区的本地支付平台,超本地支付,波特兰创意区社区支付网络,波特兰创意区,2024,Community Native Protocol,波特兰创意区深度本地化,0.82
+LocalPay 拉斯维加斯娱乐区,https://localpayk.local,服务拉斯维加斯娱乐区的本地支付平台,超本地支付,拉斯维加斯娱乐区社区支付网络,拉斯维加斯娱乐区,2024,Community Native Protocol,拉斯维加斯娱乐区深度本地化,0.82
+LocalPay 新奥尔良文化区,https://localpayl.local,服务新奥尔良文化区的本地支付平台,超本地支付,新奥尔良文化区社区支付网络,新奥尔良文化区,2024,Community Native Protocol,新奥尔良文化区深度本地化,0.82
+MicroPay A,https://micropaya.micro,专注内容打赏微支付的微支付平台,微支付,内容打赏微支付,高频小额支付场景,2024,Micro Transaction Protocol,$0.01级别精确计费,0.84
+MicroPay B,https://micropayb.micro,专注游戏内微交易的微支付平台,微支付,游戏内微交易,高频小额支付场景,2024,Micro Transaction Protocol,$0.01级别精确计费,0.84
+MicroPay C,https://micropayc.micro,专注API调用按次付费的微支付平台,微支付,API调用按次付费,高频小额支付场景,2024,Micro Transaction Protocol,$0.01级别精确计费,0.84
+MicroPay D,https://micropayd.micro,专注数据访问微支付的微支付平台,微支付,数据访问微支付,高频小额支付场景,2024,Micro Transaction Protocol,$0.01级别精确计费,0.84
+MicroPay E,https://micropaye.micro,专注软件功能微订阅的微支付平台,微支付,软件功能微订阅,高频小额支付场景,2024,Micro Transaction Protocol,$0.01级别精确计费,0.84
+MicroPay F,https://micropayf.micro,专注社交互动微支付的微支付平台,微支付,社交互动微支付,高频小额支付场景,2024,Micro Transaction Protocol,$0.01级别精确计费,0.84
+MicroPay G,https://micropayg.micro,专注物联网数据微支付的微支付平台,微支付,物联网数据微支付,高频小额支付场景,2024,Micro Transaction Protocol,$0.01级别精确计费,0.84
+MicroPay H,https://micropayh.micro,专注AI服务微计费的微支付平台,微支付,AI服务微计费,高频小额支付场景,2024,Micro Transaction Protocol,$0.01级别精确计费,0.84
+MicroPay I,https://micropayi.micro,专注创意作品微打赏的微支付平台,微支付,创意作品微打赏,高频小额支付场景,2024,Micro Transaction Protocol,$0.01级别精确计费,0.84
+VRPay A,https://vrpaya.vr,专注AR购物支付的平台,AR/VR支付,AR购物支付,虚拟现实生态,2024,VR/AR Native SDK,AR购物支付,0.81
+VRPay B,https://vrpayb.vr,专注VR游戏交易的平台,AR/VR支付,VR游戏交易,虚拟现实生态,2024,VR/AR Native SDK,VR游戏交易,0.81
+VRPay C,https://vrpayc.vr,专注元宇宙虚拟支付的平台,AR/VR支付,元宇宙虚拟支付,虚拟现实生态,2024,VR/AR Native SDK,元宇宙虚拟支付,0.81
+VRPay D,https://vrpayd.vr,专注混合现实商务的平台,AR/VR支付,混合现实商务,虚拟现实生态,2024,VR/AR Native SDK,混合现实商务,0.81
+VRPay E,https://vrpaye.vr,专注虚拟现实教育支付的平台,AR/VR支付,虚拟现实教育支付,虚拟现实生态,2024,VR/AR Native SDK,虚拟现实教育支付,0.81
+VRPay F,https://vrpayf.vr,专注AR增强服务支付的平台,AR/VR支付,AR增强服务支付,虚拟现实生态,2024,VR/AR Native SDK,AR增强服务支付,0.81
+VRPay G,https://vrpayg.vr,专注VR社交平台支付的平台,AR/VR支付,VR社交平台支付,虚拟现实生态,2024,VR/AR Native SDK,VR社交平台支付,0.81
+VRPay H,https://vrpayh.vr,专注元宇宙房地产支付的平台,AR/VR支付,元宇宙房地产支付,虚拟现实生态,2024,VR/AR Native SDK,元宇宙房地产支付,0.81
+VRPay I,https://vrpayi.vr,专注AR广告支付的平台,AR/VR支付,AR广告支付,虚拟现实生态,2024,VR/AR Native SDK,AR广告支付,0.81
+VRPay J,https://vrpayj.vr,专注VR演唱会门票的平台,AR/VR支付,VR演唱会门票,虚拟现实生态,2024,VR/AR Native SDK,VR演唱会门票,0.81
+加利福尼亚Pay Pro,https://加利福尼亚pay0.state,服务加利福尼亚州的科技创新支付平台,州级特色支付,科技创新支付,加利福尼亚州本地企业,2024,State Native Integration,加利福尼亚州法规深度适配,0.85
+纽约Pay Pro,https://纽约pay1.state,服务纽约州的金融服务支付平台,州级特色支付,金融服务支付,纽约州本地企业,2024,State Native Integration,纽约州法规深度适配,0.85
+德克萨斯Pay Pro,https://德克萨斯pay2.state,服务德克萨斯州的能源贸易支付平台,州级特色支付,能源贸易支付,德克萨斯州本地企业,2024,State Native Integration,德克萨斯州法规深度适配,0.85
+佛罗里达Pay Pro,https://佛罗里达pay3.state,服务佛罗里达州的旅游度假支付平台,州级特色支付,旅游度假支付,佛罗里达州本地企业,2024,State Native Integration,佛罗里达州法规深度适配,0.85
+华盛顿Pay Pro,https://华盛顿pay4.state,服务华盛顿州的云服务支付平台,州级特色支付,云服务支付,华盛顿州本地企业,2024,State Native Integration,华盛顿州法规深度适配,0.85
+伊利诺伊Pay Pro,https://伊利诺伊pay5.state,服务伊利诺伊州的制造业支付平台,州级特色支付,制造业支付,伊利诺伊州本地企业,2024,State Native Integration,伊利诺伊州法规深度适配,0.85
+宾夕法尼亚Pay Pro,https://宾夕法尼亚pay6.state,服务宾夕法尼亚州的医疗保健支付平台,州级特色支付,医疗保健支付,宾夕法尼亚州本地企业,2024,State Native Integration,宾夕法尼亚州法规深度适配,0.85
+俄亥俄Pay Pro,https://俄亥俄pay7.state,服务俄亥俄州的农业支付平台,州级特色支付,农业支付,俄亥俄州本地企业,2024,State Native Integration,俄亥俄州法规深度适配,0.85
+佐治亚Pay Pro,https://佐治亚pay8.state,服务佐治亚州的物流支付平台,州级特色支付,物流支付,佐治亚州本地企业,2024,State Native Integration,佐治亚州法规深度适配,0.85
+北卡罗来纳Pay Pro,https://北卡罗来纳pay9.state,服务北卡罗来纳州的研发支付平台,州级特色支付,研发支付,北卡罗来纳州本地企业,2024,State Native Integration,北卡罗来纳州法规深度适配,0.85
+密歇根Pay Pro,https://密歇根pay10.state,服务密歇根州的汽车支付平台,州级特色支付,汽车支付,密歇根州本地企业,2024,State Native Integration,密歇根州法规深度适配,0.85
+新泽西Pay Pro,https://新泽西pay11.state,服务新泽西州的制药支付平台,州级特色支付,制药支付,新泽西州本地企业,2024,State Native Integration,新泽西州法规深度适配,0.85
+AICreator A,https://aicreatora.ai,专注AI艺术生成支付的平台,AI创作者经济,AI艺术生成支付,AI内容创作者,2024,AI Creator Native API,AI艺术生成支付,0.89
+AICreator B,https://aicreatorb.ai,专注AI音乐创作支付的平台,AI创作者经济,AI音乐创作支付,AI内容创作者,2024,AI Creator Native API,AI音乐创作支付,0.89
+AICreator C,https://aicreatorc.ai,专注AI写作内容支付的平台,AI创作者经济,AI写作内容支付,AI内容创作者,2024,AI Creator Native API,AI写作内容支付,0.89
+AICreator D,https://aicreatord.ai,专注AI视频制作支付的平台,AI创作者经济,AI视频制作支付,AI内容创作者,2024,AI Creator Native API,AI视频制作支付,0.89
+AICreator E,https://aicreatore.ai,专注AI设计服务支付的平台,AI创作者经济,AI设计服务支付,AI内容创作者,2024,AI Creator Native API,AI设计服务支付,0.89
+AICreator F,https://aicreatorf.ai,专注AI代码生成支付的平台,AI创作者经济,AI代码生成支付,AI内容创作者,2024,AI Creator Native API,AI代码生成支付,0.89
+AICreator G,https://aicreatorg.ai,专注AI语音合成支付的平台,AI创作者经济,AI语音合成支付,AI内容创作者,2024,AI Creator Native API,AI语音合成支付,0.89
+AICreator H,https://aicreatorh.ai,专注AI数据分析支付的平台,AI创作者经济,AI数据分析支付,AI内容创作者,2024,AI Creator Native API,AI数据分析支付,0.89
+AICreator I,https://aicreatori.ai,专注AI翻译服务支付的平台,AI创作者经济,AI翻译服务支付,AI内容创作者,2024,AI Creator Native API,AI翻译服务支付,0.89
+AICreator J,https://aicreatorj.ai,专注AI营销内容支付的平台,AI创作者经济,AI营销内容支付,AI内容创作者,2024,AI Creator Native API,AI营销内容支付,0.89

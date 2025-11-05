@@ -1,0 +1,276 @@
+{
+  "analysis_time": "2025-10-22T16:52:05.628400",
+  "total_successful_platforms": 18,
+  "average_score": 95.83333333333333,
+  "perfect_score_platforms": 15,
+  "category_distribution": {
+    "ACH API": [
+      {
+        "name": "Dwolla",
+        "score": 100.0,
+        "category": "ACH API",
+        "url": "https://www.dwolla.com"
+      }
+    ],
+    "中小企业ACH": [
+      {
+        "name": "Rotessa",
+        "score": 100.0,
+        "category": "中小企业ACH",
+        "url": "https://rotessa.com"
+      }
+    ],
+    "高风险支付": [
+      {
+        "name": "PaymentCloud",
+        "score": 100.0,
+        "category": "高风险支付",
+        "url": "https://paymentcloudinc.com"
+      }
+    ],
+    "循环支付": [
+      {
+        "name": "GoCardless",
+        "score": 100.0,
+        "category": "循环支付",
+        "url": "https://gocardless.com"
+      }
+    ],
+    "零售酒店": [
+      {
+        "name": "Paysafe",
+        "score": 100.0,
+        "category": "零售酒店",
+        "url": "https://www.paysafe.com"
+      }
+    ],
+    "游戏电商": [
+      {
+        "name": "Aeropay",
+        "score": 100.0,
+        "category": "游戏电商",
+        "url": "https://www.aeropay.com"
+      }
+    ],
+    "企业银行": [
+      {
+        "name": "Ramp",
+        "score": 100.0,
+        "category": "企业银行",
+        "url": "https://ramp.com"
+      },
+      {
+        "name": "Rho",
+        "score": 100.0,
+        "category": "企业银行",
+        "url": "https://www.rho.co"
+      }
+    ],
+    "开发者API": [
+      {
+        "name": "Moov",
+        "score": 100.0,
+        "category": "开发者API",
+        "url": "https://moov.io"
+      },
+      {
+        "name": "Dots",
+        "score": 100.0,
+        "category": "开发者API",
+        "url": "https://dots.dev"
+      }
+    ],
+    "电商银行": [
+      {
+        "name": "Mercury",
+        "score": 100.0,
+        "category": "电商银行",
+        "url": "https://mercury.com"
+      }
+    ],
+    "智能路由": [
+      {
+        "name": "BlueHill Payments",
+        "score": 100.0,
+        "category": "智能路由",
+        "url": "https://bluehillpayments.com"
+      }
+    ],
+    "租金支付": [
+      {
+        "name": "Bilt Rewards",
+        "score": 100.0,
+        "category": "租金支付",
+        "url": "https://biltrewards.com"
+      }
+    ],
+    "支付自动化": [
+      {
+        "name": "AvidXchange",
+        "score": 100.0,
+        "category": "支付自动化",
+        "url": "https://www.avidxchange.com"
+      }
+    ],
+    "低费用处理": [
+      {
+        "name": "National Processing",
+        "score": 100.0,
+        "category": "低费用处理",
+        "url": "https://nationalprocessing.com"
+      }
+    ],
+    "ACH虚拟终端": [
+      {
+        "name": "ACHWorks",
+        "score": 75.0,
+        "category": "ACH虚拟终端",
+        "url": "https://ww3.achworks.com"
+      }
+    ],
+    "嵌入式金融": [
+      {
+        "name": "Parafin",
+        "score": 75.0,
+        "category": "嵌入式金融",
+        "url": "https://www.parafin.com"
+      }
+    ],
+    "数据平台": [
+      {
+        "name": "Seedtable",
+        "score": 75.0,
+        "category": "数据平台",
+        "url": "https://www.seedtable.com"
+      }
+    ]
+  },
+  "success_factors": {
+    "高得分平台 (100%)": 15,
+    "金融科技创新": 4,
+    "开发者体验": 3,
+    "ACH能力": 3,
+    "企业服务": 3
+  },
+  "key_insights": {
+    "api_driven_success": 0.16666666666666666,
+    "ach_capability_importance": 0.16666666666666666,
+    "business_service_preference": 0.16666666666666666
+  },
+  "recommendations": {
+    "prioritize_api_platforms": true,
+    "focus_ach_capabilities": true,
+    "target_enterprise_solutions": true,
+    "prefer_com_io_domains": true
+  },
+  "platforms": [
+    {
+      "name": "Dwolla",
+      "score": 100.0,
+      "category": "ACH API",
+      "url": "https://www.dwolla.com"
+    },
+    {
+      "name": "Rotessa",
+      "score": 100.0,
+      "category": "中小企业ACH",
+      "url": "https://rotessa.com"
+    },
+    {
+      "name": "PaymentCloud",
+      "score": 100.0,
+      "category": "高风险支付",
+      "url": "https://paymentcloudinc.com"
+    },
+    {
+      "name": "GoCardless",
+      "score": 100.0,
+      "category": "循环支付",
+      "url": "https://gocardless.com"
+    },
+    {
+      "name": "Paysafe",
+      "score": 100.0,
+      "category": "零售酒店",
+      "url": "https://www.paysafe.com"
+    },
+    {
+      "name": "Aeropay",
+      "score": 100.0,
+      "category": "游戏电商",
+      "url": "https://www.aeropay.com"
+    },
+    {
+      "name": "Ramp",
+      "score": 100.0,
+      "category": "企业银行",
+      "url": "https://ramp.com"
+    },
+    {
+      "name": "Moov",
+      "score": 100.0,
+      "category": "开发者API",
+      "url": "https://moov.io"
+    },
+    {
+      "name": "Mercury",
+      "score": 100.0,
+      "category": "电商银行",
+      "url": "https://mercury.com"
+    },
+    {
+      "name": "Rho",
+      "score": 100.0,
+      "category": "企业银行",
+      "url": "https://www.rho.co"
+    },
+    {
+      "name": "BlueHill Payments",
+      "score": 100.0,
+      "category": "智能路由",
+      "url": "https://bluehillpayments.com"
+    },
+    {
+      "name": "Dots",
+      "score": 100.0,
+      "category": "开发者API",
+      "url": "https://dots.dev"
+    },
+    {
+      "name": "Bilt Rewards",
+      "score": 100.0,
+      "category": "租金支付",
+      "url": "https://biltrewards.com"
+    },
+    {
+      "name": "AvidXchange",
+      "score": 100.0,
+      "category": "支付自动化",
+      "url": "https://www.avidxchange.com"
+    },
+    {
+      "name": "National Processing",
+      "score": 100.0,
+      "category": "低费用处理",
+      "url": "https://nationalprocessing.com"
+    },
+    {
+      "name": "ACHWorks",
+      "score": 75.0,
+      "category": "ACH虚拟终端",
+      "url": "https://ww3.achworks.com"
+    },
+    {
+      "name": "Parafin",
+      "score": 75.0,
+      "category": "嵌入式金融",
+      "url": "https://www.parafin.com"
+    },
+    {
+      "name": "Seedtable",
+      "score": 75.0,
+      "category": "数据平台",
+      "url": "https://www.seedtable.com"
+    }
+  ]
+}

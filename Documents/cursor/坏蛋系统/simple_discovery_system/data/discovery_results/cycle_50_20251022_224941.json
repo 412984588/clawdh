@@ -1,0 +1,387 @@
+{
+  "cycle_number": 50,
+  "cycle_start_time": "2025-10-22T21:59:48.891724",
+  "cycle_end_time": "2025-10-22T22:49:41.636918",
+  "platforms_verified": 4,
+  "summary": {
+    "perfect_platforms": 0,
+    "excellent_platforms": 0,
+    "good_platforms": 0,
+    "needs_improvement": 4,
+    "bank_features_count": 0,
+    "dual_features_count": 0,
+    "average_score": 12.5
+  },
+  "top_platforms": [
+    {
+      "platform_name": "booking.com",
+      "url": "https://www.booking.com",
+      "page_title": "Booking.com | Official site | The best hotels, flights, car rentals & accommodations",
+      "verification_time": "2025-10-22T22:48:35.123862",
+      "us_market_analysis": {
+        "ach_keyword_count": 16,
+        "has_us_pages": true,
+        "deep_us_keyword_count": 3,
+        "total_indicators": 29,
+        "passed": true
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 4,
+        "signup_elements_count": 2,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 6,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 0,
+        "api_docs_count": 0,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 2,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 2,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 25,
+      "criteria_met": [
+        "🇺🇸美国市场服务"
+      ],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 50
+    },
+    {
+      "platform_name": "gumroad.com",
+      "url": "https://www.gumroad.com",
+      "page_title": "Earn your first dollar online with Gumroad",
+      "verification_time": "2025-10-22T22:49:21.061336",
+      "us_market_analysis": {
+        "ach_keyword_count": 8,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 5,
+        "total_indicators": 13,
+        "passed": true
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 0,
+        "signup_elements_count": 0,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 7,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 0,
+        "api_docs_count": 0,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 0,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 25,
+      "criteria_met": [
+        "🇺🇸美国市场服务"
+      ],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 50
+    },
+    {
+      "platform_name": "gitlab.com",
+      "url": "https://www.gitlab.com",
+      "page_title": "The most-comprehensive AI-powered DevSecOps platform",
+      "verification_time": "2025-10-22T22:48:38.781515",
+      "us_market_analysis": {
+        "ach_keyword_count": 3,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 0,
+        "total_indicators": 3,
+        "passed": false
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 4,
+        "signup_elements_count": 2,
+        "enterprise_keyword_count": 2,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 7,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 7,
+        "api_docs_count": 6,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 0,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 0,
+      "criteria_met": [],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 50
+    },
+    {
+      "platform_name": "webmoney.com",
+      "url": "https://www.webmoney.com",
+      "page_title": "WebMoney — Universal Payment System",
+      "verification_time": "2025-10-22T22:49:16.873055",
+      "us_market_analysis": {
+        "ach_keyword_count": 0,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 0,
+        "total_indicators": 0,
+        "passed": false
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 0,
+        "signup_elements_count": 0,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 1,
+        "sending_keyword_count": 1,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 0,
+        "api_docs_count": 1,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 0,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 0,
+      "criteria_met": [],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 50
+    }
+  ],
+  "detailed_results": [
+    {
+      "platform_name": "booking.com",
+      "url": "https://www.booking.com",
+      "page_title": "Booking.com | Official site | The best hotels, flights, car rentals & accommodations",
+      "verification_time": "2025-10-22T22:48:35.123862",
+      "us_market_analysis": {
+        "ach_keyword_count": 16,
+        "has_us_pages": true,
+        "deep_us_keyword_count": 3,
+        "total_indicators": 29,
+        "passed": true
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 4,
+        "signup_elements_count": 2,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 6,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 0,
+        "api_docs_count": 0,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 2,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 2,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 25,
+      "criteria_met": [
+        "🇺🇸美国市场服务"
+      ],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 50
+    },
+    {
+      "platform_name": "gitlab.com",
+      "url": "https://www.gitlab.com",
+      "page_title": "The most-comprehensive AI-powered DevSecOps platform",
+      "verification_time": "2025-10-22T22:48:38.781515",
+      "us_market_analysis": {
+        "ach_keyword_count": 3,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 0,
+        "total_indicators": 3,
+        "passed": false
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 4,
+        "signup_elements_count": 2,
+        "enterprise_keyword_count": 2,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 7,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 7,
+        "api_docs_count": 6,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 0,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 0,
+      "criteria_met": [],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 50
+    },
+    {
+      "platform_name": "webmoney.com",
+      "url": "https://www.webmoney.com",
+      "page_title": "WebMoney — Universal Payment System",
+      "verification_time": "2025-10-22T22:49:16.873055",
+      "us_market_analysis": {
+        "ach_keyword_count": 0,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 0,
+        "total_indicators": 0,
+        "passed": false
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 0,
+        "signup_elements_count": 0,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 1,
+        "sending_keyword_count": 1,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 0,
+        "api_docs_count": 1,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 0,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 0,
+      "criteria_met": [],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 50
+    },
+    {
+      "platform_name": "gumroad.com",
+      "url": "https://www.gumroad.com",
+      "page_title": "Earn your first dollar online with Gumroad",
+      "verification_time": "2025-10-22T22:49:21.061336",
+      "us_market_analysis": {
+        "ach_keyword_count": 8,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 5,
+        "total_indicators": 13,
+        "passed": true
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 0,
+        "signup_elements_count": 0,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 7,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 0,
+        "api_docs_count": 0,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 0,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 25,
+      "criteria_met": [
+        "🇺🇸美国市场服务"
+      ],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 50
+    }
+  ]
+}

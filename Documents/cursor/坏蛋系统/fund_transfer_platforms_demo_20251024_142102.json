@@ -1,0 +1,1124 @@
+[
+  {
+    "name": "Patreon",
+    "url": "https://www.patreon.com",
+    "description": "创作者资助平台，支持月度订阅和一次性资助，让创作者获得稳定收入",
+    "platform_type": "creator",
+    "payment_methods": [
+      "Credit Card",
+      "Debit Card",
+      "PayPal",
+      "Direct Deposit"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "平台费5-12%，支付处理费2.9%+$0.30",
+    "target_users": [
+      "Creators",
+      "Artists",
+      "Musicians",
+      "Writers",
+      "Podcasters"
+    ],
+    "discovered_at": "2025-10-24T14:21:02.454329",
+    "validation_status": "verified",
+    "confidence_score": 0.9,
+    "notes": "支持ACH直接存款给美国创作者"
+  },
+  {
+    "name": "Kickstarter",
+    "url": "https://www.kickstarter.com",
+    "description": "创意项目众筹平台，支持各种创意项目的资金募集",
+    "platform_type": "crowdfunding",
+    "payment_methods": [
+      "Credit Card",
+      "Debit Card",
+      "Amazon Pay"
+    ],
+    "registration_type": "approval_required",
+    "fee_structure": "5%平台费 + 3-5%支付处理费",
+    "target_users": [
+      "Creators",
+      "Innovators",
+      "Artists",
+      "Entrepreneurs"
+    ],
+    "discovered_at": "2025-10-24T14:21:02.454334",
+    "validation_status": "verified",
+    "confidence_score": 0.85,
+    "notes": "项目审核制，成功后才收费"
+  },
+  {
+    "name": "GoFundMe",
+    "url": "https://www.gofundme.com",
+    "description": "个人募捐平台，支持医疗、教育、紧急情况等各种个人需求",
+    "platform_type": "donation",
+    "payment_methods": [
+      "Credit Card",
+      "Debit Card",
+      "PayPal",
+      "Bank Transfer"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "0%平台费（推荐），2.9%+$0.30支付处理费",
+    "target_users": [
+      "Individuals",
+      "Families",
+      "Nonprofits",
+      "Communities"
+    ],
+    "discovered_at": "2025-10-24T14:21:02.454336",
+    "validation_status": "verified",
+    "confidence_score": 0.88,
+    "notes": "支持快速取款，24小时客服"
+  },
+  {
+    "name": "Indiegogo",
+    "url": "https://www.indiegogo.com",
+    "description": "多元化众筹平台，支持科技创新、创意项目等多种类型",
+    "platform_type": "crowdfunding",
+    "payment_methods": [
+      "Credit Card",
+      "Debit Card",
+      "PayPal",
+      "Apple Pay",
+      "Google Pay"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "5%平台费 + 3-5%支付处理费",
+    "target_users": [
+      "Entrepreneurs",
+      "Innovators",
+      "Creators",
+      "Startups"
+    ],
+    "discovered_at": "2025-10-24T14:21:02.454337",
+    "validation_status": "verified",
+    "confidence_score": 0.82,
+    "notes": "支持固定和灵活众筹模式"
+  },
+  {
+    "name": "Eventbrite",
+    "url": "https://www.eventbrite.com",
+    "description": "活动管理和售票平台，支持各种规模的活动组织",
+    "platform_type": "ticketing",
+    "payment_methods": [
+      "Credit Card",
+      "Debit Card",
+      "PayPal",
+      "Apple Pay",
+      "Google Pay"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "服务费6.95% + $0.99/票（美国）",
+    "target_users": [
+      "Event Organizers",
+      "Conference Planners",
+      "Artists",
+      "Educators"
+    ],
+    "discovered_at": "2025-10-24T14:21:02.454337",
+    "validation_status": "verified",
+    "confidence_score": 0.87,
+    "notes": "支持免费活动，付费活动才收费"
+  },
+  {
+    "name": "Buy Me a Coffee",
+    "url": "https://www.buymeacoffee.com",
+    "description": "简单的小额资助平台，支持粉丝对创作者的一次性支持",
+    "platform_type": "creator",
+    "payment_methods": [
+      "Credit Card",
+      "Debit Card",
+      "PayPal"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "5%平台费 + 支付处理费",
+    "target_users": [
+      "Creators",
+      "Artists",
+      "Writers",
+      "Developers",
+      "Musicians"
+    ],
+    "discovered_at": "2025-10-24T14:21:02.454338",
+    "validation_status": "verified",
+    "confidence_score": 0.8,
+    "notes": "界面简洁，支持会员订阅功能"
+  },
+  {
+    "name": "Ko-fi",
+    "url": "https://www.ko-fi.com",
+    "description": "创作者小额资助平台，支持'请喝咖啡'形式的一次性支持",
+    "platform_type": "creator",
+    "payment_methods": [
+      "Credit Card",
+      "Debit Card",
+      "PayPal"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "0%平台费（免费计划），5%付费计划",
+    "target_users": [
+      "Creators",
+      "Artists",
+      "Writers",
+      "Gamers",
+      "Communities"
+    ],
+    "discovered_at": "2025-10-24T14:21:02.454339",
+    "validation_status": "verified",
+    "confidence_score": 0.78,
+    "notes": "免费使用无平台费，支持会员和商品销售"
+  },
+  {
+    "name": "Gumroad",
+    "url": "https://www.gumroad.com",
+    "description": "数字产品销售平台，支持电子书、软件、设计等数字商品",
+    "platform_type": "creator",
+    "payment_methods": [
+      "Credit Card",
+      "Debit Card",
+      "PayPal",
+      "Apple Pay",
+      "Google Pay"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "10%平台费",
+    "target_users": [
+      "Creators",
+      "Artists",
+      "Writers",
+      "Developers",
+      "Designers"
+    ],
+    "discovered_at": "2025-10-24T14:21:02.454340",
+    "validation_status": "verified",
+    "confidence_score": 0.83,
+    "notes": "支持数字和实体产品，内置营销工具"
+  },
+  {
+    "name": "Upwork",
+    "url": "https://www.upwork.com",
+    "description": "自由职业者服务平台，连接客户和自由职业者",
+    "platform_type": "service",
+    "payment_methods": [
+      "Bank Transfer",
+      "PayPal",
+      "Wire Transfer",
+      "Payoneer"
+    ],
+    "registration_type": "approval_required",
+    "fee_structure": "20%服务费（前$500），10%（$500.01-$10,000），5%（$10,000+）",
+    "target_users": [
+      "Freelancers",
+      "Consultants",
+      "Businesses",
+      "Clients"
+    ],
+    "discovered_at": "2025-10-24T14:21:02.454340",
+    "validation_status": "verified",
+    "confidence_score": 0.85,
+    "notes": "支持多种支付方式，有纠纷保护机制"
+  },
+  {
+    "name": "Fiverr",
+    "url": "https://www.fiverr.com",
+    "description": "技能服务平台，以$5起步的微任务著称",
+    "platform_type": "service",
+    "payment_methods": [
+      "Credit Card",
+      "Debit Card",
+      "PayPal",
+      "Bank Transfer"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "20%服务费",
+    "target_users": [
+      "Freelancers",
+      "Creative Professionals",
+      "Businesses",
+      "Entrepreneurs"
+    ],
+    "discovered_at": "2025-10-24T14:21:02.454341",
+    "validation_status": "verified",
+    "confidence_score": 0.82,
+    "notes": "支持多种技能分类，有升级服务选项"
+  },
+  {
+    "name": "PayPal",
+    "url": "https://www.paypal.com",
+    "description": "全球数字支付平台，支持个人和商业交易",
+    "platform_type": "payment",
+    "payment_methods": [
+      "Bank Account",
+      "Credit Card",
+      "Debit Card",
+      "PayPal Balance"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "免费（个人转账），2.9%+$0.30（商业收款）",
+    "target_users": [
+      "Individuals",
+      "Businesses",
+      "Freelancers",
+      "Online Sellers"
+    ],
+    "discovered_at": "2025-10-24T14:21:02.454342",
+    "validation_status": "verified",
+    "confidence_score": 0.95,
+    "notes": "支持即时银行转账，全球通用"
+  },
+  {
+    "name": "Stripe",
+    "url": "https://stripe.com",
+    "description": "在线支付处理平台，为企业和个人提供支付解决方案",
+    "platform_type": "payment",
+    "payment_methods": [
+      "Credit Card",
+      "Debit Card",
+      "ACH",
+      "Apple Pay",
+      "Google Pay",
+      "Bank Transfer"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "2.9%+$0.30（在线交易），0.8%（ACH）",
+    "target_users": [
+      "Businesses",
+      "Platforms",
+      "Marketplaces",
+      "Nonprofits"
+    ],
+    "discovered_at": "2025-10-24T14:21:02.454342",
+    "validation_status": "verified",
+    "confidence_score": 0.92,
+    "notes": "支持ACH Direct Debit，开发者友好"
+  },
+  {
+    "name": "Square",
+    "url": "https://www.squareup.com",
+    "description": "综合支付解决方案，支持线上和线下支付",
+    "platform_type": "payment",
+    "payment_methods": [
+      "Credit Card",
+      "Debit Card",
+      "ACH",
+      "Cash App",
+      "Gift Cards"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "2.6%+$0.10（在线），1%（ACH，最低$1）",
+    "target_users": [
+      "Small Businesses",
+      "Retailers",
+      "Restaurants",
+      "Service Providers"
+    ],
+    "discovered_at": "2025-10-24T14:21:02.454343",
+    "validation_status": "verified",
+    "confidence_score": 0.88,
+    "notes": "支持ACH银行转账，2-3个工作日到账"
+  },
+  {
+    "name": "Venmo",
+    "url": "https://www.venmo.com",
+    "description": "社交支付应用，支持朋友间的快速转账",
+    "platform_type": "payment",
+    "payment_methods": [
+      "Bank Account",
+      "Credit Card",
+      "Debit Card",
+      "Venmo Balance"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "免费（银行转账），3%（信用卡）",
+    "target_users": [
+      "Individuals",
+      "Friends",
+      "Family",
+      "Small Groups"
+    ],
+    "discovered_at": "2025-10-24T14:21:02.454344",
+    "validation_status": "verified",
+    "confidence_score": 0.75,
+    "notes": "即时转账，有社交功能"
+  },
+  {
+    "name": "Cash App",
+    "url": "https://www.cash.app",
+    "description": "移动支付应用，支持P2P转账和比特币交易",
+    "platform_type": "payment",
+    "payment_methods": [
+      "Bank Account",
+      "Credit Card",
+      "Debit Card",
+      "Bitcoin"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "免费（标准转账），1.5%（即时转账）",
+    "target_users": [
+      "Individuals",
+      "Friends",
+      "Small Businesses"
+    ],
+    "discovered_at": "2025-10-24T14:21:02.454344",
+    "validation_status": "verified",
+    "confidence_score": 0.73,
+    "notes": "支持股票和比特币投资"
+  },
+  {
+    "name": "Shopify",
+    "url": "https://shopify.com",
+    "description": "通过4项验证的平台",
+    "platform_type": "verified",
+    "payment_methods": [
+      "Multiple"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "待验证",
+    "target_users": [
+      "待验证"
+    ],
+    "discovered_at": "2025-10-24T15:30:59.535220",
+    "validation_status": "verified",
+    "confidence_score": 1.0,
+    "notes": "通过验证: ['us_market', 'self_register', 'third_party_payment', 'embedded_payment']"
+  },
+  {
+    "name": "Bigcommerce",
+    "url": "https://bigcommerce.com",
+    "description": "通过4项验证的平台",
+    "platform_type": "verified",
+    "payment_methods": [
+      "Multiple"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "待验证",
+    "target_users": [
+      "待验证"
+    ],
+    "discovered_at": "2025-10-24T15:31:00.319162",
+    "validation_status": "verified",
+    "confidence_score": 1.0,
+    "notes": "通过验证: ['us_market', 'self_register', 'third_party_payment', 'embedded_payment']"
+  },
+  {
+    "name": "Wise",
+    "url": "https://wise.com",
+    "description": "通过4项验证的平台",
+    "platform_type": "verified",
+    "payment_methods": [
+      "Multiple"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "待验证",
+    "target_users": [
+      "待验证"
+    ],
+    "discovered_at": "2025-10-24T15:31:02.009980",
+    "validation_status": "verified",
+    "confidence_score": 1.0,
+    "notes": "通过验证: ['us_market', 'self_register', 'third_party_payment', 'embedded_payment']"
+  },
+  {
+    "name": "Squarespace",
+    "url": "https://squarespace.com",
+    "description": "通过4项验证的平台",
+    "platform_type": "verified",
+    "payment_methods": [
+      "Multiple"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "待验证",
+    "target_users": [
+      "待验证"
+    ],
+    "discovered_at": "2025-10-24T15:31:03.017423",
+    "validation_status": "verified",
+    "confidence_score": 1.0,
+    "notes": "通过验证: ['us_market', 'self_register', 'third_party_payment', 'embedded_payment']"
+  },
+  {
+    "name": "Woocommerce",
+    "url": "https://woocommerce.com",
+    "description": "通过4项验证的平台",
+    "platform_type": "verified",
+    "payment_methods": [
+      "Multiple"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "待验证",
+    "target_users": [
+      "待验证"
+    ],
+    "discovered_at": "2025-10-24T15:31:03.577066",
+    "validation_status": "verified",
+    "confidence_score": 1.0,
+    "notes": "通过验证: ['us_market', 'self_register', 'third_party_payment', 'embedded_payment']"
+  },
+  {
+    "name": "Wix",
+    "url": "https://wix.com",
+    "description": "通过4项验证的平台",
+    "platform_type": "verified",
+    "payment_methods": [
+      "Multiple"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "待验证",
+    "target_users": [
+      "待验证"
+    ],
+    "discovered_at": "2025-10-24T15:31:03.830651",
+    "validation_status": "verified",
+    "confidence_score": 1.0,
+    "notes": "通过验证: ['us_market', 'self_register', 'third_party_payment', 'embedded_payment']"
+  },
+  {
+    "name": "Teachable",
+    "url": "https://teachable.com",
+    "description": "通过4项验证的平台",
+    "platform_type": "verified",
+    "payment_methods": [
+      "Multiple"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "待验证",
+    "target_users": [
+      "待验证"
+    ],
+    "discovered_at": "2025-10-24T15:31:04.902744",
+    "validation_status": "verified",
+    "confidence_score": 1.0,
+    "notes": "通过验证: ['us_market', 'self_register', 'third_party_payment', 'embedded_payment']"
+  },
+  {
+    "name": "Aweber",
+    "url": "https://aweber.com",
+    "description": "YOLO模式发现的4/4项验证平台",
+    "platform_type": "yolo_verified",
+    "payment_methods": [
+      "Multiple"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "YOLO验证",
+    "target_users": [
+      "YOLO发现"
+    ],
+    "discovered_at": "2025-10-24T15:32:24.751271",
+    "validation_status": "verified",
+    "confidence_score": 1.0,
+    "notes": "🚀 YOLO模式通过验证: 4/4项"
+  },
+  {
+    "name": "Adyen",
+    "url": "https://adyen.com",
+    "description": "YOLO模式发现的4/4项验证平台",
+    "platform_type": "yolo_verified",
+    "payment_methods": [
+      "Multiple"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "YOLO验证",
+    "target_users": [
+      "YOLO发现"
+    ],
+    "discovered_at": "2025-10-24T15:32:25.125472",
+    "validation_status": "verified",
+    "confidence_score": 1.0,
+    "notes": "🚀 YOLO模式通过验证: 4/4项"
+  },
+  {
+    "name": "Authorize.Net",
+    "url": "https://authorize.net",
+    "description": "YOLO模式发现的4/4项验证平台",
+    "platform_type": "yolo_verified",
+    "payment_methods": [
+      "Multiple"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "YOLO验证",
+    "target_users": [
+      "YOLO发现"
+    ],
+    "discovered_at": "2025-10-24T15:32:25.228508",
+    "validation_status": "verified",
+    "confidence_score": 1.0,
+    "notes": "🚀 YOLO模式通过验证: 4/4项"
+  },
+  {
+    "name": "Samcart",
+    "url": "https://samcart.com",
+    "description": "YOLO模式发现的4/4项验证平台",
+    "platform_type": "yolo_verified",
+    "payment_methods": [
+      "Multiple"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "YOLO验证",
+    "target_users": [
+      "YOLO发现"
+    ],
+    "discovered_at": "2025-10-24T15:32:25.356636",
+    "validation_status": "verified",
+    "confidence_score": 1.0,
+    "notes": "🚀 YOLO模式通过验证: 4/4项"
+  },
+  {
+    "name": "Popmoney",
+    "url": "https://popmoney.com",
+    "description": "YOLO模式发现的4/4项验证平台",
+    "platform_type": "yolo_verified",
+    "payment_methods": [
+      "Multiple"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "YOLO验证",
+    "target_users": [
+      "YOLO发现"
+    ],
+    "discovered_at": "2025-10-24T15:32:25.548950",
+    "validation_status": "verified",
+    "confidence_score": 1.0,
+    "notes": "🚀 YOLO模式通过验证: 4/4项"
+  },
+  {
+    "name": "Thrivecart",
+    "url": "https://thrivecart.com",
+    "description": "YOLO模式发现的4/4项验证平台",
+    "platform_type": "yolo_verified",
+    "payment_methods": [
+      "Multiple"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "YOLO验证",
+    "target_users": [
+      "YOLO发现"
+    ],
+    "discovered_at": "2025-10-24T15:32:25.677398",
+    "validation_status": "verified",
+    "confidence_score": 1.0,
+    "notes": "🚀 YOLO模式通过验证: 4/4项"
+  },
+  {
+    "name": "Zelle",
+    "url": "https://zelle.com",
+    "description": "YOLO模式发现的4/4项验证平台",
+    "platform_type": "yolo_verified",
+    "payment_methods": [
+      "Multiple"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "YOLO验证",
+    "target_users": [
+      "YOLO发现"
+    ],
+    "discovered_at": "2025-10-24T15:32:25.771003",
+    "validation_status": "verified",
+    "confidence_score": 1.0,
+    "notes": "🚀 YOLO模式通过验证: 4/4项"
+  },
+  {
+    "name": "Transferwise",
+    "url": "https://transferwise.com",
+    "description": "YOLO模式发现的4/4项验证平台",
+    "platform_type": "yolo_verified",
+    "payment_methods": [
+      "Multiple"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "YOLO验证",
+    "target_users": [
+      "YOLO发现"
+    ],
+    "discovered_at": "2025-10-24T15:32:25.919994",
+    "validation_status": "verified",
+    "confidence_score": 1.0,
+    "notes": "🚀 YOLO模式通过验证: 4/4项"
+  },
+  {
+    "name": "Chargebee",
+    "url": "https://chargebee.com",
+    "description": "YOLO模式发现的4/4项验证平台",
+    "platform_type": "yolo_verified",
+    "payment_methods": [
+      "Multiple"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "YOLO验证",
+    "target_users": [
+      "YOLO发现"
+    ],
+    "discovered_at": "2025-10-24T15:32:26.123543",
+    "validation_status": "verified",
+    "confidence_score": 1.0,
+    "notes": "🚀 YOLO模式通过验证: 4/4项"
+  },
+  {
+    "name": "Tilda.Cc",
+    "url": "https://tilda.cc",
+    "description": "YOLO模式发现的4/4项验证平台",
+    "platform_type": "yolo_verified",
+    "payment_methods": [
+      "Multiple"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "YOLO验证",
+    "target_users": [
+      "YOLO发现"
+    ],
+    "discovered_at": "2025-10-24T15:32:27.092718",
+    "validation_status": "verified",
+    "confidence_score": 1.0,
+    "notes": "🚀 YOLO模式通过验证: 4/4项"
+  },
+  {
+    "name": "Square",
+    "url": "https://square.com",
+    "description": "YOLO模式发现的4/4项验证平台",
+    "platform_type": "yolo_verified",
+    "payment_methods": [
+      "Multiple"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "YOLO验证",
+    "target_users": [
+      "YOLO发现"
+    ],
+    "discovered_at": "2025-10-24T15:32:27.145317",
+    "validation_status": "verified",
+    "confidence_score": 1.0,
+    "notes": "🚀 YOLO模式通过验证: 4/4项"
+  },
+  {
+    "name": "Bluesnap",
+    "url": "https://bluesnap.com",
+    "description": "YOLO模式发现的4/4项验证平台",
+    "platform_type": "yolo_verified",
+    "payment_methods": [
+      "Multiple"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "YOLO验证",
+    "target_users": [
+      "YOLO发现"
+    ],
+    "discovered_at": "2025-10-24T15:32:27.192618",
+    "validation_status": "verified",
+    "confidence_score": 1.0,
+    "notes": "🚀 YOLO模式通过验证: 4/4项"
+  },
+  {
+    "name": "Payoneer",
+    "url": "https://payoneer.com",
+    "description": "YOLO模式发现的4/4项验证平台",
+    "platform_type": "yolo_verified",
+    "payment_methods": [
+      "Multiple"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "YOLO验证",
+    "target_users": [
+      "YOLO发现"
+    ],
+    "discovered_at": "2025-10-24T15:32:27.257658",
+    "validation_status": "verified",
+    "confidence_score": 1.0,
+    "notes": "🚀 YOLO模式通过验证: 4/4项"
+  },
+  {
+    "name": "Skrill",
+    "url": "https://skrill.com",
+    "description": "YOLO模式发现的4/4项验证平台",
+    "platform_type": "yolo_verified",
+    "payment_methods": [
+      "Multiple"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "YOLO验证",
+    "target_users": [
+      "YOLO发现"
+    ],
+    "discovered_at": "2025-10-24T15:32:27.399917",
+    "validation_status": "verified",
+    "confidence_score": 1.0,
+    "notes": "🚀 YOLO模式通过验证: 4/4项"
+  },
+  {
+    "name": "Substack",
+    "url": "https://substack.com",
+    "description": "Agent团队验证的3/4项平台",
+    "platform_type": "agent_verified",
+    "payment_methods": [
+      "Multiple"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "Agent验证",
+    "target_users": [
+      "Agent发现"
+    ],
+    "discovered_at": "2025-10-24T15:36:38.731293",
+    "validation_status": "partial",
+    "confidence_score": 0.75,
+    "notes": "🤖 Agent团队通过验证: 3/4项"
+  },
+  {
+    "name": "Convertkit",
+    "url": "https://convertkit.com",
+    "description": "Agent团队验证的3/4项平台",
+    "platform_type": "agent_verified",
+    "payment_methods": [
+      "Multiple"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "Agent验证",
+    "target_users": [
+      "Agent发现"
+    ],
+    "discovered_at": "2025-10-24T15:36:38.731310",
+    "validation_status": "partial",
+    "confidence_score": 0.75,
+    "notes": "🤖 Agent团队通过验证: 3/4项"
+  },
+  {
+    "name": "Hashnode",
+    "url": "https://hashnode.com",
+    "description": "Agent团队验证的3/4项平台",
+    "platform_type": "agent_verified",
+    "payment_methods": [
+      "Multiple"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "Agent验证",
+    "target_users": [
+      "Agent发现"
+    ],
+    "discovered_at": "2025-10-24T15:36:38.731315",
+    "validation_status": "partial",
+    "confidence_score": 0.75,
+    "notes": "🤖 Agent团队通过验证: 3/4项"
+  },
+  {
+    "name": "Ghost.Org",
+    "url": "https://ghost.org",
+    "description": "Agent团队验证的3/4项平台",
+    "platform_type": "agent_verified",
+    "payment_methods": [
+      "Multiple"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "Agent验证",
+    "target_users": [
+      "Agent发现"
+    ],
+    "discovered_at": "2025-10-24T15:36:38.731319",
+    "validation_status": "partial",
+    "confidence_score": 0.75,
+    "notes": "🤖 Agent团队通过验证: 3/4项"
+  },
+  {
+    "name": "Mailchimp",
+    "url": "https://mailchimp.com",
+    "description": "Agent团队验证的4/4项平台",
+    "platform_type": "agent_verified",
+    "payment_methods": [
+      "Multiple"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "Agent验证",
+    "target_users": [
+      "Agent发现"
+    ],
+    "discovered_at": "2025-10-24T15:36:38.731321",
+    "validation_status": "verified",
+    "confidence_score": 1.0,
+    "notes": "🤖 Agent团队通过验证: 4/4项"
+  },
+  {
+    "name": "Flodesk",
+    "url": "https://flodesk.com",
+    "description": "Agent团队验证的3/4项平台",
+    "platform_type": "agent_verified",
+    "payment_methods": [
+      "Multiple"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "Agent验证",
+    "target_users": [
+      "Agent发现"
+    ],
+    "discovered_at": "2025-10-24T15:36:38.731324",
+    "validation_status": "partial",
+    "confidence_score": 0.75,
+    "notes": "🤖 Agent团队通过验证: 3/4项"
+  },
+  {
+    "name": "Beehiiv",
+    "url": "https://beehiiv.com",
+    "description": "Agent团队验证的3/4项平台",
+    "platform_type": "agent_verified",
+    "payment_methods": [
+      "Multiple"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "Agent验证",
+    "target_users": [
+      "Agent发现"
+    ],
+    "discovered_at": "2025-10-24T15:36:38.731327",
+    "validation_status": "partial",
+    "confidence_score": 0.75,
+    "notes": "🤖 Agent团队通过验证: 3/4项"
+  },
+  {
+    "name": "Kit",
+    "url": "https://kit.com",
+    "description": "Agent团队验证的3/4项平台",
+    "platform_type": "agent_verified",
+    "payment_methods": [
+      "Multiple"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "Agent验证",
+    "target_users": [
+      "Agent发现"
+    ],
+    "discovered_at": "2025-10-24T15:36:38.731330",
+    "validation_status": "partial",
+    "confidence_score": 0.75,
+    "notes": "🤖 Agent团队通过验证: 3/4项"
+  },
+  {
+    "name": "Getresponse",
+    "url": "https://getresponse.com",
+    "description": "Agent团队验证的3/4项平台",
+    "platform_type": "agent_verified",
+    "payment_methods": [
+      "Multiple"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "Agent验证",
+    "target_users": [
+      "Agent发现"
+    ],
+    "discovered_at": "2025-10-24T15:36:38.731332",
+    "validation_status": "partial",
+    "confidence_score": 0.75,
+    "notes": "🤖 Agent团队通过验证: 3/4项"
+  },
+  {
+    "name": "Activecampaign",
+    "url": "https://activecampaign.com",
+    "description": "Agent团队验证的3/4项平台",
+    "platform_type": "agent_verified",
+    "payment_methods": [
+      "Multiple"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "Agent验证",
+    "target_users": [
+      "Agent发现"
+    ],
+    "discovered_at": "2025-10-24T15:36:38.731335",
+    "validation_status": "partial",
+    "confidence_score": 0.75,
+    "notes": "🤖 Agent团队通过验证: 3/4项"
+  },
+  {
+    "name": "Cartflows",
+    "url": "https://cartflows.com",
+    "description": "Agent团队验证的3/4项平台",
+    "platform_type": "agent_verified",
+    "payment_methods": [
+      "Multiple"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "Agent验证",
+    "target_users": [
+      "Agent发现"
+    ],
+    "discovered_at": "2025-10-24T15:36:38.731338",
+    "validation_status": "partial",
+    "confidence_score": 0.75,
+    "notes": "🤖 Agent团队通过验证: 3/4项"
+  },
+  {
+    "name": "Paddle",
+    "url": "https://paddle.com",
+    "description": "Agent团队验证的3/4项平台",
+    "platform_type": "agent_verified",
+    "payment_methods": [
+      "Multiple"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "Agent验证",
+    "target_users": [
+      "Agent发现"
+    ],
+    "discovered_at": "2025-10-24T15:36:38.731340",
+    "validation_status": "partial",
+    "confidence_score": 0.75,
+    "notes": "🤖 Agent团队通过验证: 3/4项"
+  },
+  {
+    "name": "Fastspring",
+    "url": "https://fastspring.com",
+    "description": "Agent团队验证的3/4项平台",
+    "platform_type": "agent_verified",
+    "payment_methods": [
+      "Multiple"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "Agent验证",
+    "target_users": [
+      "Agent发现"
+    ],
+    "discovered_at": "2025-10-24T15:36:38.731342",
+    "validation_status": "partial",
+    "confidence_score": 0.75,
+    "notes": "🤖 Agent团队通过验证: 3/4项"
+  },
+  {
+    "name": "Unbounce",
+    "url": "https://unbounce.com",
+    "description": "Agent团队验证的3/4项平台",
+    "platform_type": "agent_verified",
+    "payment_methods": [
+      "Multiple"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "Agent验证",
+    "target_users": [
+      "Agent发现"
+    ],
+    "discovered_at": "2025-10-24T15:36:38.731345",
+    "validation_status": "partial",
+    "confidence_score": 0.75,
+    "notes": "🤖 Agent团队通过验证: 3/4项"
+  },
+  {
+    "name": "Leadpages",
+    "url": "https://leadpages.com",
+    "description": "Agent团队验证的3/4项平台",
+    "platform_type": "agent_verified",
+    "payment_methods": [
+      "Multiple"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "Agent验证",
+    "target_users": [
+      "Agent发现"
+    ],
+    "discovered_at": "2025-10-24T15:36:38.731347",
+    "validation_status": "partial",
+    "confidence_score": 0.75,
+    "notes": "🤖 Agent团队通过验证: 3/4项"
+  },
+  {
+    "name": "Carrd.Co",
+    "url": "https://carrd.co",
+    "description": "Agent团队验证的3/4项平台",
+    "platform_type": "agent_verified",
+    "payment_methods": [
+      "Multiple"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "Agent验证",
+    "target_users": [
+      "Agent发现"
+    ],
+    "discovered_at": "2025-10-24T15:36:38.731350",
+    "validation_status": "partial",
+    "confidence_score": 0.75,
+    "notes": "🤖 Agent团队通过验证: 3/4项"
+  },
+  {
+    "name": "Chargify",
+    "url": "https://chargify.com",
+    "description": "Agent团队验证的4/4项平台",
+    "platform_type": "agent_verified",
+    "payment_methods": [
+      "Multiple"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "Agent验证",
+    "target_users": [
+      "Agent发现"
+    ],
+    "discovered_at": "2025-10-24T15:36:38.731352",
+    "validation_status": "verified",
+    "confidence_score": 1.0,
+    "notes": "🤖 Agent团队通过验证: 4/4项"
+  },
+  {
+    "name": "Clickfunnels",
+    "url": "https://clickfunnels.com",
+    "description": "Agent团队验证的3/4项平台",
+    "platform_type": "agent_verified",
+    "payment_methods": [
+      "Multiple"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "Agent验证",
+    "target_users": [
+      "Agent发现"
+    ],
+    "discovered_at": "2025-10-24T15:36:38.731355",
+    "validation_status": "partial",
+    "confidence_score": 0.75,
+    "notes": "🤖 Agent团队通过验证: 3/4项"
+  },
+  {
+    "name": "Experiment",
+    "url": "https://experiment.com",
+    "description": "Agent团队验证的3/4项平台",
+    "platform_type": "agent_verified",
+    "payment_methods": [
+      "Multiple"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "Agent验证",
+    "target_users": [
+      "Agent发现"
+    ],
+    "discovered_at": "2025-10-24T15:36:38.731357",
+    "validation_status": "partial",
+    "confidence_score": 0.75,
+    "notes": "🤖 Agent团队通过验证: 3/4项"
+  },
+  {
+    "name": "Substack",
+    "url": "https://substack.com",
+    "description": "Agent团队验证的3/4项平台",
+    "platform_type": "agent_verified",
+    "payment_methods": [
+      "Multiple"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "Agent验证",
+    "target_users": [
+      "Agent发现"
+    ],
+    "discovered_at": "2025-10-24T15:36:38.731360",
+    "validation_status": "partial",
+    "confidence_score": 0.75,
+    "notes": "🤖 Agent团队通过验证: 3/4项"
+  },
+  {
+    "name": "Convertkit",
+    "url": "https://convertkit.com",
+    "description": "Agent团队验证的3/4项平台",
+    "platform_type": "agent_verified",
+    "payment_methods": [
+      "Multiple"
+    ],
+    "registration_type": "self_register",
+    "fee_structure": "Agent验证",
+    "target_users": [
+      "Agent发现"
+    ],
+    "discovered_at": "2025-10-24T15:36:38.731363",
+    "validation_status": "partial",
+    "confidence_score": 0.75,
+    "notes": "🤖 Agent团队通过验证: 3/4项"
+  }
+]

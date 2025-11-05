@@ -1,0 +1,687 @@
+{
+  "cycle_number": 11,
+  "cycle_start_time": "2025-10-22T21:59:48.891724",
+  "cycle_end_time": "2025-10-22T22:10:16.583157",
+  "platforms_verified": 7,
+  "summary": {
+    "perfect_platforms": 0,
+    "excellent_platforms": 1,
+    "good_platforms": 4,
+    "needs_improvement": 2,
+    "bank_features_count": 1,
+    "dual_features_count": 0,
+    "average_score": 43.57142857142857
+  },
+  "top_platforms": [
+    {
+      "platform_name": "hulu.com",
+      "url": "https://www.hulu.com",
+      "page_title": "Stream TV and Movies Live and Online | Hulu",
+      "verification_time": "2025-10-22T22:10:13.505017",
+      "us_market_analysis": {
+        "ach_keyword_count": 46,
+        "has_us_pages": true,
+        "deep_us_keyword_count": 30,
+        "total_indicators": 86,
+        "passed": true
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 18,
+        "signup_elements_count": 5,
+        "enterprise_keyword_count": 0,
+        "passed": true
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 30,
+        "sending_keyword_count": 0,
+        "passed": true
+      },
+      "integration_analysis": {
+        "api_keyword_count": 0,
+        "api_docs_count": 0,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 0,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 75,
+      "criteria_met": [
+        "🇺🇸美国市场服务",
+        "🔑自注册功能",
+        "💰收款能力"
+      ],
+      "recommendation": "✅推荐使用 - 优秀平台",
+      "cycle_number": 11
+    },
+    {
+      "platform_name": "skrill.com",
+      "url": "https://www.skrill.com",
+      "page_title": "Digital wallet for money transfers & online payments | Skrill",
+      "verification_time": "2025-10-22T22:09:36.673769",
+      "us_market_analysis": {
+        "ach_keyword_count": 9,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 0,
+        "total_indicators": 9,
+        "passed": true
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 4,
+        "signup_elements_count": 3,
+        "enterprise_keyword_count": 0,
+        "passed": true
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 7,
+        "sending_keyword_count": 2,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 1,
+        "api_docs_count": 1,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 8,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": true,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 8,
+        "passed": true,
+        "feature_type": "💳信用卡/Apple Pay"
+      },
+      "final_score": 55,
+      "criteria_met": [
+        "🇺🇸美国市场服务",
+        "🔑自注册功能",
+        "🏦银行功能"
+      ],
+      "recommendation": "⚠️可考虑使用 - 良好平台",
+      "cycle_number": 11
+    },
+    {
+      "platform_name": "worldpay.com",
+      "url": "https://www.worldpay.com",
+      "page_title": "Worldpay: Unleash Your Payments Potential",
+      "verification_time": "2025-10-22T22:09:41.617348",
+      "us_market_analysis": {
+        "ach_keyword_count": 4,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 2,
+        "total_indicators": 6,
+        "passed": true
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 1,
+        "signup_elements_count": 1,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 7,
+        "sending_keyword_count": 1,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 3,
+        "api_docs_count": 2,
+        "embedded_keyword_count": 5,
+        "passed": true
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 1,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 1,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 50,
+      "criteria_met": [
+        "🇺🇸美国市场服务",
+        "🔗集成能力"
+      ],
+      "recommendation": "⚠️可考虑使用 - 良好平台",
+      "cycle_number": 11
+    },
+    {
+      "platform_name": "bill.com",
+      "url": "https://www.bill.com",
+      "page_title": "BILL | Financial Operations Platform for Businesses & Firms",
+      "verification_time": "2025-10-22T22:09:45.613295",
+      "us_market_analysis": {
+        "ach_keyword_count": 12,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 4,
+        "total_indicators": 16,
+        "passed": true
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 6,
+        "signup_elements_count": 4,
+        "enterprise_keyword_count": 0,
+        "passed": true
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 5,
+        "sending_keyword_count": 1,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 20,
+        "api_docs_count": 8,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 1,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 1,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 50,
+      "criteria_met": [
+        "🇺🇸美国市场服务",
+        "🔑自注册功能"
+      ],
+      "recommendation": "⚠️可考虑使用 - 良好平台",
+      "cycle_number": 11
+    },
+    {
+      "platform_name": "yardi.com",
+      "url": "https://www.yardi.com",
+      "page_title": "Yardi: Real Estate Software Energized For Tomorrow, Today",
+      "verification_time": "2025-10-22T22:10:05.305374",
+      "us_market_analysis": {
+        "ach_keyword_count": 9,
+        "has_us_pages": true,
+        "deep_us_keyword_count": 0,
+        "total_indicators": 19,
+        "passed": true
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 3,
+        "signup_elements_count": 1,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 29,
+        "sending_keyword_count": 0,
+        "passed": true
+      },
+      "integration_analysis": {
+        "api_keyword_count": 5,
+        "api_docs_count": 1,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 0,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 50,
+      "criteria_met": [
+        "🇺🇸美国市场服务",
+        "💰收款能力"
+      ],
+      "recommendation": "⚠️可考虑使用 - 良好平台",
+      "cycle_number": 11
+    },
+    {
+      "platform_name": "woocommerce.com",
+      "url": "https://www.woocommerce.com",
+      "page_title": "WooCommerce",
+      "verification_time": "2025-10-22T22:09:53.551156",
+      "us_market_analysis": {
+        "ach_keyword_count": 1,
+        "has_us_pages": true,
+        "deep_us_keyword_count": 0,
+        "total_indicators": 11,
+        "passed": true
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 3,
+        "signup_elements_count": 2,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 1,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 3,
+        "api_docs_count": 4,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 1,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 1,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 25,
+      "criteria_met": [
+        "🇺🇸美国市场服务"
+      ],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 11
+    },
+    {
+      "platform_name": "paymentcloud.com",
+      "url": "https://www.paymentcloud.com",
+      "page_title": "paymentcloud.com",
+      "verification_time": "2025-10-22T22:10:00.237521",
+      "us_market_analysis": {
+        "ach_keyword_count": 0,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 0,
+        "total_indicators": 0,
+        "passed": false
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 0,
+        "signup_elements_count": 0,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 0,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 0,
+        "api_docs_count": 0,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 0,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 0,
+      "criteria_met": [],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 11
+    }
+  ],
+  "detailed_results": [
+    {
+      "platform_name": "skrill.com",
+      "url": "https://www.skrill.com",
+      "page_title": "Digital wallet for money transfers & online payments | Skrill",
+      "verification_time": "2025-10-22T22:09:36.673769",
+      "us_market_analysis": {
+        "ach_keyword_count": 9,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 0,
+        "total_indicators": 9,
+        "passed": true
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 4,
+        "signup_elements_count": 3,
+        "enterprise_keyword_count": 0,
+        "passed": true
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 7,
+        "sending_keyword_count": 2,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 1,
+        "api_docs_count": 1,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 8,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": true,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 8,
+        "passed": true,
+        "feature_type": "💳信用卡/Apple Pay"
+      },
+      "final_score": 55,
+      "criteria_met": [
+        "🇺🇸美国市场服务",
+        "🔑自注册功能",
+        "🏦银行功能"
+      ],
+      "recommendation": "⚠️可考虑使用 - 良好平台",
+      "cycle_number": 11
+    },
+    {
+      "platform_name": "worldpay.com",
+      "url": "https://www.worldpay.com",
+      "page_title": "Worldpay: Unleash Your Payments Potential",
+      "verification_time": "2025-10-22T22:09:41.617348",
+      "us_market_analysis": {
+        "ach_keyword_count": 4,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 2,
+        "total_indicators": 6,
+        "passed": true
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 1,
+        "signup_elements_count": 1,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 7,
+        "sending_keyword_count": 1,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 3,
+        "api_docs_count": 2,
+        "embedded_keyword_count": 5,
+        "passed": true
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 1,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 1,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 50,
+      "criteria_met": [
+        "🇺🇸美国市场服务",
+        "🔗集成能力"
+      ],
+      "recommendation": "⚠️可考虑使用 - 良好平台",
+      "cycle_number": 11
+    },
+    {
+      "platform_name": "bill.com",
+      "url": "https://www.bill.com",
+      "page_title": "BILL | Financial Operations Platform for Businesses & Firms",
+      "verification_time": "2025-10-22T22:09:45.613295",
+      "us_market_analysis": {
+        "ach_keyword_count": 12,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 4,
+        "total_indicators": 16,
+        "passed": true
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 6,
+        "signup_elements_count": 4,
+        "enterprise_keyword_count": 0,
+        "passed": true
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 5,
+        "sending_keyword_count": 1,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 20,
+        "api_docs_count": 8,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 1,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 1,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 50,
+      "criteria_met": [
+        "🇺🇸美国市场服务",
+        "🔑自注册功能"
+      ],
+      "recommendation": "⚠️可考虑使用 - 良好平台",
+      "cycle_number": 11
+    },
+    {
+      "platform_name": "woocommerce.com",
+      "url": "https://www.woocommerce.com",
+      "page_title": "WooCommerce",
+      "verification_time": "2025-10-22T22:09:53.551156",
+      "us_market_analysis": {
+        "ach_keyword_count": 1,
+        "has_us_pages": true,
+        "deep_us_keyword_count": 0,
+        "total_indicators": 11,
+        "passed": true
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 3,
+        "signup_elements_count": 2,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 1,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 3,
+        "api_docs_count": 4,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 1,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 1,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 25,
+      "criteria_met": [
+        "🇺🇸美国市场服务"
+      ],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 11
+    },
+    {
+      "platform_name": "paymentcloud.com",
+      "url": "https://www.paymentcloud.com",
+      "page_title": "paymentcloud.com",
+      "verification_time": "2025-10-22T22:10:00.237521",
+      "us_market_analysis": {
+        "ach_keyword_count": 0,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 0,
+        "total_indicators": 0,
+        "passed": false
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 0,
+        "signup_elements_count": 0,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 0,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 0,
+        "api_docs_count": 0,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 0,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 0,
+      "criteria_met": [],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 11
+    },
+    {
+      "platform_name": "yardi.com",
+      "url": "https://www.yardi.com",
+      "page_title": "Yardi: Real Estate Software Energized For Tomorrow, Today",
+      "verification_time": "2025-10-22T22:10:05.305374",
+      "us_market_analysis": {
+        "ach_keyword_count": 9,
+        "has_us_pages": true,
+        "deep_us_keyword_count": 0,
+        "total_indicators": 19,
+        "passed": true
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 3,
+        "signup_elements_count": 1,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 29,
+        "sending_keyword_count": 0,
+        "passed": true
+      },
+      "integration_analysis": {
+        "api_keyword_count": 5,
+        "api_docs_count": 1,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 0,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 50,
+      "criteria_met": [
+        "🇺🇸美国市场服务",
+        "💰收款能力"
+      ],
+      "recommendation": "⚠️可考虑使用 - 良好平台",
+      "cycle_number": 11
+    },
+    {
+      "platform_name": "hulu.com",
+      "url": "https://www.hulu.com",
+      "page_title": "Stream TV and Movies Live and Online | Hulu",
+      "verification_time": "2025-10-22T22:10:13.505017",
+      "us_market_analysis": {
+        "ach_keyword_count": 46,
+        "has_us_pages": true,
+        "deep_us_keyword_count": 30,
+        "total_indicators": 86,
+        "passed": true
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 18,
+        "signup_elements_count": 5,
+        "enterprise_keyword_count": 0,
+        "passed": true
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 30,
+        "sending_keyword_count": 0,
+        "passed": true
+      },
+      "integration_analysis": {
+        "api_keyword_count": 0,
+        "api_docs_count": 0,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 0,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 75,
+      "criteria_met": [
+        "🇺🇸美国市场服务",
+        "🔑自注册功能",
+        "💰收款能力"
+      ],
+      "recommendation": "✅推荐使用 - 优秀平台",
+      "cycle_number": 11
+    }
+  ]
+}

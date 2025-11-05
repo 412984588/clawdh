@@ -1,0 +1,781 @@
+{
+  "cycle_number": 2,
+  "cycle_start_time": "2025-10-22T21:59:48.891724",
+  "cycle_end_time": "2025-10-22T22:02:11.853171",
+  "platforms_verified": 8,
+  "summary": {
+    "perfect_platforms": 0,
+    "excellent_platforms": 2,
+    "good_platforms": 2,
+    "needs_improvement": 4,
+    "bank_features_count": 3,
+    "dual_features_count": 0,
+    "average_score": 39.375
+  },
+  "top_platforms": [
+    {
+      "platform_name": "redfin.com",
+      "url": "https://www.redfin.com",
+      "page_title": "Redfin | Real Estate & Homes for Sale, Rentals, Mortgages & Agents",
+      "verification_time": "2025-10-22T22:01:09.064326",
+      "us_market_analysis": {
+        "ach_keyword_count": 9,
+        "has_us_pages": true,
+        "deep_us_keyword_count": 0,
+        "total_indicators": 19,
+        "passed": true
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 6,
+        "signup_elements_count": 3,
+        "enterprise_keyword_count": 0,
+        "passed": true
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 188,
+        "sending_keyword_count": 0,
+        "passed": true
+      },
+      "integration_analysis": {
+        "api_keyword_count": 0,
+        "api_docs_count": 1,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 0,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 75,
+      "criteria_met": [
+        "🇺🇸美国市场服务",
+        "🔑自注册功能",
+        "💰收款能力"
+      ],
+      "recommendation": "✅推荐使用 - 优秀平台",
+      "cycle_number": 2
+    },
+    {
+      "platform_name": "freelancer.com",
+      "url": "https://www.freelancer.com",
+      "page_title": "Hire Freelancers & Find Freelance Jobs Online | Freelancer",
+      "verification_time": "2025-10-22T22:02:08.304171",
+      "us_market_analysis": {
+        "ach_keyword_count": 29,
+        "has_us_pages": true,
+        "deep_us_keyword_count": 27,
+        "total_indicators": 66,
+        "passed": true
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 6,
+        "signup_elements_count": 4,
+        "enterprise_keyword_count": 0,
+        "passed": true
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 6,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 35,
+        "api_docs_count": 33,
+        "embedded_keyword_count": 5,
+        "passed": true
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 0,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 75,
+      "criteria_met": [
+        "🇺🇸美国市场服务",
+        "🔑自注册功能",
+        "🔗集成能力"
+      ],
+      "recommendation": "✅推荐使用 - 优秀平台",
+      "cycle_number": 2
+    },
+    {
+      "platform_name": "dlocal.com",
+      "url": "https://www.dlocal.com",
+      "page_title": "dLocal: Your global payments partner across emerging markets",
+      "verification_time": "2025-10-22T22:01:04.180404",
+      "us_market_analysis": {
+        "ach_keyword_count": 15,
+        "has_us_pages": true,
+        "deep_us_keyword_count": 4,
+        "total_indicators": 29,
+        "passed": true
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 6,
+        "signup_elements_count": 3,
+        "enterprise_keyword_count": 5,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 14,
+        "sending_keyword_count": 0,
+        "passed": true
+      },
+      "integration_analysis": {
+        "api_keyword_count": 19,
+        "api_docs_count": 15,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 6,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 1,
+        "has_credit_card_support": true,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 7,
+        "passed": true,
+        "feature_type": "💳信用卡/Apple Pay"
+      },
+      "final_score": 55,
+      "criteria_met": [
+        "🇺🇸美国市场服务",
+        "💰收款能力",
+        "🏦银行功能"
+      ],
+      "recommendation": "⚠️可考虑使用 - 良好平台",
+      "cycle_number": 2
+    },
+    {
+      "platform_name": "monzo.com",
+      "url": "https://www.monzo.com",
+      "page_title": "Monzo | Your New Favourite Bank",
+      "verification_time": "2025-10-22T22:01:21.058793",
+      "us_market_analysis": {
+        "ach_keyword_count": 3,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 0,
+        "total_indicators": 3,
+        "passed": false
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 27,
+        "signup_elements_count": 6,
+        "enterprise_keyword_count": 0,
+        "passed": true
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 21,
+        "sending_keyword_count": 0,
+        "passed": true
+      },
+      "integration_analysis": {
+        "api_keyword_count": 0,
+        "api_docs_count": 0,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 6,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": true,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 6,
+        "passed": true,
+        "feature_type": "💳信用卡/Apple Pay"
+      },
+      "final_score": 55,
+      "criteria_met": [
+        "🔑自注册功能",
+        "💰收款能力",
+        "🏦银行功能"
+      ],
+      "recommendation": "⚠️可考虑使用 - 良好平台",
+      "cycle_number": 2
+    },
+    {
+      "platform_name": "volusion.com",
+      "url": "https://www.volusion.com",
+      "page_title": "Volusion: Ecommerce Website Builder & Online Selling Platform",
+      "verification_time": "2025-10-22T22:01:12.745570",
+      "us_market_analysis": {
+        "ach_keyword_count": 2,
+        "has_us_pages": true,
+        "deep_us_keyword_count": 0,
+        "total_indicators": 12,
+        "passed": true
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 0,
+        "signup_elements_count": 0,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 2,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 5,
+        "api_docs_count": 0,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 4,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": true,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 4,
+        "passed": true,
+        "feature_type": "💳信用卡/Apple Pay"
+      },
+      "final_score": 30,
+      "criteria_met": [
+        "🇺🇸美国市场服务",
+        "🏦银行功能"
+      ],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 2
+    },
+    {
+      "platform_name": "booking.com",
+      "url": "https://www.booking.com",
+      "page_title": "Booking.com | Official site | The best hotels, flights, car rentals & accommodations",
+      "verification_time": "2025-10-22T22:02:05.722454",
+      "us_market_analysis": {
+        "ach_keyword_count": 16,
+        "has_us_pages": true,
+        "deep_us_keyword_count": 3,
+        "total_indicators": 29,
+        "passed": true
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 4,
+        "signup_elements_count": 2,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 6,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 0,
+        "api_docs_count": 0,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 2,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 2,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 25,
+      "criteria_met": [
+        "🇺🇸美国市场服务"
+      ],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 2
+    },
+    {
+      "platform_name": "bluepay.com",
+      "url": "https://www.bluepay.com",
+      "page_title": "POS System & Credit Card Readers | Clover",
+      "verification_time": "2025-10-22T22:01:15.255585",
+      "us_market_analysis": {
+        "ach_keyword_count": 0,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 0,
+        "total_indicators": 0,
+        "passed": false
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 0,
+        "signup_elements_count": 0,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 1,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 0,
+        "api_docs_count": 0,
+        "embedded_keyword_count": 1,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 2,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 2,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 0,
+      "criteria_met": [],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 2
+    },
+    {
+      "platform_name": "booksy.com",
+      "url": "https://www.booksy.com",
+      "page_title": "Booksy - hair stylists, barbers, beauticians... book appointments online!",
+      "verification_time": "2025-10-22T22:02:01.369133",
+      "us_market_analysis": {
+        "ach_keyword_count": 1,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 0,
+        "total_indicators": 1,
+        "passed": false
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 0,
+        "signup_elements_count": 0,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 1,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 0,
+        "api_docs_count": 0,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 1,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 1,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 0,
+      "criteria_met": [],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 2
+    }
+  ],
+  "detailed_results": [
+    {
+      "platform_name": "dlocal.com",
+      "url": "https://www.dlocal.com",
+      "page_title": "dLocal: Your global payments partner across emerging markets",
+      "verification_time": "2025-10-22T22:01:04.180404",
+      "us_market_analysis": {
+        "ach_keyword_count": 15,
+        "has_us_pages": true,
+        "deep_us_keyword_count": 4,
+        "total_indicators": 29,
+        "passed": true
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 6,
+        "signup_elements_count": 3,
+        "enterprise_keyword_count": 5,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 14,
+        "sending_keyword_count": 0,
+        "passed": true
+      },
+      "integration_analysis": {
+        "api_keyword_count": 19,
+        "api_docs_count": 15,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 6,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 1,
+        "has_credit_card_support": true,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 7,
+        "passed": true,
+        "feature_type": "💳信用卡/Apple Pay"
+      },
+      "final_score": 55,
+      "criteria_met": [
+        "🇺🇸美国市场服务",
+        "💰收款能力",
+        "🏦银行功能"
+      ],
+      "recommendation": "⚠️可考虑使用 - 良好平台",
+      "cycle_number": 2
+    },
+    {
+      "platform_name": "redfin.com",
+      "url": "https://www.redfin.com",
+      "page_title": "Redfin | Real Estate & Homes for Sale, Rentals, Mortgages & Agents",
+      "verification_time": "2025-10-22T22:01:09.064326",
+      "us_market_analysis": {
+        "ach_keyword_count": 9,
+        "has_us_pages": true,
+        "deep_us_keyword_count": 0,
+        "total_indicators": 19,
+        "passed": true
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 6,
+        "signup_elements_count": 3,
+        "enterprise_keyword_count": 0,
+        "passed": true
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 188,
+        "sending_keyword_count": 0,
+        "passed": true
+      },
+      "integration_analysis": {
+        "api_keyword_count": 0,
+        "api_docs_count": 1,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 0,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 75,
+      "criteria_met": [
+        "🇺🇸美国市场服务",
+        "🔑自注册功能",
+        "💰收款能力"
+      ],
+      "recommendation": "✅推荐使用 - 优秀平台",
+      "cycle_number": 2
+    },
+    {
+      "platform_name": "volusion.com",
+      "url": "https://www.volusion.com",
+      "page_title": "Volusion: Ecommerce Website Builder & Online Selling Platform",
+      "verification_time": "2025-10-22T22:01:12.745570",
+      "us_market_analysis": {
+        "ach_keyword_count": 2,
+        "has_us_pages": true,
+        "deep_us_keyword_count": 0,
+        "total_indicators": 12,
+        "passed": true
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 0,
+        "signup_elements_count": 0,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 2,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 5,
+        "api_docs_count": 0,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 4,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": true,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 4,
+        "passed": true,
+        "feature_type": "💳信用卡/Apple Pay"
+      },
+      "final_score": 30,
+      "criteria_met": [
+        "🇺🇸美国市场服务",
+        "🏦银行功能"
+      ],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 2
+    },
+    {
+      "platform_name": "bluepay.com",
+      "url": "https://www.bluepay.com",
+      "page_title": "POS System & Credit Card Readers | Clover",
+      "verification_time": "2025-10-22T22:01:15.255585",
+      "us_market_analysis": {
+        "ach_keyword_count": 0,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 0,
+        "total_indicators": 0,
+        "passed": false
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 0,
+        "signup_elements_count": 0,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 1,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 0,
+        "api_docs_count": 0,
+        "embedded_keyword_count": 1,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 2,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 2,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 0,
+      "criteria_met": [],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 2
+    },
+    {
+      "platform_name": "monzo.com",
+      "url": "https://www.monzo.com",
+      "page_title": "Monzo | Your New Favourite Bank",
+      "verification_time": "2025-10-22T22:01:21.058793",
+      "us_market_analysis": {
+        "ach_keyword_count": 3,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 0,
+        "total_indicators": 3,
+        "passed": false
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 27,
+        "signup_elements_count": 6,
+        "enterprise_keyword_count": 0,
+        "passed": true
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 21,
+        "sending_keyword_count": 0,
+        "passed": true
+      },
+      "integration_analysis": {
+        "api_keyword_count": 0,
+        "api_docs_count": 0,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 6,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": true,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 6,
+        "passed": true,
+        "feature_type": "💳信用卡/Apple Pay"
+      },
+      "final_score": 55,
+      "criteria_met": [
+        "🔑自注册功能",
+        "💰收款能力",
+        "🏦银行功能"
+      ],
+      "recommendation": "⚠️可考虑使用 - 良好平台",
+      "cycle_number": 2
+    },
+    {
+      "platform_name": "booksy.com",
+      "url": "https://www.booksy.com",
+      "page_title": "Booksy - hair stylists, barbers, beauticians... book appointments online!",
+      "verification_time": "2025-10-22T22:02:01.369133",
+      "us_market_analysis": {
+        "ach_keyword_count": 1,
+        "has_us_pages": false,
+        "deep_us_keyword_count": 0,
+        "total_indicators": 1,
+        "passed": false
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 0,
+        "signup_elements_count": 0,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 1,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 0,
+        "api_docs_count": 0,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 1,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 1,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 0,
+      "criteria_met": [],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 2
+    },
+    {
+      "platform_name": "booking.com",
+      "url": "https://www.booking.com",
+      "page_title": "Booking.com | Official site | The best hotels, flights, car rentals & accommodations",
+      "verification_time": "2025-10-22T22:02:05.722454",
+      "us_market_analysis": {
+        "ach_keyword_count": 16,
+        "has_us_pages": true,
+        "deep_us_keyword_count": 3,
+        "total_indicators": 29,
+        "passed": true
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 4,
+        "signup_elements_count": 2,
+        "enterprise_keyword_count": 0,
+        "passed": false
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 6,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 0,
+        "api_docs_count": 0,
+        "embedded_keyword_count": 0,
+        "passed": false
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 2,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 2,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 25,
+      "criteria_met": [
+        "🇺🇸美国市场服务"
+      ],
+      "recommendation": "❌不推荐使用 - 需改进",
+      "cycle_number": 2
+    },
+    {
+      "platform_name": "freelancer.com",
+      "url": "https://www.freelancer.com",
+      "page_title": "Hire Freelancers & Find Freelance Jobs Online | Freelancer",
+      "verification_time": "2025-10-22T22:02:08.304171",
+      "us_market_analysis": {
+        "ach_keyword_count": 29,
+        "has_us_pages": true,
+        "deep_us_keyword_count": 27,
+        "total_indicators": 66,
+        "passed": true
+      },
+      "self_registration_analysis": {
+        "signup_keyword_count": 6,
+        "signup_elements_count": 4,
+        "enterprise_keyword_count": 0,
+        "passed": true
+      },
+      "payment_receiving_analysis": {
+        "receiving_keyword_count": 6,
+        "sending_keyword_count": 0,
+        "passed": false
+      },
+      "integration_analysis": {
+        "api_keyword_count": 35,
+        "api_docs_count": 33,
+        "embedded_keyword_count": 5,
+        "passed": true
+      },
+      "bank_direct_debit_features": {
+        "credit_card_count": 0,
+        "direct_debit_count": 0,
+        "bank_transfer_count": 0,
+        "has_credit_card_support": false,
+        "has_direct_debit_support": false,
+        "has_bank_transfer_support": false,
+        "total_features": 0,
+        "passed": false,
+        "feature_type": "❌无银行功能"
+      },
+      "final_score": 75,
+      "criteria_met": [
+        "🇺🇸美国市场服务",
+        "🔑自注册功能",
+        "🔗集成能力"
+      ],
+      "recommendation": "✅推荐使用 - 优秀平台",
+      "cycle_number": 2
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "platforms": [
+    {
+      "platform": "Modern Treasury",
+      "domain": "moderntreasury.com",
+      "rejection_date": "2025-11-05",
+      "validator": "Validator Agent 2",
+      "failed_criteria": ["individual_registration", "payment_receiving"],
+      "rejection_reason": "企业级B2B支付平台，最低月费$250，需要销售团队联系。明显面向企业客户，不适合个人用户使用。虽拥有自有支付系统和ACH功能，但完全缺乏个人注册和收款能力。",
+      "screenshot": "/Users/zhimingdeng/Documents/cursor/坏蛋系统/.playwright-mcp/moderntreasury_signup_page.png"
+    },
+    {
+      "platform": "Ramp",
+      "domain": "ramp.com", 
+      "rejection_date": "2025-11-05",
+      "validator": "Validator Agent 2",
+      "failed_criteria": ["individual_registration", "payment_receiving"],
+      "rejection_reason": "企业级支出管理平台，注册要求工作邮箱和公司信息。产品定位为企业金融管理工具，专注于企业支出控制，不提供个人收款功能。虽具备支付系统和ACH能力，但完全面向企业客户。",
+      "screenshot": "/Users/zhimingdeng/Documents/cursor/坏蛋系统/.playwright-mcp/ramp_homepage.png"
+    },
+    {
+      "platform": "Plaid",
+      "domain": "plaid.com",
+      "rejection_date": "2025-11-05", 
+      "validator": "Validator Agent 2",
+      "failed_criteria": ["individual_registration", "payment_receiving"],
+      "rejection_reason": "金融数据连接API平台，面向开发者和企业客户，提供技术基础设施而非直接收款服务。作为B2B技术服务商，不提供个人直接收款功能。虽支持ACH相关技术，但非个人收款平台。",
+      "screenshot": "/Users/zhimingdeng/Documents/cursor/坏蛋系统/.playwright-mcp/plaid_homepage.png"
+    }
+  ],
+  "last_updated": "2025-11-05",
+  "total_rejected": 9,
+  "version": "3.0"
+}
