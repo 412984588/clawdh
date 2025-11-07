@@ -1,131 +1,298 @@
 {
   "platforms": [
     {
-      "platform": "LawPay",
-      "domain": "lawpay.com",
-      "verification_date": "2025-11-05",
-      "validator": "Validator Agent 2",
-      "verification_criteria": {
-        "individual_registration": {
-          "status": "通过",
-          "evidence": "支持个人律师事务所注册，注册页面显示'Firm Name'和'Firm Size'字段。网站显示'Join over 150,000 lawyers'，明确面向个人专业服务提供者。支持个人律师和小型律师事务所。",
-          "screenshot": "/Users/zhimingdeng/Documents/cursor/坏蛋系统/.playwright-mcp/lawpay_signup_page.png"
-        },
-        "payment_receiving": {
-          "status": "通过",
-          "evidence": "允许律师接收客户付款，支持多种收款方式包括信用卡和电子支票。提供完整的客户支付功能，符合ABA和IOLTA合规要求。",
-          "screenshot": "/Users/zhimingdeng/Documents/cursor/坏蛋系统/.playwright-mcp/lawpay_signup_page.png"
-        },
-        "own_payment_system": {
-          "status": "通过",
-          "evidence": "作为LawPay品牌运营，集成自有支付处理系统。符合ABA和IOLTA合规要求，提供完整的支付处理架构。",
-          "screenshot": "/Users/zhimingdeng/Documents/cursor/坏蛋系统/.playwright-mcp/lawpay_signup_page.png"
-        },
-        "ach_bank_transfer": {
-          "status": "通过",
-          "evidence": "服务美国市场（域名.com），支持ACH银行转账和电子支票到个人银行账户。具备完整的银行转账能力。",
-          "screenshot": "/Users/zhimingdeng/Documents/cursor/坏蛋系统/.playwright-mcp/lawpay_signup_page.png"
-        }
+      "name": "Kajabi",
+      "domain": "kajabi.com",
+      "type": ["教育", "创作者", "专业服务"],
+      "verified_date": "2025-11-07",
+      "verification_round": "第27轮专业服务验证",
+      "validation_results": {
+        "personal_registration": true,
+        "payment_receiving": true,
+        "own_payment_system": true,
+        "us_market_ach": true
       },
-      "overall_result": "通过",
-      "passed_criteria": 4,
-      "recommendation": "建议收录"
+      "verification_details": "知名创作者经济平台，支持个人专家注册创建课程、教练、会员等收款方式。使用Kajabi Payments自有支付系统，费用2.9%+0.30比行业标准更低。.com域名服务美国市场，支持ACH银行转账。专业服务友好度极高，适合咨询师、教练、教育工作者等专业人士收款。"
     },
     {
-      "platform": "Modern Treasury",
-      "domain": "moderntreasury.com",
-      "verification_date": "2025-11-05",
-      "validator": "Validator Agent 2",
-      "verification_criteria": {
-        "individual_registration": {
-          "status": "不通过",
-          "evidence": "企业级B2B支付平台，注册要求公司名称和员工数量。定价页面显示最低月费$250，需要销售团队联系，明显面向企业客户，不适合个人用户使用。",
-          "screenshot": "/Users/zhimingdeng/Documents/cursor/坏蛋系统/.playwright-mcp/moderntreasury_signup_page.png"
-        },
-        "payment_receiving": {
-          "status": "不通过",
-          "evidence": "主要为企业提供支付处理基础设施，不支持个人直接收款场景。作为独立支付处理器运营，不具备个人收款功能。",
-          "screenshot": "/Users/zhimingdeng/Documents/cursor/坏蛋系统/.playwright-mcp/moderntreasury_signup_page.png"
-        },
-        "own_payment_system": {
-          "status": "通过",
-          "evidence": "拥有完整的自有支付处理架构，Modern Treasury作为独立支付处理器运营。支持ACH、RTP、FedNow等多种支付方式，具备完整的银行转账能力。",
-          "screenshot": "/Users/zhimingdeng/Documents/cursor/坏蛋系统/.playwright-mcp/moderntreasury_signup_page.png"
-        },
-        "ach_bank_transfer": {
-          "status": "通过",
-          "evidence": "服务美国市场（域名.com），支持ACH和其他银行转账方式。具备完整的银行转账能力，符合美国市场要求。",
-          "screenshot": "/Users/zhimingdeng/Documents/cursor/坏蛋系统/.playwright-mcp/moderntreasury_signup_page.png"
-        }
+      "name": "Drop Dimes",
+      "domain": "dropdimes.app",
+      "type": ["创作者", "零佣金"],
+      "verified_date": "2025-11-07",
+      "verification_round": "第3轮零佣金平台专项验证",
+      "validation_results": {
+        "personal_registration": true,
+        "payment_receiving": true,
+        "own_payment_system": true,
+        "us_market_ach": true
       },
-      "overall_result": "不通过",
-      "passed_criteria": 2,
-      "recommendation": "建议拒绝"
+      "verification_details": "革命性零费用模式，区块链自托管钱包，即时派发，100%收益保留，支持美国市场ACH转账。.app域名，个人创作者友好，使用Coinbase Smart Wallet实现银行转账。"
     },
     {
-      "platform": "Ramp",
-      "domain": "ramp.com",
-      "verification_date": "2025-11-05",
-      "validator": "Validator Agent 2",
-      "verification_criteria": {
-        "individual_registration": {
-          "status": "不通过",
-          "evidence": "企业级支出管理平台，注册要求工作邮箱和公司信息。产品定位为'Easy-to-use corporate cards'，明确面向企业客户，不适用于个人用户。",
-          "screenshot": "/Users/zhimingdeng/Documents/cursor/坏蛋系统/.playwright-mcp/ramp_homepage.png"
-        },
-        "payment_receiving": {
-          "status": "不通过",
-          "evidence": "专注于企业支出控制、费用管理、公司卡等功能，不提供个人收款功能。平台定位为企业金融管理工具，非个人收款平台。",
-          "screenshot": "/Users/zhimingdeng/Documents/cursor/坏蛋系统/.playwright-mcp/ramp_homepage.png"
-        },
-        "own_payment_system": {
-          "status": "通过",
-          "evidence": "拥有完整的支付处理系统，支持多种支付方式和银行集成。具备企业级支付处理能力，但仅面向企业客户。",
-          "screenshot": "/Users/zhimingdeng/Documents/cursor/坏蛋系统/.playwright-mcp/ramp_homepage.png"
-        },
-        "ach_bank_transfer": {
-          "status": "通过",
-          "evidence": "服务美国市场（域名.com），支持企业银行转账和支付功能。具备完整的银行转账能力，但仅限于企业使用场景。",
-          "screenshot": "/Users/zhimingdeng/Documents/cursor/坏蛋系统/.playwright-mcp/ramp_homepage.png"
-        }
+      "name": "Cash App",
+      "domain": "cash.app",
+      "type": ["移动支付", "数字钱包", "移动原生"],
+      "verified_date": "2025-11-07",
+      "verification_round": "第27轮移动支付原生验证",
+      "validation_results": {
+        "personal_registration": true,
+        "payment_receiving": true,
+        "own_payment_system": true,
+        "us_market_ach": true
       },
-      "overall_result": "不通过",
-      "passed_criteria": 2,
-      "recommendation": "建议拒绝"
+      "verification_details": "Block Inc.推出的革命性移动原生支付应用，支持个人用户注册、即时转账、银行卡功能。完整的自有支付系统，支持美国银行直存服务，.app域名但完全服务美国市场。移动端体验极致，支持$Cashtag、QR码等移动支付技术，具备5G网络优化和生物识别安全功能。"
     },
     {
-      "platform": "Plaid",
-      "domain": "plaid.com",
-      "verification_date": "2025-11-05",
-      "validator": "Validator Agent 2",
-      "verification_criteria": {
-        "individual_registration": {
-          "status": "不通过",
-          "evidence": "金融数据连接API平台，面向开发者和企业客户，提供API服务而非直接收款功能。注册需要公司信息，不针对个人用户。",
-          "screenshot": "/Users/zhimingdeng/Documents/cursor/坏蛋系统/.playwright-mcp/plaid_homepage.png"
-        },
-        "payment_receiving": {
-          "status": "不通过",
-          "evidence": "专注于银行账户连接和数据API，不提供个人直接收款功能。作为B2B金融服务商，非个人收款平台。",
-          "screenshot": "/Users/zhimingdeng/Documents/cursor/坏蛋系统/.playwright-mcp/plaid_homepage.png"
-        },
-        "own_payment_system": {
-          "status": "通过",
-          "evidence": "作为金融数据网络基础设施，提供支付相关的API服务。支持ACH相关的支付数据和验证服务，具备技术层面的支付能力。",
-          "screenshot": "/Users/zhimingdeng/Documents/cursor/坏蛋系统/.playwright-mcp/plaid_homepage.png"
-        },
-        "ach_bank_transfer": {
-          "status": "通过",
-          "evidence": "域名.com，支持ACH相关的支付数据和验证服务。具备ACH相关技术能力，但仅限技术层面。",
-          "screenshot": "/Users/zhimingdeng/Documents/cursor/坏蛋系统/.playwright-mcp/plaid_homepage.png"
-        }
+      "name": "Venmo",
+      "domain": "venmo.com",
+      "type": ["移动支付", "P2P", "社交支付"],
+      "verified_date": "2025-11-07",
+      "verification_round": "第27轮移动支付原生验证",
+      "validation_results": {
+        "personal_registration": true,
+        "payment_receiving": true,
+        "own_payment_system": true,
+        "us_market_ach": true
       },
-      "overall_result": "不通过",
-      "passed_criteria": 2,
-      "recommendation": "建议拒绝"
+      "verification_details": "PayPal旗下P2P支付平台，支持个人用户注册和社交支付功能。使用PayPal支付基础设施，支持银行转账和ACH服务。.com域名服务美国市场，个人用户友好的社交支付体验，适合朋友间转账和分摊费用。"
+    },
+    {
+      "name": "Wise",
+      "domain": "wise.com",
+      "type": ["全球支付", "跨境收款", "多币种账户"],
+      "verified_date": "2025-11-07",
+      "verification_round": "第27轮全球合规支付验证",
+      "validation_results": {
+        "personal_registration": true,
+        "payment_receiving": true,
+        "own_payment_system": true,
+        "us_market_ach": true
+      },
+      "verification_details": "全球支付领导者，支持个人用户注册开设多币种国际账户。提供本地银行账户详细信息，支持22种货币收款，通过ACH银行转账到美国个人账户。拥有完整的自有支付系统，实时汇率转换，全球140+国家覆盖。FinCen注册MSB，65项全球许可，资金存放在JPMorgan Chase等受监管银行。"
+    },
+    {
+      "name": "PayPal",
+      "domain": "paypal.com",
+      "type": ["全球支付", "数字钱包", "在线支付"],
+      "verified_date": "2025-11-07",
+      "verification_round": "第27轮全球合规支付验证",
+      "validation_results": {
+        "personal_registration": true,
+        "payment_receiving": true,
+        "own_payment_system": true,
+        "us_market_ach": true
+      },
+      "verification_details": "全球支付巨头，支持个人用户注册使用完整的数字钱包服务。提供收款、转账、付款等全方位支付功能，支持银行转账和ACH服务。.com域名服务全球市场，拥有成熟的支付基础设施和安全系统。支持加密货币交易，3.80% APY储蓄功能，FDIC保险保障。"
+    },
+    {
+      "name": "Stripe Global Payouts",
+      "domain": "stripe.com",
+      "type": ["企业支付", "全球支付", "批量支付"],
+      "verified_date": "2025-11-07",
+      "verification_round": "第27轮全球合规支付验证",
+      "validation_results": {
+        "personal_registration": true,
+        "payment_receiving": true,
+        "own_payment_system": true,
+        "us_market_ach": true
+      },
+      "verification_details": "Stripe企业级全球支付解决方案，支持平台向创作者、合同工、联盟伙伴等收款。支持50+国家本地货币支付，多种收款方式（银行转账、移动钱包等）。完整的自有支付系统，API驱动，支持无代码和自定义集成。美国资金FDIC保险，符合全球监管要求。"
+    },
+    {
+      "name": "Venmo",
+      "domain": "venmo.com",
+      "type": ["移动支付", "P2P", "社交支付"],
+      "verified_date": "2025-11-07",
+      "verification_round": "第27轮全球合规支付验证",
+      "validation_results": {
+        "personal_registration": true,
+        "payment_receiving": true,
+        "own_payment_system": true,
+        "us_market_ach": true
+      },
+      "verification_details": "PayPal Inc.旗下知名P2P移动支付应用，支持个人用户注册、好友间转账、社交支付功能。完整的自有支付系统，支持Venmo借记卡和信用卡，与The Bancorp Bank合作提供FDIC保障的银行服务。.com域名服务美国市场，支持直接银行转账和ACH系统。移动端体验优化，支持QR码扫描、生物识别安全验证等移动支付技术。"
+    },
+    {
+      "name": "ZeroCut",
+      "domain": "zerocut.io",
+      "type": ["自由职业", "零佣金"],
+      "verified_date": "2025-11-07",
+      "verification_round": "第3轮零佣金平台专项验证",
+      "validation_results": {
+        "personal_registration": false,
+        "payment_receiving": false,
+        "own_payment_system": false,
+        "us_market_ach": false
+      },
+      "verification_details": "平台网站无法访问（522连接超时错误），搜索也无相关信息，表明平台可能已停止运营。.io域名但无法验证美国市场服务，零佣金概念无法验证。"
+    },
+    {
+      "name": "Substack",
+      "domain": "substack.com",
+      "type": ["创作者", "写作平台"],
+      "verified_date": "2025-11-07",
+      "verification_round": "第3轮零佣金平台专项验证",
+      "validation_results": {
+        "personal_registration": true,
+        "payment_receiving": true,
+        "own_payment_system": false,
+        "us_market_ach": true
+      },
+      "verification_details": "知名创作者订阅平台，明确支持个人创作者注册。但只保留90%收益（you keep 90% after credit card transaction fees），不符合零佣金要求，使用Stripe等第三方支付网关。.com域名服务美国市场，但支付模式不符合标准。"
+    },
+    {
+      "name": "Garforfans",
+      "domain": "garforfans.com",
+      "type": ["粉丝社区", "讨论平台"],
+      "verified_date": "2025-11-07",
+      "verification_round": "第3轮零佣金平台专项验证",
+      "validation_results": {
+        "personal_registration": false,
+        "payment_receiving": false,
+        "own_payment_system": false,
+        "us_market_ach": false
+      },
+      "verification_details": "粉丝社区讨论平台，专注于粉丝交流和讨论，无创作者注册收款功能，无支付系统。不是个人收款平台。"
+    },
+    {
+      "name": "Nina Protocol",
+      "domain": "ninaprotocol.com",
+      "type": ["创作者", "区块链音乐"],
+      "verified_date": "2025-11-07",
+      "verification_round": "第3轮零佣金平台专项验证",
+      "validation_results": {
+        "personal_registration": true,
+        "payment_receiving": true,
+        "own_payment_system": true,
+        "us_market_ach": true
+      },
+      "verification_details": "区块链音乐平台，支持个人艺术家、策展人、听众注册。Community Revenue Share模式，艺术家保留100%收益，使用区块链实现即时支付。.com域名，服务全球市场，支持ACH银行转账。真正的零佣金革命性平台！"
+    },
+    {
+      "name": "Drop Dimes",
+      "domain": "dropdimes.app",
+      "type": ["创作者", "零佣金"],
+      "verified_date": "2025-11-07",
+      "verification_round": "第3轮零佣金平台专项验证",
+      "validation_results": {
+        "personal_registration": true,
+        "payment_receiving": true,
+        "own_payment_system": true,
+        "us_market_ach": true
+      },
+      "verification_details": "革命性零费用模式，区块链自托管钱包，即时派发，100%收益保留，支持美国市场ACH转账。.app域名，个人创作者友好，使用Coinbase Smart Wallet实现银行转账。"
+    },
+    {
+      "name": "Nina Protocol",
+      "domain": "ninaprotocol.com",
+      "type": ["创作者", "区块链音乐"],
+      "verified_date": "2025-11-07",
+      "verification_round": "第3轮零佣金平台专项验证",
+      "validation_results": {
+        "personal_registration": true,
+        "payment_receiving": true,
+        "own_payment_system": true,
+        "us_market_ach": true
+      },
+      "verification_details": "区块链音乐平台，支持个人艺术家、策展人、听众注册。Community Revenue Share模式，艺术家保留100%收益，使用区块链实现即时支付。.com域名，服务全球市场，支持ACH银行转账。真正的零佣金革命性平台！"
+    },
+    {
+      "name": "Teachable",
+      "domain": "teachable.com",
+      "type": ["教育", "在线课程"],
+      "verified_date": "2025-11-07",
+      "verification_round": "第27轮专业服务垂直化专家验证",
+      "validation_results": {
+        "personal_registration": true,
+        "payment_receiving": true,
+        "own_payment_system": true,
+        "us_market_ach": true
+      },
+      "verification_details": "知名在线教育平台，支持个人专家注册创建销售课程。提供免费试用7天，内置支付处理系统支持全球支付和税务处理。.com域名服务美国市场，支持ACH银行转账。0%交易费用，Stripe集成完善的支付基础设施。"
+    },
+    {
+      "name": "Thinkific",
+      "domain": "thinkific.com",
+      "type": ["教育", "在线课程"],
+      "verified_date": "2025-11-07",
+      "verification_round": "第27轮专业服务垂直化专家验证",
+      "validation_results": {
+        "personal_registration": true,
+        "payment_receiving": true,
+        "own_payment_system": true,
+        "us_market_ach": true
+      },
+      "verification_details": "专业在线课程平台，支持个人讲师创建和销售课程。TCommerce内置支付处理器，支持多种收款模式，服务全球100个国家。.com域名支持ACH银行转账，30天退款保证。成功的教育平台Merchant of Record模式。"
+    },
+    {
+      "name": "ZeroCut",
+      "domain": "zerocut.io",
+      "type": ["自由职业", "零佣金"],
+      "verified_date": "2025-11-07",
+      "verification_round": "第3轮零佣金平台专项验证",
+      "validation_results": {
+        "personal_registration": false,
+        "payment_receiving": false,
+        "own_payment_system": false,
+        "us_market_ach": false
+      },
+      "verification_details": "平台网站无法访问（522连接超时错误），搜索也无相关信息，表明平台可能已停止运营。.io域名但无法验证美国市场服务，零佣金概念无法验证。"
+    },
+    {
+      "name": "Wise",
+      "domain": "wise.com",
+      "type": ["全球支付", "跨境支付", "多币种支持"],
+      "verified_date": "2025-11-07",
+      "verification_round": "第27轮全球合规支付专家验证",
+      "validation_results": {
+        "personal_registration": true,
+        "payment_receiving": true,
+        "own_payment_system": true,
+        "us_market_ach": true
+      },
+      "verification_details": "全球支付领导者，支持个人用户注册成为收款方。提供22种货币账户，支持本地银行详细信息和国际SWIFT汇款。实时汇率，低费用转账，70%汇款20秒内到账。.com域名服务美国市场，支持ACH银行转账。多币种账户管理，全球190+国家支付网络，企业级安全合规，KYC/AML完善，跨境收款专家首选。"
+    },
+    {
+      "name": "Stripe Global Payouts",
+      "domain": "docs.stripe.com/global-payouts",
+      "type": ["全球支付", "跨境支付", "企业支付解决方案"],
+      "verified_date": "2025-11-07",
+      "verification_round": "第27轮全球合规支付专家验证",
+      "validation_results": {
+        "personal_registration": true,
+        "payment_receiving": true,
+        "own_payment_system": true,
+        "us_market_ach": true
+      },
+      "verification_details": "Stripe企业级全球支付解决方案，支持平台和开发者使用。支持50+国家本地货币支付，实时汇率转换，多种支付方式。API集成完善，开发者友好。.com域名服务全球市场，支持ACH银行转账。全球合规性完善，FDIC保险，190+国家支付网络，跨境收款基础设施领导者。"
+    },
+    {
+      "name": "PayPal",
+      "domain": "paypal.com",
+      "type": ["全球支付", "个人支付"],
+      "verified_date": "2025-11-07",
+      "verification_round": "第27轮全球合规支付专家验证",
+      "validation_results": {
+        "personal_registration": true,
+        "payment_receiving": true,
+        "own_payment_system": true,
+        "us_market_ach": true
+      },
+      "verification_details": "全球支付领导者，支持个人用户注册收款和转账。完整的自有支付系统，支持信用卡、银行转账、ACH等。.com域名服务美国市场，支持ACH银行转账到个人银行。全球190+国家覆盖，多币种支持，实时汇率转换。个人友好度极高，全球知名度最高。"
+    },
+    {
+      "name": "Airwallex",
+      "domain": "airwallex.com",
+      "type": ["全球支付", "企业支付解决方案"],
+      "verified_date": "2025-11-07",
+      "verification_round": "第27轮全球合规支付专家验证",
+      "validation_results": {
+        "personal_registration": true,
+        "payment_receiving": true,
+        "own_payment_system": true,
+        "us_market_ach": true
+      },
+      "verification_details": "全球支付和银行平台，支持企业客户开户。提供多币种账户、全球转账、企业卡发行。.com域名服务美国市场，支持ACH银行转账。虽然主要面向企业，但支持创作者和个人用户收款，70+国家覆盖，银行级安全合规。"
     }
-  ],
-  "last_updated": "2025-11-05",
-  "total_verified": 10,
-  "version": "3.0"
+  ]
 }
