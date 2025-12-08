@@ -1,70 +1,217 @@
 {
-  "data_sources": [
+  "software_directories": [
     {
-      "name": "Stripe Connect目录",
-      "type": "支付处理器目录",
+      "name": "G2",
+      "url": "https://www.g2.com",
+      "categories": [
+        "online-community-management-software",
+        "membership-management-software",
+        "donation-management-software",
+        "crowdfunding-software",
+        "creator-economy",
+        "payments",
+        "digital-wallet",
+        "payment-gateway",
+        "payment-processing",
+        "mobile-payment"
+      ],
       "priority": 1,
-      "status": "待使用",
-      "url": "https://stripe.com/connect/partners",
-      "last_used": null,
-      "platform_count": 0
+      "status": "active",
+      "last_crawled": null,
+      "platforms_found": 0,
+      "quality_score": 0
     },
     {
-      "name": "PayPal Partners目录",
-      "type": "支付处理器目录",
+      "name": "TrustRadius",
+      "url": "https://www.trustradius.com",
+      "categories": [
+        "online-community-software",
+        "membership-management-software",
+        "fundraising-software",
+        "crowdfunding-software",
+        "payment-gateway-software",
+        "mobile-payments-software",
+        "digital-wallet-software"
+      ],
       "priority": 1,
-      "status": "待使用",
-      "url": "https://www.paypal.com/partners",
-      "last_used": null,
-      "platform_count": 0
+      "status": "active",
+      "last_crawled": null,
+      "platforms_found": 0,
+      "quality_score": 0
     },
     {
-      "name": "Patreon替代品列表",
-      "type": "创作者平台聚合器",
+      "name": "GetApp",
+      "url": "https://www.getapp.com",
+      "categories": [
+        "fundraising-software",
+        "membership-management-software",
+        "payment-processing-software",
+        "digital-wallet-software"
+      ],
       "priority": 2,
-      "status": "待使用",
-      "url": "待搜索",
-      "last_used": null,
-      "platform_count": 0
+      "status": "active",
+      "last_crawled": null,
+      "platforms_found": 0,
+      "quality_score": 0
     },
     {
-      "name": "Substack竞争者分析",
-      "type": "创作者平台聚合器",
+      "name": "Software Advice",
+      "url": "https://www.softwareadvice.com",
+      "categories": [
+        "fundraising-software",
+        "membership-management-software",
+        "payment-processing-software"
+      ],
       "priority": 2,
-      "status": "待使用",
-      "url": "待搜索",
-      "last_used": null,
-      "platform_count": 0
+      "status": "active",
+      "last_crawled": null,
+      "platforms_found": 0,
+      "quality_score": 0
     },
     {
-      "name": "众筹平台数据库",
-      "type": "众筹平台数据库",
+      "name": "Capterra",
+      "url": "https://www.capterra.com",
+      "categories": [
+        "online-community-software",
+        "fundraising-software",
+        "payment-gateway-software",
+        "digital-wallet-software"
+      ],
+      "priority": 2,
+      "status": "active",
+      "last_crawled": null,
+      "platforms_found": 0,
+      "quality_score": 0
+    },
+    {
+      "name": "Crozdesk",
+      "url": "https://crozdesk.com",
+      "categories": [
+        "fundraising-software",
+        "payment-gateway-software",
+        "digital-wallet-software"
+      ],
       "priority": 3,
-      "status": "待使用",
-      "url": "待搜索",
-      "last_used": null,
-      "platform_count": 0
+      "status": "active",
+      "last_crawled": null,
+      "platforms_found": 0,
+      "quality_score": 0
     },
     {
-      "name": "GitHub支付相关项目",
-      "type": "开发者工具库",
-      "priority": 5,
-      "status": "待使用",
-      "url": "https://github.com",
-      "last_used": null,
-      "platform_count": 0
+      "name": "DiscoverCloud",
+      "url": "https://discovercloud.com",
+      "categories": [
+        "online-community-software",
+        "payment-gateway-software"
+      ],
+      "priority": 3,
+      "status": "active",
+      "last_crawled": null,
+      "platforms_found": 0,
+      "quality_score": 0
     },
     {
-      "name": "Product Hunt支付应用",
-      "type": "社区挖掘",
-      "priority": 7,
-      "status": "待使用",
-      "url": "https://producthunt.com",
-      "last_used": null,
-      "platform_count": 0
+      "name": "SoftwareFinder",
+      "url": "https://www.softwarefinder.com",
+      "categories": [
+        "payment-processing-software",
+        "digital-wallet-software"
+      ],
+      "priority": 3,
+      "status": "active",
+      "last_crawled": null,
+      "platforms_found": 0,
+      "quality_score": 0
+    },
+    {
+      "name": "Serchen",
+      "url": "https://www.serchen.com",
+      "categories": [
+        "online-community-software",
+        "payment-gateway-software"
+      ],
+      "priority": 3,
+      "status": "active",
+      "last_crawled": null,
+      "platforms_found": 0,
+      "quality_score": 0
     }
   ],
-  "last_updated": "2025-11-01",
-  "total_sources": 7,
-  "version": "1.0"
+  "product_discovery": [
+    {
+      "name": "ProductHunt",
+      "url": "https://www.producthunt.com",
+      "categories": [
+        "fintech",
+        "creator-tools",
+        "payments",
+        "saas",
+        "tech"
+      ],
+      "priority": 1,
+      "status": "active",
+      "last_crawled": null,
+      "platforms_found": 0,
+      "quality_score": 0,
+      "anti_crawl_enabled": true
+    }
+  ],
+  "review_platforms": [
+    {
+      "name": "Trustpilot",
+      "url": "https://www.trustpilot.com",
+      "priority": 2,
+      "status": "active",
+      "last_crawled": null,
+      "platforms_found": 0,
+      "quality_score": 0
+    },
+    {
+      "name": "CrowdReviews",
+      "url": "https://www.crowdreviews.com",
+      "priority": 3,
+      "status": "active",
+      "last_crawled": null,
+      "platforms_found": 0,
+      "quality_score": 0
+    }
+  ],
+  "developer_platforms": [
+    {
+      "name": "GitHub",
+      "url": "https://github.com",
+      "topics": [
+        "payment",
+        "payments",
+        "donation",
+        "creator-economy",
+        "stripe",
+        "paypal",
+        "subscription",
+        "fundraising",
+        "crowdfunding"
+      ],
+      "priority": 1,
+      "status": "active",
+      "last_crawled": null,
+      "platforms_found": 0,
+      "quality_score": 0
+    }
+  ],
+  "app_stores": [
+    {
+      "name": "Chrome Web Store",
+      "url": "https://chrome.google.com/webstore",
+      "categories": [
+        "payment",
+        "donation",
+        "crowdfunding"
+      ],
+      "priority": 3,
+      "status": "pending",
+      "last_crawled": null,
+      "platforms_found": 0,
+      "quality_score": 0
+    }
+  ]
 }

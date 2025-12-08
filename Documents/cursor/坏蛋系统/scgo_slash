@@ -1,8 +1,0 @@
-#!/bin/bash
-# SCGO斜杠命令包装脚本
-
-# 获取脚本所在目录
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
-# 调用斜杠命令系统
-python3 "$SCRIPT_DIR/slash_commands.py" "/scgo $*"

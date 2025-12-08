@@ -1,0 +1,14 @@
+{
+  "session_id": "20251205_210414",
+  "timestamp": "2025-12-05T21:04:15.055207",
+  "this_session": {
+    "discovered": 25,
+    "validated": 18,
+    "pass_rate": "72.0%"
+  },
+  "total_stats": {
+    "verified": 5699,
+    "rejected": 516,
+    "pending": 0
+  }
+}

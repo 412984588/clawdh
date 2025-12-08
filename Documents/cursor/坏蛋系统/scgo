@@ -1,8 +1,0 @@
-#!/bin/bash
-# SCGO 快捷命令脚本
-
-# 获取脚本所在目录
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
-# 执行SCGO Python脚本
-python3 "$SCRIPT_DIR/scgo.py" "$@"

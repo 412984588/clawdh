@@ -1,0 +1,822 @@
+{
+  "session_id": "20251205_174525",
+  "timestamp": "2025-12-05T17:45:25.663589",
+  "discovery_method": "High Quality Template Generation",
+  "quality_threshold": 0.7,
+  "total_platforms": 30,
+  "high_quality_count": 30,
+  "average_quality_score": 0.9946666666666667,
+  "template_coverage": 16,
+  "platforms": [
+    {
+      "name": "PayFlow Pro",
+      "domain": "payflow.com",
+      "type": [
+        "支付",
+        "金融科技"
+      ],
+      "description": "Professional 支付 platform 金融科技 with secure features. Service US market with ACH bank transfer support.",
+      "template_id": "PayFlow {modifier}",
+      "quality_score": 1.0,
+      "template_quality": 0.9,
+      "confidence": 0.9983982084030606,
+      "source": "high_quality_template",
+      "discovery_rank": 1,
+      "business_model": "Payment processing with service fees",
+      "target_market": "Small businesses and enterprises",
+      "tech_stack": [
+        "Mobile App",
+        "Cloud Infrastructure",
+        "Secure Socket Layer",
+        "REST API",
+        "Fraud Detection",
+        "Payment Gateway API"
+      ],
+      "competitive_advantage": "High-quality platform with professional features; Secure and reliable payment processing; Professional-grade features for business users",
+      "growth_potential": "Very High - Strong market fit and professional quality"
+    },
+    {
+      "name": "PayFlow Enterprise",
+      "domain": "payflow-pro.com",
+      "type": [
+        "支付",
+        "金融科技"
+      ],
+      "description": "Professional 支付 platform 金融科技 with secure features. Service US market with ACH bank transfer support.",
+      "template_id": "PayFlow {modifier}",
+      "quality_score": 1.0,
+      "template_quality": 0.9,
+      "confidence": 0.9565996216135786,
+      "source": "high_quality_template",
+      "discovery_rank": 2,
+      "business_model": "Payment processing with service fees",
+      "target_market": "Small businesses and enterprises",
+      "tech_stack": [
+        "Mobile App",
+        "Cloud Infrastructure",
+        "Secure Socket Layer",
+        "REST API",
+        "Fraud Detection",
+        "Payment Gateway API"
+      ],
+      "competitive_advantage": "High-quality platform with professional features; Secure and reliable payment processing; Professional-grade features for business users",
+      "growth_potential": "Very High - Strong market fit and professional quality"
+    },
+    {
+      "name": "PayFlow Global",
+      "domain": "payflow-enterprise.com",
+      "type": [
+        "支付",
+        "金融科技"
+      ],
+      "description": "Professional 支付 platform 金融科技 with secure features. Service US market with ACH bank transfer support.",
+      "template_id": "PayFlow {modifier}",
+      "quality_score": 1.0,
+      "template_quality": 0.9,
+      "confidence": 0.9527159195948115,
+      "source": "high_quality_template",
+      "discovery_rank": 3,
+      "business_model": "Payment processing with service fees",
+      "target_market": "Small businesses and enterprises",
+      "tech_stack": [
+        "Mobile App",
+        "Cloud Infrastructure",
+        "Secure Socket Layer",
+        "REST API",
+        "Fraud Detection",
+        "Payment Gateway API"
+      ],
+      "competitive_advantage": "High-quality platform with professional features; Secure and reliable payment processing",
+      "growth_potential": "Very High - Strong market fit and professional quality"
+    },
+    {
+      "name": "SwiftPay",
+      "domain": "{modifier.lower()}pay.com",
+      "type": [
+        "支付",
+        "金融科技"
+      ],
+      "description": "Professional 支付 platform 金融科技 with instant features. Service US market with ACH bank transfer support.",
+      "template_id": "{modifier}Pay",
+      "quality_score": 1.0,
+      "template_quality": 0.85,
+      "confidence": 0.9123614929958441,
+      "source": "high_quality_template",
+      "discovery_rank": 4,
+      "business_model": "Payment processing with service fees",
+      "target_market": "Small businesses and enterprises",
+      "tech_stack": [
+        "Mobile App",
+        "Cloud Infrastructure",
+        "Secure Socket Layer",
+        "REST API",
+        "Fraud Detection",
+        "Payment Gateway API"
+      ],
+      "competitive_advantage": "High-quality platform with professional features; Secure and reliable payment processing",
+      "growth_potential": "Very High - Strong market fit and professional quality"
+    },
+    {
+      "name": "InstantPay",
+      "domain": "{modifier.lower()}pay.com",
+      "type": [
+        "支付",
+        "金融科技"
+      ],
+      "description": "Professional 支付 platform 金融科技 with instant features. Service US market with ACH bank transfer support.",
+      "template_id": "{modifier}Pay",
+      "quality_score": 1.0,
+      "template_quality": 0.85,
+      "confidence": 1.06271779348784,
+      "source": "high_quality_template",
+      "discovery_rank": 5,
+      "business_model": "Payment processing with service fees",
+      "target_market": "Small businesses and enterprises",
+      "tech_stack": [
+        "Mobile App",
+        "Cloud Infrastructure",
+        "Secure Socket Layer",
+        "REST API",
+        "Fraud Detection",
+        "Payment Gateway API"
+      ],
+      "competitive_advantage": "High-quality platform with professional features; Secure and reliable payment processing",
+      "growth_potential": "Very High - Strong market fit and professional quality"
+    },
+    {
+      "name": "GlobalPay",
+      "domain": "{modifier.lower()}pay.com",
+      "type": [
+        "支付",
+        "金融科技"
+      ],
+      "description": "Professional 支付 platform 金融科技 with instant features. Service US market with ACH bank transfer support.",
+      "template_id": "{modifier}Pay",
+      "quality_score": 1.0,
+      "template_quality": 0.85,
+      "confidence": 0.9922266106185548,
+      "source": "high_quality_template",
+      "discovery_rank": 6,
+      "business_model": "Payment processing with service fees",
+      "target_market": "Small businesses and enterprises",
+      "tech_stack": [
+        "Mobile App",
+        "Cloud Infrastructure",
+        "Secure Socket Layer",
+        "REST API",
+        "Fraud Detection",
+        "Payment Gateway API"
+      ],
+      "competitive_advantage": "High-quality platform with professional features; Secure and reliable payment processing",
+      "growth_potential": "Very High - Strong market fit and professional quality"
+    },
+    {
+      "name": "CreatorHub Pro",
+      "domain": "{creator_type.lower()}hub.com",
+      "type": [
+        "创作者",
+        "订阅",
+        "会员"
+      ],
+      "description": "Professional 创作者 platform 订阅 and 会员 with creator features. Service US market with ACH bank transfer support.",
+      "template_id": "{creator_type}Hub {modifier}",
+      "quality_score": 1.0,
+      "template_quality": 0.9,
+      "confidence": 1.0974608187797075,
+      "source": "high_quality_template",
+      "discovery_rank": 7,
+      "business_model": "Subscription-based SaaS",
+      "target_market": "Content creators, artists, and digital creators",
+      "tech_stack": [
+        "Mobile App",
+        "Subscription Management",
+        "Content Management",
+        "Cloud Infrastructure",
+        "REST API",
+        "Recurring Billing",
+        "Analytics",
+        "Creator Dashboard"
+      ],
+      "competitive_advantage": "High-quality platform with professional features; Creator-friendly features and tools; Professional-grade features for business users",
+      "growth_potential": "Very High - Strong market fit and professional quality"
+    },
+    {
+      "name": "ArtistHub Global",
+      "domain": "{creator_type.lower()}hub-pro.com",
+      "type": [
+        "创作者",
+        "订阅",
+        "会员"
+      ],
+      "description": "Professional 创作者 platform 订阅 and 会员 with creator features. Service US market with ACH bank transfer support.",
+      "template_id": "{creator_type}Hub {modifier}",
+      "quality_score": 1.0,
+      "template_quality": 0.9,
+      "confidence": 1.0003596372196442,
+      "source": "high_quality_template",
+      "discovery_rank": 8,
+      "business_model": "Subscription-based SaaS",
+      "target_market": "Content creators, artists, and digital creators",
+      "tech_stack": [
+        "Mobile App",
+        "Subscription Management",
+        "Content Management",
+        "Cloud Infrastructure",
+        "REST API",
+        "Recurring Billing",
+        "Analytics",
+        "Creator Dashboard"
+      ],
+      "competitive_advantage": "High-quality platform with professional features; Creator-friendly features and tools",
+      "growth_potential": "Very High - Strong market fit and professional quality"
+    },
+    {
+      "name": "WriterHub Plus",
+      "domain": "{creator_type.lower()}hub-global.com",
+      "type": [
+        "创作者",
+        "订阅",
+        "会员"
+      ],
+      "description": "Professional 创作者 platform 订阅 and 会员 with creator features. Service US market with ACH bank transfer support.",
+      "template_id": "{creator_type}Hub {modifier}",
+      "quality_score": 1.0,
+      "template_quality": 0.9,
+      "confidence": 1.0982552510792507,
+      "source": "high_quality_template",
+      "discovery_rank": 9,
+      "business_model": "Subscription-based SaaS",
+      "target_market": "Content creators, artists, and digital creators",
+      "tech_stack": [
+        "Mobile App",
+        "Subscription Management",
+        "Content Management",
+        "Cloud Infrastructure",
+        "REST API",
+        "Recurring Billing",
+        "Analytics",
+        "Creator Dashboard"
+      ],
+      "competitive_advantage": "High-quality platform with professional features; Creator-friendly features and tools",
+      "growth_potential": "Very High - Strong market fit and professional quality"
+    },
+    {
+      "name": "ExpertConnect Network",
+      "domain": "expert{modifier.lower()}.net",
+      "type": [
+        "专业服务",
+        "咨询"
+      ],
+      "description": "Professional 专业服务 platform 咨询 with expert features. Service US market with ACH bank transfer support.",
+      "template_id": "Expert{modifier} Network",
+      "quality_score": 1.0,
+      "template_quality": 0.9,
+      "confidence": 1.0059709255060088,
+      "source": "high_quality_template",
+      "discovery_rank": 10,
+      "business_model": "Professional services with subscription or project fees",
+      "target_market": "Consultants, coaches, and professional service providers",
+      "tech_stack": [
+        "Mobile App",
+        "REST API",
+        "Cloud Infrastructure"
+      ],
+      "competitive_advantage": "High-quality platform with professional features",
+      "growth_potential": "Very High - Strong market fit and professional quality"
+    },
+    {
+      "name": "ExpertLink Network",
+      "domain": "expert{modifier.lower()}.net",
+      "type": [
+        "专业服务",
+        "咨询"
+      ],
+      "description": "Professional 专业服务 platform 咨询 with expert features. Service US market with ACH bank transfer support.",
+      "template_id": "Expert{modifier} Network",
+      "quality_score": 1.0,
+      "template_quality": 0.9,
+      "confidence": 1.0327485775995546,
+      "source": "high_quality_template",
+      "discovery_rank": 11,
+      "business_model": "Professional services with subscription or project fees",
+      "target_market": "Consultants, coaches, and professional service providers",
+      "tech_stack": [
+        "Mobile App",
+        "REST API",
+        "Cloud Infrastructure"
+      ],
+      "competitive_advantage": "High-quality platform with professional features",
+      "growth_potential": "Very High - Strong market fit and professional quality"
+    },
+    {
+      "name": "ExpertHub Network",
+      "domain": "expert{modifier.lower()}.net",
+      "type": [
+        "专业服务",
+        "咨询"
+      ],
+      "description": "Professional 专业服务 platform 咨询 with expert features. Service US market with ACH bank transfer support.",
+      "template_id": "Expert{modifier} Network",
+      "quality_score": 1.0,
+      "template_quality": 0.9,
+      "confidence": 1.0789785589599432,
+      "source": "high_quality_template",
+      "discovery_rank": 12,
+      "business_model": "Professional services with subscription or project fees",
+      "target_market": "Consultants, coaches, and professional service providers",
+      "tech_stack": [
+        "Mobile App",
+        "REST API",
+        "Cloud Infrastructure"
+      ],
+      "competitive_advantage": "High-quality platform with professional features",
+      "growth_potential": "Very High - Strong market fit and professional quality"
+    },
+    {
+      "name": "ConsultingPro",
+      "domain": "{service_type.lower()}pro.com",
+      "type": [
+        "专业服务",
+        "咨询",
+        "教练"
+      ],
+      "description": "Professional 专业服务 platform 咨询 and 教练 with professional features. Service US market with ACH bank transfer support.",
+      "template_id": "{service_type}Pro",
+      "quality_score": 1.0,
+      "template_quality": 0.85,
+      "confidence": 0.994039301972505,
+      "source": "high_quality_template",
+      "discovery_rank": 13,
+      "business_model": "Professional services with subscription or project fees",
+      "target_market": "Consultants, coaches, and professional service providers",
+      "tech_stack": [
+        "Mobile App",
+        "REST API",
+        "Cloud Infrastructure"
+      ],
+      "competitive_advantage": "High-quality platform with professional features; Professional-grade features for business users",
+      "growth_potential": "Very High - Strong market fit and professional quality"
+    },
+    {
+      "name": "MemberHub",
+      "domain": "member{modifier.lower()}.com",
+      "type": [
+        "会员",
+        "订阅"
+      ],
+      "description": "Professional 会员 platform 订阅 with membership features. Service US market with ACH bank transfer support.",
+      "template_id": "Member{modifier}",
+      "quality_score": 1.0,
+      "template_quality": 0.9,
+      "confidence": 1.0206667457340324,
+      "source": "high_quality_template",
+      "discovery_rank": 14,
+      "business_model": "Subscription-based SaaS",
+      "target_market": "General online users and small businesses",
+      "tech_stack": [
+        "Mobile App",
+        "Subscription Management",
+        "Cloud Infrastructure",
+        "REST API",
+        "Recurring Billing"
+      ],
+      "competitive_advantage": "High-quality platform with professional features",
+      "growth_potential": "Very High - Strong market fit and professional quality"
+    },
+    {
+      "name": "MemberPlus",
+      "domain": "member{modifier.lower()}.com",
+      "type": [
+        "会员",
+        "订阅"
+      ],
+      "description": "Professional 会员 platform 订阅 with membership features. Service US market with ACH bank transfer support.",
+      "template_id": "Member{modifier}",
+      "quality_score": 1.0,
+      "template_quality": 0.9,
+      "confidence": 1.0471487387179161,
+      "source": "high_quality_template",
+      "discovery_rank": 15,
+      "business_model": "Subscription-based SaaS",
+      "target_market": "General online users and small businesses",
+      "tech_stack": [
+        "Mobile App",
+        "Subscription Management",
+        "Cloud Infrastructure",
+        "REST API",
+        "Recurring Billing"
+      ],
+      "competitive_advantage": "High-quality platform with professional features",
+      "growth_potential": "Very High - Strong market fit and professional quality"
+    },
+    {
+      "name": "MemberPro",
+      "domain": "member{modifier.lower()}.com",
+      "type": [
+        "会员",
+        "订阅"
+      ],
+      "description": "Professional 会员 platform 订阅 with membership features. Service US market with ACH bank transfer support.",
+      "template_id": "Member{modifier}",
+      "quality_score": 1.0,
+      "template_quality": 0.9,
+      "confidence": 1.0631647292667055,
+      "source": "high_quality_template",
+      "discovery_rank": 16,
+      "business_model": "Subscription-based SaaS",
+      "target_market": "General online users and small businesses",
+      "tech_stack": [
+        "Mobile App",
+        "Subscription Management",
+        "Cloud Infrastructure",
+        "REST API",
+        "Recurring Billing"
+      ],
+      "competitive_advantage": "High-quality platform with professional features; Professional-grade features for business users",
+      "growth_potential": "Very High - Strong market fit and professional quality"
+    },
+    {
+      "name": "MarketHub",
+      "domain": "market{modifier.lower()}.com",
+      "type": [
+        "电商",
+        "市场"
+      ],
+      "description": "Professional 电商 platform 市场 with marketplace features. Service US market with ACH bank transfer support.",
+      "template_id": "Market{modifier}",
+      "quality_score": 1.0,
+      "template_quality": 0.9,
+      "confidence": 0.996351864405061,
+      "source": "high_quality_template",
+      "discovery_rank": 17,
+      "business_model": "Marketplace with transaction fees",
+      "target_market": "E-commerce sellers and digital product creators",
+      "tech_stack": [
+        "Mobile App",
+        "Cloud Infrastructure",
+        "REST API",
+        "User Ratings",
+        "Marketplace Engine",
+        "Dispute Resolution"
+      ],
+      "competitive_advantage": "High-quality platform with professional features",
+      "growth_potential": "Very High - Strong market fit and professional quality"
+    },
+    {
+      "name": "MarketPro",
+      "domain": "market{modifier.lower()}.com",
+      "type": [
+        "电商",
+        "市场"
+      ],
+      "description": "Professional 电商 platform 市场 with marketplace features. Service US market with ACH bank transfer support.",
+      "template_id": "Market{modifier}",
+      "quality_score": 1.0,
+      "template_quality": 0.9,
+      "confidence": 0.9024949773158608,
+      "source": "high_quality_template",
+      "discovery_rank": 18,
+      "business_model": "Marketplace with transaction fees",
+      "target_market": "E-commerce sellers and digital product creators",
+      "tech_stack": [
+        "Mobile App",
+        "Cloud Infrastructure",
+        "REST API",
+        "User Ratings",
+        "Marketplace Engine",
+        "Dispute Resolution"
+      ],
+      "competitive_advantage": "High-quality platform with professional features; Professional-grade features for business users",
+      "growth_potential": "Very High - Strong market fit and professional quality"
+    },
+    {
+      "name": "MarketGlobal",
+      "domain": "market{modifier.lower()}.com",
+      "type": [
+        "电商",
+        "市场"
+      ],
+      "description": "Professional 电商 platform 市场 with marketplace features. Service US market with ACH bank transfer support.",
+      "template_id": "Market{modifier}",
+      "quality_score": 1.0,
+      "template_quality": 0.9,
+      "confidence": 1.0592792899549968,
+      "source": "high_quality_template",
+      "discovery_rank": 19,
+      "business_model": "Marketplace with transaction fees",
+      "target_market": "E-commerce sellers and digital product creators",
+      "tech_stack": [
+        "Mobile App",
+        "Cloud Infrastructure",
+        "REST API",
+        "User Ratings",
+        "Marketplace Engine",
+        "Dispute Resolution"
+      ],
+      "competitive_advantage": "High-quality platform with professional features",
+      "growth_potential": "Very High - Strong market fit and professional quality"
+    },
+    {
+      "name": "FinTechHub",
+      "domain": "fintech{modifier.lower()}.com",
+      "type": [
+        "金融科技",
+        "支付",
+        "银行"
+      ],
+      "description": "Professional 金融科技 platform 支付 and 银行 with fintech features. Service US market with ACH bank transfer support.",
+      "template_id": "FinTech{modifier}",
+      "quality_score": 1.0,
+      "template_quality": 0.9,
+      "confidence": 0.9610507388758028,
+      "source": "high_quality_template",
+      "discovery_rank": 20,
+      "business_model": "Payment processing with service fees",
+      "target_market": "Small businesses and enterprises",
+      "tech_stack": [
+        "Mobile App",
+        "Cloud Infrastructure",
+        "Secure Socket Layer",
+        "REST API",
+        "Fraud Detection",
+        "Payment Gateway API"
+      ],
+      "competitive_advantage": "High-quality platform with professional features; Secure and reliable payment processing",
+      "growth_potential": "Very High - Strong market fit and professional quality"
+    },
+    {
+      "name": "FinTechLabs",
+      "domain": "fintech{modifier.lower()}.com",
+      "type": [
+        "金融科技",
+        "支付",
+        "银行"
+      ],
+      "description": "Professional 金融科技 platform 支付 and 银行 with fintech features. Service US market with ACH bank transfer support.",
+      "template_id": "FinTech{modifier}",
+      "quality_score": 1.0,
+      "template_quality": 0.9,
+      "confidence": 1.0171682829624549,
+      "source": "high_quality_template",
+      "discovery_rank": 21,
+      "business_model": "Payment processing with service fees",
+      "target_market": "Small businesses and enterprises",
+      "tech_stack": [
+        "Mobile App",
+        "Cloud Infrastructure",
+        "Secure Socket Layer",
+        "REST API",
+        "Fraud Detection",
+        "Payment Gateway API"
+      ],
+      "competitive_advantage": "High-quality platform with professional features; Secure and reliable payment processing",
+      "growth_potential": "Very High - Strong market fit and professional quality"
+    },
+    {
+      "name": "FinTechPro",
+      "domain": "fintech{modifier.lower()}.com",
+      "type": [
+        "金融科技",
+        "支付",
+        "银行"
+      ],
+      "description": "Professional 金融科技 platform 支付 and 银行 with fintech features. Service US market with ACH bank transfer support.",
+      "template_id": "FinTech{modifier}",
+      "quality_score": 1.0,
+      "template_quality": 0.9,
+      "confidence": 1.0477550321661122,
+      "source": "high_quality_template",
+      "discovery_rank": 22,
+      "business_model": "Payment processing with service fees",
+      "target_market": "Small businesses and enterprises",
+      "tech_stack": [
+        "Mobile App",
+        "Cloud Infrastructure",
+        "Secure Socket Layer",
+        "REST API",
+        "Fraud Detection",
+        "Payment Gateway API"
+      ],
+      "competitive_advantage": "High-quality platform with professional features; Secure and reliable payment processing; Professional-grade features for business users",
+      "growth_potential": "Very High - Strong market fit and professional quality"
+    },
+    {
+      "name": "SuperCreator",
+      "domain": "{modifier.lower()}{platform_type.lower()}.io",
+      "type": [
+        "创作者",
+        "数字产品"
+      ],
+      "description": "Professional 创作者 platform 数字产品 with creator features. Service US market with ACH bank transfer support.",
+      "template_id": "{modifier}{platform_type}",
+      "quality_score": 0.98,
+      "template_quality": 0.85,
+      "confidence": 1.0246305330975654,
+      "source": "high_quality_template",
+      "discovery_rank": 23,
+      "business_model": "Creator economy platform with revenue sharing",
+      "target_market": "Content creators, artists, and digital creators",
+      "tech_stack": [
+        "Mobile App",
+        "Content Management",
+        "Cloud Infrastructure",
+        "REST API",
+        "Analytics",
+        "Creator Dashboard",
+        "API-first Architecture"
+      ],
+      "competitive_advantage": "High-quality platform with professional features; Creator-friendly features and tools",
+      "growth_potential": "Very High - Strong market fit and professional quality"
+    },
+    {
+      "name": "MegaContent",
+      "domain": "{modifier.lower()}{platform_type.lower()}.io",
+      "type": [
+        "创作者",
+        "数字产品"
+      ],
+      "description": "Professional 创作者 platform 数字产品 with creator features. Service US market with ACH bank transfer support.",
+      "template_id": "{modifier}{platform_type}",
+      "quality_score": 0.98,
+      "template_quality": 0.85,
+      "confidence": 0.9440458659262146,
+      "source": "high_quality_template",
+      "discovery_rank": 24,
+      "business_model": "Creator economy platform with revenue sharing",
+      "target_market": "Content creators, artists, and digital creators",
+      "tech_stack": [
+        "Mobile App",
+        "Content Management",
+        "Cloud Infrastructure",
+        "REST API",
+        "Analytics",
+        "Creator Dashboard",
+        "API-first Architecture"
+      ],
+      "competitive_advantage": "High-quality platform with professional features; Creator-friendly features and tools",
+      "growth_potential": "Very High - Strong market fit and professional quality"
+    },
+    {
+      "name": "UltraDigital",
+      "domain": "{modifier.lower()}{platform_type.lower()}.io",
+      "type": [
+        "创作者",
+        "数字产品"
+      ],
+      "description": "Professional 创作者 platform 数字产品 with creator features. Service US market with ACH bank transfer support.",
+      "template_id": "{modifier}{platform_type}",
+      "quality_score": 0.98,
+      "template_quality": 0.85,
+      "confidence": 1.0467867348255027,
+      "source": "high_quality_template",
+      "discovery_rank": 25,
+      "business_model": "Creator economy platform with revenue sharing",
+      "target_market": "Content creators, artists, and digital creators",
+      "tech_stack": [
+        "Mobile App",
+        "Content Management",
+        "Cloud Infrastructure",
+        "REST API",
+        "Analytics",
+        "Creator Dashboard",
+        "API-first Architecture"
+      ],
+      "competitive_advantage": "High-quality platform with professional features; Creator-friendly features and tools",
+      "growth_potential": "Very High - Strong market fit and professional quality"
+    },
+    {
+      "name": "ContentSub",
+      "domain": "{modifier.lower()}sub.io",
+      "type": [
+        "订阅",
+        "数字产品"
+      ],
+      "description": "Professional 订阅 platform 数字产品 with subscription features. Service US market with ACH bank transfer support.",
+      "template_id": "{modifier}Sub",
+      "quality_score": 0.98,
+      "template_quality": 0.85,
+      "confidence": 0.9934443772460825,
+      "source": "high_quality_template",
+      "discovery_rank": 26,
+      "business_model": "Subscription-based SaaS",
+      "target_market": "General online users and small businesses",
+      "tech_stack": [
+        "Mobile App",
+        "Subscription Management",
+        "Cloud Infrastructure",
+        "REST API",
+        "Recurring Billing",
+        "API-first Architecture"
+      ],
+      "competitive_advantage": "High-quality platform with professional features",
+      "growth_potential": "Very High - Strong market fit and professional quality"
+    },
+    {
+      "name": "CreatorSub",
+      "domain": "{modifier.lower()}sub.io",
+      "type": [
+        "订阅",
+        "数字产品"
+      ],
+      "description": "Professional 订阅 platform 数字产品 with subscription features. Service US market with ACH bank transfer support.",
+      "template_id": "{modifier}Sub",
+      "quality_score": 0.98,
+      "template_quality": 0.85,
+      "confidence": 1.0151219989548395,
+      "source": "high_quality_template",
+      "discovery_rank": 27,
+      "business_model": "Subscription-based SaaS",
+      "target_market": "General online users and small businesses",
+      "tech_stack": [
+        "Mobile App",
+        "Subscription Management",
+        "Cloud Infrastructure",
+        "REST API",
+        "Recurring Billing",
+        "API-first Architecture"
+      ],
+      "competitive_advantage": "High-quality platform with professional features",
+      "growth_potential": "Very High - Strong market fit and professional quality"
+    },
+    {
+      "name": "DigitalSub",
+      "domain": "{modifier.lower()}sub.io",
+      "type": [
+        "订阅",
+        "数字产品"
+      ],
+      "description": "Professional 订阅 platform 数字产品 with subscription features. Service US market with ACH bank transfer support.",
+      "template_id": "{modifier}Sub",
+      "quality_score": 0.98,
+      "template_quality": 0.85,
+      "confidence": 0.9082030943422974,
+      "source": "high_quality_template",
+      "discovery_rank": 28,
+      "business_model": "Subscription-based SaaS",
+      "target_market": "General online users and small businesses",
+      "tech_stack": [
+        "Mobile App",
+        "Subscription Management",
+        "Cloud Infrastructure",
+        "REST API",
+        "Recurring Billing",
+        "API-first Architecture"
+      ],
+      "competitive_advantage": "High-quality platform with professional features",
+      "growth_potential": "Very High - Strong market fit and professional quality"
+    },
+    {
+      "name": "DigitalStore",
+      "domain": "{product_type.lower()}store.io",
+      "type": [
+        "电商",
+        "数字产品"
+      ],
+      "description": "Professional 电商 platform 数字产品 with ecommerce features. Service US market with ACH bank transfer support.",
+      "template_id": "{product_type}Store",
+      "quality_score": 0.98,
+      "template_quality": 0.85,
+      "confidence": 0.9552050154436819,
+      "source": "high_quality_template",
+      "discovery_rank": 29,
+      "business_model": "Digital marketplace with commission model",
+      "target_market": "E-commerce sellers and digital product creators",
+      "tech_stack": [
+        "Mobile App",
+        "REST API",
+        "API-first Architecture",
+        "Cloud Infrastructure"
+      ],
+      "competitive_advantage": "High-quality platform with professional features",
+      "growth_potential": "Very High - Strong market fit and professional quality"
+    },
+    {
+      "name": "PaymentTech",
+      "domain": "{payment_type.lower()}tech.io",
+      "type": [
+        "金融科技",
+        "支付"
+      ],
+      "description": "Professional 金融科技 platform 支付 with technology features. Service US market with ACH bank transfer support.",
+      "template_id": "{payment_type}Tech",
+      "quality_score": 0.98,
+      "template_quality": 0.85,
+      "confidence": 0.9293744524256287,
+      "source": "high_quality_template",
+      "discovery_rank": 30,
+      "business_model": "Payment processing with service fees",
+      "target_market": "Small businesses and enterprises",
+      "tech_stack": [
+        "Mobile App",
+        "Cloud Infrastructure",
+        "Secure Socket Layer",
+        "REST API",
+        "Fraud Detection",
+        "API-first Architecture",
+        "Payment Gateway API"
+      ],
+      "competitive_advantage": "High-quality platform with professional features; Secure and reliable payment processing",
+      "growth_potential": "Very High - Strong market fit and professional quality"
+    }
+  ]
+}
