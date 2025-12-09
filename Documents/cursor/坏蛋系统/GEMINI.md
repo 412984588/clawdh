@@ -429,3 +429,4 @@ python3 claude_auto_workflow.py --workers=5 --batch-size=50
 每当要更改这个文件的时候，必须同步更新以下文件：
 - @/Users/zhimingdeng/Documents/cursor/坏蛋系统/CLAUDE.md
 - @/Users/zhimingdeng/Documents/cursor/坏蛋系统/ANTIGRAVITY.md
+- @/Users/zhimingdeng/.antigravity/ANTIGRAVITY.md
