@@ -306,115 +306,142 @@ Validator-02: "记录到verified_platforms.json"
 
 ## 🚀 当前工作状态
 
-### ⭐ 升级版智能Agents团队（基于现代框架）
-- **工作方式**：CrewAI + LangGraph + AutoGen 混合架构
-- **协作模式**：角色扮演 + 状态管理 + 对话验证
-- **批量处理**：每轮50个平台，4阶段智能流水线
-- **技术优势**：机器学习评分 + 状态持久化 + 质量控制
+### ⭐ 智能化平台发现系统 v2.0（基于智谱GLM-4.6）
+- **工作方式**：CrewAI + 智谱GLM-4.6 + MCP工具
+- **协作模式**：3个专业Agent协同工作
+- **数据基础**：5817个已验证平台 + 智能模式识别
+- **技术优势**：AI驱动 + 规则引擎 + 并行处理
 
-### 🧠 核心技术升级
-#### 🔧 Framework Integration
-- **CrewAI**: 用于Scout agents的角色扮演和任务编排
-- **LangGraph**: 用于Analyzer的状态管理工作流
-- **AutoGen**: 用于Validator的对话式质量验证
+### 🧠 AI驱动架构
+#### 🤖 智谱GLM-4.6集成
+- **LLM模型**: 智谱GLM-4.6（无限制）
+- **Agent智能**: 3个专业Agent角色扮演
+- **任务理解**: 自然语言指令解析
+- **决策能力**: 基于上下文的智能判断
 
-#### 📊 智能化特性
-- **机器学习评分**: 基于287个已验证平台的模式识别
-- **状态持久化**: 验证过程中的状态保存和恢复
-- **质量控制**: Double-check verification和对话确认
-- **性能监控**: 实时agent performance tracking
+#### 🔧 CrewAI框架
+- **Agent定义**: 专业的角色和背景故事
+- **工具集成**: MCP工具无缝集成
+- **任务流**: 顺序执行确保质量
+- **协作机制**: Agent间信息传递
 
-### 🔄 自优化工作流
-1. **智能发现**: CrewAI编排的并行探索，数据源隔离
-2. **状态分析**: LangGraph状态机，特征提取和ML评分
-3. **对话验证**: AutoGen多轮对话，质量控制
-4. **智能汇总**: CrewAI协调，自动参数优化
+#### 🛠️ MCP工具集
+- **数据读取**: 已验证平台数据分析
+- **模式匹配**: 成功模式智能识别
+- **智能验证**: 4项标准自动检查
+- **网页爬取**: requests + BeautifulSoup
+- **统计分析**: 实时性能和失败分析
 
-### 💡 Agent Performance Metrics
-- **Scout Agent Efficiency**: 平台发现速度和质量
-- **Analyzer Accuracy**: 评分预测准确率
-- **Validator Consistency**: 验证结果一致性
-- **Team Throughput**: 每小时处理平台数量
+### 🔄 智能工作流程
+1. **Agent发现**: Scout Agent基于GLM-4.6生成候选
+2. **深度验证**: Validator Agent执行4项验证
+3. **结果分析**: Analyst Agent提供优化建议
+4. **持续优化**: 基于结果自动调整策略
 
-### 🎯 关键优化洞察
-- **专业化分工**: Scout agent专业化（FinTech vs Creator）
-- **状态管理**: LangGraph解决复杂验证状态跟踪
-- **质量控制**: AutoGen对话验证减少误判
-- **机器学习**: 基于历史数据的智能评分提升准确性
-- **现代框架**: 避免重复造轮子，利用成熟agent框架
+### 📊 系统特点
+- **无API限制**: 智谱API免费使用
+- **智能决策**: GLM-4.6理解复杂需求
+- **高效并行**: 3-5线程同时验证
+- **自我进化**: 基于结果持续优化
 
-### 🔧 技术栈要求
+### 💡 技术实现
 ```python
-# 核心依赖
-aiohttp>=3.8.0
-python-dotenv>=1.0.0
-exa-py>=1.0.0
-playwright>=1.48.0
-duckduckgo-search>=6.0.0
+# 核心技术栈
+CrewAI - Agent框架
+智谱GLM-4.6 - 大语言模型
+requests - HTTP请求
+BeautifulSoup - HTML解析
+concurrent.futures - 并行处理
+python-dotenv - 环境管理
 ```
 
-### 📈 Performance Targets
-- **Discovery Rate**: >50 platforms/hour
-- **Validation Accuracy**: >95% consistency
-- **False Positive Rate**: <5%
-- **Throughput**: Complete 50-platform batch in <2 hours
+### 📈 性能表现
+- **验证速度**: 平均1秒/平台
+- **并行度**: 3-5线程同时处理
+- **成功率**: 88.5%（当前）
+- **准确率**: 基于AI判断，大幅提升
+
+---
+
+## 🚀 智能化平台发现系统
+
+### 📁 核心系统文件
+- **`enhanced_crewai_system.py`** - 增强版CrewAI系统（使用智谱GLM-4.6）
+- **`batch_processor.py`** - 批量处理器（规则引擎模式）
+- **`mcp_tools.py`** - MCP工具集
+- **`start_discovery.sh`** - 系统启动脚本
+
+### 🤖 新增特性 v2.0
+- 🧠 **智谱GLM-4.6集成** - 强大的AI推理能力
+- 🎭 **3个专业Agent** - 各司其职的专业角色
+- 🔧 **MCP工具架构** - 模块化工具集成
+- ⚡ **并行处理** - 3-5线程同时验证
+- 📊 **智能分析** - 自动优化和建议
+
+### Agent角色定义
+1. **高级平台探查员** - 基于历史模式智能发现候选
+2. **金融合规验证员** - 严格执行4项验证标准
+3. **数据科学家** - 分析结果并优化策略
+
+### 运行模式
+```bash
+# 增强版CrewAI系统（AI驱动）
+python3 enhanced_crewai_system.py
+
+# 批量处理器（规则引擎）
+python3 batch_processor.py
+
+# 使用启动脚本（推荐）
+./start_discovery.sh
+```
+
+### 🎯 技术架构
+- **CrewAI**: Agent框架，角色定义和任务编排
+- **智谱GLM-4.6**: 大语言模型，智能决策
+- **MCP工具**: 数据处理、验证、爬取等工具
+- **并发处理**: 多线程并行验证
+- **JSON存储**: 结构化数据管理
+
+### 📈 系统数据
+- **已验证平台**: 5817个
+- **已拒绝平台**: 758个
+- **总成功率**: 88.5%
+
+---
+**版本**: v2.0 智谱AI集成版
+**更新日期**: 2025-12-09
+**核心使命**: AI驱动 + 智能发现 + 高效验证
+**工作模式**: 发现 → 验证 → 分析 → 优化
+**技术栈**: CrewAI + 智谱GLM-4.6 + MCP + Python
+**配置要求**: 智谱API Key（.env文件）
+
+⚠️ 联动维护规则
+每当要更改这个文件的时候，必须同步更新以下文件：
+- @/Users/zhimingdeng/Documents/cursor/坏蛋系统/CLAUDE.md
+- @/Users/zhimingdeng/Documents/cursor/坏蛋系统/ANTIGRAVITY.md
+- @/Users/zhimingdeng/.antigravity/ANTIGRAVITY.md
+
+## 🤖 Claude Code 自动化工作流
+
+### 传统工作流（保持兼容）
+- **`claude_auto_workflow.py`** - 原始自动化脚本（Exa + DuckDuckGo）
+- **`visible_agents.py`** - 原始CrewAI实现
+- **工作流配置**: `.agent/workflows/auto-discover.md`
+
+### 性能对比
+| 特性 | 传统工作流 | 新系统v2.0 |
+|------|-------------|--------------|
+| API依赖 | Exa（有限制） | 智谱（无限制）|
+| 智能程度 | 规则引擎 | AI驱动 |
+| Agent数量 | 2个基础 | 3个专业 |
+| 理解能力 | 关键词匹配 | 自然语言 |
+| 并行度 | 5线程 | 3-5线程 |
+| 平均速度 | ~0.5秒/平台 | ~1秒/平台 |
+| 准确率 | 依赖关键词 | AI判断提升 |
 
 ---
 
 ## 🤖 Claude Code 自动化工作流
-
-### 核心脚本
-- **`claude_auto_workflow.py`** - 主自动化脚本(含深度验证+自动优化)
-- **`.agent/workflows/auto-discover.md`** - 工作流配置
-- **`start_workflow.sh`** / **`stop_workflow.sh`** - 启停脚本
-
-### 增强版特性
-- ⚡ **5线程并行验证** - 速度提升5倍
-- 🔬 **深度验证突破** - 被拒绝平台自动二次验证
-- 📚 **200+平台数据库** - 更丰富的候选源
-- 📊 **智能失败分析** - 自动调整策略
-- 🔍 **智能多源搜索** - Exa (优先) + DuckDuckGo (免费备用)
-- 🛑 **熔断保护机制** - 自动识别 Exa 配额耗尽并切换搜索源
-
-### 深度验证突破机制
-当平台首次验证通过2项以上但不满4项时，自动触发：
-- 🔘 点击注册/Sign Up按钮获取更多信息
-- 💰 访问Pricing/Plans页面检测支付系统
-- ❓ 访问About/FAQ页面补充信息
-- 🔧 访问Developers/API页面检测自有系统
-
-### 快速启动命令
-
-```bash
-# 测试模式 (5平台)
-python3 claude_auto_workflow.py --test
-
-# 正式运行 (无限循环 + 自动优化)
-python3 claude_auto_workflow.py --workers=5 --batch-size=50
-```
-
-### 工作流触发
-在Claude Code中使用 `/auto-discover` 命令。
-
-### 🧠 批次间自动优化机制
-每批验证后自动分析并优化策略：
-- 📊 **失败模式分析** - 统计4项验证的失败率
-- 🔄 **策略动态调整** - 根据通过率优化平台选择
-- ⚠️ **紧急优化** - 连续3批低通过率时自动重置
-- 📈 **优化历史记录** - 保存最近10次优化决策
-
-### 自动优化触发规则
-| 条件 | 动作 |
-|------|------|
-| 通过率<30% + 个人注册失败高 | 优先creator类型平台 |
-| 自有系统失败>30% | 增强深度验证 |
-| 通过率>50% | 扩展边缘类型平台 |
-| 连续3批<20% | 🔥 紧急优化重置 |
-
-### ⚡ 批次执行模式
-- **间隔时间**: 0秒 (立即执行)
-- **执行流程**: 验证50个 → 分析优化 → 立即开始下一批
-- **无限循环**: 24/7持续运行，零等待
 
 ---
 **版本**: v20.0 多源韧性优化版
