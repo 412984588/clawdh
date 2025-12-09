@@ -426,4 +426,6 @@ python3 claude_auto_workflow.py --workers=5 --batch-size=50
 **技术栈**: Python + Exa + DuckDuckGo + Playwright + 并行处理 + 自优化引擎
 
 ⚠️ 联动维护规则
-每当要更改这个文件的时候要把@/Users/zhimingdeng/Documents/cursor/坏蛋系统/CLAUDE.md 这个文件一起改
+每当要更改这个文件的时候，必须同步更新以下文件：
+- @/Users/zhimingdeng/Documents/cursor/坏蛋系统/CLAUDE.md
+- @/Users/zhimingdeng/Documents/cursor/坏蛋系统/ANTIGRAVITY.md
