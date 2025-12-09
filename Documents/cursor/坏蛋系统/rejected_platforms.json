@@ -24216,6 +24216,320 @@
       "discovered_date": "2025-12-08T19:01:09.533748",
       "validation_status": "failed",
       "error": "Page.goto: net::ERR_CERT_COMMON_NAME_INVALID at https://tipeasy.me/\nCall log:\n  - navigating to \"https://tipeasy.me/\", waiting until \"domcontentloaded\"\n"
+    },
+    {
+      "platform": {
+        "name": "Variant of Cash App",
+        "domain": "pluscash.com",
+        "url": "https://pluscash.com",
+        "type": [
+          "移动支付",
+          "数字钱包",
+          "移动原生"
+        ],
+        "source": "verified_variant"
+      },
+      "validation_results": {
+        "personal_registration": false,
+        "payment_receiving": false,
+        "own_payment_system": false,
+        "us_market_ach": false
+      },
+      "evidence": {},
+      "verified": false,
+      "verification_details": "{}",
+      "scraped_content_length": 0,
+      "scraped_title": "",
+      "rejected_date": "2025-12-09T01:08:56.144426"
+    },
+    {
+      "platform": {
+        "name": "Variant of Kajabi",
+        "domain": "gokajabi.com",
+        "url": "https://gokajabi.com",
+        "type": [
+          "教育",
+          "创作者",
+          "专业服务"
+        ],
+        "source": "verified_variant"
+      },
+      "validation_results": {
+        "personal_registration": false,
+        "payment_receiving": false,
+        "own_payment_system": false,
+        "us_market_ach": false
+      },
+      "evidence": {},
+      "verified": false,
+      "verification_details": "{}",
+      "scraped_content_length": 14,
+      "scraped_title": "Redirecting...",
+      "rejected_date": "2025-12-09T01:08:56.206670"
+    },
+    {
+      "platform": {
+        "name": "Variant of Venmo",
+        "domain": "myvenmo.com",
+        "url": "https://myvenmo.com",
+        "type": [
+          "移动支付",
+          "P2P",
+          "社交支付"
+        ],
+        "source": "verified_variant"
+      },
+      "validation_results": {
+        "personal_registration": false,
+        "payment_receiving": false,
+        "own_payment_system": false,
+        "us_market_ach": false
+      },
+      "evidence": {},
+      "verified": false,
+      "verification_details": "{}",
+      "scraped_content_length": 0,
+      "scraped_title": "",
+      "rejected_date": "2025-12-09T01:08:56.279295"
+    },
+    {
+      "platform": {
+        "name": "Variant of Wise",
+        "domain": "joinwise.com",
+        "url": "https://joinwise.com",
+        "type": [
+          "全球支付",
+          "跨境收款",
+          "多币种账户"
+        ],
+        "source": "verified_variant"
+      },
+      "validation_results": {
+        "personal_registration": false,
+        "payment_receiving": false,
+        "own_payment_system": false,
+        "us_market_ach": false
+      },
+      "evidence": {},
+      "verified": false,
+      "verification_details": "{}",
+      "scraped_content_length": 1694,
+      "scraped_title": "yavip.com Everyone could open Online Store for FREE. And, turn your professional to extra income. A brand essential e-commerce English platform for anyone who wants to have extra income and keep loyal customers.",
+      "rejected_date": "2025-12-09T01:08:57.885904"
+    },
+    {
+      "platform": {
+        "name": "Variant of Wise",
+        "domain": "wisehub.com",
+        "url": "https://wisehub.com",
+        "type": [
+          "全球支付",
+          "跨境收款",
+          "多币种账户"
+        ],
+        "source": "verified_variant"
+      },
+      "validation_results": {
+        "personal_registration": false,
+        "payment_receiving": true,
+        "own_payment_system": false,
+        "us_market_ach": false
+      },
+      "evidence": {
+        "payment_receiving": "找到支付接收相关功能"
+      },
+      "verified": false,
+      "verification_details": "{\"payment_receiving\": \"找到支付接收相关功能\"}",
+      "scraped_content_length": 5000,
+      "scraped_title": "WiseHub US LLC Formation Expert",
+      "rejected_date": "2025-12-09T01:08:59.540620"
+    },
+    {
+      "platform": {
+        "name": "Variant of Venmo",
+        "domain": "myvenmo.com",
+        "url": "https://myvenmo.com",
+        "type": [
+          "移动支付",
+          "P2P",
+          "社交支付"
+        ],
+        "source": "verified_variant"
+      },
+      "validation_results": {
+        "personal_registration": false,
+        "payment_receiving": false,
+        "own_payment_system": false,
+        "us_market_ach": false
+      },
+      "evidence": {},
+      "verified": false,
+      "verification_details": "{}",
+      "scraped_content_length": 0,
+      "scraped_title": "",
+      "rejected_date": "2025-12-09T01:08:59.651148"
+    },
+    {
+      "platform": {
+        "name": "Variant of Substack",
+        "domain": "thesubstack.com",
+        "url": "https://thesubstack.com",
+        "type": [
+          "创作者",
+          "写作平台"
+        ],
+        "source": "verified_variant"
+      },
+      "validation_results": {
+        "personal_registration": false,
+        "payment_receiving": false,
+        "own_payment_system": false,
+        "us_market_ach": false
+      },
+      "evidence": {},
+      "verified": false,
+      "verification_details": "{}",
+      "scraped_content_length": 0,
+      "scraped_title": "",
+      "rejected_date": "2025-12-09T01:08:59.794314"
+    },
+    {
+      "platform": {
+        "name": "中心版 Platform 748",
+        "domain": "中心版-984.com",
+        "url": "https://中心版-286.com",
+        "type": [
+          "中心版"
+        ],
+        "source": "type_extension"
+      },
+      "verified": false,
+      "error": "HTTPSConnectionPool(host='xn---286-zf5fn54ghy2a.com', port=443): Max retries exceeded with url: / (Caused by NameResolutionError(\"<urllib3.connection.HTTPSConnection object at 0x1040afb10>: Failed to resolve 'xn---286-zf5fn54ghy2a.com' ([Errno 8] nodename nor servname provided, or not known)\"))",
+      "verification_details": "无法访问网站: HTTPSConnectionPool(host='xn---286-zf5fn54ghy2a.com', port=443): Max retries exceeded with url: / (Caused by NameResolutionError(\"<urllib3.connection.HTTPSConnection object at 0x1040afb10>: Failed to resolve 'xn---286-zf5fn54ghy2a.com' ([Errno 8] nodename nor servname provided, or not known)\"))",
+      "rejected_date": "2025-12-09T01:08:59.820078"
+    },
+    {
+      "platform": {
+        "name": "Payment Platform 274",
+        "domain": "payment-219.com",
+        "url": "https://payment-491.com",
+        "type": [
+          "payment"
+        ],
+        "source": "type_extension"
+      },
+      "verified": false,
+      "error": "HTTPSConnectionPool(host='payment-491.com', port=443): Max retries exceeded with url: / (Caused by NameResolutionError(\"<urllib3.connection.HTTPSConnection object at 0x1040afd90>: Failed to resolve 'payment-491.com' ([Errno 8] nodename nor servname provided, or not known)\"))",
+      "verification_details": "无法访问网站: HTTPSConnectionPool(host='payment-491.com', port=443): Max retries exceeded with url: / (Caused by NameResolutionError(\"<urllib3.connection.HTTPSConnection object at 0x1040afd90>: Failed to resolve 'payment-491.com' ([Errno 8] nodename nor servname provided, or not known)\"))",
+      "rejected_date": "2025-12-09T01:08:59.842699"
+    },
+    {
+      "platform": {
+        "name": "Creator Platform 880",
+        "domain": "creator-220.com",
+        "url": "https://creator-215.com",
+        "type": [
+          "creator"
+        ],
+        "source": "type_extension"
+      },
+      "verified": false,
+      "error": "HTTPSConnectionPool(host='creator-215.com', port=443): Max retries exceeded with url: / (Caused by NameResolutionError(\"<urllib3.connection.HTTPSConnection object at 0x1040afed0>: Failed to resolve 'creator-215.com' ([Errno 8] nodename nor servname provided, or not known)\"))",
+      "verification_details": "无法访问网站: HTTPSConnectionPool(host='creator-215.com', port=443): Max retries exceeded with url: / (Caused by NameResolutionError(\"<urllib3.connection.HTTPSConnection object at 0x1040afed0>: Failed to resolve 'creator-215.com' ([Errno 8] nodename nor servname provided, or not known)\"))",
+      "rejected_date": "2025-12-09T01:08:59.878598"
+    },
+    {
+      "platform": {
+        "name": "Donation Platform 208",
+        "domain": "donation-621.com",
+        "url": "https://donation-555.com",
+        "type": [
+          "donation"
+        ],
+        "source": "type_extension"
+      },
+      "verified": false,
+      "error": "HTTPSConnectionPool(host='donation-555.com', port=443): Max retries exceeded with url: / (Caused by NameResolutionError(\"<urllib3.connection.HTTPSConnection object at 0x1040afed0>: Failed to resolve 'donation-555.com' ([Errno 8] nodename nor servname provided, or not known)\"))",
+      "verification_details": "无法访问网站: HTTPSConnectionPool(host='donation-555.com', port=443): Max retries exceeded with url: / (Caused by NameResolutionError(\"<urllib3.connection.HTTPSConnection object at 0x1040afed0>: Failed to resolve 'donation-555.com' ([Errno 8] nodename nor servname provided, or not known)\"))",
+      "rejected_date": "2025-12-09T01:08:59.915895"
+    },
+    {
+      "platform": {
+        "name": "增强版 Platform 140",
+        "domain": "增强版-543.com",
+        "url": "https://增强版-429.com",
+        "type": [
+          "增强版"
+        ],
+        "source": "type_extension"
+      },
+      "verified": false,
+      "error": "HTTPSConnectionPool(host='xn---429-uc6gm25avs7a.com', port=443): Max retries exceeded with url: / (Caused by NameResolutionError(\"<urllib3.connection.HTTPSConnection object at 0x1040afed0>: Failed to resolve 'xn---429-uc6gm25avs7a.com' ([Errno 8] nodename nor servname provided, or not known)\"))",
+      "verification_details": "无法访问网站: HTTPSConnectionPool(host='xn---429-uc6gm25avs7a.com', port=443): Max retries exceeded with url: / (Caused by NameResolutionError(\"<urllib3.connection.HTTPSConnection object at 0x1040afed0>: Failed to resolve 'xn---429-uc6gm25avs7a.com' ([Errno 8] nodename nor servname provided, or not known)\"))",
+      "rejected_date": "2025-12-09T01:08:59.939623"
+    },
+    {
+      "platform": {
+        "name": "Variant of PayPal",
+        "domain": "paypalglobal.com",
+        "url": "https://paypalglobal.com",
+        "type": [
+          "全球支付",
+          "数字钱包",
+          "在线支付"
+        ],
+        "source": "verified_variant"
+      },
+      "verified": false,
+      "error": "HTTPSConnectionPool(host='paypalglobal.com', port=443): Read timed out. (read timeout=10)",
+      "verification_details": "无法访问网站: HTTPSConnectionPool(host='paypalglobal.com', port=443): Read timed out. (read timeout=10)",
+      "rejected_date": "2025-12-09T01:09:07.917625"
+    },
+    {
+      "platform": {
+        "name": "Variant of Cash App",
+        "domain": "globalcash.com",
+        "url": "https://globalcash.com",
+        "type": [
+          "移动支付",
+          "数字钱包",
+          "移动原生"
+        ],
+        "source": "verified_variant"
+      },
+      "verified": false,
+      "error": "HTTPSConnectionPool(host='justanswer.com', port=443): Max retries exceeded with url: /sip/finance?r=impact%7C76210%7CTalk%20To%20A%20Finance%20Expert%7C&clickid=UeqVXLVj1xycUr7zNETuMVBnUkpTaRSJo0eYSM0&aff_sub_id=219693&aff_sub_id2=354778539&aff_sub_id3=21097&aff_sub_id4=&chat_text=&iradId=560799&irgwc=1&afsrc=1 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPSConnection object at 0x1040ae990>, 'Connection to justanswer.com timed out. (connect timeout=10)'))",
+      "verification_details": "无法访问网站: HTTPSConnectionPool(host='justanswer.com', port=443): Max retries exceeded with url: /sip/finance?r=impact%7C76210%7CTalk%20To%20A%20Finance%20Expert%7C&clickid=UeqVXLVj1xycUr7zNETuMVBnUkpTaRSJo0eYSM0&aff_sub_id=219693&aff_sub_id2=354778539&aff_sub_id3=21097&aff_sub_id4=&chat_text=&iradId=560799&irgwc=1&afsrc=1 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPSConnection object at 0x1040ae990>, 'Connection to justanswer.com timed out. (connect timeout=10)'))",
+      "rejected_date": "2025-12-09T01:09:08.230219"
+    },
+    {
+      "platform": {
+        "name": "Variant of Cash App",
+        "domain": "cashplus.com",
+        "url": "https://cashplus.com",
+        "type": [
+          "移动支付",
+          "数字钱包",
+          "移动原生"
+        ]
+      },
+      "validation_results": {
+        "personal_registration": true,
+        "payment_receiving": true,
+        "own_payment_system": true,
+        "us_market_ach": false
+      },
+      "evidence": {
+        "personal_registration": "找到个人注册相关关键词",
+        "payment_receiving": "找到支付接收相关功能",
+        "own_payment_system": "发现自有支付系统"
+      },
+      "verified": false,
+      "failed_criteria": [
+        "us_market_ach"
+      ],
+      "verification_details": "{\"personal_registration\": \"找到个人注册相关关键词\", \"payment_receiving\": \"找到支付接收相关功能\", \"own_payment_system\": \"发现自有支付系统\"}",
+      "rejected_date": "2025-12-09T01:18:28.592389"
     }
   ]
 }

@@ -1,8 +1,8 @@
 {
-  "total_discovered": 24,
+  "total_discovered": 50848,
   "total_verified": 0,
   "total_rejected": 0,
-  "batches_completed": 1,
+  "batches_completed": 2129,
   "discovery_success_rates": {
     "smart_names": 8,
     "type_combinations": 0,
@@ -11,6 +11,43 @@
     "trend_extrapolation": 0,
     "hybrid_generation": 8
   },
-  "strategy_performance": {},
-  "last_update": "2025-12-09T00:21:56.021324"
+  "strategy_performance": {
+    "smart_names": [
+      8,
+      8,
+      8,
+      8,
+      8,
+      8,
+      7,
+      8,
+      7,
+      7
+    ],
+    "variant_of_unknown": [
+      8,
+      8,
+      8,
+      8,
+      8,
+      8,
+      8,
+      8,
+      8,
+      8
+    ],
+    "hybrid_generation": [
+      8,
+      8,
+      8,
+      8,
+      8,
+      8,
+      8,
+      8,
+      8,
+      8
+    ]
+  },
+  "last_update": "2025-12-09T01:22:08.301286"
 }
