@@ -1,0 +1,38 @@
+{
+  "feature_automated_workflow": {
+    "desc": "Automated infinite loop for platform discovery and validation",
+    "implemented": true,
+    "test_criteria": "Runs continuously, processes batches, handles errors",
+    "related_files": ["claude_auto_workflow.py"]
+  },
+  "feature_scout_agent": {
+    "desc": "Discovery of new platforms via Exa API and internal database",
+    "implemented": true,
+    "test_criteria": "Finds unique platforms, filters duplicates",
+    "related_files": ["claude_auto_workflow.py"]
+  },
+  "feature_validator_agent": {
+    "desc": "Strict 4-criteria validation using Playwright",
+    "implemented": true,
+    "test_criteria": "Correctly identifies 4 criteria, handles browser interactions",
+    "related_files": ["claude_auto_workflow.py"]
+  },
+  "feature_deep_validation": {
+    "desc": "Secondary validation mechanism for initially rejected platforms",
+    "implemented": true,
+    "test_criteria": "Triggers on partial pass, navigates to pricing/signup pages",
+    "related_files": ["claude_auto_workflow.py"]
+  },
+  "feature_optimization_engine": {
+    "desc": "Self-optimizing logic based on batch pass rates and failure patterns",
+    "implemented": true,
+    "test_criteria": "Adjusts strategies based on stats, triggers emergency optimization",
+    "related_files": ["claude_auto_workflow.py"]
+  },
+  "feature_data_persistence": {
+    "desc": "JSON-based data storage for verified, rejected, and stats",
+    "implemented": true,
+    "test_criteria": "Reads/writes JSON files correctly, maintains data integrity",
+    "related_files": ["claude_auto_workflow.py"]
+  }
+}

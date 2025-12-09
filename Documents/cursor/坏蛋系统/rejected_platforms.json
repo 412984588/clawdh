@@ -23940,6 +23940,282 @@
       "passed_count": 3,
       "deep_validated": false,
       "verified_date": "2025-12-08T01:13:59.337837"
+    },
+    {
+      "name": "SleekBio | One, simple link for your social media bio.",
+      "domain": "sleekbio.com",
+      "url": "https://sleekbio.com",
+      "type": [
+        "linkinbio",
+        "creator"
+      ],
+      "source": "database",
+      "priority": 3,
+      "discovered_date": "2025-12-08T01:17:50.278408",
+      "validation_status": "rejected",
+      "validation_results": {
+        "personal_registration": true,
+        "payment_receiving": false,
+        "own_payment_system": false,
+        "us_market_ach": true
+      },
+      "validation_scores": {
+        "personal_registration": 3,
+        "payment_receiving": 0,
+        "own_payment_system": 0,
+        "us_market_ach": 5
+      },
+      "passed_count": 2,
+      "deep_validated": false,
+      "verified_date": "2025-12-08T01:17:56.843806"
+    },
+    {
+      "name": "Airmeet | AI powered Webinar platform with deep insights",
+      "domain": "airmeet.com",
+      "url": "https://airmeet.com",
+      "type": [
+        "events",
+        "virtual"
+      ],
+      "source": "database",
+      "priority": 3,
+      "discovered_date": "2025-12-08T01:17:50.278397",
+      "validation_status": "rejected",
+      "validation_results": {
+        "personal_registration": true,
+        "payment_receiving": true,
+        "own_payment_system": false,
+        "us_market_ach": true
+      },
+      "validation_scores": {
+        "personal_registration": 3,
+        "payment_receiving": 8,
+        "own_payment_system": 0,
+        "us_market_ach": 5
+      },
+      "passed_count": 3,
+      "deep_validated": false,
+      "verified_date": "2025-12-08T01:18:06.013094"
+    },
+    {
+      "name": "LANDR: The Best Music Production Software for Creators",
+      "domain": "landr.com",
+      "url": "https://landr.com",
+      "type": [
+        "music",
+        "mastering"
+      ],
+      "source": "database",
+      "priority": 3,
+      "discovered_date": "2025-12-08T01:17:50.278403",
+      "validation_status": "rejected",
+      "validation_results": {
+        "personal_registration": true,
+        "payment_receiving": true,
+        "own_payment_system": false,
+        "us_market_ach": true
+      },
+      "validation_scores": {
+        "personal_registration": 8,
+        "payment_receiving": 10,
+        "own_payment_system": 0,
+        "us_market_ach": 5
+      },
+      "passed_count": 3,
+      "deep_validated": false,
+      "verified_date": "2025-12-08T01:18:09.270278"
+    },
+    {
+      "name": "Tippy",
+      "domain": "tippy.money",
+      "url": "https://www.tippy.money/creators",
+      "source": "exa",
+      "discovered_date": "2025-12-08T14:58:24.909464",
+      "validation_status": "failed",
+      "error": "Page.goto: net::ERR_CERT_DATE_INVALID at https://www.tippy.money/creators\nCall log:\n  - navigating to \"https://www.tippy.money/creators\", waiting until \"domcontentloaded\"\n"
+    },
+    {
+      "name": "Creators",
+      "domain": "vibepay.com",
+      "url": "https://www.vibepay.com/creators",
+      "source": "exa",
+      "discovered_date": "2025-12-08T14:58:24.122540",
+      "validation_status": "rejected",
+      "validation_results": {
+        "personal_registration": true,
+        "payment_receiving": true,
+        "own_payment_system": false,
+        "us_market_ach": true
+      },
+      "validation_scores": {
+        "personal_registration": 3,
+        "payment_receiving": 22,
+        "own_payment_system": 1,
+        "us_market_ach": 5
+      },
+      "passed_count": 3,
+      "deep_validated": false,
+      "verified_date": "2025-12-08T14:58:30.605564"
+    },
+    {
+      "name": "GigPay - Revolutionizing the way the world gets paid.",
+      "domain": "gigpay.com",
+      "url": "https://www.gigpay.com/en-us",
+      "source": "exa",
+      "discovered_date": "2025-12-08T14:58:24.122610",
+      "validation_status": "rejected",
+      "validation_results": {
+        "personal_registration": true,
+        "payment_receiving": true,
+        "own_payment_system": false,
+        "us_market_ach": true
+      },
+      "validation_scores": {
+        "personal_registration": 3,
+        "payment_receiving": 7,
+        "own_payment_system": 1,
+        "us_market_ach": 5
+      },
+      "passed_count": 3,
+      "deep_validated": false,
+      "verified_date": "2025-12-08T14:58:34.074765"
+    },
+    {
+      "name": "Youtipper",
+      "domain": "youtipper.com",
+      "url": "https://youtipper.com/",
+      "source": "exa",
+      "discovered_date": "2025-12-08T14:58:24.909527",
+      "validation_status": "rejected",
+      "validation_results": {
+        "personal_registration": true,
+        "payment_receiving": true,
+        "own_payment_system": false,
+        "us_market_ach": true
+      },
+      "validation_scores": {
+        "personal_registration": 14,
+        "payment_receiving": 12,
+        "own_payment_system": 1,
+        "us_market_ach": 5
+      },
+      "passed_count": 3,
+      "deep_validated": false,
+      "verified_date": "2025-12-08T14:58:38.224990"
+    },
+    {
+      "name": "OpenTip - Monetize globally",
+      "domain": "opentip.io",
+      "url": "https://opentip.io/",
+      "source": "exa",
+      "discovered_date": "2025-12-08T14:58:24.909657",
+      "validation_status": "failed",
+      "error": "Page.goto: net::ERR_NAME_NOT_RESOLVED at https://opentip.io/\nCall log:\n  - navigating to \"https://opentip.io/\", waiting until \"domcontentloaded\"\n"
+    },
+    {
+      "name": "Collect Tips From Fans",
+      "domain": "tipptree.com",
+      "url": "https://tipptree.com/",
+      "source": "exa",
+      "discovered_date": "2025-12-08T14:58:24.909686",
+      "validation_status": "failed",
+      "error": "Page.goto: net::ERR_CONNECTION_REFUSED at https://tipptree.com/\nCall log:\n  - navigating to \"https://tipptree.com/\", waiting until \"domcontentloaded\"\n"
+    },
+    {
+      "name": "Buy Me a Coffee alternatives | Joinado",
+      "domain": "joinado.com",
+      "url": "https://joinado.com/buymeacoffee-alternative",
+      "source": "exa",
+      "discovered_date": "2025-12-08T14:58:24.122475",
+      "validation_status": "rejected",
+      "validation_results": {
+        "personal_registration": true,
+        "payment_receiving": true,
+        "own_payment_system": false,
+        "us_market_ach": true
+      },
+      "validation_scores": {
+        "personal_registration": 3,
+        "payment_receiving": 8,
+        "own_payment_system": 0,
+        "us_market_ach": 5
+      },
+      "passed_count": 3,
+      "deep_validated": false,
+      "verified_date": "2025-12-08T14:58:39.195032"
+    },
+    {
+      "name": "TipSend - Sell Digital Content Without Subscriptions, Receive Tips and Connect with Supporters",
+      "domain": "tipsend.com",
+      "url": "https://tipsend.com/",
+      "source": "exa",
+      "discovered_date": "2025-12-08T14:58:24.909627",
+      "validation_status": "rejected",
+      "validation_results": {
+        "personal_registration": true,
+        "payment_receiving": true,
+        "own_payment_system": false,
+        "us_market_ach": true
+      },
+      "validation_scores": {
+        "personal_registration": 6,
+        "payment_receiving": 16,
+        "own_payment_system": 1,
+        "us_market_ach": 5
+      },
+      "passed_count": 3,
+      "deep_validated": false,
+      "verified_date": "2025-12-08T14:58:39.909311"
+    },
+    {
+      "name": "Zink - Online Tip Jar - Free Virtual Tip Jar With QR Code",
+      "domain": "zink.tips",
+      "url": "https://zink.tips/?v=video-makers",
+      "source": "exa",
+      "discovered_date": "2025-12-08T14:58:24.909753",
+      "validation_status": "failed",
+      "error": "HTTP 500"
+    },
+    {
+      "name": "Pally.gg - Where creators and their teams get paid",
+      "domain": "pally.gg",
+      "url": "https://pally.gg/",
+      "source": "exa",
+      "discovered_date": "2025-12-08T14:58:24.909782",
+      "validation_status": "rejected",
+      "validation_results": {
+        "personal_registration": true,
+        "payment_receiving": true,
+        "own_payment_system": false,
+        "us_market_ach": false
+      },
+      "validation_scores": {
+        "personal_registration": 11,
+        "payment_receiving": 23,
+        "own_payment_system": 1,
+        "us_market_ach": 1
+      },
+      "passed_count": 2,
+      "deep_validated": false,
+      "verified_date": "2025-12-08T14:58:45.433579"
+    },
+    {
+      "name": "Tipsme - The Virtual Tip Jar for Content Creators & Musicians",
+      "domain": "tipsme.online",
+      "url": "https://tipsme.online/digital-creators",
+      "source": "exa",
+      "discovered_date": "2025-12-08T14:58:24.909562",
+      "validation_status": "failed",
+      "error": "HTTP 522"
+    },
+    {
+      "name": "TipEasy | The #1 QR Code Tipping Platform",
+      "domain": "tipeasy.me",
+      "url": "https://tipeasy.me/",
+      "source": "exa",
+      "discovered_date": "2025-12-08T19:01:09.533748",
+      "validation_status": "failed",
+      "error": "Page.goto: net::ERR_CERT_COMMON_NAME_INVALID at https://tipeasy.me/\nCall log:\n  - navigating to \"https://tipeasy.me/\", waiting until \"domcontentloaded\"\n"
     }
   ]
 }

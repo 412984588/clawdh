@@ -346,11 +346,11 @@ Validator-02: "记录到verified_platforms.json"
 ### 🔧 技术栈要求
 ```python
 # 核心依赖
-crewai==0.1.0
-langgraph==0.0.20
-autogen-agentchat==0.2.0
-playwright==1.40.0
-asyncio
+aiohttp>=3.8.0
+python-dotenv>=1.0.0
+exa-py>=1.0.0
+playwright>=1.48.0
+duckduckgo-search>=6.0.0
 ```
 
 ### 📈 Performance Targets
@@ -364,16 +364,17 @@ asyncio
 ## 🤖 Claude Code 自动化工作流
 
 ### 核心脚本
-- **`claude_auto_workflow.py`** - V1基础版自动化脚本
-- **`claude_auto_workflow_v2.py`** - V2增强版(推荐)
+- **`claude_auto_workflow.py`** - 主自动化脚本(含深度验证+自动优化)
 - **`.agent/workflows/auto-discover.md`** - 工作流配置
 - **`start_workflow.sh`** / **`stop_workflow.sh`** - 启停脚本
 
-### V2增强版特性
+### 增强版特性
 - ⚡ **5线程并行验证** - 速度提升5倍
 - 🔬 **深度验证突破** - 被拒绝平台自动二次验证
 - 📚 **200+平台数据库** - 更丰富的候选源
 - 📊 **智能失败分析** - 自动调整策略
+- 🔍 **智能多源搜索** - Exa (优先) + DuckDuckGo (免费备用)
+- 🛑 **熔断保护机制** - 自动识别 Exa 配额耗尽并切换搜索源
 
 ### 深度验证突破机制
 当平台首次验证通过2项以上但不满4项时，自动触发：
@@ -385,29 +386,44 @@ asyncio
 ### 快速启动命令
 
 ```bash
-# V2测试模式 (推荐)
-python3 claude_auto_workflow_v2.py --test
+# 测试模式 (5平台)
+python3 claude_auto_workflow.py --test
 
-# V2正式运行 (5 workers)
-python3 claude_auto_workflow_v2.py --workers=5 --batch-size=50
-
-# V1基础版
-python3 claude_auto_workflow.py --batch
+# 正式运行 (无限循环 + 自动优化)
+python3 claude_auto_workflow.py --workers=5 --batch-size=50
 ```
 
 ### 工作流触发
 在Claude Code中使用 `/auto-discover` 命令。
 
+### 🧠 批次间自动优化机制
+每批验证后自动分析并优化策略：
+- 📊 **失败模式分析** - 统计4项验证的失败率
+- 🔄 **策略动态调整** - 根据通过率优化平台选择
+- ⚠️ **紧急优化** - 连续3批低通过率时自动重置
+- 📈 **优化历史记录** - 保存最近10次优化决策
+
+### 自动优化触发规则
+| 条件 | 动作 |
+|------|------|
+| 通过率<30% + 个人注册失败高 | 优先creator类型平台 |
+| 自有系统失败>30% | 增强深度验证 |
+| 通过率>50% | 扩展边缘类型平台 |
+| 连续3批<20% | 🔥 紧急优化重置 |
+
+### ⚡ 批次执行模式
+- **间隔时间**: 0秒 (立即执行)
+- **执行流程**: 验证50个 → 分析优化 → 立即开始下一批
+- **无限循环**: 24/7持续运行，零等待
+
 ---
-**版本**: v18.0 深度验证突破版
+**版本**: v20.0 多源韧性优化版
 **更新日期**: 2025-12-08
-**核心使命**: 完全自动化的平台发现验证系统+智能突破
-**工作模式**: Exa搜索 + Playwright验证 + 深度交互突破
-**验证逻辑**: 首次验证 → 失败分析 → 深度验证突破 → 重新评估
-**文件管理**: 实时更新verified/rejected/pending JSON文件
-**技术栈**: Python + Exa API + Playwright + 并行处理
+**核心使命**: 完全自动化 + 智能突破 + 自我优化 + 成本韧性
+**工作模式**: 验证 → 分析 → 优化 → 循环
+**验证逻辑**: 首次验证 → 深度突破 → 失败分析 → 策略调整
+**文件管理**: 实时更新JSON + 优化历史记录
+**技术栈**: Python + Exa + DuckDuckGo + Playwright + 并行处理 + 自优化引擎
 
 ⚠️ 联动维护规则
-每次更改就更改@GEMINI.md
-
-
+每当要更改这个文件的时候要把@/Users/zhimingdeng/Documents/cursor/坏蛋系统/GEMINI.md 这个文件一起改
