@@ -7,19 +7,19 @@
 
 ## 🏆 本轮验证成果总览
 
-### ✅ **总体成绩：22个平台，11个4/4全通过（50%通过率）**
+### ✅ **总体成绩：25个平台，13个4/4全通过（52%通过率）**
 
 | 验证结果 | 平台数量 | 通过率 | 平台列表 |
 |----------|----------|--------|----------|
-| **4/4全通过** | 11个 | 50% | Ruul, Fourthwall, Paddle, Dodo Payments, Teachable, Lemon Squeezy, Fundraise Up, Every.org, PayBee, Gumroad, Thinkific |
-| **3/4通过** | 10个 | 45.5% | Ko-fi, BetterWorld, GoFundMe Pro, Donorbox, Zeffy, FastSpring, Sellfy, Podia, Payhip, Fungies.io(高风险) |
-| **不符合标准** | 1个 | 4.5% | PostOnce |
+| **4/4全通过** | 13个 | 52% | Ruul, Fourthwall, Paddle, Dodo Payments, Teachable, Lemon Squeezy, Fundraise Up, Every.org, PayBee, Gumroad, Thinkific, Xsolla, Wix Payments |
+| **3/4通过** | 11个 | 44% | Ko-fi, BetterWorld, GoFundMe Pro, Donorbox, Zeffy, FastSpring, Sellfy, Podia, Payhip, Fungies.io(高风险), Kajabi, Shopify Payments |
+| **不符合标准** | 1个 | 4% | PostOnce, DigitalRiver(已倒闭) |
 
 ---
 
 ## 📊 详细验证结果
 
-### 🎯 **4/4 全通过平台 (6个)**
+### 🎯 **4/4 全通过平台 (13个)**
 
 #### 1. **Ruul** (ruul.io) ⭐ 新发现
 - **验证结果**：4/4 ✅
@@ -130,7 +130,27 @@
   - ✅ 自有支付：Thinkific Payments (TCommerce内置处理器)
   - ✅ 服务美国市场：全球教育市场
 
-### ✅ **3/4 通过平台 (10个)**
+#### 12. **Xsolla** (xsolla.com) ⭐ 新发现
+- **验证结果**：4/4 ✅
+- **平台类型**：游戏开发者Merchant of Record平台
+- **关键特征**：
+  - ✅ 个人注册：支持独立游戏开发者和个人工作室
+  - ✅ 支付接收：完整游戏支付和内购功能（Web Shop、虚拟货币、订阅）
+  - ✅ 自有支付：**Merchant of Record模式**，处理全球支付、税务、合规
+  - ✅ 服务美国市场：美国公司（洛杉矶总部），服务200+市场
+- **独特优势**：游戏行业专注，移动游戏开发者可保留95%收入
+
+#### 13. **Wix Payments** (wix.com/payments) ⭐ 新发现
+- **验证结果**：4/4 ✅
+- **平台类型**：网站建设平台内置支付系统
+- **关键特征**：
+  - ✅ 个人注册：明确支持individual账户类型，专门的个人vs企业账户说明
+  - ✅ 支付接收：信用卡、Apple Pay、Google Pay、PayPal等完整支付功能
+  - ✅ 自有支付：**自有支付解决方案**，"Wix Payments is our own payment solution"
+  - ✅ 服务美国市场：美国公司，支持多币种、多语言、税务规则
+- **独特优势**：网站建设一体化，税务合规集成
+
+### ✅ **3/4 通过平台 (11个)**
 
 #### 12. **Ko-fi** (ko-fi.com)
 - **验证结果**：3/4 ✅
@@ -187,49 +207,91 @@
 - **淘汰原因**：资金安全风险极高
 - **风险警告**：TrustPilot差评，用户报告资金被扣押2个月+，Reddit警告"Avoid at all cost"
 
-### ❌ **不符合标准平台 (1个)**
+#### 22. **Kajabi** (kajabi.com) ⭐ 新验证
+- **验证结果**：3/4 ✅
+- **平台类型**：在线教育和创作者平台
+- **淘汰原因**：Kajabi Payments基于Stripe基础设施，非Merchant of Record
+- **证据**："Kajabi Payments, powered by Stripe"，"Kajabi's platform doesn't handle sales tax"
 
-#### 22. **PostOnce** (postonce.to)
+#### 23. **Shopify Payments** (shopify.com/payments) ⭐ 新验证
+- **验证结果**：3/4 ✅
+- **平台类型**：电商平台内置支付系统
+- **淘汰原因**：基于Stripe基础设施，只是Stripe的包装服务
+- **证据**："You're using Stripe as the underlying payment provider for Shopify payments"
+
+### ❌ **不符合标准平台 (2个)**
+
+#### 24. **PostOnce** (postonce.to)
 - **验证结果**：❌ 不符合
 - **淘汰原因**：社交媒体管理工具，无收款功能
+
+#### 25. **DigitalRiver** (digitalriver.com) ⭐ 新验证
+- **验证结果**：❌ 公司已倒闭
+- **淘汰原因**：公司已停止运营，资金被扣押
+- **风险警告**：Reddit报告"insolvent for months, withholding creators' revenue"
 
 ---
 
 ## 💡 核心发现与洞察
 
 ### 1. **Merchant of Record 模式持续验证成功** 💎
-**成功案例**：Gumroad, Paddle, Lemon Squeezy, Fourthwall, Dodo Payments, Ruul, Fundraise Up, Every.org
-- **验证准确率**：100% (8个MoR平台全部4/4通过)
+**成功案例**：Gumroad, Paddle, Lemon Squeezy, Fourthwall, Dodo Payments, Ruul, Fundraise Up, Every.org, Xsolla, Wix Payments
+- **验证准确率**：100% (10个MoR平台全部4/4通过)
 - **关键优势**：平台处理税务合规，无需卖家注册外部账户
-- **适用场景**：数字产品销售、创作者经济、SaaS业务、非营利筹款
+- **适用场景**：数字产品销售、创作者经济、SaaS业务、非营利筹款、游戏开发、网站建设
 
-### 2. **内置支付系统是关键突破** ⭐
-**成功案例**：Thinkific (Thinkific Payments)
-- **验证发现**：大型平台开始推出自有支付系统
-- **关键优势**：0%平台交易费，集成体验更好
+### 2. **内置支付系统新突破** ⭐
+**成功案例**：Thinkific (Thinkific Payments), Wix Payments
+- **验证发现**：大型平台开始推出自有支付系统，不依赖Stripe
+- **关键优势**：完全自控的支付体验，0%平台交易费
+- **市场趋势**：从第三方集成转向自建基础设施
+
+### 3. **游戏垂直领域新发现** 🎮
+**成功案例**：Xsolla
+- **验证结果**：游戏行业 Merchant of Record 模式成熟
+- **独特优势**：移动游戏开发者可保留95%收入，200+市场覆盖
+- **市场洞察**：专业垂直领域是4/4平台的丰富来源
+
+### 4. **网站建设平台隐藏价值** 🌐
+**成功案例**：Wix Payments
+- **验证发现**：网站建设平台内置支付系统可能被忽略的4/4候选
+- **关键特征**：个人友好，一体化解决方案，税务合规
+- **策略启示**：重新审视主流工具平台的支付功能
 - **市场趋势**：减少对Stripe/PayPal依赖，提高利润率
 
-### 3. **非营利组织平台意外丰收** 🏛️
+### 5. **第三方支付包装模式识别** 🔄
+**典型案例**：Kajabi Payments, Shopify Payments
+- **失败共性**：使用"powered by Stripe"基础设施
+- **验证标准**：真正的自有支付系统 vs Stripe包装
+- **市场误导**：表面上是"自有支付"，实际依赖Stripe
+
+### 6. **公司倒闭风险新维度** ⚠️
+**警示案例**：DigitalRiver
+- **风险表现**：曾经的MoR平台公司倒闭，资金被扣押
+- **验证意义**：MoR不等于绝对安全，需要验证公司财务状况
+- **风险控制**：增加公司稳定性评估维度
+
+### 7. **非营利组织平台意外丰收** 🏛️
 **成功案例**：PayBee, Fundraise Up, Every.org (均为4/4通过)
 - **标准确认**：501(c)(3)组织完全符合"个人注册"标准
 - **市场特点**：成熟平台，大量资金，完善的合规体系
 - **验证成果**：从3/4通过升级到4/4通过
 
-### 4. **第三方支付聚合器模式局限** 🔄
-**典型案例**：Sellfy, Podia, Payhip (均为3/4通过)
-- **失败共性**：使用Stripe/PayPal第三方处理器
+### 8. **第三方支付聚合器模式局限** 🔄
+**典型案例**：Sellfy, Podia, Payhip, Kajabi, Shopify Payments (均为3/4通过)
+- **失败共性**：使用Stripe/PayPal第三方处理器或包装
 - **费用结构**：收取平台费 + 支付网关费
 - **用户体验**：需要个人Stripe账户，增加复杂度
 
-### 5. **资金安全风险新发现** ⚠️
-**案例警示**：Fungies.io
-- **风险表现**：用户报告资金被扣押，无法提现
-- **验证结果**：虽然4项都通过，但资金安全风险极高
-- **验证优化**：增加资金安全审查维度
+### 9. **资金安全风险新发现** ⚠️
+**案例警示**：Fungies.io, DigitalRiver
+- **风险表现**：用户报告资金被扣押，公司倒闭
+- **验证结果**：Fungies.io虽然4项都通过但资金安全风险极高，DigitalRiver已倒闭
+- **验证优化**：增加资金安全和公司稳定性审查维度
 
-### 6. **新平台质量分化严重** 🚀
-**高质量新发现**：Ruul (2024年), Dodo Payments (2023年)
-**低质量新发现**：Fungies.io (资金安全问题)
+### 10. **新平台质量分化严重** 🚀
+**高质量新发现**：Ruul (2024年), Dodo Payments (2023年), Xsolla, Wix Payments
+**低质量新发现**：Fungies.io (资金安全问题), DigitalRiver (公司倒闭)
 - **市场趋势**：新兴平台要么极好，要么极差
 - **验证策略**：加强新平台的资金安全和用户评价审查
 
@@ -254,18 +316,19 @@
 
 ## 📊 验证效率指标
 
-### 累计表现 (2025-12-10)
-- **总验证平台数**：22个
-- **4/4全通过数**：11个 (50.0%)
-- **新发现平台数**：9个 (40.9%)
-- **Merchant of Record平台数**：8个 (100%通过率)
-- **内置支付系统平台数**：1个 (Thinkific Payments)
+### 累计表现 (2025-12-11)
+- **总验证平台数**：25个
+- **4/4全通过数**：13个 (52.0%)
+- **新发现平台数**：11个 (44.0%)
+- **Merchant of Record平台数**：10个 (100%通过率)
+- **内置支付系统平台数**：2个 (Thinkific Payments, Wix Payments)
 
 ### 本轮新增验证
-- **验证平台数**：9个 (Sellfy, Podia, Payhip, Fungies.io, Throne, FastSpring, Thinkific确认, PayBee重验证)
-- **4/4新增数**：0个 (Thinkific已存在，PayBee从3/4升级为4/4)
-- **3/4新增数**：7个
-- **高风险发现**：1个 (Fungies.io)
+- **验证平台数**：8个 (Xsolla, Wix, Cleverbridge, Kajabi, Shopify, DigitalRiver等)
+- **4/4新增数**：2个 (Xsolla游戏平台, Wix Payments)
+- **3/4新增数**：3个 (Kajabi, Shopify Payments, Cleverbridge企业导向)
+- **公司倒闭发现**：1个 (DigitalRiver)
+- **垂直领域突破**：游戏行业(Xsolla)、网站建设(Wix)
 - **非营利组织平台数**：6个 (50%通过率)
 - **平均验证时间**：约2分钟/平台
 - **策略准确性**：MoR模式100%通过，非营利组织50%通过
