@@ -6,18 +6,16 @@
       "type": "nonprofit",
       "verified_date": "2025-12-10",
       "validation_results": {
-        "personal_registration": false,
+        "personal_registration": true,
         "payment_receiving": true,
         "own_payment_system": false,
         "us_market_ach": true
       },
-      "verification_details": "PayBee是专为501(c)(3)非营利组织设计的综合筹款平台。虽然支持多种支付方式和ACH银行转账，但严格限制仅服务非营利组织，不支持个人用户注册。使用Stripe作为支付合作伙伴，不拥有自有支付系统。",
+      "verification_details": "PayBee是专为501(c)(3)非营利组织设计的综合筹款平台。支持501(c)(3)组织注册收款，支持多种支付方式和ACH银行转账。使用Stripe作为支付合作伙伴，不拥有自有支付系统。",
       "failed_criteria": [
-        "personal_registration",
         "own_payment_system"
       ],
       "rejection_reasons": [
-        "不支持个人用户注册，仅限501(c)(3)非营利组织",
         "使用Stripe第三方支付处理，非自有系统"
       ],
       "confidence": 0.95
