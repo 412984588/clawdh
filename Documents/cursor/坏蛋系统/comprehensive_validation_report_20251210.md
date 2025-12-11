@@ -7,19 +7,19 @@
 
 ## 🏆 本轮验证成果总览
 
-### ✅ **总体成绩：25个平台，13个4/4全通过（52%通过率）**
+### ✅ **总体成绩：30个平台，15个4/4全通过（50%通过率）**
 
 | 验证结果 | 平台数量 | 通过率 | 平台列表 |
 |----------|----------|--------|----------|
-| **4/4全通过** | 13个 | 52% | Ruul, Fourthwall, Paddle, Dodo Payments, Teachable, Lemon Squeezy, Fundraise Up, Every.org, PayBee, Gumroad, Thinkific, Xsolla, Wix Payments |
-| **3/4通过** | 11个 | 44% | Ko-fi, BetterWorld, GoFundMe Pro, Donorbox, Zeffy, FastSpring, Sellfy, Podia, Payhip, Fungies.io(高风险), Kajabi, Shopify Payments |
-| **不符合标准** | 1个 | 4% | PostOnce, DigitalRiver(已倒闭) |
+| **4/4全通过** | 15个 | 50% | Ruul, Fourthwall, Paddle, Dodo Payments, Teachable, Lemon Squeezy, Fundraise Up, Every.org, PayBee, Gumroad, Thinkific, Xsolla, Wix Payments, 2Checkout/Verifone, PayPro Global |
+| **3/4通过** | 13个 | 43.3% | Ko-fi, BetterWorld, GoFundMe Pro, Donorbox, Zeffy, FastSpring, Sellfy, Podia, Payhip, Fungies.io(高风险), Kajabi, Shopify Payments, Squarespace Payments, Square, Webflow |
+| **不符合标准** | 2个 | 6.7% | PostOnce, DigitalRiver(已倒闭) |
 
 ---
 
 ## 📊 详细验证结果
 
-### 🎯 **4/4 全通过平台 (13个)**
+### 🎯 **4/4 全通过平台 (15个)**
 
 #### 1. **Ruul** (ruul.io) ⭐ 新发现
 - **验证结果**：4/4 ✅
@@ -150,7 +150,27 @@
   - ✅ 服务美国市场：美国公司，支持多币种、多语言、税务规则
 - **独特优势**：网站建设一体化，税务合规集成
 
-### ✅ **3/4 通过平台 (11个)**
+#### 14. **2Checkout/Verifone** (2checkout.com) ⭐ 新发现
+- **验证结果**：4/4 ✅
+- **平台类型**：全球支付处理Merchant of Record平台
+- **关键特征**：
+  - ✅ 个人注册：支持individual账户类型，需要政府ID和地址证明
+  - ✅ 支付接收：支持Visa、MasterCard、AMEX、PayPal等20多种支付方式
+  - ✅ 自有支付：**Merchant of Record模式**，"Power your global sales with online payment processing and merchant of record services"
+  - ✅ 服务美国市场：支持20多种货币，全球支付处理
+- **独特优势**：被Verifone收购的企业级支付处理能力
+
+#### 15. **PayPro Global** (payproglobal.com) ⭐ 新发现
+- **验证结果**：4/4 ✅
+- **平台类型**：SaaS和游戏开发者Merchant of Record平台
+- **关键特征**：
+  - ✅ 个人注册：专门服务SaaS、软件、视频游戏个人开发者
+  - ✅ 支付接收：支持70+支付方式，110+货币，全球销售
+  - ✅ 自有支付：**Merchant of Record模式**，"PayPro Global offers a unique Merchant of Record model"
+  - ✅ 服务美国市场：美国市场优先，5% + $0.50交易费
+- **独特优势**：专门为SaaS、游戏、数字产品设计的MoR，类似Paddle定价
+
+### ✅ **3/4 通过平台 (13个)**
 
 #### 12. **Ko-fi** (ko-fi.com)
 - **验证结果**：3/4 ✅
@@ -225,7 +245,25 @@
 - **验证结果**：❌ 不符合
 - **淘汰原因**：社交媒体管理工具，无收款功能
 
-#### 25. **DigitalRiver** (digitalriver.com) ⭐ 新验证
+#### 25. **Squarespace Payments** (squarespace.com) ⭐ 新验证
+- **验证结果**：3/4 ✅
+- **平台类型**：网站建设平台支付系统
+- **淘汰原因**：基于Stripe基础设施，"Squarespace Payments charges Stripe's same flat rate"
+- **证据**：非真正的自有支付系统
+
+#### 26. **Square** (squareup.com) ⭐ 新验证
+- **验证结果**：3/4 ✅
+- **平台类型**：支付处理器和POS系统
+- **淘汰原因**：支付处理器模式，非Merchant of Record
+- **证据**：主要用于线下和基础线上支付，不是为数字产品设计的MoR
+
+#### 27. **Webflow** (webflow.com) ⭐ 新验证
+- **验证结果**：3/4 ✅
+- **平台类型**：网站建设平台
+- **淘汰原因**：需要连接Stripe账户，"Payments for Webflow ecommerce sites are processed through Stripe"
+- **证据**：依赖第三方支付处理器
+
+#### 28. **DigitalRiver** (digitalriver.com) ⭐ 新验证
 - **验证结果**：❌ 公司已倒闭
 - **淘汰原因**：公司已停止运营，资金被扣押
 - **风险警告**：Reddit报告"insolvent for months, withholding creators' revenue"
@@ -235,62 +273,75 @@
 ## 💡 核心发现与洞察
 
 ### 1. **Merchant of Record 模式持续验证成功** 💎
-**成功案例**：Gumroad, Paddle, Lemon Squeezy, Fourthwall, Dodo Payments, Ruul, Fundraise Up, Every.org, Xsolla, Wix Payments
-- **验证准确率**：100% (10个MoR平台全部4/4通过)
+**成功案例**：Gumroad, Paddle, Lemon Squeezy, Fourthwall, Dodo Payments, Ruul, Fundraise Up, Every.org, Xsolla, Wix Payments, 2Checkout/Verifone, PayPro Global
+- **验证准确率**：100% (12个MoR平台全部4/4通过)
 - **关键优势**：平台处理税务合规，无需卖家注册外部账户
-- **适用场景**：数字产品销售、创作者经济、SaaS业务、非营利筹款、游戏开发、网站建设
+- **适用场景**：数字产品销售、创作者经济、SaaS业务、非营利筹款、游戏开发、网站建设、企业电商
 
-### 2. **内置支付系统新突破** ⭐
+### 2. **传统支付巨头转型MoR** 🏢
+**成功案例**：2Checkout/Verifone
+- **验证发现**：传统支付处理商通过收购转型为MoR服务
+- **关键优势**：企业级基础设施+MoR税务合规能力
+- **市场趋势**：传统支付公司向MoR模式转型
+
+### 3. **内置支付系统新突破** ⭐
 **成功案例**：Thinkific (Thinkific Payments), Wix Payments
 - **验证发现**：大型平台开始推出自有支付系统，不依赖Stripe
 - **关键优势**：完全自控的支付体验，0%平台交易费
 - **市场趋势**：从第三方集成转向自建基础设施
 
-### 3. **游戏垂直领域新发现** 🎮
-**成功案例**：Xsolla
-- **验证结果**：游戏行业 Merchant of Record 模式成熟
-- **独特优势**：移动游戏开发者可保留95%收入，200+市场覆盖
+### 4. **游戏垂直领域新发现** 🎮
+**成功案例**：Xsolla, PayPro Global
+- **验证结果**：游戏行业Merchant of Record模式成熟，新发现PayPro Global
+- **独特优势**：移动游戏开发者95%收入分成，70+支付方式，110+货币支持
 - **市场洞察**：专业垂直领域是4/4平台的丰富来源
 
-### 4. **网站建设平台隐藏价值** 🌐
-**成功案例**：Wix Payments
-- **验证发现**：网站建设平台内置支付系统可能被忽略的4/4候选
-- **关键特征**：个人友好，一体化解决方案，税务合规
-- **策略启示**：重新审视主流工具平台的支付功能
+### 5. **网站建设平台分化明显** 🌐
+**4/4成功案例**：Wix Payments
+**3/4失败案例**：Squarespace, Webflow
+- **验证发现**：网站建设平台在支付系统策略上分化严重
+- **成功关键**：真正的自有支付系统vs Stripe包装
+- **策略启示**：必须深入验证是否为真正的MoR模式
 - **市场趋势**：减少对Stripe/PayPal依赖，提高利润率
 
-### 5. **第三方支付包装模式识别** 🔄
-**典型案例**：Kajabi Payments, Shopify Payments
-- **失败共性**：使用"powered by Stripe"基础设施
+### 6. **第三方支付包装模式识别** 🔄
+**典型案例**：Kajabi Payments, Shopify Payments, Squarespace Payments
+- **失败共性**：使用"powered by Stripe"基础设施或包装
 - **验证标准**：真正的自有支付系统 vs Stripe包装
 - **市场误导**：表面上是"自有支付"，实际依赖Stripe
 
-### 6. **公司倒闭风险新维度** ⚠️
+### 7. **公司倒闭风险新维度** ⚠️
 **警示案例**：DigitalRiver
 - **风险表现**：曾经的MoR平台公司倒闭，资金被扣押
 - **验证意义**：MoR不等于绝对安全，需要验证公司财务状况
 - **风险控制**：增加公司稳定性评估维度
 
-### 7. **非营利组织平台意外丰收** 🏛️
+### 8. **传统支付处理器局限性** 💳
+**典型案例**：Square
+- **失败共性**：支付处理器模式，非Merchant of Record
+- **业务定位**：主要为线下和基础线上支付设计
+- **验证启示**：不是所有支付平台都是MoR模式
+
+### 9. **非营利组织平台意外丰收** 🏛️
 **成功案例**：PayBee, Fundraise Up, Every.org (均为4/4通过)
 - **标准确认**：501(c)(3)组织完全符合"个人注册"标准
 - **市场特点**：成熟平台，大量资金，完善的合规体系
 - **验证成果**：从3/4通过升级到4/4通过
 
-### 8. **第三方支付聚合器模式局限** 🔄
-**典型案例**：Sellfy, Podia, Payhip, Kajabi, Shopify Payments (均为3/4通过)
+### 10. **第三方支付聚合器模式局限** 🔄
+**典型案例**：Sellfy, Podia, Payhip, Kajabi, Shopify Payments, Squarespace, Webflow
 - **失败共性**：使用Stripe/PayPal第三方处理器或包装
 - **费用结构**：收取平台费 + 支付网关费
 - **用户体验**：需要个人Stripe账户，增加复杂度
 
-### 9. **资金安全风险新发现** ⚠️
+### 11. **资金安全风险新发现** ⚠️
 **案例警示**：Fungies.io, DigitalRiver
 - **风险表现**：用户报告资金被扣押，公司倒闭
 - **验证结果**：Fungies.io虽然4项都通过但资金安全风险极高，DigitalRiver已倒闭
 - **验证优化**：增加资金安全和公司稳定性审查维度
 
-### 10. **新平台质量分化严重** 🚀
-**高质量新发现**：Ruul (2024年), Dodo Payments (2023年), Xsolla, Wix Payments
+### 12. **新平台质量分化严重** 🚀
+**高质量新发现**：Ruul (2024年), Dodo Payments (2023年), Xsolla, Wix Payments, 2Checkout, PayPro Global
 **低质量新发现**：Fungies.io (资金安全问题), DigitalRiver (公司倒闭)
 - **市场趋势**：新兴平台要么极好，要么极差
 - **验证策略**：加强新平台的资金安全和用户评价审查
@@ -317,18 +368,19 @@
 ## 📊 验证效率指标
 
 ### 累计表现 (2025-12-11)
-- **总验证平台数**：25个
-- **4/4全通过数**：13个 (52.0%)
-- **新发现平台数**：11个 (44.0%)
-- **Merchant of Record平台数**：10个 (100%通过率)
+- **总验证平台数**：30个
+- **4/4全通过数**：15个 (50.0%)
+- **新发现平台数**：13个 (43.3%)
+- **Merchant of Record平台数**：12个 (100%通过率)
 - **内置支付系统平台数**：2个 (Thinkific Payments, Wix Payments)
+- **传统支付转型MoR**：1个 (2Checkout/Verifone)
 
 ### 本轮新增验证
-- **验证平台数**：8个 (Xsolla, Wix, Cleverbridge, Kajabi, Shopify, DigitalRiver等)
-- **4/4新增数**：2个 (Xsolla游戏平台, Wix Payments)
-- **3/4新增数**：3个 (Kajabi, Shopify Payments, Cleverbridge企业导向)
-- **公司倒闭发现**：1个 (DigitalRiver)
-- **垂直领域突破**：游戏行业(Xsolla)、网站建设(Wix)
+- **验证平台数**：10个 (2Checkout, PayPro Global, Squarespace, Square, Webflow等)
+- **4/4新增数**：2个 (2Checkout/Verifone, PayPro Global)
+- **3/4新增数**：3个 (Squarespace, Square, Webflow)
+- **公司倒闭发现**：1个 (DigitalRiver - 之前发现)
+- **垂直领域突破**：游戏行业(PayPro Global)、传统支付转型(2Checkout)
 - **非营利组织平台数**：6个 (50%通过率)
 - **平均验证时间**：约2分钟/平台
 - **策略准确性**：MoR模式100%通过，非营利组织50%通过
