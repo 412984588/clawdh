@@ -34409,6 +34409,5110 @@
       "confidence": 0.75,
       "discovered_date": "2025-12-09T01:21:59.962629",
       "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "donateusely",
+      "platform_domain": "donateusely.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:22:23.254702",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "tippagely",
+      "platform_domain": "tippagely.com",
+      "platform_type": [
+        "payment",
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:22:28.244406",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "easyfundgo",
+      "platform_domain": "easyfundgo.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:22:29.910864",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "gotiply",
+      "platform_domain": "gotiply.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:22:38.222818",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "creatorfundio",
+      "platform_domain": "creatorfundio.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:22:43.210571",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "joinhubio",
+      "platform_domain": "joinhubio.com",
+      "platform_type": [
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:22:59.852966",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "payplacego",
+      "platform_domain": "payplacego.com",
+      "platform_type": [
+        "payment",
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:23:01.513362",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "makert",
+      "platform_domain": "makert.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:23:04.839673",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "starthubio",
+      "platform_domain": "starthubio.com",
+      "platform_type": [
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:23:26.456769",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "sponsorusego",
+      "platform_domain": "sponsorusego.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:23:31.451163",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "backers",
+      "platform_domain": "backers.com",
+      "platform_type": [
+        "community"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:23:56.515896",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "paysiteify",
+      "platform_domain": "paysiteify.com",
+      "platform_type": [
+        "payment",
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:24:06.563014",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "supportplacely",
+      "platform_domain": "supportplacely.com",
+      "platform_type": [
+        "payment",
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:24:11.630318",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "writerf",
+      "platform_domain": "writerf.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:24:20.054602",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "usehubio",
+      "platform_domain": "usehubio.com",
+      "platform_type": [
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:24:35.174183",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "makerbackly",
+      "platform_domain": "makerbackly.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:24:50.288086",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "tipspacely",
+      "platform_domain": "tipspacely.com",
+      "platform_type": [
+        "payment",
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:24:56.999594",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "joinspaceio",
+      "platform_domain": "joinspaceio.com",
+      "platform_type": [
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:25:07.090983",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "beginartistio",
+      "platform_domain": "beginartistio.com",
+      "platform_type": [
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:25:33.976853",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "backplaceify",
+      "platform_domain": "backplaceify.com",
+      "platform_type": [
+        "payment",
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:25:35.654791",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "supportspotify",
+      "platform_domain": "supportspotify.com",
+      "platform_type": [
+        "payment",
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:25:37.335552",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "superpagely",
+      "platform_domain": "superpagely.com",
+      "platform_type": [
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:25:39.010085",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "donatepageio",
+      "platform_domain": "donatepageio.com",
+      "platform_type": [
+        "payment",
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:25:40.686254",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "getmakerly",
+      "platform_domain": "getmakerly.com",
+      "platform_type": [
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:25:47.419724",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "beginartistly",
+      "platform_domain": "beginartistly.com",
+      "platform_type": [
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:26:10.964945",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "getsupportgo",
+      "platform_domain": "getsupportgo.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:26:26.090692",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "gospacely",
+      "platform_domain": "gospacely.com",
+      "platform_type": [
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:26:36.163692",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "launchfundio",
+      "platform_domain": "launchfundio.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:26:59.734187",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "backsitego",
+      "platform_domain": "backsitego.com",
+      "platform_type": [
+        "payment",
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:27:08.120645",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "donatespotgo",
+      "platform_domain": "donatespotgo.com",
+      "platform_type": [
+        "payment",
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:27:21.516453",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "gopagego",
+      "platform_domain": "gopagego.com",
+      "platform_type": [
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:27:46.774643",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "tipzoneio",
+      "platform_domain": "tipzoneio.com",
+      "platform_type": [
+        "payment",
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:27:50.145782",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "maxspaceify",
+      "platform_domain": "maxspaceify.com",
+      "platform_type": [
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:27:56.893861",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "payd",
+      "platform_domain": "payd.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:28:10.360216",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "launchdonatego",
+      "platform_domain": "launchdonatego.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:28:20.462868",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "easysupportly",
+      "platform_domain": "easysupportly.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:28:30.559380",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "backjoinio",
+      "platform_domain": "backjoinio.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:28:42.329740",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "usespacely",
+      "platform_domain": "usespacely.com",
+      "platform_type": [
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:28:44.021320",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "joinfundgo",
+      "platform_domain": "joinfundgo.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:29:24.433819",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "getsponsorly",
+      "platform_domain": "getsponsorly.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:29:27.817958",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "usespotgo",
+      "platform_domain": "usespotgo.com",
+      "platform_type": [
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:29:29.518755",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "backplaceio",
+      "platform_domain": "backplaceio.com",
+      "platform_type": [
+        "payment",
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:29:36.287499",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "donatelaunchify",
+      "platform_domain": "donatelaunchify.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:29:49.794979",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "funduseio",
+      "platform_domain": "funduseio.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:30:01.585947",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "beginsupportify",
+      "platform_domain": "beginsupportify.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:30:23.564737",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "sponsorusely",
+      "platform_domain": "sponsorusely.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:30:42.164594",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "funda",
+      "platform_domain": "funda.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:30:42.164595",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "startfundgo",
+      "platform_domain": "startfundgo.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:30:47.243439",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "begindeveloperly",
+      "platform_domain": "begindeveloperly.com",
+      "platform_type": [
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:31:12.609790",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "fundplaceio",
+      "platform_domain": "fundplaceio.com",
+      "platform_type": [
+        "payment",
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:31:51.514226",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "paymaker",
+      "platform_domain": "paymaker.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:31:56.589270",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "backjoinly",
+      "platform_domain": "backjoinly.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:31:59.975020",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "joinartistify",
+      "platform_domain": "joinartistify.com",
+      "platform_type": [
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:32:20.275780",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "usedeveloperio",
+      "platform_domain": "usedeveloperio.com",
+      "platform_type": [
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:32:47.360317",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "fastsupportly",
+      "platform_domain": "fastsupportly.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:32:47.360318",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "beginsponsorly",
+      "platform_domain": "beginsponsorly.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:32:49.052275",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "payuseify",
+      "platform_domain": "payuseify.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:33:27.975201",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "maxpageify",
+      "platform_domain": "maxpageify.com",
+      "platform_type": [
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:33:41.517346",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "designert",
+      "platform_domain": "designert.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:33:58.453609",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "beginmakerio",
+      "platform_domain": "beginmakerio.com",
+      "platform_type": [
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:34:27.211152",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "donatejoinly",
+      "platform_domain": "donatejoinly.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:34:30.591631",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "tipgetly",
+      "platform_domain": "tipgetly.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:34:45.800893",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "designertipgo",
+      "platform_domain": "designertipgo.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:34:45.800893",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "donatespotly",
+      "platform_domain": "donatespotly.com",
+      "platform_type": [
+        "payment",
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:35:02.686848",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "gospotly",
+      "platform_domain": "gospotly.com",
+      "platform_type": [
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:35:16.238881",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "payhubify",
+      "platform_domain": "payhubify.com",
+      "platform_type": [
+        "payment",
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:35:23.005526",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "fastbackly",
+      "platform_domain": "fastbackly.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:35:31.457930",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "startmakerio",
+      "platform_domain": "startmakerio.com",
+      "platform_type": [
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:35:34.851011",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "beginpagely",
+      "platform_domain": "beginpagely.com",
+      "platform_type": [
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:35:34.851011",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "usesponsorgo",
+      "platform_domain": "usesponsorgo.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:36:25.604738",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "simpledonately",
+      "platform_domain": "simpledonately.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:37:16.366532",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "beginpayly",
+      "platform_domain": "beginpayly.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:38:20.657211",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "tipdeveloper",
+      "platform_domain": "tipdeveloper.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:38:35.896305",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "plusspaceify",
+      "platform_domain": "plusspaceify.com",
+      "platform_type": [
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:38:54.507362",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "ultrapageio",
+      "platform_domain": "ultrapageio.com",
+      "platform_type": [
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:39:11.418130",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "getfundly",
+      "platform_domain": "getfundly.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:40:32.618076",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "gethubify",
+      "platform_domain": "gethubify.com",
+      "platform_type": [
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:40:46.143600",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "launchwriterio",
+      "platform_domain": "launchwriterio.com",
+      "platform_type": [
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:41:06.451860",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "patronsgo",
+      "platform_domain": "patronsgo.com",
+      "platform_type": [
+        "community"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:42:27.810604",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "tipplacego",
+      "platform_domain": "tipplacego.com",
+      "platform_type": [
+        "payment",
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:42:44.730400",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "fundhubgo",
+      "platform_domain": "fundhubgo.com",
+      "platform_type": [
+        "payment",
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:43:15.176107",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "supportgetly",
+      "platform_domain": "supportgetly.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:43:21.926048",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "getplaceio",
+      "platform_domain": "getplaceio.com",
+      "platform_type": [
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:43:32.060599",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "writersupportly",
+      "platform_domain": "writersupportly.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:43:48.978076",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "tipspacego",
+      "platform_domain": "tipspacego.com",
+      "platform_type": [
+        "payment",
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:43:54.049569",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "plusspacego",
+      "platform_domain": "plusspacego.com",
+      "platform_type": [
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:43:59.122964",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "fundwriter",
+      "platform_domain": "fundwriter.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:45:06.740828",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "donategoify",
+      "platform_domain": "donategoify.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:45:59.123254",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "usemakerly",
+      "platform_domain": "usemakerly.com",
+      "platform_type": [
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:46:02.499026",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "supportzonego",
+      "platform_domain": "supportzonego.com",
+      "platform_type": [
+        "payment",
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:46:22.792796",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "launchdonateify",
+      "platform_domain": "launchdonateify.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:46:29.560914",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "makerfundly",
+      "platform_domain": "makerfundly.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:47:20.254393",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "payzonego",
+      "platform_domain": "payzonego.com",
+      "platform_type": [
+        "payment",
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:47:42.221086",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "fundgoify",
+      "platform_domain": "fundgoify.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:48:24.460662",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "fundjoingo",
+      "platform_domain": "fundjoingo.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:48:43.048658",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "fundgetio",
+      "platform_domain": "fundgetio.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:49:05.027289",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "paystartify",
+      "platform_domain": "paystartify.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:50:07.577862",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "launchhubly",
+      "platform_domain": "launchhubly.com",
+      "platform_type": [
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:50:44.749326",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "makerp",
+      "platform_domain": "makerp.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:50:58.277159",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "supportsiteify",
+      "platform_domain": "supportsiteify.com",
+      "platform_type": [
+        "payment",
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:51:30.397502",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "simplebackgo",
+      "platform_domain": "simplebackgo.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:52:39.734172",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "startsupportly",
+      "platform_domain": "startsupportly.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:53:03.404531",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "tippageio",
+      "platform_domain": "tippageio.com",
+      "platform_type": [
+        "payment",
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:53:40.585819",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "instantbackly",
+      "platform_domain": "instantbackly.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:53:55.795204",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "usebackgo",
+      "platform_domain": "usebackgo.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:54:22.850989",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "donatejoingo",
+      "platform_domain": "donatejoingo.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:54:58.323124",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "supporta",
+      "platform_domain": "supporta.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:56:09.664212",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "getbackly",
+      "platform_domain": "getbackly.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:56:11.391056",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "sponsorspacely",
+      "platform_domain": "sponsorspacely.com",
+      "platform_type": [
+        "payment",
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:56:13.068413",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "sponsorspaceio",
+      "platform_domain": "sponsorspaceio.com",
+      "platform_type": [
+        "payment",
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:57:03.126673",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "paygoio",
+      "platform_domain": "paygoio.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:57:28.943514",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "quickfundly",
+      "platform_domain": "quickfundly.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:57:32.407426",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "supportuseio",
+      "platform_domain": "supportuseio.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:58:01.691961",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "donatejoinify",
+      "platform_domain": "donatejoinify.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T01:59:07.283929",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "getartistio",
+      "platform_domain": "getartistio.com",
+      "platform_type": [
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:01:08.290345",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "funduseify",
+      "platform_domain": "funduseify.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:01:16.729972",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "plusplacego",
+      "platform_domain": "plusplacego.com",
+      "platform_type": [
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:01:28.583732",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "easydonateify",
+      "platform_domain": "easydonateify.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:01:35.323008",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "begindonateify",
+      "platform_domain": "begindonateify.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:02:18.922010",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "quicktipgo",
+      "platform_domain": "quicktipgo.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:02:25.648403",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "supportlaunchgo",
+      "platform_domain": "supportlaunchgo.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:02:30.698357",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "joinsitely",
+      "platform_domain": "joinsitely.com",
+      "platform_type": [
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:02:44.143012",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "supportgoly",
+      "platform_domain": "supportgoly.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:03:18.143520",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "payjoinly",
+      "platform_domain": "payjoinly.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:03:28.477922",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "startzonego",
+      "platform_domain": "startzonego.com",
+      "platform_type": [
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:03:33.662691",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "supportstartify",
+      "platform_domain": "supportstartify.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:03:48.919625",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "sponsora",
+      "platform_domain": "sponsora.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:04:31.268549",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "artistdonate",
+      "platform_domain": "artistdonate.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:05:27.749213",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "launchzonego",
+      "platform_domain": "launchzonego.com",
+      "platform_type": [
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:05:52.881628",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "joinpayify",
+      "platform_domain": "joinpayify.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:06:28.499707",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "supportzonely",
+      "platform_domain": "supportzonely.com",
+      "platform_type": [
+        "payment",
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:06:33.574597",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "gofundly",
+      "platform_domain": "gofundly.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:07:02.843642",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "makersponsor",
+      "platform_domain": "makersponsor.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:07:58.336323",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "paygoly",
+      "platform_domain": "paygoly.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:08:08.748062",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "writersponsor",
+      "platform_domain": "writersponsor.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:08:17.417012",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "supportuseify",
+      "platform_domain": "supportuseify.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:08:24.366255",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "fundd",
+      "platform_domain": "fundd.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:09:09.306253",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "joinbackly",
+      "platform_domain": "joinbackly.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:10:20.326542",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "tipw",
+      "platform_domain": "tipw.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:11:31.121949",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "tipgogo",
+      "platform_domain": "tipgogo.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:11:48.422791",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "designerbackgo",
+      "platform_domain": "designerbackgo.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:11:48.422792",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "donatelaunchgo",
+      "platform_domain": "donatelaunchgo.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:12:47.128076",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "paylaunchgo",
+      "platform_domain": "paylaunchgo.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:12:48.795067",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "designerfundio",
+      "platform_domain": "designerfundio.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:12:57.467392",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "payusely",
+      "platform_domain": "payusely.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:13:54.371985",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "artistsponsor",
+      "platform_domain": "artistsponsor.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:13:54.371986",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "backlaunchify",
+      "platform_domain": "backlaunchify.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:14:08.189558",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "fundbeginio",
+      "platform_domain": "fundbeginio.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:14:09.924924",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "donatebeginify",
+      "platform_domain": "donatebeginify.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:15:36.532892",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "paylaunchio",
+      "platform_domain": "paylaunchio.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:15:59.016149",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "writerbackio",
+      "platform_domain": "writerbackio.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:16:00.760865",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "fundspaceio",
+      "platform_domain": "fundspaceio.com",
+      "platform_type": [
+        "payment",
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:16:32.124929",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "fastfundgo",
+      "platform_domain": "fastfundgo.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:17:10.223563",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "gositego",
+      "platform_domain": "gositego.com",
+      "platform_type": [
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:17:13.687616",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "backzonely",
+      "platform_domain": "backzonely.com",
+      "platform_type": [
+        "payment",
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:17:13.687618",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "backlaunchgo",
+      "platform_domain": "backlaunchgo.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:18:00.715533",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "joinpagego",
+      "platform_domain": "joinpagego.com",
+      "platform_type": [
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:18:48.172990",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "maxspotly",
+      "platform_domain": "maxspotly.com",
+      "platform_type": [
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:19:17.063140",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "sponsordeveloper",
+      "platform_domain": "sponsordeveloper.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:19:23.777387",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "supportjoinly",
+      "platform_domain": "supportjoinly.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:20:39.946945",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "backuseio",
+      "platform_domain": "backuseio.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:20:50.264607",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "developersponsor",
+      "platform_domain": "developersponsor.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:20:52.004898",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "startfundly",
+      "platform_domain": "startfundly.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:21:07.523884",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "usedeveloperify",
+      "platform_domain": "usedeveloperify.com",
+      "platform_type": [
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:23:08.676571",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "donatestartify",
+      "platform_domain": "donatestartify.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:24:52.912865",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "donategetly",
+      "platform_domain": "donategetly.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:25:48.296417",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "artistsupportgo",
+      "platform_domain": "artistsupportgo.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:27:11.671566",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "creatorbackio",
+      "platform_domain": "creatorbackio.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:27:43.003314",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "tipgetio",
+      "platform_domain": "tipgetio.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:29:28.541691",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "supportjoingo",
+      "platform_domain": "supportjoingo.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:30:44.755128",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "sponsorm",
+      "platform_domain": "sponsorm.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:31:22.325043",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "tipstartly",
+      "platform_domain": "tipstartly.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:31:34.126864",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "paypagely",
+      "platform_domain": "paypagely.com",
+      "platform_type": [
+        "payment",
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:31:40.851836",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "paya",
+      "platform_domain": "paya.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:33:31.897551",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "fundsiteio",
+      "platform_domain": "fundsiteio.com",
+      "platform_type": [
+        "payment",
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:34:28.481664",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "patrons",
+      "platform_domain": "patrons.com",
+      "platform_type": [
+        "community"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:34:35.187911",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "usehubly",
+      "platform_domain": "usehubly.com",
+      "platform_type": [
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:34:53.758848",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "sponsorc",
+      "platform_domain": "sponsorc.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:36:31.920558",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "gosponsorify",
+      "platform_domain": "gosponsorify.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:36:58.015532",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "gospotgo",
+      "platform_domain": "gospotgo.com",
+      "platform_type": [
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:37:48.488086",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "developerdonate",
+      "platform_domain": "developerdonate.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:38:07.691759",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "fundgetify",
+      "platform_domain": "fundgetify.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:39:08.547496",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "backm",
+      "platform_domain": "backm.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:40:11.240769",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "supportd",
+      "platform_domain": "supportd.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:40:14.738616",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "fundlaunchly",
+      "platform_domain": "fundlaunchly.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:42:16.608674",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "creatorsponsor",
+      "platform_domain": "creatorsponsor.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:44:02.777966",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "fundjoinio",
+      "platform_domain": "fundjoinio.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:44:08.015483",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "backwriter",
+      "platform_domain": "backwriter.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:44:11.490357",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "tiplaunchio",
+      "platform_domain": "tiplaunchio.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:45:47.151049",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "ultrapagely",
+      "platform_domain": "ultrapagely.com",
+      "platform_type": [
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:46:16.742516",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "designersponsorgo",
+      "platform_domain": "designersponsorgo.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:47:19.356003",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "godeveloperly",
+      "platform_domain": "godeveloperly.com",
+      "platform_type": [
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:48:01.160605",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "payw",
+      "platform_domain": "payw.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:48:20.288821",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "developerbackify",
+      "platform_domain": "developerbackify.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:49:29.778800",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "makerd",
+      "platform_domain": "makerd.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:51:36.749401",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "paybeginly",
+      "platform_domain": "paybeginly.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:52:39.328898",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "backbeginio",
+      "platform_domain": "backbeginio.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:52:42.795139",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "donatestartio",
+      "platform_domain": "donatestartio.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:53:01.886086",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "tipbeginio",
+      "platform_domain": "tipbeginio.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:53:24.529183",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "makerpay",
+      "platform_domain": "makerpay.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:53:52.263006",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "fansify",
+      "platform_domain": "fansify.com",
+      "platform_type": [
+        "community"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:53:52.263006",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "backdeveloper",
+      "platform_domain": "backdeveloper.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:54:00.937112",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "donateusego",
+      "platform_domain": "donateusego.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:55:57.422814",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "joinmakerly",
+      "platform_domain": "joinmakerly.com",
+      "platform_type": [
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:57:38.322888",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "backstartio",
+      "platform_domain": "backstartio.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T02:59:24.456578",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "donatec",
+      "platform_domain": "donatec.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:02:54.857733",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "artistsupportly",
+      "platform_domain": "artistsupportly.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:03:38.445306",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "creatortipio",
+      "platform_domain": "creatortipio.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:05:19.433234",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "designerdonatego",
+      "platform_domain": "designerdonatego.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:05:43.854651",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "sponsorgetly",
+      "platform_domain": "sponsorgetly.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:06:41.270993",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "supportstartio",
+      "platform_domain": "supportstartio.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:12:48.594015",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "makertip",
+      "platform_domain": "makertip.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:13:26.806970",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "tipusego",
+      "platform_domain": "tipusego.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:15:31.983183",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "tipusely",
+      "platform_domain": "tipusely.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:15:40.692786",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "writerp",
+      "platform_domain": "writerp.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:17:00.929151",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "donatehubly",
+      "platform_domain": "donatehubly.com",
+      "platform_type": [
+        "payment",
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:18:40.054832",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "payuseio",
+      "platform_domain": "payuseio.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:19:35.716998",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "writert",
+      "platform_domain": "writert.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:20:00.152619",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "writerd",
+      "platform_domain": "writerd.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:21:08.114331",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "makersponsorgo",
+      "platform_domain": "makersponsorgo.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:22:21.283897",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "paybeginio",
+      "platform_domain": "paybeginio.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:23:22.273672",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "donatecreator",
+      "platform_domain": "donatecreator.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:23:22.273673",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "patronsly",
+      "platform_domain": "patronsly.com",
+      "platform_type": [
+        "community"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:23:22.273673",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "donategetgo",
+      "platform_domain": "donategetgo.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:23:32.702903",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "sponsorgoify",
+      "platform_domain": "sponsorgoify.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:23:44.842200",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "fundbeginify",
+      "platform_domain": "fundbeginify.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:24:58.059207",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "tipmaker",
+      "platform_domain": "tipmaker.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:26:31.776624",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "supportc",
+      "platform_domain": "supportc.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:27:22.331101",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "designersponsor",
+      "platform_domain": "designersponsor.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:27:25.815054",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "donateuseify",
+      "platform_domain": "donateuseify.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:28:07.568568",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "supportwriter",
+      "platform_domain": "supportwriter.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:28:09.310583",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "fundusely",
+      "platform_domain": "fundusely.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:28:54.622594",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "makerdonate",
+      "platform_domain": "makerdonate.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:28:54.622595",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "fundjoinly",
+      "platform_domain": "fundjoinly.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:29:39.900213",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "sponsorbeginly",
+      "platform_domain": "sponsorbeginly.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:29:52.118985",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "donatelaunchio",
+      "platform_domain": "donatelaunchio.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:30:00.791910",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "fundbegingo",
+      "platform_domain": "fundbegingo.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:30:39.081848",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "backa",
+      "platform_domain": "backa.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:31:45.271480",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "tipgoio",
+      "platform_domain": "tipgoio.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:32:07.961857",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "backgetgo",
+      "platform_domain": "backgetgo.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:32:58.378134",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "sponsorgoly",
+      "platform_domain": "sponsorgoly.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:33:03.601600",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "writerpay",
+      "platform_domain": "writerpay.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:35:54.176422",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "designersupport",
+      "platform_domain": "designersupport.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:38:42.953774",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "creatorsupport",
+      "platform_domain": "creatorsupport.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:42:29.362940",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "backuseify",
+      "platform_domain": "backuseify.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:42:31.109261",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "fundw",
+      "platform_domain": "fundw.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:42:32.851442",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "artistbackgo",
+      "platform_domain": "artistbackgo.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:42:55.535033",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "sponsorlaunchgo",
+      "platform_domain": "sponsorlaunchgo.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:43:14.671505",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "backmaker",
+      "platform_domain": "backmaker.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:43:32.033934",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "makertipgo",
+      "platform_domain": "makertipgo.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:43:33.773325",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "developersupportly",
+      "platform_domain": "developersupportly.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:44:06.909047",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "supportlaunchio",
+      "platform_domain": "supportlaunchio.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:44:29.575886",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "makersupportgo",
+      "platform_domain": "makersupportgo.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:50:24.711961",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "paygetgo",
+      "platform_domain": "paygetgo.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:52:03.988257",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "backcreator",
+      "platform_domain": "backcreator.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:53:39.880909",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "backgetify",
+      "platform_domain": "backgetify.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:54:07.678591",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "artistpaygo",
+      "platform_domain": "artistpaygo.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:54:39.120809",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "paydeveloper",
+      "platform_domain": "paydeveloper.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:54:47.823191",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "backc",
+      "platform_domain": "backc.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:56:21.613622",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "creatort",
+      "platform_domain": "creatort.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T03:56:47.761262",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "sponsoruseify",
+      "platform_domain": "sponsoruseify.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T04:00:41.217887",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "supportplaceio",
+      "platform_domain": "supportplaceio.com",
+      "platform_type": [
+        "payment",
+        "platform"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T04:03:06.164965",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "tipbeginly",
+      "platform_domain": "tipbeginly.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T04:04:10.663415",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "backw",
+      "platform_domain": "backw.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T04:05:08.096272",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "tiplaunchly",
+      "platform_domain": "tiplaunchly.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T04:06:14.414959",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "donatea",
+      "platform_domain": "donatea.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T04:06:21.382246",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "developertip",
+      "platform_domain": "developertip.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T04:07:46.860286",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "artistpayio",
+      "platform_domain": "artistpayio.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T04:09:15.717299",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "fundlaunchgo",
+      "platform_domain": "fundlaunchgo.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T04:13:32.239951",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "artistd",
+      "platform_domain": "artistd.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T04:17:55.517585",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "backgogo",
+      "platform_domain": "backgogo.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T04:19:00.065175",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "backlaunchio",
+      "platform_domain": "backlaunchio.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T04:19:54.045535",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "backdesigner",
+      "platform_domain": "backdesigner.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T04:20:14.972916",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "sponsorjoinio",
+      "platform_domain": "sponsorjoinio.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T04:20:28.948983",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "supportusely",
+      "platform_domain": "supportusely.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T04:20:39.415044",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "supportbeginio",
+      "platform_domain": "supportbeginio.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T04:23:19.974726",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "tipjoinio",
+      "platform_domain": "tipjoinio.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T04:23:35.695098",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "followers",
+      "platform_domain": "followers.com",
+      "platform_type": [
+        "community"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T04:24:15.758216",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "designersponsorify",
+      "platform_domain": "designersponsorify.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T04:24:57.681756",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "artistpayly",
+      "platform_domain": "artistpayly.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T04:27:36.464352",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "developerfund",
+      "platform_domain": "developerfund.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T04:29:49.039557",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "paylaunchly",
+      "platform_domain": "paylaunchly.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T04:29:52.523621",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "artistp",
+      "platform_domain": "artistp.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T04:35:53.740568",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "donatelaunchly",
+      "platform_domain": "donatelaunchly.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T04:36:02.480779",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "creatordonateify",
+      "platform_domain": "creatordonateify.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T04:36:02.480780",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "tipwriter",
+      "platform_domain": "tipwriter.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T04:36:51.306202",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "tipartist",
+      "platform_domain": "tipartist.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T04:37:00.048748",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "makerbackgo",
+      "platform_domain": "makerbackgo.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T04:39:17.965292",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "supportjoinio",
+      "platform_domain": "supportjoinio.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T04:40:36.625017",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "tipuseify",
+      "platform_domain": "tipuseify.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T04:41:25.421583",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "backgetly",
+      "platform_domain": "backgetly.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T04:42:35.313325",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "developert",
+      "platform_domain": "developert.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T04:42:37.053913",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "developertipio",
+      "platform_domain": "developertipio.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T04:43:06.785388",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "writerback",
+      "platform_domain": "writerback.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T04:43:29.479953",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "makerdonately",
+      "platform_domain": "makerdonately.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T04:44:32.383714",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "supportgoio",
+      "platform_domain": "supportgoio.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T04:46:20.301589",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "developerd",
+      "platform_domain": "developerd.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T04:48:33.923627",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "backusego",
+      "platform_domain": "backusego.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T04:53:58.598117",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "backusely",
+      "platform_domain": "backusely.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T04:54:43.265733",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "designerpay",
+      "platform_domain": "designerpay.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T04:55:21.063234",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "developerback",
+      "platform_domain": "developerback.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T04:56:16.007940",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "developerfundgo",
+      "platform_domain": "developerfundgo.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T04:58:19.710345",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "supportusego",
+      "platform_domain": "supportusego.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T04:58:38.632338",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "designerpayify",
+      "platform_domain": "designerpayify.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T04:59:59.455965",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "makerpayly",
+      "platform_domain": "makerpayly.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T05:00:16.628925",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "backjoingo",
+      "platform_domain": "backjoingo.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T05:00:57.798061",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "sponsorgogo",
+      "platform_domain": "sponsorgogo.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T05:01:42.431682",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "designersupportio",
+      "platform_domain": "designersupportio.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T05:03:25.473892",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "fundlaunchify",
+      "platform_domain": "fundlaunchify.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T05:05:17.093978",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "tipstartgo",
+      "platform_domain": "tipstartgo.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T05:07:45.380035",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "tipc",
+      "platform_domain": "tipc.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T05:08:46.533637",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "fundc",
+      "platform_domain": "fundc.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T05:13:01.409267",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "donateuseio",
+      "platform_domain": "donateuseio.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T05:13:04.895253",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "paygetio",
+      "platform_domain": "paygetio.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T05:17:05.289233",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "supportbeginify",
+      "platform_domain": "supportbeginify.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T05:18:03.780056",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "artistbackify",
+      "platform_domain": "artistbackify.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T05:18:47.433408",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "paydesigner",
+      "platform_domain": "paydesigner.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T05:24:10.406058",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "fundstartify",
+      "platform_domain": "fundstartify.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T05:24:38.309600",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "sponsorgoio",
+      "platform_domain": "sponsorgoio.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T05:28:07.974330",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "sponsorjoinly",
+      "platform_domain": "sponsorjoinly.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T05:28:25.336529",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "paystartly",
+      "platform_domain": "paystartly.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T05:29:29.973685",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "makerdonateify",
+      "platform_domain": "makerdonateify.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T05:33:34.501250",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "supportlaunchify",
+      "platform_domain": "supportlaunchify.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T05:33:43.244599",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "paygetly",
+      "platform_domain": "paygetly.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T05:33:44.995320",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "sponsord",
+      "platform_domain": "sponsord.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T05:38:40.584635",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "supportdesigner",
+      "platform_domain": "supportdesigner.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T05:39:03.249765",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "developersupportify",
+      "platform_domain": "developersupportify.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T05:41:03.638356",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "tipcreator",
+      "platform_domain": "tipcreator.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T05:43:02.335884",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "sponsordesigner",
+      "platform_domain": "sponsordesigner.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T05:44:24.324695",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "tiplaunchify",
+      "platform_domain": "tiplaunchify.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T05:45:20.237714",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "supportm",
+      "platform_domain": "supportm.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T05:49:14.126544",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "donatedesigner",
+      "platform_domain": "donatedesigner.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T05:49:42.078785",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "developerpay",
+      "platform_domain": "developerpay.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T05:51:58.231035",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "creatordonately",
+      "platform_domain": "creatordonately.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T05:52:08.594125",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "backgetio",
+      "platform_domain": "backgetio.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T05:54:21.293416",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "developersponsorio",
+      "platform_domain": "developersponsorio.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T05:56:30.350994",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "backbeginify",
+      "platform_domain": "backbeginify.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T06:02:35.188149",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "creatord",
+      "platform_domain": "creatord.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T06:05:01.683566",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "funddesigner",
+      "platform_domain": "funddesigner.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T06:07:54.513818",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "backup",
+      "platform_domain": "backup.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T06:12:04.112274",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "backd",
+      "platform_domain": "backd.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T06:15:16.140984",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "tipgetgo",
+      "platform_domain": "tipgetgo.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T06:22:58.334216",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "tipbeginify",
+      "platform_domain": "tipbeginify.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T06:24:40.971770",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "tipuseio",
+      "platform_domain": "tipuseio.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T06:28:03.465162",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "supportstartly",
+      "platform_domain": "supportstartly.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T06:29:35.989663",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "fans",
+      "platform_domain": "fans.com",
+      "platform_type": [
+        "community"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T06:30:00.464643",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "makerfund",
+      "platform_domain": "makerfund.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T06:32:16.729245",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "tipgoify",
+      "platform_domain": "tipgoify.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T06:38:10.918112",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "tipnow",
+      "platform_domain": "tipnow.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T06:38:38.859907",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "paygetify",
+      "platform_domain": "paygetify.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T06:39:27.738437",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "fundbeginly",
+      "platform_domain": "fundbeginly.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T06:40:18.307276",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "fundgetgo",
+      "platform_domain": "fundgetgo.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T06:48:16.450424",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "paygogo",
+      "platform_domain": "paygogo.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T06:52:46.929073",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "sponsorbeginio",
+      "platform_domain": "sponsorbeginio.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T06:54:56.037278",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "tipgetify",
+      "platform_domain": "tipgetify.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T07:03:30.983570",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "makerf",
+      "platform_domain": "makerf.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T07:05:54.090901",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "writersupport",
+      "platform_domain": "writersupport.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T07:10:00.109296",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "supportstartgo",
+      "platform_domain": "supportstartgo.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T07:10:41.977123",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "donategoio",
+      "platform_domain": "donategoio.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T07:15:38.457148",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "creatorp",
+      "platform_domain": "creatorp.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T07:16:56.958784",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "donatebeginio",
+      "platform_domain": "donatebeginio.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T07:19:53.089512",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "sponsoruseio",
+      "platform_domain": "sponsoruseio.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T07:19:58.325008",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "paystartgo",
+      "platform_domain": "paystartgo.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T07:20:43.669066",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "artisttiply",
+      "platform_domain": "artisttiply.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T07:20:43.669066",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "tipstartio",
+      "platform_domain": "tipstartio.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T07:24:06.169758",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "designerp",
+      "platform_domain": "designerp.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T07:26:52.010798",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "writerbackly",
+      "platform_domain": "writerbackly.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T07:29:18.403264",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "donategetio",
+      "platform_domain": "donategetio.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T07:31:10.067146",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "writerfundify",
+      "platform_domain": "writerfundify.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T07:32:26.913123",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "sponsorgetify",
+      "platform_domain": "sponsorgetify.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T07:36:20.779421",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "artistsponsorify",
+      "platform_domain": "artistsponsorify.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T07:39:15.329288",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "artistdonateify",
+      "platform_domain": "artistdonateify.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T07:47:30.604928",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "writerfundgo",
+      "platform_domain": "writerfundgo.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T07:47:55.114569",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "backbeginly",
+      "platform_domain": "backbeginly.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T07:51:10.582087",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "payjoinify",
+      "platform_domain": "payjoinify.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T07:59:05.376628",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "writerfundio",
+      "platform_domain": "writerfundio.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T08:00:13.518665",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "paywriter",
+      "platform_domain": "paywriter.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T08:00:48.472773",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "makerfundgo",
+      "platform_domain": "makerfundgo.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T08:06:40.739147",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "funddeveloper",
+      "platform_domain": "funddeveloper.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T08:07:31.378314",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "donatestartgo",
+      "platform_domain": "donatestartgo.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T08:11:16.547095",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "supportartist",
+      "platform_domain": "supportartist.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T08:11:16.547095",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "creatorpay",
+      "platform_domain": "creatorpay.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T08:17:40.422561",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "makersponsorly",
+      "platform_domain": "makersponsorly.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T08:18:24.050759",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "artistdonateio",
+      "platform_domain": "artistdonateio.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T08:20:27.983352",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "sponsorlaunchify",
+      "platform_domain": "sponsorlaunchify.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T08:23:03.235543",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "donatewriter",
+      "platform_domain": "donatewriter.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T08:32:07.988161",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "sponsorbeginify",
+      "platform_domain": "sponsorbeginify.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T08:33:30.106423",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "developertiply",
+      "platform_domain": "developertiply.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T08:34:57.302956",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "tipd",
+      "platform_domain": "tipd.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T08:38:25.059693",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "tipbegingo",
+      "platform_domain": "tipbegingo.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T08:42:52.297676",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "makerdonatego",
+      "platform_domain": "makerdonatego.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T08:49:02.325824",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "designerdonate",
+      "platform_domain": "designerdonate.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T08:50:59.140816",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "developerp",
+      "platform_domain": "developerp.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T08:52:00.095835",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "designerfundgo",
+      "platform_domain": "designerfundgo.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T08:55:47.032187",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "supportbeginly",
+      "platform_domain": "supportbeginly.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T09:01:27.437203",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "artistback",
+      "platform_domain": "artistback.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T09:03:34.910406",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "makerdonateio",
+      "platform_domain": "makerdonateio.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T09:09:37.822347",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "artisttipgo",
+      "platform_domain": "artisttipgo.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T09:11:52.246321",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "payartist",
+      "platform_domain": "payartist.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T09:12:09.697174",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "fundstartly",
+      "platform_domain": "fundstartly.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T09:22:46.905189",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "fundm",
+      "platform_domain": "fundm.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T09:22:46.905190",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "makertipio",
+      "platform_domain": "makertipio.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T09:23:16.610499",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "backgoio",
+      "platform_domain": "backgoio.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T09:24:54.250723",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "sponsormaker",
+      "platform_domain": "sponsormaker.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T09:27:20.885869",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "sponsorartist",
+      "platform_domain": "sponsorartist.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T09:29:07.325676",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "makertiply",
+      "platform_domain": "makertiply.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T09:31:20.095822",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "developertipgo",
+      "platform_domain": "developertipgo.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T09:33:11.885515",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "paybeginify",
+      "platform_domain": "paybeginify.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T09:33:29.351232",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "fundgoio",
+      "platform_domain": "fundgoio.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T09:44:07.748462",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "makersupport",
+      "platform_domain": "makersupport.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T09:47:58.162740",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "makerfundify",
+      "platform_domain": "makerfundify.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T10:06:23.065364",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "designerfundly",
+      "platform_domain": "designerfundly.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T10:07:57.255840",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "fundstartio",
+      "platform_domain": "fundstartio.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T10:17:33.266310",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "tipa",
+      "platform_domain": "tipa.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T10:17:48.982233",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "backartist",
+      "platform_domain": "backartist.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T10:18:32.645334",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "designerdonateify",
+      "platform_domain": "designerdonateify.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T10:19:58.180039",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "writertipgo",
+      "platform_domain": "writertipgo.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T10:27:05.947994",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "supportjoinify",
+      "platform_domain": "supportjoinify.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T10:28:26.003107",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "developersupportgo",
+      "platform_domain": "developersupportgo.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T10:34:15.158370",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "tiplaunchgo",
+      "platform_domain": "tiplaunchgo.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T10:41:15.771619",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "creatorsupportify",
+      "platform_domain": "creatorsupportify.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T10:43:58.074436",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "supportgetify",
+      "platform_domain": "supportgetify.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T10:56:14.753621",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "creatortip",
+      "platform_domain": "creatortip.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T11:04:40.868231",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "tipgoly",
+      "platform_domain": "tipgoly.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T11:06:39.594472",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "sponsorgetgo",
+      "platform_domain": "sponsorgetgo.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T11:19:51.766785",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "artistsupportio",
+      "platform_domain": "artistsupportio.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T11:22:20.090757",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "paycreator",
+      "platform_domain": "paycreator.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T11:23:45.693970",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "creatorback",
+      "platform_domain": "creatorback.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T11:29:34.867503",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "donatejoinio",
+      "platform_domain": "donatejoinio.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T11:33:06.123633",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "fundcreator",
+      "platform_domain": "fundcreator.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T11:49:23.747730",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "designertiply",
+      "platform_domain": "designertiply.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T11:56:10.337299",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "developerpayly",
+      "platform_domain": "developerpayly.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T12:02:41.314606",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "supportgetgo",
+      "platform_domain": "supportgetgo.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T12:03:05.706762",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "designerpayly",
+      "platform_domain": "designerpayly.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T12:09:45.388136",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "donatemaker",
+      "platform_domain": "donatemaker.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T12:11:21.410854",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "developersupportio",
+      "platform_domain": "developersupportio.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T12:17:47.276543",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "donatebeginly",
+      "platform_domain": "donatebeginly.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T12:26:25.720087",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "writerfundly",
+      "platform_domain": "writerfundly.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T12:30:50.889775",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "makersponsorify",
+      "platform_domain": "makersponsorify.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T12:46:36.869054",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "backjoinify",
+      "platform_domain": "backjoinify.com",
+      "platform_type": [
+        "payment"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T12:48:12.954013",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "designerpayio",
+      "platform_domain": "designerpayio.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T12:51:30.370692",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "creatortipgo",
+      "platform_domain": "creatortipgo.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T13:00:15.629530",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "writerdonately",
+      "platform_domain": "writerdonately.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T13:08:48.894204",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "creatorbackgo",
+      "platform_domain": "creatorbackgo.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T13:12:37.361955",
+      "discovered_method": "local_mining"
+    },
+    {
+      "platform_name": "designersponsorio",
+      "platform_domain": "designersponsorio.com",
+      "platform_type": [
+        "payment",
+        "creator"
+      ],
+      "source": "smart_names",
+      "confidence": 0.75,
+      "discovered_date": "2025-12-09T13:19:53.801185",
+      "discovered_method": "local_mining"
     }
   ],
   "analysis_results": {

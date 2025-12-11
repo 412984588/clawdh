@@ -1,0 +1,23 @@
+{
+  "session_id": "20251209_012517",
+  "timestamp": "2025-12-09T01:25:24.463853",
+  "discovery_method": "real_web_scraping",
+  "total_discovered": 1,
+  "verified_count": 0,
+  "rejected_count": 1,
+  "success_rate": 0.0,
+  "results": [
+    {
+      "platform": {
+        "name": "15 Patreon Alternatives for Creators in 2026 - ThriveCart",
+        "url": "//duckduckgo.com/l/?uddg=https%3A%2F%2Fthrivecart.com%2Fblog%2Ftop%2Dpatreon%2Dalternatives%2F&rut=6ad842468a98112c105a047b779ea75275748c7f5c2584b5f794e073deba8d06",
+        "domain": "duckduckgo.com",
+        "source": "google_search"
+      },
+      "verified": false,
+      "error": "Invalid URL '//duckduckgo.com/l/?uddg=https%3A%2F%2Fthrivecart.com%2Fblog%2Ftop%2Dpatreon%2Dalternatives%2F&rut=6ad842468a98112c105a047b779ea75275748c7f5c2584b5f794e073deba8d06': No scheme supplied. Perhaps you meant https:////duckduckgo.com/l/?uddg=https%3A%2F%2Fthrivecart.com%2Fblog%2Ftop%2Dpatreon%2Dalternatives%2F&rut=6ad842468a98112c105a047b779ea75275748c7f5c2584b5f794e073deba8d06?",
+      "verification_details": "无法访问网站: Invalid URL '//duckduckgo.com/l/?uddg=https%3A%2F%2Fthrivecart.com%2Fblog%2Ftop%2Dpatreon%2Dalternatives%2F&rut=6ad842468a98112c105a047b779ea75275748c7f5c2584b5f794e073deba8d06': No scheme supplied. Perhaps you meant https:////duckduckgo.com/l/?uddg=https%3A%2F%2Fthrivecart.com%2Fblog%2Ftop%2Dpatreon%2Dalternatives%2F&rut=6ad842468a98112c105a047b779ea75275748c7f5c2584b5f794e073deba8d06?",
+      "rejected_date": "2025-12-09T01:25:24.454264"
+    }
+  ]
+}

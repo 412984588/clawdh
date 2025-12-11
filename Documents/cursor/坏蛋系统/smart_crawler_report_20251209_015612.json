@@ -1,0 +1,222 @@
+{
+  "session_id": "20251209_015612",
+  "timestamp": "2025-12-09T01:56:21.409948",
+  "method": "smart_crawling",
+  "total_verified": 1,
+  "total_rejected": 7,
+  "success_rate": 12.5,
+  "platforms": [
+    {
+      "platform": {
+        "name": "Memberful",
+        "url": "https://memberful.com",
+        "domain": "memberful.com",
+        "source": "known_list"
+      },
+      "validation_results": {
+        "personal_registration": true,
+        "payment_receiving": true,
+        "own_payment_system": false,
+        "us_market_ach": true
+      },
+      "evidence": {
+        "personal_registration": "找到个人注册相关关键词",
+        "payment_receiving": "找到支付接收相关功能",
+        "us_market_ach": "确认支持美国市场/ACH"
+      },
+      "verified": false,
+      "verification_details": "{\"personal_registration\": \"找到个人注册相关关键词\", \"payment_receiving\": \"找到支付接收相关功能\", \"us_market_ach\": \"确认支持美国市场/ACH\"}",
+      "scraped_content_length": 5000,
+      "scraped_title": "Memberful — Membership on your terms | Memberful.com",
+      "failed_criteria": [
+        "own_payment_system"
+      ],
+      "rejected_date": "2025-12-09T01:56:20.803979"
+    },
+    {
+      "platform": {
+        "name": "Patreon",
+        "url": "https://www.patreon.com",
+        "domain": "patreon.com",
+        "source": "known_list"
+      },
+      "validation_results": {
+        "personal_registration": true,
+        "payment_receiving": true,
+        "own_payment_system": false,
+        "us_market_ach": true
+      },
+      "evidence": {
+        "personal_registration": "找到个人注册相关关键词",
+        "payment_receiving": "找到支付接收相关功能",
+        "us_market_ach": "确认支持美国市场/ACH"
+      },
+      "verified": false,
+      "verification_details": "{\"personal_registration\": \"找到个人注册相关关键词\", \"payment_receiving\": \"找到支付接收相关功能\", \"us_market_ach\": \"确认支持美国市场/ACH\"}",
+      "scraped_content_length": 4974,
+      "scraped_title": "Empowering Creators and Building Communities — Patreon",
+      "failed_criteria": [
+        "own_payment_system"
+      ],
+      "rejected_date": "2025-12-09T01:56:20.864735"
+    },
+    {
+      "platform": {
+        "name": "Buy Me a Coffee",
+        "url": "https://www.buymeacoffee.com",
+        "domain": "buymeacoffee.com",
+        "source": "known_list"
+      },
+      "validation_results": {
+        "personal_registration": true,
+        "payment_receiving": true,
+        "own_payment_system": true,
+        "us_market_ach": false
+      },
+      "evidence": {
+        "personal_registration": "找到个人注册相关关键词",
+        "payment_receiving": "找到支付接收相关功能",
+        "own_payment_system": "发现自有支付系统"
+      },
+      "verified": false,
+      "verification_details": "{\"personal_registration\": \"找到个人注册相关关键词\", \"payment_receiving\": \"找到支付接收相关功能\", \"own_payment_system\": \"发现自有支付系统\"}",
+      "scraped_content_length": 3560,
+      "scraped_title": "Buy Me a Coffee",
+      "failed_criteria": [
+        "us_market_ach"
+      ],
+      "rejected_date": "2025-12-09T01:56:20.916162"
+    },
+    {
+      "platform": {
+        "name": "Substack",
+        "url": "https://substack.com",
+        "domain": "substack.com",
+        "source": "known_list"
+      },
+      "validation_results": {
+        "personal_registration": false,
+        "payment_receiving": false,
+        "own_payment_system": false,
+        "us_market_ach": false
+      },
+      "evidence": {},
+      "verified": false,
+      "verification_details": "{}",
+      "scraped_content_length": 534,
+      "scraped_title": "Home | Substack",
+      "failed_criteria": [
+        "personal_registration",
+        "payment_receiving",
+        "own_payment_system",
+        "us_market_ach"
+      ],
+      "rejected_date": "2025-12-09T01:56:20.956650"
+    },
+    {
+      "platform": {
+        "name": "Gumroad",
+        "url": "https://gumroad.com",
+        "domain": "gumroad.com",
+        "source": "known_list"
+      },
+      "validation_results": {
+        "personal_registration": true,
+        "payment_receiving": true,
+        "own_payment_system": true,
+        "us_market_ach": true
+      },
+      "evidence": {
+        "personal_registration": "找到个人注册相关关键词",
+        "payment_receiving": "找到支付接收相关功能",
+        "own_payment_system": "发现自有支付系统",
+        "us_market_ach": "确认支持美国市场/ACH"
+      },
+      "verified": true,
+      "verification_details": "{\"personal_registration\": \"找到个人注册相关关键词\", \"payment_receiving\": \"找到支付接收相关功能\", \"own_payment_system\": \"发现自有支付系统\", \"us_market_ach\": \"确认支持美国市场/ACH\"}",
+      "scraped_content_length": 5000,
+      "scraped_title": "Earn your first dollar online with Gumroad",
+      "verified_date": "2025-12-09T01:56:20.847682"
+    },
+    {
+      "platform": {
+        "name": "Registered sex offenders in Bellefonte, Pennsylvania",
+        "url": "https://www.bing.com/ck/a?!&&p=7dbf6158e684185b356fb2be776c4f66cf57e7f6e31d50aadd592e17db154b33JmltdHM9MTc2NTE1MjAwMA&ptn=3&ver=2&hsh=4&fclid=1437960b-c16d-6f8a-11f5-80b6c0b36e07&u=a1aHR0cHM6Ly93d3cuY2l0eS1kYXRhLmNvbS9zby9zby1CZWxsZWZvbnRlLVBlbm5zeWx2YW5pYS5odG1s&ntb=1",
+        "domain": "bing.com",
+        "source": "bing_search"
+      },
+      "validation_results": {
+        "personal_registration": false,
+        "payment_receiving": false,
+        "own_payment_system": false,
+        "us_market_ach": false
+      },
+      "evidence": {},
+      "verified": false,
+      "verification_details": "{}",
+      "scraped_content_length": 89,
+      "scraped_title": "",
+      "failed_criteria": [
+        "personal_registration",
+        "payment_receiving",
+        "own_payment_system",
+        "us_market_ach"
+      ],
+      "rejected_date": "2025-12-09T01:56:21.109727"
+    },
+    {
+      "platform": {
+        "name": "GoFundMe",
+        "url": "https://www.gofundme.com",
+        "domain": "gofundme.com",
+        "source": "known_list"
+      },
+      "validation_results": {
+        "personal_registration": false,
+        "payment_receiving": true,
+        "own_payment_system": false,
+        "us_market_ach": true
+      },
+      "evidence": {
+        "payment_receiving": "找到支付接收相关功能",
+        "us_market_ach": "确认支持美国市场/ACH"
+      },
+      "verified": false,
+      "verification_details": "{\"payment_receiving\": \"找到支付接收相关功能\", \"us_market_ach\": \"确认支持美国市场/ACH\"}",
+      "scraped_content_length": 3774,
+      "scraped_title": "GoFundMe | The #1 Crowdfunding and Fundraising Platform",
+      "failed_criteria": [
+        "personal_registration",
+        "own_payment_system"
+      ],
+      "rejected_date": "2025-12-09T01:56:21.185816"
+    },
+    {
+      "platform": {
+        "name": "Acast",
+        "url": "https://acast.com",
+        "domain": "acast.com",
+        "source": "known_list"
+      },
+      "validation_results": {
+        "personal_registration": true,
+        "payment_receiving": true,
+        "own_payment_system": false,
+        "us_market_ach": true
+      },
+      "evidence": {
+        "personal_registration": "找到个人注册相关关键词",
+        "payment_receiving": "找到支付接收相关功能",
+        "us_market_ach": "确认支持美国市场/ACH"
+      },
+      "verified": false,
+      "verification_details": "{\"personal_registration\": \"找到个人注册相关关键词\", \"payment_receiving\": \"找到支付接收相关功能\", \"us_market_ach\": \"确认支持美国市场/ACH\"}",
+      "scraped_content_length": 4022,
+      "scraped_title": "Acast: The Best Podcast Monetization Platform",
+      "failed_criteria": [
+        "own_payment_system"
+      ],
+      "rejected_date": "2025-12-09T01:56:21.409229"
+    }
+  ]
+}

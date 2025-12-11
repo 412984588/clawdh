@@ -1,0 +1,62 @@
+{
+  "timestamp": "2025-12-10T03:29:31.927984",
+  "total_failed": 7,
+  "platforms": [
+    {
+      "name": "Udemy",
+      "domain": "udemy.com",
+      "type": "education",
+      "status": "http_error",
+      "verified": false,
+      "http_status": 403
+    },
+    {
+      "name": "Skillshare",
+      "domain": "skillshare.com",
+      "type": "education",
+      "status": "http_error",
+      "verified": false,
+      "http_status": 403
+    },
+    {
+      "name": "Kickstarter",
+      "domain": "kickstarter.com",
+      "type": "crowdfunding",
+      "status": "http_error",
+      "verified": false,
+      "http_status": 403
+    },
+    {
+      "name": "Indiegogo",
+      "domain": "indiegogo.com",
+      "type": "crowdfunding",
+      "status": "http_error",
+      "verified": false,
+      "http_status": 403
+    },
+    {
+      "name": "Fundly",
+      "domain": "fundly.com",
+      "type": "crowdfunding",
+      "status": "http_error",
+      "verified": false,
+      "http_status": 403
+    },
+    {
+      "name": "Crowdfunder",
+      "domain": "crowdfunder.com",
+      "type": "crowdfunding",
+      "status": "http_error",
+      "verified": false,
+      "http_status": 403
+    },
+    {
+      "name": "Liberapay",
+      "domain": "liberapay.com",
+      "type": "donation",
+      "status": "http_error",
+      "verified": false,
+      "http_status": 403
+    }
+  ]
+}

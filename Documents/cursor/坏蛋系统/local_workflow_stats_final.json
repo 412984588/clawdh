@@ -1,8 +1,8 @@
 {
-  "total_discovered": 50848,
+  "total_discovered": 647847,
   "total_verified": 0,
   "total_rejected": 0,
-  "batches_completed": 2129,
+  "batches_completed": 27120,
   "discovery_success_rates": {
     "smart_names": 8,
     "type_combinations": 0,
@@ -17,12 +17,12 @@
       8,
       8,
       8,
+      7,
       8,
       8,
       7,
-      8,
       7,
-      7
+      8
     ],
     "variant_of_unknown": [
       8,
@@ -49,5 +49,5 @@
       8
     ]
   },
-  "last_update": "2025-12-09T01:22:08.301286"
+  "last_update": "2025-12-09T13:26:59.268468"
 }
