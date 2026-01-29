@@ -1,50 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:wh_app/core/models/org.dart';
-import 'package:wh_app/core/models/event.dart';
-import 'package:wh_app/core/models/announcement.dart';
+import 'package:wh_app/core/providers/mock_data_providers.dart';
+import 'package:wh_app/core/constants/app_constants.dart';
 import 'package:wh_app/features/home/presentation/widgets/org_info_card.dart';
 import 'package:wh_app/features/home/presentation/widgets/event_list_item.dart';
 import 'package:wh_app/features/home/presentation/widgets/announcement_list_item.dart';
+import 'package:wh_app/shared/widgets/state_widgets.dart';
 
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final mockOrg = Org(
-      id: '1',
-      name: '紐約唐人街同鄉總會',
-      logo: '',
-      description: '成立於1980年，旨在聯絡鄉情，服務鄉親，促進僑社安定繁榮。',
-      memberCount: 500,
-    );
-
-    final mockEvents = List.generate(3, (index) => Event(
-      id: '$index',
-      orgId: '1',
-      title: '2026 春節聯歡大宴會',
-      type: 'party',
-      coverImage: '',
-      content: '春回大地，萬象更新...',
-      eventDate: DateTime.now().add(Duration(days: index * 7)),
-      venueName: '華埠大酒樓',
-      address: '紐約華埠東百老匯88號',
-      status: 'upcoming',
-      visibility: 'public',
-    ));
-
-    final mockAnnouncements = List.generate(3, (index) => Announcement(
-      id: '$index',
-      orgId: '1',
-      title: '關於2026年度會費繳納通知',
-      type: 'notice',
-      content: '各位會員：請按時繳納會費...',
-      isPinned: index == 0,
-      visibility: 'public',
-      createdAt: DateTime.now().subtract(Duration(days: index)),
-    ));
+    final org = ref.watch(mockOrgProvider);
+    final eventsAsync = ref.watch(mockEventsProvider);
+    final announcementsAsync = ref.watch(mockAnnouncementsProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -53,50 +24,129 @@ class HomePage extends ConsumerWidget {
       ),
       body: RefreshIndicator(
         onRefresh: () async {
-          await Future.delayed(const Duration(seconds: 1));
+          // 刷新数据
+          ref.invalidate(mockEventsProvider);
+          ref.invalidate(mockAnnouncementsProvider);
         },
         child: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppConstants.spacingMedium,
+            vertical: AppConstants.spacingSmall,
+          ),
           children: [
-            OrgInfoCard(org: mockOrg),
-            const SizedBox(height: 24),
+            OrgInfoCard(org: org),
+            const SizedBox(height: AppConstants.spacingLarge),
             _buildHeader(context, '最新活動', () => context.go('/events')),
-            ...mockEvents.map((e) => EventListItem(
-                  event: e,
-                  onTap: () => context.push('/events/detail/${e.id}'),
-                )),
-            const SizedBox(height: 24),
+            _buildEventsSection(context, eventsAsync, ref),
+            const SizedBox(height: AppConstants.spacingLarge),
             _buildHeader(context, '最新公告', () => context.go('/announcements')),
-            Card(
-              child: Column(
-                children: mockAnnouncements
-                    .map((a) => AnnouncementListItem(
-                          announcement: a,
-                          onTap: () => context.push('/announcements/detail/${a.id}'),
-                        ))
-                    .toList(),
-              ),
-            ),
-            const SizedBox(height: 32),
+            _buildAnnouncementsSection(context, announcementsAsync, ref),
+            const SizedBox(height: AppConstants.spacingXLarge),
           ],
         ),
       ),
     );
   }
 
+  Widget _buildEventsSection(
+    BuildContext context,
+    AsyncValue eventsAsync,
+    WidgetRef ref,
+  ) {
+    return eventsAsync.when(
+      loading: () => const SizedBox(
+        height: 200,
+        child: LoadingStateWidget(message: '加載活動中...'),
+      ),
+      error: (err, stack) => SizedBox(
+        height: 200,
+        child: ErrorStateWidget(
+          message: '加載活動失敗',
+          onRetry: () => ref.invalidate(mockEventsProvider),
+        ),
+      ),
+      data: (events) {
+        if (events.isEmpty) {
+          return const SizedBox(
+            height: 150,
+            child: EmptyStateWidget(
+              icon: Icons.event_busy,
+              message: '暫無活動',
+            ),
+          );
+        }
+        return Column(
+          children: events
+              .map((e) => EventListItem(
+                    event: e,
+                    onTap: () => context.push('/events/detail/${e.id}'),
+                  ))
+              .toList(),
+        );
+      },
+    );
+  }
+
+  Widget _buildAnnouncementsSection(
+    BuildContext context,
+    AsyncValue announcementsAsync,
+    WidgetRef ref,
+  ) {
+    return announcementsAsync.when(
+      loading: () => const SizedBox(
+        height: 150,
+        child: LoadingStateWidget(message: '加載公告中...'),
+      ),
+      error: (err, stack) => SizedBox(
+        height: 150,
+        child: ErrorStateWidget(
+          message: '加載公告失敗',
+          onRetry: () => ref.invalidate(mockAnnouncementsProvider),
+        ),
+      ),
+      data: (announcements) {
+        if (announcements.isEmpty) {
+          return const SizedBox(
+            height: 150,
+            child: EmptyStateWidget(
+              icon: Icons.campaign_outlined,
+              message: '暫無公告',
+            ),
+          );
+        }
+        return Card(
+          child: Column(
+            children: announcements
+                .map((a) => AnnouncementListItem(
+                      announcement: a,
+                      onTap: () => context.push('/announcements/detail/${a.id}'),
+                    ))
+                .toList(),
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildHeader(BuildContext context, String title, VoidCallback onMore) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12),
+      padding: const EdgeInsets.symmetric(vertical: AppConstants.spacingSmall),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             title,
-            style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+            style: const TextStyle(
+              fontSize: AppConstants.fontSizeLarge,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           TextButton(
             onPressed: onMore,
-            child: const Text('全部 >', style: TextStyle(fontSize: 20)),
+            child: const Text(
+              '全部 >',
+              style: TextStyle(fontSize: AppConstants.fontSizeNormal),
+            ),
           ),
         ],
       ),
