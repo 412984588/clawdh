@@ -49,7 +49,7 @@ class _AnnouncementDetailPageState extends ConsumerState<AnnouncementDetailPage>
           children: [
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              color: Theme.of(context).primaryColor.withOpacity(0.05),
+              color: Theme.of(context).primaryColor.withValues(alpha: 0.05),
               child: Row(
                 children: [
                   ElevatedButton.icon(

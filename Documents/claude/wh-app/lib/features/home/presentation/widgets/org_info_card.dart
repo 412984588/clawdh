@@ -22,11 +22,12 @@ class OrgInfoCard extends StatelessWidget {
                   CircleAvatar(
                     radius: 30,
                     backgroundImage: NetworkImage(org.logo),
+                    onBackgroundImageError: (exception, stackTrace) {},
                   )
                 else
                   CircleAvatar(
                     radius: 30,
-                    backgroundColor: Theme.of(context).primaryColor.withOpacity(0.1),
+                    backgroundColor: Theme.of(context).primaryColor.withValues(alpha: 0.1),
                     child: Icon(Icons.business, size: 30, color: Theme.of(context).primaryColor),
                   ),
                 const SizedBox(width: 16),

@@ -9,7 +9,13 @@ class ProfilePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(appSettingsProvider);
+    final firebaseUser = ref.watch(firebaseUserProvider).value;
     final isAdmin = ref.watch(isAdminProvider);
+
+    final displayName = firebaseUser?.displayName ??
+        firebaseUser?.email ??
+        firebaseUser?.phoneNumber ??
+        '會員';
 
     return Scaffold(
       appBar: AppBar(
@@ -30,12 +36,14 @@ class ProfilePage extends ConsumerWidget {
                     child: const Icon(Icons.person, size: 50, color: Colors.white),
                   ),
                   const SizedBox(width: 20),
-                  const Expanded(
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('陳大文', style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
-                        Text('普通會員 | 紐約唐人街同鄉會', style: TextStyle(fontSize: 18)),
+                        Text(displayName,
+                            style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
+                        Text(isAdmin ? '管理員' : '普通會員',
+                            style: const TextStyle(fontSize: 18)),
                       ],
                     ),
                   ),
@@ -45,7 +53,12 @@ class ProfilePage extends ConsumerWidget {
           ),
           const SizedBox(height: 16),
           if (isAdmin)
-            _buildMenuTile(Icons.admin_panel_settings, '管理後台入口', () => context.push('/admin'), isHighlight: true),
+            _buildMenuTile(
+              Icons.admin_panel_settings,
+              '管理後台入口',
+              () => context.push('/admin'),
+              isHighlight: true,
+            ),
           const SizedBox(height: 24),
           const Text('系統設置', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
@@ -76,9 +89,10 @@ class ProfilePage extends ConsumerWidget {
           ),
           const SizedBox(height: 32),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
+              await ref.read(authServiceProvider).signOut();
               ref.read(currentUserProvider.notifier).state = null;
-              context.go('/login');
+              if (context.mounted) context.go('/login');
             },
             child: const Text('退出登錄', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
           ),
@@ -87,11 +101,13 @@ class ProfilePage extends ConsumerWidget {
     );
   }
 
-  Widget _buildMenuTile(IconData icon, String title, VoidCallback onTap, {bool isHighlight = false}) {
+  Widget _buildMenuTile(IconData icon, String title, VoidCallback onTap,
+      {bool isHighlight = false}) {
     return Card(
       child: ListTile(
         leading: Icon(icon, size: 30, color: isHighlight ? Colors.red : null),
-        title: Text(title, style: TextStyle(fontSize: 22, fontWeight: isHighlight ? FontWeight.bold : null)),
+        title: Text(title,
+            style: TextStyle(fontSize: 22, fontWeight: isHighlight ? FontWeight.bold : null)),
         trailing: const Icon(Icons.chevron_right, size: 30),
         onTap: onTap,
       ),
