@@ -1,0 +1,10 @@
+{
+  "name": "forge",
+  "version": "2.0.0",
+  "description": "PRD → Production Code Automation - 完整的代码自动化系统",
+  "type": "module",
+  "main": "index.js",
+  "dependencies": {
+    "sqlite3": "^5.1.6"
+  }
+}
