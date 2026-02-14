@@ -1,0 +1,12 @@
+[Unit]
+Description=OpenClaw 监控代理定时器（每5分钟）
+Documentation=https://docs.openclaw.ai/cli/gateway
+Requires=openclaw-monitor.service
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=5min
+AccuracySec=1
+
+[Install]
+WantedBy=timers.target
