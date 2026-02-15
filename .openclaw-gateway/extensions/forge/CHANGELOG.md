@@ -1,5 +1,24 @@
 # Changelog
 
+## 2.6.3 - 2026-02-15
+
+### Fixed
+- Added path input whitelist validation in `validateToolParams` to block traversal and malformed path strings.
+- Added compound index `idx_runs_feature_id_status` for run lookup by feature and status.
+- Added regression coverage for cross-project status isolation.
+
+### Security
+- Extended command-injection surface checks for `repoName`, `path`, and `testCommand`.
+- Kept whitelist validation compatible and explicit for `packages` and repository visibility.
+
+### Performance
+- Minor query-path win from `runs(feature_id, status)` index for status-based run lookups under `forge_status`/`forge_implement`.
+
+### Tests
+- Added regression cases:
+  - unsafe `repoName` / `path` / `testCommand` rejection
+  - `forge_status` project-scoped isolation check
+
 ## 2.6.2 - 2026-02-15
 
 ### Fixed

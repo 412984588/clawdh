@@ -42,6 +42,34 @@ describe('forge internals', () => {
     expect(validation.error).toContain('branch');
   });
 
+  test('input whitelist rejects unsafe repoName values', () => {
+    const validation = __testing.validateToolParams('forge_push', {
+      projectId: 'proj-1',
+      action: 'status',
+      repoName: 'bad/repo;rm -rf /',
+    });
+    expect(validation.valid).toBe(false);
+    expect(validation.error).toContain('repoName');
+  });
+
+  test('input whitelist rejects unsafe path values', () => {
+    const validation = __testing.validateToolParams('forge_init', {
+      projectId: 'proj-1',
+      path: '../secret',
+    });
+    expect(validation.valid).toBe(false);
+    expect(validation.error).toContain('path');
+  });
+
+  test('input whitelist rejects unsafe testCommand content', () => {
+    const validation = __testing.validateToolParams('forge_test', {
+      projectId: 'proj-1',
+      testCommand: 'npm test && rm -rf /',
+    });
+    expect(validation.valid).toBe(false);
+    expect(validation.error).toContain('Unsafe');
+  });
+
   test('normalizeErrorResult adds standard error shape', () => {
     const normalized = __testing.normalizeErrorResult({
       success: false,
@@ -122,6 +150,16 @@ describe('forge internals', () => {
     expect(validation.valid).toBe(false);
   });
 
+  test('validateToolParams rejects non-array packages input', () => {
+    const validation = __testing.validateToolParams('forge_install', {
+      projectId: 'proj-1',
+      packages: 'lodash',
+      dev: false,
+    });
+    expect(validation.valid).toBe(false);
+    expect(validation.error).toContain('packages');
+  });
+
   test('state machine blocks invalid transition pending -> complete', () => {
     expect(__testing.isValidFeatureTransition('pending', 'complete')).toBe(false);
     expect(__testing.isValidFeatureTransition('pending', 'in_progress')).toBe(true);
@@ -152,6 +190,57 @@ describe('forge internals', () => {
       dev: true,
     });
     expect(validation.valid).toBe(false);
+  });
+
+  test('forge_status is isolated across projects', async () => {
+    const tools = new Map();
+    const originalHome = process.env.HOME;
+    const originalStateDir = process.env.OPENCLAW_STATE_DIR;
+    const tempHome = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'forge-project-isolation-'));
+    process.env.HOME = tempHome;
+    process.env.OPENCLAW_STATE_DIR = path.join(tempHome, '.forge-state');
+
+    try {
+      register({
+        logger: { info: () => {}, warn: () => {}, error: () => {} },
+        registerTool: (toolDef) => tools.set(toolDef.name, toolDef),
+      });
+
+      const prdA = [
+        '# Project A',
+        '### Feature 1: A',
+        '- 描述: alpha',
+        '- 优先级: P1',
+      ].join('\n');
+
+      const prdB = [
+        '# Project B',
+        '### Feature 1: B1',
+        '- 描述: beta',
+        '- 优先级: P1',
+        '### Feature 2: B2',
+        '- 描述: beta2',
+        '- 优先级: P1',
+      ].join('\n');
+
+      const first = await tools.get('forge_init').execute('t-a', { prd: prdA });
+      await new Promise((resolve) => setTimeout(resolve, 2));
+      const second = await tools.get('forge_init').execute('t-b', { prd: prdB });
+      expect(first.success).toBe(true);
+      expect(second.success).toBe(true);
+      expect(second.projectId).not.toBe(first.projectId);
+
+      const firstStatus = await tools.get('forge_status').execute('t-a', { projectId: first.projectId });
+      const secondStatus = await tools.get('forge_status').execute('t-b', { projectId: second.projectId });
+      expect(firstStatus.success).toBe(true);
+      expect(secondStatus.success).toBe(true);
+      expect(firstStatus.progress.total).toBe(1);
+      expect(secondStatus.progress.total).toBe(2);
+    } finally {
+      process.env.HOME = originalHome;
+      process.env.OPENCLAW_STATE_DIR = originalStateDir;
+      await fs.promises.rm(tempHome, { recursive: true, force: true });
+    }
   });
 
   test('audit sanitizer redacts token/account/path fields', () => {
@@ -196,5 +285,54 @@ describe('forge internals', () => {
     await expect(__testing.ensureSchema(db)).resolves.toBeUndefined();
 
     await new Promise((resolve, reject) => db.close((err) => (err ? reject(err) : resolve())));
+  });
+
+  test('forge_template_load tolerates malformed template dependencies', async () => {
+    const tools = new Map();
+    const originalHome = process.env.HOME;
+    const tempHome = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'forge-template-load-'));
+    process.env.HOME = tempHome;
+
+    try {
+      register({
+        logger: { info: () => {}, warn: () => {}, error: () => {} },
+        registerTool: (toolDef) => tools.set(toolDef.name, toolDef),
+      });
+
+      const templateDir = path.join(tempHome, '.openclaw-gateway', 'forge-templates');
+      fs.mkdirSync(templateDir, { recursive: true });
+      const templateFile = path.join(templateDir, 'bad-deps.json');
+      const template = {
+        id: 'bad-deps',
+        name: 'Bad Dependency Template',
+        options: { language: 'typescript' },
+        features: [
+          {
+            name: 'Feature A',
+            description: 'alpha',
+            priority: 1,
+            dependencies: { bad: 'dep' },
+          },
+        ],
+      };
+      fs.writeFileSync(templateFile, JSON.stringify(template, null, 2));
+
+      const loadResult = await tools.get('forge_template_load').execute('t', {
+        templateId: 'bad-deps',
+        projectName: 'FromMalformedTemplate',
+      });
+      expect(loadResult.success).toBe(true);
+
+      const status = await tools.get('forge_status').execute('t', {
+        projectId: loadResult.projectId,
+      });
+      expect(status.success).toBe(true);
+      expect(status.project.id).toBe(loadResult.projectId);
+      expect(status.progress.total).toBe(1);
+      expect(status.progress.pending).toBe(1);
+    } finally {
+      process.env.HOME = originalHome;
+      await fs.promises.rm(tempHome, { recursive: true, force: true });
+    }
   });
 });

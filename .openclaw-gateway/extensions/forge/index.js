@@ -136,6 +136,7 @@ function ensureSchema(db) {
     `CREATE INDEX IF NOT EXISTS idx_features_project_status_priority_created ON features(project_id, status, priority, created_at)`,
     `CREATE INDEX IF NOT EXISTS idx_runs_project ON runs(project_id)`,
     `CREATE INDEX IF NOT EXISTS idx_runs_status ON runs(status)`,
+    `CREATE INDEX IF NOT EXISTS idx_runs_feature_id_status ON runs(feature_id, status)`,
     `CREATE INDEX IF NOT EXISTS idx_runs_project_started_at ON runs(project_id, started_at DESC)`
   ];
 
@@ -587,6 +588,7 @@ const rateLimiter = new RateLimiter({ limit: RATE_LIMIT_MAX, windowMs: RATE_LIMI
 const ID_PATTERN = /^[a-zA-Z0-9._:-]{1,128}$/;
 const NAME_PATTERN = /^[a-zA-Z0-9._@/: -]{1,200}$/;
 const REPO_PATTERN = /^[a-zA-Z0-9._-]{1,120}$/;
+const PATH_PATTERN = /^(?!.*\.\.)(?!^\.)(?!.*\/\.)(?!.*\/$)[a-zA-Z0-9._@/-]+(?:\/[a-zA-Z0-9._@-]+)*$/;
 const PACKAGE_PATTERN = /^[a-zA-Z0-9._@/:-]{1,120}$/;
 const COMMAND_UNSAFE_PATTERN = /[;&|`$<>\\\n\r]/;
 const SAFE_TEXT_PATTERN = /^[\s\S]{0,200000}$/;
@@ -702,6 +704,11 @@ function validateToolParams(toolName, params) {
     const repoErr = check(params.repoName, REPO_PATTERN, 'repoName');
     if (repoErr) return { valid: false, error: repoErr };
   }
+  if (params.path != null) {
+    if (typeof params.path !== 'string' || !PATH_PATTERN.test(params.path)) {
+      return { valid: false, error: 'Invalid path format' };
+    }
+  }
   const commonFields = ['branch', 'action', 'language', 'framework', 'name', 'templateName'];
   for (const field of commonFields) {
     if (params[field] == null) continue;
@@ -727,6 +734,8 @@ function validateToolParams(toolName, params) {
         return { valid: false, error: 'Invalid package name format' };
       }
     }
+  } else if (params.packages != null) {
+    return { valid: false, error: 'packages must be an array' };
   }
   if (typeof params.prd === 'string' && !SAFE_TEXT_PATTERN.test(params.prd)) {
     return { valid: false, error: 'Invalid prd content length' };
@@ -736,6 +745,9 @@ function validateToolParams(toolName, params) {
   }
   if (toolName === 'forge_git' && params.action && !ALLOWED_GIT_ACTIONS.has(params.action)) {
     return { valid: false, error: 'Unsupported git action' };
+  }
+  if (toolName === 'forge_push' && params.visibility && !['public', 'private'].includes(params.visibility)) {
+    return { valid: false, error: 'Unsupported visibility value' };
   }
   return { valid: true };
 }
@@ -1040,7 +1052,7 @@ export default function register(api) {
         const scopedIdMap = new Map(parsed.features.map((f) => [f.id, toScopedFeatureId(projectId, f.id)]));
         
         for (const f of parsed.features) {
-          const scopedDeps = (f.dependencies || []).map((dep) => scopedIdMap.get(dep) || toScopedFeatureId(projectId, dep));
+          const scopedDeps = normalizeDependencyList(f.dependencies).map((dep) => scopedIdMap.get(dep) || toScopedFeatureId(projectId, dep));
           await run(db, `INSERT INTO features (id, project_id, name, description, priority, status, dependencies) VALUES (?,?,?,?,?,?,?)`,
             [scopedIdMap.get(f.id), projectId, f.name, f.description, f.priority, 'pending', JSON.stringify(scopedDeps)]);
         }
@@ -2780,7 +2792,7 @@ out/
       const parsed = parsePRD(prdContent);
       const scopedIdMap = new Map(parsed.features.map((f) => [f.id, toScopedFeatureId(projectId, f.id)]));
       for (const f of parsed.features) {
-        const scopedDeps = (f.dependencies || []).map((dep) => scopedIdMap.get(dep) || toScopedFeatureId(projectId, dep));
+        const scopedDeps = normalizeDependencyList(f.dependencies).map((dep) => scopedIdMap.get(dep) || toScopedFeatureId(projectId, dep));
         await run(db, `INSERT INTO features (id, project_id, name, description, priority, status, dependencies) VALUES (?,?,?,?,?,?,?)`,
           [scopedIdMap.get(f.id), projectId, f.name, f.description, f.priority, 'pending', JSON.stringify(scopedDeps)]);
       }
@@ -2833,7 +2845,7 @@ out/
     }
   }));
 
-  logger.info?.("[forge] Extension loaded v2.6.2 - unattended weekly iteration (stability + security + perf)");
+  logger.info?.("[forge] Extension loaded v2.6.3 - unattended weekly iteration (stability + security + perf)");
 }
 
 export const __testing = {
