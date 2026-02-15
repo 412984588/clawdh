@@ -24,6 +24,7 @@ const STATUS_CACHE_TTL_MS = Math.max(100, Number(process.env.FORGE_STATUS_CACHE_
 const RATE_LIMIT_MAX = Math.max(1, Number(process.env.FORGE_RATE_LIMIT_MAX || 120));
 const RATE_LIMIT_WINDOW_MS = Math.max(1000, Number(process.env.FORGE_RATE_LIMIT_WINDOW_MS || 60_000));
 const WS_PORT = Math.max(1024, Number(process.env.FORGE_WS_PORT || 17345));
+const AUDIT_DISABLED = process.env.FORGE_DISABLE_AUDIT === '1' || process.env.NODE_ENV === 'test' || !!process.env.JEST_WORKER_ID;
 
 /**
  * 安全解析 JSON，失败时返回 fallback。
@@ -183,6 +184,10 @@ function ensureSchema(db) {
   return new Promise((resolve, reject) => {
     db.serialize(() => {
       runSequential(tableSQL)
+        .then(() => ensureColumn('projects', 'options', 'TEXT'))
+        .then(() => ensureColumn('features', 'assigned_model', 'TEXT'))
+        .then(() => ensureColumn('features', 'implementation', 'TEXT'))
+        .then(() => ensureColumn('features', 'review_notes', 'TEXT'))
         .then(() => ensureColumn('runs', 'started_at', 'DATETIME DEFAULT CURRENT_TIMESTAMP'))
         .then(() => ensureColumn('runs', 'completed_at', 'DATETIME'))
         .then(() => runSequential(indexSQL, { ignoreError: true }))
@@ -555,6 +560,10 @@ class LRUCache {
   clear() {
     this.map.clear();
   }
+
+  delete(key) {
+    this.map.delete(key);
+  }
 }
 
 /**
@@ -583,7 +592,22 @@ class RateLimiter {
 }
 
 const statusCache = new LRUCache(STATUS_CACHE_LIMIT, STATUS_CACHE_TTL_MS);
+const runContextCache = new LRUCache(256, 1_500);
+const parsedOptionsCache = new LRUCache(256, 5_000);
+const normalizedDepsCache = new LRUCache(512, 5_000);
+const implementPromptCache = new LRUCache(512, 2_000);
+const workdirExistsCache = new LRUCache(512, 5_000);
 const rateLimiter = new RateLimiter({ limit: RATE_LIMIT_MAX, windowMs: RATE_LIMIT_WINDOW_MS });
+
+function resetRuntimeStateForTests() {
+  statusCache.clear();
+  runContextCache.clear();
+  parsedOptionsCache.clear();
+  normalizedDepsCache.clear();
+  implementPromptCache.clear();
+  workdirExistsCache.clear();
+  rateLimiter.counters.clear();
+}
 
 const ID_PATTERN = /^[a-zA-Z0-9._:-]{1,128}$/;
 const NAME_PATTERN = /^[a-zA-Z0-9._@/: -]{1,200}$/;
@@ -616,6 +640,98 @@ function normalizeDependencyList(rawDependencies) {
     .filter((item) => typeof item === 'string')
     .map((item) => item.trim())
     .filter(Boolean);
+}
+
+/**
+ * 缓存解析项目 options，避免热点 JSON.parse。
+ * @param {unknown} rawOptions
+ * @returns {Record<string, any>}
+ */
+function parseProjectOptionsCached(rawOptions) {
+  if (rawOptions == null) return {};
+  if (typeof rawOptions !== 'string') return (typeof rawOptions === 'object' ? rawOptions : {});
+  const cached = parsedOptionsCache.get(rawOptions);
+  if (cached) return cached;
+  const parsed = safeJSONParse(rawOptions, {});
+  parsedOptionsCache.set(rawOptions, parsed);
+  return parsed;
+}
+
+/**
+ * 缓存归一化依赖列表，减少重复 split/trim。
+ * @param {unknown} rawDependencies
+ * @returns {string[]}
+ */
+function getNormalizedDependenciesCached(rawDependencies) {
+  if (typeof rawDependencies !== 'string') return normalizeDependencyList(rawDependencies);
+  const cached = normalizedDepsCache.get(rawDependencies);
+  if (cached) return cached;
+  const normalized = normalizeDependencyList(rawDependencies);
+  normalizedDepsCache.set(rawDependencies, normalized);
+  return normalized;
+}
+
+/**
+ * 构建（并缓存）forge_implement 任务提示。
+ * @param {{id: string, project_name: string, name: string, description: string, dependencies: unknown, workdir: string, architecture: string | null}} feature
+ * @returns {string}
+ */
+function buildImplementationPrompt(feature) {
+  const cacheKey = feature.id;
+  const cached = implementPromptCache.get(cacheKey);
+  if (cached) return cached;
+  const deps = getNormalizedDependenciesCached(feature.dependencies).join(', ') || 'None';
+  const prompt = `# Implementation Task
+
+## Project: ${feature.project_name}
+## Feature: ${feature.name}
+
+**Description**: ${feature.description}
+**Dependencies**: ${deps}
+
+## Work Directory
+${feature.workdir}
+
+## Architecture
+${feature.architecture || 'No architecture defined'}
+
+## Task
+1. Create necessary files in the work directory
+2. Implement the feature following best practices
+3. Include error handling
+4. Add appropriate comments
+
+## Output Format
+After implementation:
+1. List all files created/modified
+2. Summarize key implementation decisions
+3. Report any issues encountered
+4. Call forge_done to mark completion`;
+  implementPromptCache.set(cacheKey, prompt);
+  return prompt;
+}
+
+/**
+ * 生成运行 ID，避免高并发下时间戳冲突。
+ * @param {string} [prefix]
+ * @returns {string}
+ */
+function createRunId(prefix = 'run') {
+  return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+/**
+ * 缓存 workdir 存在性检查，减少重复 sync I/O。
+ * @param {string} workdir
+ * @returns {void}
+ */
+function ensureWorkdirExistsCached(workdir) {
+  if (!workdir) return;
+  if (workdirExistsCache.get(workdir)) return;
+  if (!fs.existsSync(workdir)) {
+    fs.mkdirSync(workdir, { recursive: true });
+  }
+  workdirExistsCache.set(workdir, true);
 }
 
 /**
@@ -801,8 +917,32 @@ function sanitizeAuditValue(value, keyName = '') {
  * @returns {Promise<void>}
  */
 async function writeAuditLog(payload) {
+  if (AUDIT_DISABLED) return;
   const line = `${JSON.stringify({ ...payload, ts: new Date().toISOString() })}\n`;
   await fs.promises.appendFile(AUDIT_LOG_PATH, line, 'utf8');
+}
+
+/**
+ * 生成轻量审计摘要，避免在热点路径序列化大对象。
+ * @param {any} result
+ * @param {Record<string, any>} params
+ * @param {number} durationMs
+ * @returns {Record<string, any>}
+ */
+function toAuditSummary(result, params, durationMs) {
+  if (!result || typeof result !== 'object') {
+    return { success: true, durationMs };
+  }
+  return {
+    success: result.success !== false,
+    errorCode: result.errorCode || null,
+    error: result.error || null,
+    tool: result._meta?.tool || null,
+    status: result.status || null,
+    projectId: result.projectId || params?.projectId || null,
+    featureId: result.featureId || params?.featureId || null,
+    durationMs
+  };
 }
 
 function ensureWebSocketServer(logger = console) {
@@ -951,15 +1091,16 @@ function tool(name, description, parameters, handler) {
         }
         writeAuditLog({ id: `audit-${Date.now()}`, tool: name, phase: 'start', payload: sanitizeAuditValue(p) }).catch(() => {});
         const result = normalizeErrorResult(await handler(p));
+        const durationMs = Date.now() - startTime;
         if (result && typeof result === 'object') {
-          result._meta = { tool: name, durationMs: Date.now() - startTime, timestamp: new Date().toISOString() };
+          result._meta = { tool: name, durationMs, timestamp: new Date().toISOString() };
         }
         writeAuditLog({
           id: `audit-${Date.now()}-${Math.random()}`,
           tool: name,
           phase: 'end',
           success: result?.success !== false ? 1 : 0,
-          payload: sanitizeAuditValue(result)
+          payload: sanitizeAuditValue(toAuditSummary(result, p, durationMs))
         }).catch(() => {});
         broadcastProgress({
           type: 'forge_progress',
@@ -1379,8 +1520,20 @@ Provide the complete implementation including:
     
     const db = await initDB();
     try {
-      const feature = await get(db, `SELECT f.*, p.name as project_name, p.workdir, p.architecture, p.options 
-        FROM features f JOIN projects p ON f.project_id = p.id WHERE f.id=?`, [featureId]);
+      const feature = await get(db, `SELECT 
+          f.id,
+          f.project_id,
+          f.name,
+          f.description,
+          f.dependencies,
+          f.status,
+          p.name as project_name,
+          p.workdir,
+          p.architecture,
+          p.options
+        FROM features f 
+        JOIN projects p ON f.project_id = p.id 
+        WHERE f.id=?`, [featureId]);
       
       if (!feature) return { success: false, error: 'Feature not found', featureId };
       
@@ -1395,48 +1548,47 @@ Provide the complete implementation including:
         return { success: false, error: 'Feature already complete', featureId };
       }
       // in_progress 状态继续执行
+
+      let activeRun = null;
+      if (feature.status === 'in_progress') {
+        activeRun = await get(
+          db,
+          `SELECT id, model FROM runs 
+           WHERE feature_id=? AND tool=? AND status=?
+           ORDER BY started_at DESC LIMIT 1`,
+          [featureId, 'forge_implement', 'running']
+        );
+      }
       
-      const options = safeJSONParse(feature.options, {});
-      const useModel = model || options.coderModel || 'anthropic-newcli/claude-opus-4-6-20250528';
-      
-      const taskPrompt = `# Implementation Task
+      const options = parseProjectOptionsCached(feature.options);
+      const useModel = model || activeRun?.model || options.coderModel || 'anthropic-newcli/claude-opus-4-6-20250528';
+      const taskPrompt = buildImplementationPrompt(feature);
 
-## Project: ${feature.project_name}
-## Feature: ${feature.name}
-
-**Description**: ${feature.description}
-**Dependencies**: ${normalizeDependencyList(feature.dependencies).join(', ') || 'None'}
-
-## Work Directory
-${feature.workdir}
-
-## Architecture
-${feature.architecture || 'No architecture defined'}
-
-## Task
-1. Create necessary files in the work directory
-2. Implement the feature following best practices
-3. Include error handling
-4. Add appropriate comments
-
-## Output Format
-After implementation:
-1. List all files created/modified
-2. Summarize key implementation decisions
-3. Report any issues encountered
-4. Call forge_done to mark completion`;
+      if (activeRun?.id) {
+        logger.info?.(`[forge] Feature ${featureId} already in progress, reusing run ${activeRun.id}`);
+        return {
+          success: true,
+          featureId,
+          projectId: feature.project_id,
+          status: 'in_progress',
+          model: useModel,
+          workdir: feature.workdir,
+          task: taskPrompt,
+          runId: activeRun.id,
+          reusedRun: true,
+          instruction: 'Feature is already in progress. Reuse the existing run instead of spawning a new agent.'
+        };
+      }
 
       // 记录 run
-      const runId = `run-${Date.now()}`;
+      const runId = createRunId('run');
       await run(db, 'INSERT INTO runs (id, project_id, feature_id, tool, status, model) VALUES (?,?,?,?,?,?)',
         [runId, feature.project_id, featureId, 'forge_implement', 'running', useModel]);
       
       logger.info?.(`[forge] Implementing ${featureId} with model ${useModel}`);
       
-      // P4: workdir 删除检测
-      if (!fs.existsSync(feature.workdir)) {
-        fs.mkdirSync(feature.workdir, { recursive: true });
-      }
+      // P4: workdir 删除检测（带缓存，降低重复 sync I/O）
+      ensureWorkdirExistsCached(feature.workdir);
       
       // P0: 真正自动化
       if (shouldAutoSpawn) {
@@ -1517,6 +1669,7 @@ After implementation:
       
       const wasComplete = existing.status === 'complete';
       await run(db, 'UPDATE features SET status=?, implementation=? WHERE id=?', ['complete', implementation, featureId]);
+      implementPromptCache.delete(featureId);
       
       // 更新 run 状态
       await run(db, 'UPDATE runs SET status=?, completed_at=? WHERE feature_id=? AND status=?',
@@ -1921,35 +2074,52 @@ For each feature:
     
     const db = await initDB();
     try {
-      const project = await get(db, 'SELECT * FROM projects WHERE id=?', [projectId]);
-      if (!project) return { success: false, error: 'Project not found', projectId };
-      
-      const featureCountRow = await get(db, 'SELECT COUNT(1) as count FROM features WHERE project_id=?', [projectId]);
-      const options = safeJSONParse(project.options, {});
-      const featureCount = featureCountRow?.count || 0;
+      let context = runContextCache.get(projectId);
+      if (!context) {
+        const row = await get(db, `SELECT
+            p.id,
+            p.name,
+            p.status,
+            p.options,
+            (SELECT COUNT(1) FROM features f WHERE f.project_id = p.id) AS feature_count
+          FROM projects p
+          WHERE p.id=?`, [projectId]);
+        if (!row) return { success: false, error: 'Project not found', projectId };
+        context = {
+          projectName: row.name,
+          status: row.status,
+          options: parseProjectOptionsCached(row.options),
+          featureCount: row.feature_count || 0
+        };
+        runContextCache.set(projectId, context);
+      }
+
+      const options = context.options;
+      const featureCount = context.featureCount;
+      const stepSet = new Set(Array.isArray(steps) ? steps : []);
       
       const workflow = [];
-      if (steps.includes('plan')) {
+      if (stepSet.has('plan')) {
         workflow.push({ step: 'plan', tool: 'forge_plan', description: 'Design architecture', model: options.architectModel, autoSpawn: true });
       }
-      if (steps.includes('implement')) {
+      if (stepSet.has('implement')) {
         workflow.push({ step: 'implement', tool: 'forge_next + forge_implement', description: `Implement ${featureCount} features`, model: options.coderModel, parallel: options.maxParallel, autoSpawn: true });
       }
-      if (steps.includes('review')) {
+      if (stepSet.has('review')) {
         workflow.push({ step: 'review', tool: 'forge_review', description: 'Code review', model: options.reviewerModel, autoSpawn: true });
       }
-      if (steps.includes('test')) {
+      if (stepSet.has('test')) {
         workflow.push({ step: 'test', tool: 'forge_test', description: 'Run tests' });
       }
-      if (steps.includes('push')) {
+      if (stepSet.has('push')) {
         workflow.push({ step: 'push', tool: 'forge_push', description: 'Push to GitHub' });
       }
       
       return {
         success: true,
         projectId,
-        projectName: project.name,
-        status: project.status,
+        projectName: context.projectName,
+        status: context.status,
         features: featureCount,
         workflow,
         instruction: 'Each step with autoSpawn=true will automatically spawn the required agent. Execute steps in order.',
@@ -1993,12 +2163,13 @@ For each feature:
       // 重置状态为 pending，然后重新实现
       await run(db, 'UPDATE features SET status=?, implementation=?, assigned_model=? WHERE id=?',
         ['pending', '', null, featureId]);
+      implementPromptCache.delete(featureId);
       
       // 更新 run 状态
       await run(db, 'UPDATE runs SET status=? WHERE feature_id=? AND status=?',
         ['retrying', featureId, 'running']);
       
-      const options = safeJSONParse(feature.options, {});
+      const options = parseProjectOptionsCached(feature.options);
       const useModel = model || options.coderModel || 'anthropic-newcli/claude-opus-4-6-20250528';
       
       logger.info?.(`[forge] Retrying ${featureId} with model ${useModel}`);
@@ -2024,7 +2195,7 @@ ${feature.architecture || 'No architecture defined'}
 3. Include error handling
 4. Add appropriate comments`;
 
-      const runId = `run-${Date.now()}`;
+      const runId = createRunId('run');
       await run(db, 'INSERT INTO runs (id, project_id, feature_id, tool, status, model) VALUES (?,?,?,?,?,?)',
         [runId, feature.project_id, featureId, 'forge_retry', 'running', useModel]);
       
@@ -2081,6 +2252,7 @@ ${feature.architecture || 'No architecture defined'}
       
       await run(db, 'UPDATE features SET status=?, implementation=? WHERE id=?',
         ['cancelled', `Cancelled: ${reason}`, featureId]);
+      implementPromptCache.delete(featureId);
       
       await run(db, 'UPDATE runs SET status=?, error=? WHERE feature_id=? AND status=?',
         ['cancelled', reason, featureId, 'running']);
@@ -2845,7 +3017,7 @@ out/
     }
   }));
 
-  logger.info?.("[forge] Extension loaded v2.6.3 - unattended weekly iteration (stability + security + perf)");
+  logger.info?.("[forge] Extension loaded v2.6.4 - unattended weekly iteration (stability + security + perf)");
 }
 
 export const __testing = {
@@ -2860,5 +3032,6 @@ export const __testing = {
   validateDependencies,
   sanitizeAuditValue,
   normalizeDependencyList,
-  ensureSchema
+  ensureSchema,
+  resetRuntimeStateForTests
 };
