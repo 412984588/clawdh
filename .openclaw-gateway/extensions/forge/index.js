@@ -10,98 +10,311 @@
 
 import fs from 'fs';
 import path from 'path';
-import { execSync } from 'child_process';
+import { exec } from 'child_process';
 import sqlite3pkg from 'sqlite3';
+import { WebSocketServer } from 'ws';
 
 const sqlite3 = sqlite3pkg.verbose();
 const DB_PATH = path.join(process.env.OPENCLAW_STATE_DIR || process.env.HOME || '/tmp', '.openclaw-gateway', 'forge.db');
 const PROJECTS_DIR = path.join(process.env.HOME || '/tmp', 'forge-projects');
+const DEFAULT_MODEL = process.env.FORGE_MODEL || 'anthropic-newcli/claude-opus-4-6-20250528';
+const DB_POOL_MAX = Math.max(1, Number(process.env.FORGE_DB_POOL_MAX || 4));
+const STATUS_CACHE_LIMIT = Math.max(16, Number(process.env.FORGE_STATUS_CACHE_LIMIT || 256));
+const STATUS_CACHE_TTL_MS = Math.max(100, Number(process.env.FORGE_STATUS_CACHE_TTL_MS || 2000));
+const RATE_LIMIT_MAX = Math.max(1, Number(process.env.FORGE_RATE_LIMIT_MAX || 120));
+const RATE_LIMIT_WINDOW_MS = Math.max(1000, Number(process.env.FORGE_RATE_LIMIT_WINDOW_MS || 60_000));
+const WS_PORT = Math.max(1024, Number(process.env.FORGE_WS_PORT || 17345));
+
+/**
+ * 安全解析 JSON，失败时返回 fallback。
+ * @param {string} str
+ * @param {any} fallback
+ * @returns {any}
+ */
+function safeJSONParse(str, fallback = null) {
+  if (str == null) return fallback;
+  if (typeof str !== 'string') return str;
+  try {
+    return JSON.parse(str);
+  } catch (err) {
+    const preview = typeof str === 'string' ? str.slice(0, 100) : String(str).slice(0, 100);
+    if (process.env.FORGE_DEBUG_JSON === '1') {
+      console.warn('[forge] JSON parse error:', err.message, 'Input:', preview);
+    }
+    return fallback;
+  }
+}
 
 // 确保 DB 目录存在
 const DB_DIR = path.dirname(DB_PATH);
+const AUDIT_LOG_PATH = path.join(DB_DIR, 'forge-audit.log');
 if (!fs.existsSync(DB_DIR)) {
   fs.mkdirSync(DB_DIR, { recursive: true });
 }
 
-function initDB() {
-  return new Promise((resolve, reject) => {
-    const db = new sqlite3.Database(DB_PATH, (err) => {
-      if (err) return reject(err);
-      db.serialize(() => {
-        db.run(`CREATE TABLE IF NOT EXISTS projects (
-          id TEXT PRIMARY KEY,
-          name TEXT,
-          prd TEXT,
-          architecture TEXT,
-          status TEXT,
-          github_url TEXT,
-          workdir TEXT,
-          options TEXT,
-          created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-        )`);
-        db.run(`CREATE TABLE IF NOT EXISTS features (
-          id TEXT PRIMARY KEY,
-          project_id TEXT,
-          name TEXT,
-          description TEXT,
-          priority INTEGER,
-          status TEXT,
-          dependencies TEXT,
-          assigned_model TEXT,
-          implementation TEXT,
-          review_notes TEXT,
-          created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-        )`);
-        db.run(`CREATE TABLE IF NOT EXISTS runs (
-          id TEXT PRIMARY KEY,
-          project_id TEXT,
-          feature_id TEXT,
-          tool TEXT,
-          status TEXT,
-          model TEXT,
-          started_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-          completed_at DATETIME,
-          error TEXT,
-          output TEXT
-        )`, [], () => resolve(db));
+const dbPool = {
+  max: DB_POOL_MAX,
+  available: [],
+  waiters: [],
+  inUse: 0,
+  creating: 0
+};
+
+let wsState = { started: false, server: null, clients: new Set(), url: null };
+
+/**
+ * 初始化数据库 schema。
+ * @param {import('sqlite3').Database} db
+ * @returns {Promise<void>}
+ */
+function ensureSchema(db) {
+  const tableSQL = [
+    `CREATE TABLE IF NOT EXISTS projects (
+      id TEXT PRIMARY KEY,
+      name TEXT,
+      prd TEXT,
+      architecture TEXT,
+      status TEXT,
+      github_url TEXT,
+      workdir TEXT,
+      options TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`,
+    `CREATE TABLE IF NOT EXISTS features (
+      id TEXT PRIMARY KEY,
+      project_id TEXT,
+      name TEXT,
+      description TEXT,
+      priority INTEGER,
+      status TEXT,
+      dependencies TEXT,
+      assigned_model TEXT,
+      implementation TEXT,
+      review_notes TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`,
+    `CREATE TABLE IF NOT EXISTS runs (
+      id TEXT PRIMARY KEY,
+      project_id TEXT,
+      feature_id TEXT,
+      tool TEXT,
+      status TEXT,
+      model TEXT,
+      started_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      completed_at DATETIME,
+      error TEXT,
+      output TEXT
+    )`,
+    `CREATE TABLE IF NOT EXISTS commits (
+      id TEXT PRIMARY KEY,
+      project_id TEXT,
+      feature_id TEXT,
+      sha TEXT,
+      message TEXT,
+      author TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`,
+    `CREATE TABLE IF NOT EXISTS file_index (
+      project_id TEXT,
+      rel_path TEXT,
+      fingerprint TEXT,
+      indexed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      PRIMARY KEY (project_id, rel_path)
+    )`,
+    `CREATE TABLE IF NOT EXISTS audit_logs (
+      id TEXT PRIMARY KEY,
+      tool TEXT,
+      phase TEXT,
+      success INTEGER,
+      payload TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`
+  ];
+  const indexSQL = [
+    `CREATE INDEX IF NOT EXISTS idx_features_project ON features(project_id)`,
+    `CREATE INDEX IF NOT EXISTS idx_features_status ON features(status)`,
+    `CREATE INDEX IF NOT EXISTS idx_features_project_status_priority_created ON features(project_id, status, priority, created_at)`,
+    `CREATE INDEX IF NOT EXISTS idx_runs_project ON runs(project_id)`,
+    `CREATE INDEX IF NOT EXISTS idx_runs_status ON runs(status)`,
+    `CREATE INDEX IF NOT EXISTS idx_runs_project_started_at ON runs(project_id, started_at DESC)`
+  ];
+
+  const runSequential = (sqlList, { ignoreError = false } = {}) => new Promise((resolve, reject) => {
+    let i = 0;
+    const next = () => {
+      if (i >= sqlList.length) {
+        resolve();
+        return;
+      }
+      db.run(sqlList[i], [], (err) => {
+        if (err && !ignoreError) {
+          reject(err);
+          return;
+        }
+        i += 1;
+        next();
+      });
+    };
+    next();
+  });
+
+  const ensureColumn = (tableName, columnName, definition) => new Promise((resolve, reject) => {
+    db.all(`PRAGMA table_info(${tableName})`, [], (err, rows) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      const exists = (rows || []).some((row) => row.name === columnName);
+      if (exists) {
+        resolve();
+        return;
+      }
+      db.run(`ALTER TABLE ${tableName} ADD COLUMN ${columnName} ${definition}`, [], (alterErr) => {
+        if (alterErr) {
+          reject(alterErr);
+          return;
+        }
+        resolve();
       });
     });
   });
-}
 
-function closeDB(db) {
-  try { db.close(); } catch {}
-}
-
-function run(db, sql, params = []) {
   return new Promise((resolve, reject) => {
-    db.run(sql, params, function (err) {
-      if (err) reject(err);
-      else resolve({ changes: this.changes, lastID: this.lastID });
+    db.serialize(() => {
+      runSequential(tableSQL)
+        .then(() => ensureColumn('runs', 'started_at', 'DATETIME DEFAULT CURRENT_TIMESTAMP'))
+        .then(() => ensureColumn('runs', 'completed_at', 'DATETIME'))
+        .then(() => runSequential(indexSQL, { ignoreError: true }))
+        .then(() => resolve())
+        .catch((err) => reject(err));
     });
   });
 }
 
+/**
+ * 创建新的数据库连接并初始化 schema。
+ * @returns {Promise<import('sqlite3').Database>}
+ */
+function createDBConnection() {
+  return new Promise((resolve, reject) => {
+    const db = new sqlite3.Database(DB_PATH, async (err) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      try {
+        await ensureSchema(db);
+        resolve(db);
+      } catch (schemaErr) {
+        reject(schemaErr);
+      }
+    });
+  });
+}
+
+/**
+ * 从连接池获取连接。
+ * @returns {Promise<import('sqlite3').Database>}
+ */
+async function initDB() {
+  if (dbPool.available.length > 0) {
+    dbPool.inUse += 1;
+    return dbPool.available.pop();
+  }
+
+  if (dbPool.inUse + dbPool.creating < dbPool.max) {
+    dbPool.creating += 1;
+    try {
+      const db = await createDBConnection();
+      dbPool.inUse += 1;
+      return db;
+    } finally {
+      dbPool.creating -= 1;
+    }
+  }
+
+  return new Promise((resolve) => {
+    dbPool.waiters.push(resolve);
+  });
+}
+
+/**
+ * 归还数据库连接到连接池。
+ * @param {import('sqlite3').Database} db
+ * @returns {void}
+ */
+function closeDB(db) {
+  if (!db) return;
+  if (dbPool.waiters.length > 0) {
+    const waiter = dbPool.waiters.shift();
+    waiter(db);
+    return;
+  }
+  dbPool.inUse = Math.max(0, dbPool.inUse - 1);
+  dbPool.available.push(db);
+}
+
+/**
+ * 执行写操作 SQL。
+ * @param {import('sqlite3').Database} db
+ * @param {string} sql
+ * @param {any[]} params
+ * @returns {Promise<{changes: number, lastID: number}>}
+ */
+function run(db, sql, params = []) {
+  return new Promise((resolve, reject) => {
+    db.run(sql, params, function (err) {
+      if (err) {
+        reject(err);
+        return;
+      }
+      if (/\b(INSERT|UPDATE|DELETE|REPLACE)\b/i.test(sql) && /\b(projects|features|runs|file_index)\b/i.test(sql)) {
+        statusCache.clear();
+        broadcastProgress({ type: 'forge_status_invalidate' });
+      }
+      resolve({ changes: this.changes, lastID: this.lastID });
+    });
+  });
+}
+
+/**
+ * 执行单行查询 SQL。
+ * @param {import('sqlite3').Database} db
+ * @param {string} sql
+ * @param {any[]} params
+ * @returns {Promise<any>}
+ */
 function get(db, sql, params = []) {
   return new Promise((resolve, reject) => {
     db.get(sql, params, (err, row) => err ? reject(err) : resolve(row));
   });
 }
 
+/**
+ * 执行多行查询 SQL。
+ * @param {import('sqlite3').Database} db
+ * @param {string} sql
+ * @param {any[]} params
+ * @returns {Promise<any[]>}
+ */
 function all(db, sql, params = []) {
   return new Promise((resolve, reject) => {
-    db.all(sql, params, (err, rows) => err ? reject(err) : resolve(rows));
+    db.all(sql, params, (err, rows) => err ? reject(err) : resolve(rows || []));
   });
 }
 
-// 检测循环依赖（拓扑排序）
+/**
+ * 检测特性依赖中的循环依赖。
+ * @param {Array<{id: string, dependencies: string | string[]}>} features
+ * @returns {boolean}
+ */
 function detectCycle(features) {
   const graph = {};
   const visited = new Set();
   const recStack = new Set();
   
   features.forEach(f => {
-    graph[f.id] = JSON.parse(f.dependencies || '[]');
+    graph[f.id] = normalizeDependencyList(f.dependencies);
   });
   
   function dfs(node) {
@@ -129,13 +342,17 @@ function detectCycle(features) {
   return false;
 }
 
-// 验证依赖 ID 是否存在
+/**
+ * 验证依赖 ID 是否都存在。
+ * @param {Array<{id: string, dependencies: string | string[]}>} features
+ * @returns {string[]}
+ */
 function validateDependencies(features) {
   const ids = new Set(features.map(f => f.id));
   const errors = [];
   
   features.forEach(f => {
-    const deps = JSON.parse(f.dependencies || '[]');
+    const deps = normalizeDependencyList(f.dependencies);
     deps.forEach(dep => {
       if (!ids.has(dep)) {
         errors.push(`Feature "${f.id}" 依赖不存在的 "${dep}"`);
@@ -146,12 +363,30 @@ function validateDependencies(features) {
   return errors;
 }
 
+/**
+ * 将 PRD 文本解析为项目与 feature 列表。
+ * @param {string} prdContent
+ * @returns {{name: string, overview: string, features: any[], techStack: string[]}}
+ */
 function parsePRD(prdContent) {
-  if (!prdContent || typeof prdContent !== 'string') {
-    return { name: 'Untitled Project', overview: '', features: [], techStack: [] };
+  // P1: 输入验证
+  if (prdContent === null || prdContent === undefined) {
+    throw new Error('PRD content is required');
+  }
+  if (typeof prdContent !== 'string') {
+    throw new Error('PRD must be a string, got ' + typeof prdContent);
+  }
+  if (prdContent.trim().length === 0) {
+    return { name: 'Empty Project', overview: '', features: [], techStack: [] };
   }
   
-  const lines = prdContent.split('\n');
+  // P2: 输入清理 - 限制长度和危险字符
+  const sanitized = prdContent
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '') // 移除 script 标签
+    .replace(/javascript:/gi, '') // 移除 javascript: 协议
+    .substring(0, 100000); // 限制 100KB
+  
+  const lines = sanitized.split('\n');
   const project = { name: 'Untitled Project', overview: '', features: [], techStack: [] };
   const seenIds = new Set();
   let currentFeature = null;
@@ -229,29 +464,517 @@ function parsePRD(prdContent) {
   return project;
 }
 
+/**
+ * 对 shell 参数进行单引号转义。
+ * @param {string} str
+ * @returns {string}
+ */
 function escapeShellArg(str) {
   if (!str) return "''";
   return "'" + String(str).replace(/'/g, "'\\''") + "'";
 }
 
+function toScopedFeatureId(projectId, featureId) {
+  return `${projectId}::${featureId}`;
+}
+
+function fromScopedFeatureId(featureId) {
+  if (typeof featureId !== 'string') return featureId;
+  const marker = '::';
+  const pos = featureId.lastIndexOf(marker);
+  if (pos === -1) return featureId;
+  return featureId.slice(pos + marker.length);
+}
+
+const ERROR_CODES = {
+  MISSING_PARAM: { code: 'E001', suggestion: 'Check required parameters in tool schema' },
+  NOT_FOUND: { code: 'E002', suggestion: 'Verify the ID exists using forge_status or forge_next' },
+  INVALID_STATE: { code: 'E003', suggestion: 'Check current status before this operation' },
+  CIRCULAR_DEP: { code: 'E004', suggestion: 'Remove circular dependencies in PRD feature definitions' },
+  ENV_NOT_READY: { code: 'E005', suggestion: 'Run forge_init_project first to create project structure' },
+  PERMISSION: { code: 'E006', suggestion: 'Check file permissions or run with appropriate privileges' },
+  GIT_ERROR: { code: 'E007', suggestion: 'Ensure git is installed and repository is valid' },
+  TIMEOUT: { code: 'E008', suggestion: 'Increase timeoutSeconds parameter or check network' },
+  RATE_LIMIT: { code: 'E009', suggestion: 'Retry later or lower request frequency' },
+  INVALID_INPUT: { code: 'E010', suggestion: 'Check input whitelist and parameter format' }
+};
+
+/**
+ * 构造标准错误返回格式。
+ * @param {string} type
+ * @param {string} message
+ * @param {Record<string, unknown>} [extra]
+ * @returns {Record<string, unknown>}
+ */
+function error(type, message, extra = {}) {
+  const errInfo = ERROR_CODES[type] || { code: 'E999', suggestion: 'Check logs for details' };
+  return {
+    success: false,
+    errorCode: errInfo.code,
+    error: message,
+    suggestion: errInfo.suggestion,
+    timestamp: new Date().toISOString(),
+    ...extra
+  };
+}
+
+/**
+ * 简单 LRU 缓存（支持 TTL）。
+ */
+class LRUCache {
+  constructor(limit = 128, ttlMs = 2_000) {
+    this.limit = limit;
+    this.ttlMs = ttlMs;
+    this.map = new Map();
+  }
+
+  get(key) {
+    const hit = this.map.get(key);
+    if (!hit) return undefined;
+    if (Date.now() > hit.expiresAt) {
+      this.map.delete(key);
+      return undefined;
+    }
+    this.map.delete(key);
+    this.map.set(key, hit);
+    return hit.value;
+  }
+
+  set(key, value) {
+    if (this.map.has(key)) {
+      this.map.delete(key);
+    }
+    this.map.set(key, { value, expiresAt: Date.now() + this.ttlMs });
+    while (this.map.size > this.limit) {
+      const firstKey = this.map.keys().next().value;
+      this.map.delete(firstKey);
+    }
+  }
+
+  clear() {
+    this.map.clear();
+  }
+}
+
+/**
+ * 固定窗口速率限制器。
+ */
+class RateLimiter {
+  constructor({ limit, windowMs }) {
+    this.limit = limit;
+    this.windowMs = windowMs;
+    this.counters = new Map();
+  }
+
+  consume(key) {
+    const now = Date.now();
+    const hit = this.counters.get(key);
+    if (!hit || now >= hit.resetAt) {
+      this.counters.set(key, { count: 1, resetAt: now + this.windowMs });
+      return true;
+    }
+    if (hit.count >= this.limit) {
+      return false;
+    }
+    hit.count += 1;
+    return true;
+  }
+}
+
+const statusCache = new LRUCache(STATUS_CACHE_LIMIT, STATUS_CACHE_TTL_MS);
+const rateLimiter = new RateLimiter({ limit: RATE_LIMIT_MAX, windowMs: RATE_LIMIT_WINDOW_MS });
+
+const ID_PATTERN = /^[a-zA-Z0-9._:-]{1,128}$/;
+const NAME_PATTERN = /^[a-zA-Z0-9._@/: -]{1,200}$/;
+const REPO_PATTERN = /^[a-zA-Z0-9._-]{1,120}$/;
+const PACKAGE_PATTERN = /^[a-zA-Z0-9._@/:-]{1,120}$/;
+const COMMAND_UNSAFE_PATTERN = /[;&|`$<>\\\n\r]/;
+const SAFE_TEXT_PATTERN = /^[\s\S]{0,200000}$/;
+const ALLOWED_LANGUAGES = new Set(['typescript', 'javascript', 'python', 'go', 'rust', 'swift', 'kotlin']);
+const ALLOWED_GIT_ACTIONS = new Set(['init', 'status', 'commit', 'pull', 'branch', 'merge', 'log']);
+const FEATURE_STATUS_TRANSITIONS = {
+  pending: new Set(['in_progress', 'cancelled']),
+  in_progress: new Set(['complete', 'cancelled', 'pending']),
+  cancelled: new Set(['pending']),
+  complete: new Set(['complete'])
+};
+
+function isValidFeatureTransition(fromStatus, toStatus) {
+  const allowed = FEATURE_STATUS_TRANSITIONS[fromStatus];
+  if (!allowed) return false;
+  return allowed.has(toStatus);
+}
+
+function normalizeDependencyList(rawDependencies) {
+  const parsed = typeof rawDependencies === 'string'
+    ? safeJSONParse(rawDependencies, [])
+    : rawDependencies;
+  if (!Array.isArray(parsed)) return [];
+  return parsed
+    .filter((item) => typeof item === 'string')
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+/**
+ * 推断错误类型。
+ * @param {string} message
+ * @returns {string}
+ */
+function inferErrorType(message) {
+  const lower = String(message || '').toLowerCase();
+  if (lower.includes('missing')) return 'MISSING_PARAM';
+  if (lower.includes('not found')) return 'NOT_FOUND';
+  if (lower.includes('timeout')) return 'TIMEOUT';
+  if (lower.includes('permission')) return 'PERMISSION';
+  if (lower.includes('invalid')) return 'INVALID_INPUT';
+  return 'INVALID_STATE';
+}
+
+/**
+ * 标准化 handler 的失败返回。
+ * @param {any} result
+ * @returns {any}
+ */
+function normalizeErrorResult(result) {
+  if (!result || typeof result !== 'object' || result.success !== false || result.errorCode) {
+    return result;
+  }
+  const normalized = error(inferErrorType(result.error), result.error || 'Unknown error', result);
+  return { ...result, ...normalized };
+}
+
+/**
+ * 执行 shell 命令（异步，非阻塞事件循环）。
+ * @param {string} cmd
+ * @param {{cwd?: string, timeoutMs?: number}} [options]
+ * @returns {Promise<{ok: boolean, stdout: string, stderr: string, code: number | null, error: Error | null}>}
+ */
+function runCommand(cmd, options = {}) {
+  const { cwd, timeoutMs = 120_000 } = options;
+  return new Promise((resolve) => {
+    exec(
+      cmd,
+      {
+        cwd,
+        timeout: timeoutMs,
+        maxBuffer: 10 * 1024 * 1024,
+        env: process.env
+      },
+      (err, stdout, stderr) => {
+        if (err) {
+          resolve({
+            ok: false,
+            stdout: stdout || '',
+            stderr: stderr || '',
+            code: typeof err.code === 'number' ? err.code : null,
+            error: err
+          });
+          return;
+        }
+        resolve({ ok: true, stdout: stdout || '', stderr: stderr || '', code: 0, error: null });
+      }
+    );
+  });
+}
+
+/**
+ * 入参白名单验证。
+ * @param {string} toolName
+ * @param {Record<string, any>} params
+ * @returns {{valid: true} | {valid: false, error: string}}
+ */
+function validateToolParams(toolName, params) {
+  const check = (value, pattern, field) => {
+    if (value == null) return null;
+    if (typeof value !== 'string' || !pattern.test(value)) {
+      return `Invalid ${field} format`;
+    }
+    return null;
+  };
+
+  const idFields = ['projectId', 'featureId', 'templateId'];
+  for (const field of idFields) {
+    const errMsg = check(params[field], ID_PATTERN, field);
+    if (errMsg) return { valid: false, error: errMsg };
+  }
+  if (params.repoName != null) {
+    const repoErr = check(params.repoName, REPO_PATTERN, 'repoName');
+    if (repoErr) return { valid: false, error: repoErr };
+  }
+  const commonFields = ['branch', 'action', 'language', 'framework', 'name', 'templateName'];
+  for (const field of commonFields) {
+    if (params[field] == null) continue;
+    const errMsg = check(params[field], NAME_PATTERN, field);
+    if (errMsg) return { valid: false, error: errMsg };
+  }
+  if (params.testCommand != null) {
+    if (typeof params.testCommand !== 'string' || params.testCommand.length > 200) {
+      return { valid: false, error: 'Invalid testCommand format' };
+    }
+    if (COMMAND_UNSAFE_PATTERN.test(params.testCommand)) {
+      return { valid: false, error: 'Unsafe characters in testCommand' };
+    }
+  }
+  if (params.commitMessage != null) {
+    if (typeof params.commitMessage !== 'string' || params.commitMessage.length > 200) {
+      return { valid: false, error: 'Invalid commitMessage format' };
+    }
+  }
+  if (Array.isArray(params.packages)) {
+    for (const pkg of params.packages) {
+      if (!isSafePackageName(pkg)) {
+        return { valid: false, error: 'Invalid package name format' };
+      }
+    }
+  }
+  if (typeof params.prd === 'string' && !SAFE_TEXT_PATTERN.test(params.prd)) {
+    return { valid: false, error: 'Invalid prd content length' };
+  }
+  if (toolName === 'forge_init_project' && params.language && !ALLOWED_LANGUAGES.has(params.language)) {
+    return { valid: false, error: 'Unsupported language' };
+  }
+  if (toolName === 'forge_git' && params.action && !ALLOWED_GIT_ACTIONS.has(params.action)) {
+    return { valid: false, error: 'Unsupported git action' };
+  }
+  return { valid: true };
+}
+
+function isSafePackageName(pkg) {
+  if (typeof pkg !== 'string') return false;
+  if (!pkg || pkg.length > 120 || pkg.trim() !== pkg) return false;
+  if (!PACKAGE_PATTERN.test(pkg)) return false;
+  if (pkg.includes('..') || pkg.startsWith('/') || pkg.startsWith('~') || pkg.includes('\\')) return false;
+  if (COMMAND_UNSAFE_PATTERN.test(pkg)) return false;
+  return true;
+}
+
+function isSensitiveKey(keyName) {
+  return /(token|secret|password|apikey|api_key|auth|account|email|path|workdir|home|cwd)/i.test(keyName || '');
+}
+
+function redactStringValue(value, keyName = '') {
+  if (isSensitiveKey(keyName)) {
+    if (/path|workdir|home|cwd/i.test(keyName)) return '[REDACTED_PATH]';
+    if (/email|account/i.test(keyName)) return '[REDACTED_ACCOUNT]';
+    return '[REDACTED_TOKEN]';
+  }
+  if (/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/.test(value)) return '[REDACTED_ACCOUNT]';
+  if (/^(\/|[A-Za-z]:\\)/.test(value)) return '[REDACTED_PATH]';
+  if (/(ghp_|sk-|xoxb-|api[_-]?token|bearer\s+)/i.test(value)) return '[REDACTED_TOKEN]';
+  return value.length > 300 ? `${value.slice(0, 300)}...` : value;
+}
+
+function sanitizeAuditValue(value, keyName = '') {
+  if (value == null) return value;
+  if (typeof value === 'string') {
+    return redactStringValue(value, keyName);
+  }
+  if (Array.isArray(value)) {
+    return value.slice(0, 20).map((item) => sanitizeAuditValue(item, keyName));
+  }
+  if (typeof value === 'object') {
+    const out = {};
+    for (const [k, v] of Object.entries(value)) {
+      out[k] = sanitizeAuditValue(v, k);
+    }
+    return out;
+  }
+  return value;
+}
+
+/**
+ * 记录审计日志到本地 JSONL 文件。
+ * @param {Record<string, any>} payload
+ * @returns {Promise<void>}
+ */
+async function writeAuditLog(payload) {
+  const line = `${JSON.stringify({ ...payload, ts: new Date().toISOString() })}\n`;
+  await fs.promises.appendFile(AUDIT_LOG_PATH, line, 'utf8');
+}
+
+function ensureWebSocketServer(logger = console) {
+  const wsDisabled = process.env.FORGE_DISABLE_WS === '1' || process.env.NODE_ENV === 'test' || !!process.env.JEST_WORKER_ID;
+  if (wsDisabled) return null;
+  if (wsState.started) return wsState.url;
+  try {
+    const server = new WebSocketServer({ port: WS_PORT });
+    server.on('error', (err) => {
+      logger.warn?.(`[forge] WebSocket runtime error: ${err.message}`);
+    });
+    wsState.started = true;
+    wsState.server = server;
+    wsState.url = `ws://127.0.0.1:${WS_PORT}`;
+    server.on('connection', (socket) => {
+      wsState.clients.add(socket);
+      socket.send(JSON.stringify({ type: 'forge_connected', ts: new Date().toISOString() }));
+      socket.on('close', () => wsState.clients.delete(socket));
+      socket.on('error', () => wsState.clients.delete(socket));
+    });
+    logger.info?.(`[forge] WebSocket progress server started at ${wsState.url}`);
+    return wsState.url;
+  } catch (err) {
+    logger.warn?.(`[forge] WebSocket disabled: ${err.message}`);
+    return null;
+  }
+}
+
+function broadcastProgress(event) {
+  if (!wsState.started || wsState.clients.size === 0) return;
+  const payload = JSON.stringify({ ...event, ts: new Date().toISOString() });
+  for (const socket of wsState.clients) {
+    try {
+      socket.send(payload);
+    } catch {
+      wsState.clients.delete(socket);
+    }
+  }
+}
+
+const INDEX_IGNORE_DIRS = new Set(['.git', 'node_modules', 'dist', 'build', 'target', '.next', '.venv']);
+
+async function walkProjectFiles(rootDir, currentDir = rootDir, acc = []) {
+  const entries = await fs.promises.readdir(currentDir, { withFileTypes: true });
+  for (const entry of entries) {
+    const abs = path.join(currentDir, entry.name);
+    const rel = path.relative(rootDir, abs);
+    if (entry.isDirectory()) {
+      if (!INDEX_IGNORE_DIRS.has(entry.name)) {
+        await walkProjectFiles(rootDir, abs, acc);
+      }
+      continue;
+    }
+    const stat = await fs.promises.stat(abs);
+    acc.push({ relPath: rel, mtimeMs: stat.mtimeMs, size: stat.size });
+  }
+  return acc;
+}
+
+function fileFingerprint(file) {
+  return `${Math.trunc(file.mtimeMs)}:${file.size}`;
+}
+
+/**
+ * 计算增量变更。
+ * @param {() => Promise<Array<{relPath: string, mtimeMs: number, size: number}>>} walkFn
+ * @param {Map<string, string>} previousState
+ * @returns {Promise<{changed: string[], removed: string[], current: Map<string, string>}>}
+ */
+async function computeIncrementalChanges(walkFn, previousState) {
+  const files = await walkFn();
+  const current = new Map();
+  const changed = [];
+  for (const file of files) {
+    const fp = fileFingerprint(file);
+    current.set(file.relPath, fp);
+    if (previousState.get(file.relPath) !== fp) {
+      changed.push(file.relPath);
+    }
+  }
+  const removed = [];
+  for (const prevKey of previousState.keys()) {
+    if (!current.has(prevKey)) {
+      removed.push(prevKey);
+    }
+  }
+  return { changed, removed, current };
+}
+
+async function loadIndexState(db, projectId) {
+  const rows = await all(db, 'SELECT rel_path, fingerprint FROM file_index WHERE project_id=?', [projectId]);
+  const map = new Map();
+  rows.forEach((row) => map.set(row.rel_path, row.fingerprint));
+  return map;
+}
+
+async function persistIncrementalState(db, projectId, changed, removed, current) {
+  for (const relPath of changed) {
+    const fingerprint = current.get(relPath);
+    await run(
+      db,
+      `INSERT INTO file_index (project_id, rel_path, fingerprint, indexed_at)
+       VALUES (?,?,?,CURRENT_TIMESTAMP)
+       ON CONFLICT(project_id, rel_path) DO UPDATE SET fingerprint=excluded.fingerprint, indexed_at=CURRENT_TIMESTAMP`,
+      [projectId, relPath, fingerprint]
+    );
+  }
+  for (const relPath of removed) {
+    await run(db, 'DELETE FROM file_index WHERE project_id=? AND rel_path=?', [projectId, relPath]);
+  }
+}
+
+async function incrementalIndexProject(db, projectId, workdir) {
+  if (!workdir || !fs.existsSync(workdir)) {
+    return { changed: [], removed: [] };
+  }
+  const previous = await loadIndexState(db, projectId);
+  const diff = await computeIncrementalChanges(() => walkProjectFiles(workdir), previous);
+  await persistIncrementalState(db, projectId, diff.changed, diff.removed, diff.current);
+  return { changed: diff.changed, removed: diff.removed };
+}
+
+/**
+ * 构造统一包装后的工具定义（限流、审计、输入校验、错误标准化）。
+ * @param {string} name
+ * @param {string} description
+ * @param {Record<string, any>} parameters
+ * @param {(params: Record<string, any>) => Promise<any>} handler
+ * @returns {{name: string, description: string, parameters: any, execute: Function}}
+ */
 function tool(name, description, parameters, handler) {
   return {
     name,
     description,
     parameters,
     execute: async (_toolCallId, params) => {
+      const startTime = Date.now();
       try {
         const p = (params && typeof params === 'object') ? params : {};
-        return await handler(p);
+        const validation = validateToolParams(name, p);
+        if (!validation.valid) {
+          return error('INVALID_INPUT', validation.error, { tool: name });
+        }
+        if (!rateLimiter.consume(name)) {
+          return error('RATE_LIMIT', `Rate limit exceeded for ${name}`, { tool: name });
+        }
+        writeAuditLog({ id: `audit-${Date.now()}`, tool: name, phase: 'start', payload: sanitizeAuditValue(p) }).catch(() => {});
+        const result = normalizeErrorResult(await handler(p));
+        if (result && typeof result === 'object') {
+          result._meta = { tool: name, durationMs: Date.now() - startTime, timestamp: new Date().toISOString() };
+        }
+        writeAuditLog({
+          id: `audit-${Date.now()}-${Math.random()}`,
+          tool: name,
+          phase: 'end',
+          success: result?.success !== false ? 1 : 0,
+          payload: sanitizeAuditValue(result)
+        }).catch(() => {});
+        broadcastProgress({
+          type: 'forge_progress',
+          tool: name,
+          success: result?.success !== false,
+          projectId: result?.projectId || p?.projectId || null,
+          featureId: result?.featureId || p?.featureId || null
+        });
+        return result;
       } catch (err) {
-        return { success: false, error: err?.message || String(err), tool: name };
+        return error('INVALID_STATE', err?.message || String(err), {
+          tool: name,
+          durationMs: Date.now() - startTime
+        });
       }
     }
   };
 }
 
+/**
+ * 注册 Forge 全量工具。
+ * @param {{registerTool: Function, logger?: Console}} api
+ * @returns {void}
+ */
 export default function register(api) {
   const logger = api.logger || console;
+  const wsUrl = ensureWebSocketServer(logger);
   
   // ==================== 工具 1: forge_init ====================
   api.registerTool(tool('forge_init', 'Initialize a new project from PRD', {
@@ -301,20 +1024,31 @@ export default function register(api) {
       fs.writeFileSync(path.join(workdir, 'PRD.md'), prdContent);
       
       const defaultOptions = {
-        architectModel: 'anthropic-newcli/claude-opus-4-6-20250528',
-        coderModel: 'anthropic-newcli/claude-opus-4-6-20250528',
-        reviewerModel: 'anthropic-newcli/claude-opus-4-6-20250528',
-        maxParallel: 3,
+        architectModel: options.architectModel || DEFAULT_MODEL,
+        coderModel: options.coderModel || DEFAULT_MODEL,
+        reviewerModel: options.reviewerModel || DEFAULT_MODEL,
+        maxParallel: options.maxParallel || 3,
         language: options.language || 'typescript',
         framework: options.framework || 'auto'
       };
       
-      await run(db, `INSERT INTO projects (id, name, prd, status, workdir, options) VALUES (?,?,?,?,?,?)`,
-        [projectId, parsed.name, prdContent, 'initialized', workdir, JSON.stringify(defaultOptions)]);
-      
-      for (const f of parsed.features) {
-        await run(db, `INSERT INTO features (id, project_id, name, description, priority, status, dependencies) VALUES (?,?,?,?,?,?,?)`,
-          [f.id, projectId, f.name, f.description, f.priority, 'pending', JSON.stringify(f.dependencies)]);
+      // P2: 事务支持 - 确保原子性
+      await run(db, 'BEGIN TRANSACTION');
+      try {
+        await run(db, `INSERT INTO projects (id, name, prd, status, workdir, options) VALUES (?,?,?,?,?,?)`,
+          [projectId, parsed.name, prdContent, 'initialized', workdir, JSON.stringify(defaultOptions)]);
+        const scopedIdMap = new Map(parsed.features.map((f) => [f.id, toScopedFeatureId(projectId, f.id)]));
+        
+        for (const f of parsed.features) {
+          const scopedDeps = (f.dependencies || []).map((dep) => scopedIdMap.get(dep) || toScopedFeatureId(projectId, dep));
+          await run(db, `INSERT INTO features (id, project_id, name, description, priority, status, dependencies) VALUES (?,?,?,?,?,?,?)`,
+            [scopedIdMap.get(f.id), projectId, f.name, f.description, f.priority, 'pending', JSON.stringify(scopedDeps)]);
+        }
+        
+        await run(db, 'COMMIT');
+      } catch (err) {
+        await run(db, 'ROLLBACK');
+        throw err;
       }
       
       logger.info?.(`[forge] Project initialized: ${projectId} with ${parsed.features.length} features`);
@@ -357,7 +1091,7 @@ export default function register(api) {
       if (!project) return { success: false, error: 'Project not found', projectId };
       
       const features = await all(db, 'SELECT id, name, description, dependencies FROM features WHERE project_id=?', [projectId]);
-      const options = JSON.parse(project.options || '{}');
+      const options = safeJSONParse(project.options, {});
       
       const archPrompt = `# Architecture Design Task
 
@@ -507,7 +1241,7 @@ After designing, save the result by calling forge_save_architecture with the arc
       const pendingIds = new Set(features.map(f => f.id));
       
       const ready = features.filter(f => {
-        const deps = JSON.parse(f.dependencies || '[]');
+        const deps = normalizeDependencyList(f.dependencies);
         return deps.every(d => completeIds.has(d) || !pendingIds.has(d));
       }).slice(0, count);
       
@@ -566,7 +1300,7 @@ After designing, save the result by calling forge_save_architecture with the arc
       }
       
       const existing = await get(db, 'SELECT f.*, p.name as project_name, p.workdir, p.architecture, p.options FROM features f JOIN projects p ON f.project_id = p.id WHERE f.id=?', [featureId]);
-      const options = JSON.parse(existing.options || '{}');
+      const options = safeJSONParse(existing.options, {});
       
       const implPrompt = `# Implementation Task
 
@@ -618,7 +1352,8 @@ Provide the complete implementation including:
       featureId: { type: 'string' },
       model: { type: 'string' },
       timeoutSeconds: { type: 'number' },
-      autoSpawn: { type: 'boolean', description: 'Automatically spawn coding agent (default: true)' }
+      autoSpawn: { type: 'boolean', description: 'Automatically spawn coding agent (default: true)' },
+      maxRetries: { type: 'number', description: 'Max auto-retry attempts on failure (default: 2, P4)' }
     },
     required: ['featureId']
   }, async (params) => {
@@ -626,6 +1361,7 @@ Provide the complete implementation including:
     const model = params?.model;
     const timeoutSeconds = params?.timeoutSeconds || 600;
     const shouldAutoSpawn = params?.autoSpawn !== false;
+    const maxRetries = params?.maxRetries ?? 2; // P4: auto-retry
     
     if (!featureId) return { success: false, error: 'Missing featureId' };
     
@@ -648,7 +1384,7 @@ Provide the complete implementation including:
       }
       // in_progress 状态继续执行
       
-      const options = JSON.parse(feature.options || '{}');
+      const options = safeJSONParse(feature.options, {});
       const useModel = model || options.coderModel || 'anthropic-newcli/claude-opus-4-6-20250528';
       
       const taskPrompt = `# Implementation Task
@@ -657,7 +1393,7 @@ Provide the complete implementation including:
 ## Feature: ${feature.name}
 
 **Description**: ${feature.description}
-**Dependencies**: ${JSON.parse(feature.dependencies || '[]').join(', ') || 'None'}
+**Dependencies**: ${normalizeDependencyList(feature.dependencies).join(', ') || 'None'}
 
 ## Work Directory
 ${feature.workdir}
@@ -685,6 +1421,11 @@ After implementation:
       
       logger.info?.(`[forge] Implementing ${featureId} with model ${useModel}`);
       
+      // P4: workdir 删除检测
+      if (!fs.existsSync(feature.workdir)) {
+        fs.mkdirSync(feature.workdir, { recursive: true });
+      }
+      
       // P0: 真正自动化
       if (shouldAutoSpawn) {
         return {
@@ -706,10 +1447,16 @@ After implementation:
               tool: 'forge_done',
               params: { featureId },
               resultField: 'implementation'
-            }
+            },
+            onError: maxRetries > 0 ? {
+              tool: 'forge_retry',
+              params: { featureId, model: useModel },
+              maxRetries
+            } : null
           },
           task: taskPrompt,
           runId,
+          maxRetries,
           instruction: 'Auto-spawning coding agent. Result will be saved via forge_done.'
         };
       }
@@ -746,8 +1493,15 @@ After implementation:
     
     const db = await initDB();
     try {
-      const existing = await get(db, 'SELECT f.*, p.id as project_id FROM features f JOIN projects p ON f.project_id = p.id WHERE f.id=?', [featureId]);
+      const existing = await get(db, 'SELECT f.*, p.id as project_id, p.workdir FROM features f JOIN projects p ON f.project_id = p.id WHERE f.id=?', [featureId]);
       if (!existing) return { success: false, error: 'Feature not found', featureId };
+      if (!isValidFeatureTransition(existing.status, 'complete')) {
+        return error('INVALID_STATE', `Illegal status transition ${existing.status} -> complete`, {
+          featureId,
+          fromStatus: existing.status,
+          toStatus: 'complete'
+        });
+      }
       
       const wasComplete = existing.status === 'complete';
       await run(db, 'UPDATE features SET status=?, implementation=? WHERE id=?', ['complete', implementation, featureId]);
@@ -756,6 +1510,7 @@ After implementation:
       await run(db, 'UPDATE runs SET status=?, completed_at=? WHERE feature_id=? AND status=?',
         ['success', new Date().toISOString(), featureId, 'running']);
       
+      const indexDiff = await incrementalIndexProject(db, existing.project_id, existing.workdir);
       const remaining = await all(db, 'SELECT id FROM features WHERE project_id=? AND status!=?', [existing.project_id, 'complete']);
       
       logger.info?.(`[forge] Feature ${featureId} marked complete`);
@@ -767,6 +1522,11 @@ After implementation:
         status: 'complete',
         implementation,
         wasAlreadyComplete: wasComplete,
+        indexed: {
+          changedFiles: indexDiff.changed.length,
+          removedFiles: indexDiff.removed.length,
+          changed: indexDiff.changed
+        },
         remainingFeatures: remaining.length,
         allComplete: remaining.length === 0,
         nextStep: remaining.length > 0 ? 'Run forge_next to get next feature' : 'All features complete! Run forge_review or forge_push'
@@ -789,6 +1549,16 @@ After implementation:
     const detailed = params?.detailed || false;
     
     if (!projectId) return { success: false, error: 'Missing projectId' };
+
+    const cacheKey = `forge_status:${projectId}:${detailed ? '1' : '0'}`;
+    const cached = statusCache.get(cacheKey);
+    if (cached) {
+      return {
+        ...cached,
+        _cache: { hit: true, key: cacheKey },
+        websocket: wsUrl ? { enabled: true, url: wsUrl } : { enabled: false }
+      };
+    }
     
     const db = await initDB();
     try {
@@ -806,7 +1576,7 @@ After implementation:
       counts.forEach(c => statusMap[c.status] = c.count);
       const total = Object.values(statusMap).reduce((a, b) => a + b, 0);
       
-      return {
+      const result = {
         success: true,
         project: {
           id: project.id,
@@ -826,8 +1596,11 @@ After implementation:
         },
         featureCounts: counts,
         features: allFeatures,
-        recentRuns: runs
+        recentRuns: runs,
+        websocket: wsUrl ? { enabled: true, url: wsUrl } : { enabled: false }
       };
+      statusCache.set(cacheKey, result);
+      return { ...result, _cache: { hit: false, key: cacheKey } };
     } finally {
       closeDB(db);
     }
@@ -863,7 +1636,7 @@ After implementation:
         features = await all(db, 'SELECT * FROM features WHERE project_id=? AND status=?', [projectId, 'complete']);
       }
       
-      const options = JSON.parse(project.options || '{}');
+      const options = safeJSONParse(project.options, {});
       const reviewModel = model || options.reviewerModel || 'anthropic-newcli/claude-opus-4-6-20250528';
       
       const reviewPrompt = `# Code Review Task
@@ -953,8 +1726,42 @@ For each feature:
         return { success: false, error: 'Project workdir does not exist', workdir: project.workdir };
       }
       
-      const options = JSON.parse(project.options || '{}');
+      const options = safeJSONParse(project.options, {});
       const language = options.language || 'typescript';
+      
+      // P4: 环境检测
+      let envReady = true;
+      let envError = null;
+      if (language === 'typescript' || language === 'javascript') {
+        if (!fs.existsSync(path.join(project.workdir, 'package.json'))) {
+          envReady = false;
+          envError = 'package.json not found - run forge_init_project first';
+        }
+      } else if (language === 'go') {
+        if (!fs.existsSync(path.join(project.workdir, 'go.mod'))) {
+          envReady = false;
+          envError = 'go.mod not found - run forge_init_project first';
+        }
+      } else if (language === 'rust') {
+        if (!fs.existsSync(path.join(project.workdir, 'Cargo.toml'))) {
+          envReady = false;
+          envError = 'Cargo.toml not found - run forge_init_project first';
+        }
+      } else if (language === 'swift') {
+        if (!fs.existsSync(path.join(project.workdir, 'Package.swift'))) {
+          envReady = false;
+          envError = 'Package.swift not found - run forge_init_project first';
+        }
+      } else if (language === 'kotlin') {
+        if (!fs.existsSync(path.join(project.workdir, 'build.gradle.kts'))) {
+          envReady = false;
+          envError = 'build.gradle.kts not found - run forge_init_project first';
+        }
+      }
+      
+      if (!envReady) {
+        return { success: false, error: 'Test environment not ready', envError, workdir: project.workdir };
+      }
       
       let cmd = testCommand;
       if (!cmd) {
@@ -963,19 +1770,18 @@ For each feature:
           'javascript': 'npm test 2>&1',
           'python': 'pytest 2>&1 || python -m pytest 2>&1',
           'go': 'go test ./... 2>&1',
-          'rust': 'cargo test 2>&1'
+          'rust': 'cargo test 2>&1',
+          'swift': 'swift test 2>&1',
+          'kotlin': 'test -x ./gradlew && ./gradlew test || gradle test'
         };
         cmd = testCommands[language] || 'npm test 2>&1';
       }
       
       let output = '';
       let success = false;
-      try {
-        output = execSync(cmd, { cwd: project.workdir, encoding: 'utf8', timeout: 120000 });
-        success = true;
-      } catch (err) {
-        output = err.stdout || err.stderr || err.message;
-      }
+      const testResult = await runCommand(cmd, { cwd: project.workdir, timeoutMs: 120_000 });
+      output = testResult.stdout || testResult.stderr || testResult.error?.message || '';
+      success = testResult.ok;
       
       logger.info?.(`[forge] Tests run for ${projectId}: ${success ? 'PASS' : 'FAIL'}`);
       
@@ -1011,9 +1817,8 @@ For each feature:
     
     if (!projectId) return { success: false, error: 'Missing projectId' };
     
-    try {
-      execSync('gh --version', { stdio: 'ignore' });
-    } catch {
+    const ghCheck = await runCommand('gh --version', { timeoutMs: 10_000 });
+    if (!ghCheck.ok) {
       return { success: false, error: 'GitHub CLI (gh) not installed. Run: brew install gh' };
     }
     
@@ -1030,31 +1835,44 @@ For each feature:
       if (!repoName) {
         repoName = project.name.toLowerCase().replace(/[^a-z0-9-]/g, '-');
       }
+      const normalizedRepoName = String(repoName).toLowerCase().replace(/[^a-z0-9._-]/g, '-');
+      if (!normalizedRepoName) {
+        return error('INVALID_INPUT', 'Invalid repoName after normalization');
+      }
       
       if (!fs.existsSync(path.join(workdir, '.git'))) {
-        execSync('git init', { cwd: workdir });
-        execSync('git add -A', { cwd: workdir });
-        execSync(`git commit -m "${escapeShellArg(commitMessage).slice(1, -1)}"`, { cwd: workdir });
+        const initRes = await runCommand('git init', { cwd: workdir });
+        if (!initRes.ok) return error('GIT_ERROR', initRes.stderr || initRes.error?.message || 'git init failed');
+        const addRes = await runCommand('git add -A', { cwd: workdir });
+        if (!addRes.ok) return error('GIT_ERROR', addRes.stderr || addRes.error?.message || 'git add failed');
+        const commitRes = await runCommand(`git commit -m "${escapeShellArg(commitMessage).slice(1, -1)}"`, { cwd: workdir });
+        if (!commitRes.ok) return error('GIT_ERROR', commitRes.stderr || commitRes.error?.message || 'git commit failed');
       }
       
       const visibilityFlag = visibility === 'public' ? '--public' : '--private';
-      const safeRepoName = escapeShellArg(repoName);
+      const safeRepoName = escapeShellArg(normalizedRepoName);
       
       let githubUrl = '';
-      try {
-        const result = execSync(
-          `gh repo create ${safeRepoName} ${visibilityFlag} --source="${workdir}" --push --description="${escapeShellArg(project.name)}" 2>&1`,
-          { cwd: workdir, encoding: 'utf8' }
-        );
+      const createRes = await runCommand(
+        `gh repo create ${safeRepoName} ${visibilityFlag} --source="${workdir}" --push --description="${escapeShellArg(project.name)}" 2>&1`,
+        { cwd: workdir }
+      );
+      if (createRes.ok) {
+        const result = createRes.stdout || createRes.stderr || '';
         const match = result.match(/https:\/\/github\.com\/[^\s]+/);
-        githubUrl = match ? match[0] : `https://github.com/${safeRepoName}`;
-      } catch (err) {
-        if (err.message?.includes('already exists')) {
-          execSync(`git remote add origin https://github.com/412984588/${safeRepoName}.git 2>/dev/null || git remote set-url origin https://github.com/412984588/${safeRepoName}.git`, { cwd: workdir });
-          execSync('git push -u origin HEAD 2>&1', { cwd: workdir });
-          githubUrl = `https://github.com/412984588/${repoName}`;
+        githubUrl = match ? match[0] : `https://github.com/${normalizedRepoName}`;
+      } else {
+        const createError = `${createRes.stdout}\n${createRes.stderr}\n${createRes.error?.message || ''}`;
+        if (createError.includes('already exists')) {
+          const ghUserRes = await runCommand('gh api user --jq .login 2>/dev/null || echo "unknown"', { cwd: workdir });
+          const ghUser = (ghUserRes.stdout || 'unknown').trim();
+          const remoteRes = await runCommand(`git remote add origin https://github.com/${ghUser}/${safeRepoName}.git 2>/dev/null || git remote set-url origin https://github.com/${ghUser}/${safeRepoName}.git`, { cwd: workdir });
+          if (!remoteRes.ok) return error('GIT_ERROR', remoteRes.stderr || remoteRes.error?.message || 'git remote failed');
+          const pushRes = await runCommand('git push -u origin HEAD 2>&1', { cwd: workdir });
+          if (!pushRes.ok) return error('GIT_ERROR', pushRes.stderr || pushRes.error?.message || 'git push failed');
+          githubUrl = `https://github.com/${ghUser}/${normalizedRepoName}`;
         } else {
-          throw err;
+          return error('GIT_ERROR', createError || 'gh repo create failed');
         }
       }
       
@@ -1066,7 +1884,7 @@ For each feature:
         success: true,
         projectId,
         githubUrl,
-        repoName,
+        repoName: normalizedRepoName,
         visibility,
         workdir
       };
@@ -1094,15 +1912,16 @@ For each feature:
       const project = await get(db, 'SELECT * FROM projects WHERE id=?', [projectId]);
       if (!project) return { success: false, error: 'Project not found', projectId };
       
-      const features = await all(db, 'SELECT id, name, status FROM features WHERE project_id=?', [projectId]);
-      const options = JSON.parse(project.options || '{}');
+      const featureCountRow = await get(db, 'SELECT COUNT(1) as count FROM features WHERE project_id=?', [projectId]);
+      const options = safeJSONParse(project.options, {});
+      const featureCount = featureCountRow?.count || 0;
       
       const workflow = [];
       if (steps.includes('plan')) {
         workflow.push({ step: 'plan', tool: 'forge_plan', description: 'Design architecture', model: options.architectModel, autoSpawn: true });
       }
       if (steps.includes('implement')) {
-        workflow.push({ step: 'implement', tool: 'forge_next + forge_implement', description: `Implement ${features.length} features`, model: options.coderModel, parallel: options.maxParallel, autoSpawn: true });
+        workflow.push({ step: 'implement', tool: 'forge_next + forge_implement', description: `Implement ${featureCount} features`, model: options.coderModel, parallel: options.maxParallel, autoSpawn: true });
       }
       if (steps.includes('review')) {
         workflow.push({ step: 'review', tool: 'forge_review', description: 'Code review', model: options.reviewerModel, autoSpawn: true });
@@ -1119,7 +1938,7 @@ For each feature:
         projectId,
         projectName: project.name,
         status: project.status,
-        features: features.length,
+        features: featureCount,
         workflow,
         instruction: 'Each step with autoSpawn=true will automatically spawn the required agent. Execute steps in order.',
         maxParallel: options.maxParallel || 3
@@ -1151,6 +1970,13 @@ For each feature:
         FROM features f JOIN projects p ON f.project_id = p.id WHERE f.id=?`, [featureId]);
       
       if (!feature) return { success: false, error: 'Feature not found', featureId };
+      if (!isValidFeatureTransition(feature.status, 'pending')) {
+        return error('INVALID_STATE', `Illegal status transition ${feature.status} -> pending`, {
+          featureId,
+          fromStatus: feature.status,
+          toStatus: 'pending'
+        });
+      }
       
       // 重置状态为 pending，然后重新实现
       await run(db, 'UPDATE features SET status=?, implementation=?, assigned_model=? WHERE id=?',
@@ -1160,7 +1986,7 @@ For each feature:
       await run(db, 'UPDATE runs SET status=? WHERE feature_id=? AND status=?',
         ['retrying', featureId, 'running']);
       
-      const options = JSON.parse(feature.options || '{}');
+      const options = safeJSONParse(feature.options, {});
       const useModel = model || options.coderModel || 'anthropic-newcli/claude-opus-4-6-20250528';
       
       logger.info?.(`[forge] Retrying ${featureId} with model ${useModel}`);
@@ -1267,7 +2093,7 @@ ${feature.architecture || 'No architecture defined'}
     type: 'object',
     properties: {
       projectId: { type: 'string' },
-      language: { type: 'string', description: 'typescript, javascript, python, go, rust' },
+      language: { type: 'string', description: 'typescript, javascript, python, go, rust, swift, kotlin' },
       framework: { type: 'string', description: 'react, nextjs, express, fastapi, etc.' },
       name: { type: 'string', description: 'Project name (default: from PRD)' }
     },
@@ -1290,7 +2116,7 @@ ${feature.architecture || 'No architecture defined'}
         fs.mkdirSync(workdir, { recursive: true });
       }
       
-      const options = JSON.parse(project.options || '{}');
+      const options = safeJSONParse(project.options, {});
       const lang = language || options.language || 'typescript';
       const projName = name || project.name.toLowerCase().replace(/[^a-z0-9-]/g, '-');
       
@@ -1386,7 +2212,8 @@ npm test
 `;
         
         // src 目录
-        files['src/index.ts'] = lang === 'typescript' ? `export function main() {
+        const indexFile = lang === 'typescript' ? 'src/index.ts' : 'src/index.js';
+        files[indexFile] = lang === 'typescript' ? `export function main() {
   console.log('Hello from ${project.name}!');
 }
 
@@ -1464,6 +2291,52 @@ edition = "2021"
         files['.gitignore'] = `target/
 Cargo.lock
 `;
+      } else if (lang === 'swift') {
+        files['Package.swift'] = `// swift-tools-version: 5.9
+import PackageDescription
+
+let package = Package(
+    name: "${projName}",
+    targets: [
+        .executableTarget(
+            name: "${projName}"
+        )
+    ]
+)
+`;
+        files[`Sources/${projName}/main.swift`] = `import Foundation
+
+print("Hello from ${project.name}!")
+`;
+        files['.gitignore'] = `.build/
+.swiftpm/
+`;
+      } else if (lang === 'kotlin') {
+        files['settings.gradle.kts'] = `rootProject.name = "${projName}"
+`;
+        files['build.gradle.kts'] = `plugins {
+    kotlin("jvm") version "1.9.25"
+    application
+}
+
+repositories {
+    mavenCentral()
+}
+
+application {
+    mainClass.set("MainKt")
+}
+`;
+        files['src/main/kotlin/Main.kt'] = `fun main() {
+    println("Hello from ${project.name}!")
+}
+`;
+        files['.gitignore'] = `.gradle/
+build/
+out/
+`;
+      } else {
+        return error('INVALID_INPUT', `Unsupported language: ${lang}`);
       }
       
       // 写入文件
@@ -1477,6 +2350,7 @@ Cargo.lock
         fs.writeFileSync(filepath, content);
         createdFiles.push(filename);
       }
+      const indexDiff = await incrementalIndexProject(db, projectId, workdir);
       
       // 更新项目选项
       options.language = lang;
@@ -1492,6 +2366,10 @@ Cargo.lock
         language: lang,
         framework: framework || 'none',
         createdFiles,
+        indexed: {
+          changedFiles: indexDiff.changed.length,
+          removedFiles: indexDiff.removed.length
+        },
         nextStep: 'Run forge_install to install dependencies'
       };
     } finally {
@@ -1525,7 +2403,7 @@ Cargo.lock
         return { success: false, error: 'Project workdir does not exist', workdir };
       }
       
-      const options = JSON.parse(project.options || '{}');
+      const options = safeJSONParse(project.options, {});
       const language = options.language || 'typescript';
       
       let cmd = '';
@@ -1564,17 +2442,21 @@ Cargo.lock
             cmd += ` && cargo add ${pkg}`;
           }
         }
+      } else if (language === 'swift') {
+        cmd = 'swift package resolve';
+      } else if (language === 'kotlin') {
+        cmd = 'test -x ./gradlew && ./gradlew dependencies || gradle dependencies';
       } else {
         return { success: false, error: `Unsupported language: ${language}` };
       }
       
-      try {
-        output = execSync(cmd, { cwd: workdir, encoding: 'utf8', timeout: 300000 });
-      } catch (err) {
+      const installRes = await runCommand(cmd, { cwd: workdir, timeoutMs: 300_000 });
+      output = installRes.stdout || installRes.stderr || installRes.error?.message || '';
+      if (!installRes.ok) {
         return { 
           success: false, 
           error: 'Installation failed', 
-          output: err.stdout || err.stderr || err.message,
+          output,
           workdir
         };
       }
@@ -1629,9 +2511,12 @@ Cargo.lock
       switch (action) {
         case 'init':
           if (!fs.existsSync(path.join(workdir, '.git'))) {
-            execSync('git init', { cwd: workdir });
-            execSync('git add -A', { cwd: workdir });
-            execSync(`git commit -m "Initial commit"`, { cwd: workdir });
+            const initRes = await runCommand('git init', { cwd: workdir });
+            if (!initRes.ok) return error('GIT_ERROR', initRes.stderr || initRes.error?.message || 'git init failed');
+            const addRes = await runCommand('git add -A', { cwd: workdir });
+            if (!addRes.ok) return error('GIT_ERROR', addRes.stderr || addRes.error?.message || 'git add failed');
+            const commitRes = await runCommand('git commit -m "Initial commit"', { cwd: workdir });
+            if (!commitRes.ok) return error('GIT_ERROR', commitRes.stderr || commitRes.error?.message || 'git commit failed');
             output = 'Git repository initialized';
           } else {
             output = 'Git repository already exists';
@@ -1639,34 +2524,60 @@ Cargo.lock
           break;
           
         case 'status':
-          output = execSync('git status --short', { cwd: workdir, encoding: 'utf8' });
+          {
+            const statusRes = await runCommand('git status --short', { cwd: workdir });
+            if (!statusRes.ok) return error('GIT_ERROR', statusRes.stderr || statusRes.error?.message || 'git status failed');
+            output = statusRes.stdout;
+          }
           break;
           
         case 'commit':
-          execSync('git add -A', { cwd: workdir });
-          output = execSync(`git commit -m "${escapeShellArg(message).slice(1, -1)}"`, { cwd: workdir, encoding: 'utf8' });
+          {
+            const addRes = await runCommand('git add -A', { cwd: workdir });
+            if (!addRes.ok) return error('GIT_ERROR', addRes.stderr || addRes.error?.message || 'git add failed');
+          }
+          {
+            const commitCmd = `git diff --cached --quiet && echo "Nothing to commit" || git commit -m "${escapeShellArg(message).slice(1, -1)}"`;
+            const commitRes = await runCommand(commitCmd, { cwd: workdir });
+            output = commitRes.stdout || commitRes.stderr || 'Commit skipped (no changes or hook rejected)';
+          }
           break;
           
         case 'pull':
-          output = execSync('git pull', { cwd: workdir, encoding: 'utf8' });
+          {
+            const pullRes = await runCommand('git pull', { cwd: workdir });
+            if (!pullRes.ok) return error('GIT_ERROR', pullRes.stderr || pullRes.error?.message || 'git pull failed');
+            output = pullRes.stdout;
+          }
           break;
           
         case 'branch':
           if (branch) {
-            execSync(`git checkout -b "${escapeShellArg(branch).slice(1, -1)}"`, { cwd: workdir });
+            const branchRes = await runCommand(`git checkout -b "${escapeShellArg(branch).slice(1, -1)}"`, { cwd: workdir });
+            if (!branchRes.ok) return error('GIT_ERROR', branchRes.stderr || branchRes.error?.message || 'git checkout failed');
             output = `Created and switched to branch: ${branch}`;
           } else {
-            output = execSync('git branch -a', { cwd: workdir, encoding: 'utf8' });
+            const listRes = await runCommand('git branch -a', { cwd: workdir });
+            if (!listRes.ok) return error('GIT_ERROR', listRes.stderr || listRes.error?.message || 'git branch failed');
+            output = listRes.stdout;
           }
           break;
           
         case 'merge':
           if (!branch) return { success: false, error: 'Branch name required for merge' };
-          output = execSync(`git merge "${escapeShellArg(branch).slice(1, -1)}"`, { cwd: workdir, encoding: 'utf8' });
+          {
+            const mergeRes = await runCommand(`git merge "${escapeShellArg(branch).slice(1, -1)}"`, { cwd: workdir });
+            if (!mergeRes.ok) return error('GIT_ERROR', mergeRes.stderr || mergeRes.error?.message || 'git merge failed');
+            output = mergeRes.stdout;
+          }
           break;
           
         case 'log':
-          output = execSync('git log --oneline -10', { cwd: workdir, encoding: 'utf8' });
+          {
+            const logRes = await runCommand('git log --oneline -10', { cwd: workdir });
+            if (!logRes.ok) return error('GIT_ERROR', logRes.stderr || logRes.error?.message || 'git log failed');
+            output = logRes.stdout;
+          }
           break;
           
         default:
@@ -1691,5 +2602,251 @@ Cargo.lock
     }
   }));
 
-  logger.info?.("[forge] Extension loaded v2.2 - Full PRD → Code Automation (P0-P3 complete)");
+  // ==================== 工具 18: forge_template_save ====================
+  api.registerTool(tool('forge_template_save', 'Save current project config as a reusable template', {
+    type: 'object',
+    properties: {
+      projectId: { type: 'string' },
+      templateName: { type: 'string', description: 'Name for the template' },
+      description: { type: 'string', description: 'Template description' }
+    },
+    required: ['projectId', 'templateName']
+  }, async (params) => {
+    const projectId = params?.projectId;
+    const templateName = params?.templateName;
+    const description = params?.description || '';
+    
+    if (!projectId || !templateName) {
+      return { success: false, error: 'Missing projectId or templateName' };
+    }
+    
+    const db = await initDB();
+    try {
+      const project = await get(db, 'SELECT * FROM projects WHERE id=?', [projectId]);
+      if (!project) return { success: false, error: 'Project not found', projectId };
+      
+      const features = await all(db, 'SELECT id, name, description, priority, dependencies FROM features WHERE project_id=?', [projectId]);
+      const options = safeJSONParse(project.options, {});
+      
+      // 模板目录
+      const templateDir = path.join(process.env.HOME || '/tmp', '.openclaw-gateway', 'forge-templates');
+      if (!fs.existsSync(templateDir)) {
+        fs.mkdirSync(templateDir, { recursive: true });
+      }
+      
+      const templateId = templateName.toLowerCase().replace(/[^a-z0-9-]/g, '-');
+      const template = {
+        id: templateId,
+        name: templateName,
+        description,
+        sourceProject: projectId,
+        sourceProjectName: project.name,
+        options,
+        features: features.map(f => ({
+          name: f.name,
+          description: f.description,
+          priority: f.priority,
+          dependencies: normalizeDependencyList(f.dependencies).map((dep) => fromScopedFeatureId(dep))
+        })),
+        createdAt: new Date().toISOString()
+      };
+      
+      const templateFile = path.join(templateDir, `${templateId}.json`);
+      fs.writeFileSync(templateFile, JSON.stringify(template, null, 2));
+      
+      logger.info?.(`[forge] Template saved: ${templateId}`);
+      
+      return {
+        success: true,
+        templateId,
+        templateName,
+        templateFile,
+        featureCount: features.length,
+        options: template.options
+      };
+    } finally {
+      closeDB(db);
+    }
+  }));
+
+  // ==================== 工具 19: forge_template_list ====================
+  api.registerTool(tool('forge_template_list', 'List all saved templates', {
+    type: 'object',
+    properties: {}
+  }, async (params) => {
+    const templateDir = path.join(process.env.HOME || '/tmp', '.openclaw-gateway', 'forge-templates');
+    
+    if (!fs.existsSync(templateDir)) {
+      return { success: true, templates: [], count: 0 };
+    }
+    
+    const templates = [];
+    const files = fs.readdirSync(templateDir).filter(f => f.endsWith('.json'));
+    
+    for (const file of files) {
+      try {
+        const content = JSON.parse(fs.readFileSync(path.join(templateDir, file), 'utf8'));
+        templates.push({
+          id: content.id,
+          name: content.name,
+          description: content.description,
+          featureCount: content.features?.length || 0,
+          language: content.options?.language,
+          framework: content.options?.framework,
+          createdAt: content.createdAt
+        });
+      } catch {}
+    }
+    
+    return {
+      success: true,
+      templates,
+      count: templates.length,
+      templateDir
+    };
+  }));
+
+  // ==================== 工具 20: forge_template_load ====================
+  api.registerTool(tool('forge_template_load', 'Create a new project from a template', {
+    type: 'object',
+    properties: {
+      templateId: { type: 'string' },
+      projectName: { type: 'string', description: 'Name for the new project' },
+      prd: { type: 'string', description: 'Additional PRD content (optional)' },
+      options: { type: 'object', description: 'Override options' }
+    },
+    required: ['templateId', 'projectName']
+  }, async (params) => {
+    const templateId = params?.templateId;
+    const projectName = params?.projectName;
+    const extraPrd = params?.prd || '';
+    const overrideOptions = params?.options || {};
+    
+    if (!templateId || !projectName) {
+      return { success: false, error: 'Missing templateId or projectName' };
+    }
+    
+    const templateDir = path.join(process.env.HOME || '/tmp', '.openclaw-gateway', 'forge-templates');
+    const templateFile = path.join(templateDir, `${templateId}.json`);
+    
+    if (!fs.existsSync(templateFile)) {
+      return { success: false, error: 'Template not found', templateId };
+    }
+    
+    let template;
+    try {
+      template = JSON.parse(fs.readFileSync(templateFile, 'utf8'));
+    } catch {
+      return { success: false, error: 'Invalid template file', templateId };
+    }
+    
+    // 合并选项
+    const mergedOptions = { ...template.options, ...overrideOptions };
+    
+    // 构建 PRD
+    let prdContent = `# ${projectName}\n\n`;
+    prdContent += `Template: ${template.name}\n\n`;
+    if (template.description) {
+      prdContent += `## Overview\n${template.description}\n\n`;
+    }
+    if (extraPrd) {
+      prdContent += `${extraPrd}\n\n`;
+    }
+    prdContent += `## Features\n\n`;
+    
+    template.features.forEach((f, i) => {
+      const idx = String(i + 1).padStart(3, '0');
+      prdContent += `### Feature ${idx}: ${f.name}\n`;
+      prdContent += `- **描述**: ${f.description}\n`;
+      prdContent += `- **优先级**: P${f.priority}\n`;
+      if (f.dependencies && f.dependencies.length > 0) {
+        prdContent += `- **依赖**: ${f.dependencies.join(', ')}\n`;
+      } else {
+        prdContent += `- **依赖**: 无\n`;
+      }
+      prdContent += `\n`;
+    });
+    
+    const db = await initDB();
+    try {
+      const projectId = `proj-${Date.now()}`;
+      const workdir = path.join(PROJECTS_DIR, projectId);
+      fs.mkdirSync(workdir, { recursive: true });
+      fs.writeFileSync(path.join(workdir, 'PRD.md'), prdContent);
+      
+      await run(db, `INSERT INTO projects (id, name, prd, status, workdir, options) VALUES (?,?,?,?,?,?)`,
+        [projectId, projectName, prdContent, 'initialized', workdir, JSON.stringify(mergedOptions)]);
+      
+      const parsed = parsePRD(prdContent);
+      const scopedIdMap = new Map(parsed.features.map((f) => [f.id, toScopedFeatureId(projectId, f.id)]));
+      for (const f of parsed.features) {
+        const scopedDeps = (f.dependencies || []).map((dep) => scopedIdMap.get(dep) || toScopedFeatureId(projectId, dep));
+        await run(db, `INSERT INTO features (id, project_id, name, description, priority, status, dependencies) VALUES (?,?,?,?,?,?,?)`,
+          [scopedIdMap.get(f.id), projectId, f.name, f.description, f.priority, 'pending', JSON.stringify(scopedDeps)]);
+      }
+      
+      logger.info?.(`[forge] Project created from template ${templateId}: ${projectId}`);
+      
+      return {
+        success: true,
+        projectId,
+        projectName,
+        templateId,
+        templateName: template.name,
+        featureCount: parsed.features.length,
+        workdir,
+        options: mergedOptions,
+        nextStep: 'Run forge_plan to design the architecture'
+      };
+    } finally {
+      closeDB(db);
+    }
+  }));
+
+  // ==================== 工具 21: forge_index ====================
+  api.registerTool(tool('forge_index', 'Run incremental index and return changed files', {
+    type: 'object',
+    properties: {
+      projectId: { type: 'string' }
+    },
+    required: ['projectId']
+  }, async (params) => {
+    const projectId = params?.projectId;
+    if (!projectId) return error('MISSING_PARAM', 'Missing projectId');
+
+    const db = await initDB();
+    try {
+      const project = await get(db, 'SELECT * FROM projects WHERE id=?', [projectId]);
+      if (!project) return error('NOT_FOUND', 'Project not found', { projectId });
+      const diff = await incrementalIndexProject(db, projectId, project.workdir);
+      return {
+        success: true,
+        projectId,
+        workdir: project.workdir,
+        changedFiles: diff.changed,
+        removedFiles: diff.removed,
+        changedCount: diff.changed.length,
+        removedCount: diff.removed.length
+      };
+    } finally {
+      closeDB(db);
+    }
+  }));
+
+  logger.info?.("[forge] Extension loaded v2.6.2 - unattended weekly iteration (stability + security + perf)");
 }
+
+export const __testing = {
+  runCommand,
+  LRUCache,
+  RateLimiter,
+  validateToolParams,
+  normalizeErrorResult,
+  computeIncrementalChanges,
+  isValidFeatureTransition,
+  detectCycle,
+  validateDependencies,
+  sanitizeAuditValue,
+  normalizeDependencyList,
+  ensureSchema
+};
