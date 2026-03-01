@@ -7,6 +7,7 @@ export interface RedditPost {
   subreddit: string;
   author: string;
   score: number;
+  numComments: number;
   createdUtc: number;
 }
 
@@ -20,6 +21,7 @@ export interface DigestConfig {
   keywords: string[];
   excludeKeywords: string[];
   minScore: number;
+  minComments: number;
   postLimitPerSubreddit: number;
   maxPostAgeHours: number;
   maxMatches: number;

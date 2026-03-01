@@ -89,6 +89,7 @@ export async function run(): Promise<void> {
     includeKeywords: config.digest.keywords,
     excludeKeywords: config.digest.excludeKeywords,
     minScore: config.digest.minScore,
+    minComments: config.digest.minComments,
   });
   filtered.sort((a, b) => b.post.createdUtc - a.post.createdUtc);
 

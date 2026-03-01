@@ -68,6 +68,11 @@ export function loadRuntimeConfig(env: NodeJS.ProcessEnv = process.env): Runtime
     throw new Error("MIN_SCORE 必须是非负整数");
   }
 
+  const minComments = Number.parseInt(env.MIN_COMMENTS ?? "0", 10);
+  if (Number.isNaN(minComments) || minComments < 0) {
+    throw new Error("MIN_COMMENTS 必须是非负整数");
+  }
+
   const postLimitPerSubreddit = Number.parseInt(env.POST_LIMIT_PER_SUBREDDIT ?? "30", 10);
   if (Number.isNaN(postLimitPerSubreddit) || postLimitPerSubreddit <= 0) {
     throw new Error("POST_LIMIT_PER_SUBREDDIT 必须是正整数");
@@ -96,6 +101,7 @@ export function loadRuntimeConfig(env: NodeJS.ProcessEnv = process.env): Runtime
       keywords,
       excludeKeywords,
       minScore,
+      minComments,
       postLimitPerSubreddit,
       maxPostAgeHours,
       maxMatches,

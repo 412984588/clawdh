@@ -12,6 +12,7 @@ interface RedditListingResponse {
         subreddit?: string;
         author?: string;
         score?: number;
+        num_comments?: number;
         created_utc?: number;
       };
     }>;
@@ -152,6 +153,7 @@ export async function fetchSubredditPosts(
       subreddit: item.subreddit ?? subreddit,
       author: item.author ?? "unknown",
       score: item.score ?? 0,
+      numComments: item.num_comments ?? 0,
       createdUtc: item.created_utc ?? 0,
     }));
 }

@@ -15,6 +15,7 @@ function createPost(id: string, createdUtc: number): RedditPost {
     subreddit: "programming",
     author: "alice",
     score: 10,
+    numComments: 0,
     createdUtc,
   };
 }

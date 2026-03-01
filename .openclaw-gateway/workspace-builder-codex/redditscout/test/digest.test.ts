@@ -12,6 +12,7 @@ const item = {
     subreddit: "technology",
     author: "bob",
     score: 99,
+    numComments: 27,
     createdUtc: 1700000000,
   },
   matchedKeywords: ["digest", "reliable"],
@@ -24,6 +25,7 @@ test("日报渲染应包含分组和关键词", () => {
   assert.match(text, /命中帖子: 1/);
   assert.match(text, /关键词热度: digest×1，reliable×1/);
   assert.match(text, /## r\/technology（1）/);
+  assert.match(text, /👍 99 \| 💬 27/);
   assert.match(text, /关键词: digest, reliable/);
 });
 

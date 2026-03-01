@@ -16,6 +16,7 @@ function createListingResponse(postId: string): Response {
               subreddit: "programming",
               author: "alice",
               score: 42,
+              num_comments: 13,
               created_utc: 1700000000,
             },
           },
@@ -53,6 +54,7 @@ test("Reddit 503 后应自动重试并成功返回", async () => {
     assert.equal(callCount, 2);
     assert.equal(posts.length, 1);
     assert.equal(posts[0]?.id, "p1");
+    assert.equal(posts[0]?.numComments, 13);
   } finally {
     globalThis.fetch = realFetch;
   }

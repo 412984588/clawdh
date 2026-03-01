@@ -12,6 +12,7 @@ const basePost: RedditPost = {
   subreddit: "programming",
   author: "alice",
   score: 10,
+  numComments: 3,
   createdUtc: 1700000000,
 };
 
@@ -74,6 +75,31 @@ test("支持最小分数过滤", () => {
 
   assert.equal(matched.length, 1);
   assert.equal(matched[0]?.post.id, "4");
+});
+
+test("支持最小评论数过滤", () => {
+  const posts: RedditPost[] = [
+    {
+      ...basePost,
+      id: "7",
+      numComments: 2,
+      title: "Rust baseline post",
+    },
+    {
+      ...basePost,
+      id: "8",
+      numComments: 20,
+      title: "Rust hot discussion",
+    },
+  ];
+
+  const matched = filterPostsByKeywords(posts, {
+    includeKeywords: ["rust"],
+    minComments: 10,
+  });
+
+  assert.equal(matched.length, 1);
+  assert.equal(matched[0]?.post.id, "8");
 });
 
 test("全量模式下也应应用排除关键词和分数阈值", () => {

@@ -32,7 +32,7 @@ function summarizeKeywords(items: MatchedPost[]): string {
 function formatPostLine(item: MatchedPost, index: number): string {
   const { post, matchedKeywords } = item;
   const keywordLabel = matchedKeywords.length > 0 ? ` | 关键词: ${matchedKeywords.join(", ")}` : "";
-  return `${index + 1}. [r/${post.subreddit}] ${truncate(post.title, 120)}${keywordLabel}\n   ${post.permalink || post.url}`;
+  return `${index + 1}. [r/${post.subreddit}] ${truncate(post.title, 120)} | 👍 ${post.score} | 💬 ${post.numComments}${keywordLabel}\n   ${post.permalink || post.url}`;
 }
 
 export function renderDigest(

@@ -4,6 +4,7 @@ export interface KeywordFilterOptions {
   includeKeywords: string[];
   excludeKeywords?: string[];
   minScore?: number;
+  minComments?: number;
 }
 
 function unique(items: string[]): string[] {
@@ -18,6 +19,7 @@ function normalizeOptions(
       includeKeywords: keywordsOrOptions,
       excludeKeywords: [],
       minScore: 0,
+      minComments: 0,
     };
   }
 
@@ -25,6 +27,7 @@ function normalizeOptions(
     includeKeywords: keywordsOrOptions.includeKeywords,
     excludeKeywords: keywordsOrOptions.excludeKeywords ?? [],
     minScore: keywordsOrOptions.minScore ?? 0,
+    minComments: keywordsOrOptions.minComments ?? 0,
   };
 }
 
@@ -35,7 +38,7 @@ export function filterPostsByKeywords(
   const options = normalizeOptions(keywordsOrOptions);
 
   return posts
-    .filter((post) => post.score >= options.minScore)
+    .filter((post) => post.score >= options.minScore && post.numComments >= options.minComments)
     .map((post) => {
       const haystack = `${post.title}\n${post.selftext}`.toLowerCase();
       const excluded = options.excludeKeywords.some((keyword) => haystack.includes(keyword));
@@ -64,7 +67,7 @@ export function filterPostsByKeywords(
         return false;
       }
 
-      // includeKeywords 为空时走全量模式，仅受最小分数和排除词影响。
+      // includeKeywords 为空时走全量模式，仅受最小分数/评论数和排除词影响。
       if (options.includeKeywords.length === 0) {
         return true;
       }

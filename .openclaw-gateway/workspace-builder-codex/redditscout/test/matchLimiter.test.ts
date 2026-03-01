@@ -12,6 +12,7 @@ const buildItem = (id: string) => ({
     subreddit: "programming",
     author: "alice",
     score: 1,
+    numComments: 0,
     createdUtc: Number(id),
   },
   matchedKeywords: ["ai"],
