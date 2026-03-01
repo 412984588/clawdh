@@ -47,6 +47,13 @@ function loadEmailConfig(env: NodeJS.ProcessEnv): EmailConfig | undefined {
   };
 }
 
+function formatLocalDate(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 export function loadRuntimeConfig(env: NodeJS.ProcessEnv = process.env): RuntimeConfig {
   const subreddits = splitCsv(env.SUBREDDITS);
   if (subreddits.length === 0) {
@@ -60,7 +67,7 @@ export function loadRuntimeConfig(env: NodeJS.ProcessEnv = process.env): Runtime
   }
 
   // 使用本地日期作为日报维度，避免 UTC 跨日导致摘要错位。
-  const digestDate = env.DIGEST_DATE?.trim() || new Date().toISOString().slice(0, 10);
+  const digestDate = env.DIGEST_DATE?.trim() || formatLocalDate(new Date());
 
   const outputDir = env.OUTPUT_DIR?.trim()
     ? path.resolve(env.OUTPUT_DIR)

@@ -21,8 +21,34 @@ test("日报渲染应包含分组和关键词", () => {
   const text = renderDigest([item], "2026-03-01");
 
   assert.match(text, /# RedditScout 日报 \(2026-03-01\)/);
+  assert.match(text, /命中帖子: 1/);
+  assert.match(text, /关键词热度: digest×1，reliable×1/);
   assert.match(text, /## r\/technology（1）/);
   assert.match(text, /关键词: digest, reliable/);
+});
+
+
+test("日报分组应按 subreddit 排序", () => {
+  const text = renderDigest(
+    [
+      item,
+      {
+        ...item,
+        post: {
+          ...item.post,
+          id: "2",
+          subreddit: "apple",
+          title: "Apple post",
+        },
+      },
+    ],
+    "2026-03-01",
+  );
+
+  const appleIndex = text.indexOf("## r/apple（1）");
+  const techIndex = text.indexOf("## r/technology（1）");
+  assert.ok(appleIndex >= 0 && techIndex >= 0);
+  assert.ok(appleIndex < techIndex);
 });
 
 test("空结果应返回无命中提示", () => {

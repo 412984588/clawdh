@@ -7,16 +7,57 @@ import { filterPostsByKeywords } from "./keywordFilter.js";
 import { fetchSubredditPosts } from "./redditClient.js";
 import { RedditPost } from "./types.js";
 
-async function collectPosts(subreddits: string[], limit: number): Promise<RedditPost[]> {
+interface CollectPostsResult {
+  posts: RedditPost[];
+  failedSubreddits: string[];
+}
+
+function dedupePosts(posts: RedditPost[]): RedditPost[] {
+  const byStableKey = new Map<string, RedditPost>();
+
+  for (const post of posts) {
+    // 优先 permalink，其次 url，最后兜底到 id，避免跨板块重复转发刷屏。
+    const stableKey = post.permalink || post.url || post.id;
+    const existed = byStableKey.get(stableKey);
+
+    if (!existed || post.createdUtc > existed.createdUtc) {
+      byStableKey.set(stableKey, post);
+    }
+  }
+
+  return [...byStableKey.values()];
+}
+
+async function collectPosts(subreddits: string[], limit: number): Promise<CollectPostsResult> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 15000);
 
   try {
-    const groups = await Promise.all(
-      subreddits.map((subreddit) => fetchSubredditPosts(subreddit, limit, controller.signal)),
+    const tasks = subreddits.map((subreddit) =>
+      fetchSubredditPosts(subreddit, limit, controller.signal).then((posts) => ({ subreddit, posts })),
     );
 
-    return groups.flat();
+    const settled = await Promise.allSettled(tasks);
+    const failedSubreddits: string[] = [];
+    const posts: RedditPost[] = [];
+
+    settled.forEach((result, index) => {
+      if (result.status === "fulfilled") {
+        posts.push(...result.value.posts);
+        return;
+      }
+
+      // 尽量降级运行：局部板块失败不影响整份日报产出。
+      const failedSubreddit = subreddits[index];
+      if (failedSubreddit) {
+        failedSubreddits.push(failedSubreddit);
+      }
+    });
+
+    return {
+      posts: dedupePosts(posts),
+      failedSubreddits,
+    };
   } finally {
     clearTimeout(timeout);
   }
@@ -32,10 +73,14 @@ async function persistDigest(outputDir: string, digestDate: string, digestText: 
 export async function run(): Promise<void> {
   const config = loadRuntimeConfig(process.env);
 
-  const posts = await collectPosts(
+  const { posts, failedSubreddits } = await collectPosts(
     config.digest.subreddits,
     config.digest.postLimitPerSubreddit,
   );
+
+  if (failedSubreddits.length > 0) {
+    console.warn(`[RedditScout] 部分板块抓取失败：${failedSubreddits.join(", ")}`);
+  }
 
   const filtered = filterPostsByKeywords(posts, config.digest.keywords);
   filtered.sort((a, b) => b.post.createdUtc - a.post.createdUtc);
