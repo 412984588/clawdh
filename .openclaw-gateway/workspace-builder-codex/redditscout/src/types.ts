@@ -21,6 +21,7 @@ export interface DigestConfig {
   excludeKeywords: string[];
   minScore: number;
   postLimitPerSubreddit: number;
+  maxPostAgeHours: number;
   digestDate: string;
   outputDir: string;
 }

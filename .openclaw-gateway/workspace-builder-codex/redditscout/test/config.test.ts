@@ -39,11 +39,13 @@ test("应加载排除关键词和最小分数配置", () => {
     KEYWORDS: "rust,ai",
     EXCLUDE_KEYWORDS: "hiring,job",
     MIN_SCORE: "15",
+    MAX_POST_AGE_HOURS: "36",
   });
 
   assert.deepEqual(config.digest.keywords, ["rust", "ai"]);
   assert.deepEqual(config.digest.excludeKeywords, ["hiring", "job"]);
   assert.equal(config.digest.minScore, 15);
+  assert.equal(config.digest.maxPostAgeHours, 36);
 });
 
 test("MIN_SCORE 非法时应抛错", () => {
@@ -55,5 +57,17 @@ test("MIN_SCORE 非法时应抛错", () => {
         MIN_SCORE: "-1",
       }),
     /MIN_SCORE 必须是非负整数/,
+  );
+});
+
+test("MAX_POST_AGE_HOURS 非法时应抛错", () => {
+  assert.throws(
+    () =>
+      loadRuntimeConfig({
+        SUBREDDITS: "programming",
+        KEYWORDS: "rust",
+        MAX_POST_AGE_HOURS: "0",
+      }),
+    /MAX_POST_AGE_HOURS 必须是正整数/,
   );
 });

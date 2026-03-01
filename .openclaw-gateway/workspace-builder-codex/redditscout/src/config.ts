@@ -73,6 +73,11 @@ export function loadRuntimeConfig(env: NodeJS.ProcessEnv = process.env): Runtime
     throw new Error("POST_LIMIT_PER_SUBREDDIT 必须是正整数");
   }
 
+  const maxPostAgeHours = Number.parseInt(env.MAX_POST_AGE_HOURS ?? "24", 10);
+  if (Number.isNaN(maxPostAgeHours) || maxPostAgeHours <= 0) {
+    throw new Error("MAX_POST_AGE_HOURS 必须是正整数");
+  }
+
   // 使用本地日期作为日报维度，避免 UTC 跨日导致摘要错位。
   const digestDate = env.DIGEST_DATE?.trim() || formatLocalDate(new Date());
 
@@ -87,6 +92,7 @@ export function loadRuntimeConfig(env: NodeJS.ProcessEnv = process.env): Runtime
       excludeKeywords,
       minScore,
       postLimitPerSubreddit,
+      maxPostAgeHours,
       digestDate,
       outputDir,
     },

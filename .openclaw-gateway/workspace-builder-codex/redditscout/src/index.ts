@@ -4,6 +4,7 @@ import { loadRuntimeConfig } from "./config.js";
 import { renderDigest } from "./digest.js";
 import { notifyDigest } from "./notifiers/index.js";
 import { filterPostsByKeywords } from "./keywordFilter.js";
+import { filterRecentPosts } from "./postAgeFilter.js";
 import { fetchSubredditPosts } from "./redditClient.js";
 import { RedditPost } from "./types.js";
 
@@ -82,12 +83,20 @@ export async function run(): Promise<void> {
     console.warn(`[RedditScout] 部分板块抓取失败：${failedSubreddits.join(", ")}`);
   }
 
-  const filtered = filterPostsByKeywords(posts, {
+  const recentPosts = filterRecentPosts(posts, config.digest.maxPostAgeHours);
+  const filtered = filterPostsByKeywords(recentPosts, {
     includeKeywords: config.digest.keywords,
     excludeKeywords: config.digest.excludeKeywords,
     minScore: config.digest.minScore,
   });
   filtered.sort((a, b) => b.post.createdUtc - a.post.createdUtc);
+
+  const outdatedCount = posts.length - recentPosts.length;
+  if (outdatedCount > 0) {
+    console.log(
+      `[RedditScout] 已过滤 ${outdatedCount} 条超过 ${config.digest.maxPostAgeHours} 小时的历史帖子`,
+    );
+  }
 
   const digestText = renderDigest(filtered, config.digest.digestDate);
 
