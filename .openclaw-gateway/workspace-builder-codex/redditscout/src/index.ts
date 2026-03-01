@@ -82,7 +82,11 @@ export async function run(): Promise<void> {
     console.warn(`[RedditScout] 部分板块抓取失败：${failedSubreddits.join(", ")}`);
   }
 
-  const filtered = filterPostsByKeywords(posts, config.digest.keywords);
+  const filtered = filterPostsByKeywords(posts, {
+    includeKeywords: config.digest.keywords,
+    excludeKeywords: config.digest.excludeKeywords,
+    minScore: config.digest.minScore,
+  });
   filtered.sort((a, b) => b.post.createdUtc - a.post.createdUtc);
 
   const digestText = renderDigest(filtered, config.digest.digestDate);

@@ -61,6 +61,13 @@ export function loadRuntimeConfig(env: NodeJS.ProcessEnv = process.env): Runtime
   }
 
   const keywords = splitCsv(env.KEYWORDS).map((word) => word.toLowerCase());
+  const excludeKeywords = splitCsv(env.EXCLUDE_KEYWORDS).map((word) => word.toLowerCase());
+
+  const minScore = Number.parseInt(env.MIN_SCORE ?? "0", 10);
+  if (Number.isNaN(minScore) || minScore < 0) {
+    throw new Error("MIN_SCORE 必须是非负整数");
+  }
+
   const postLimitPerSubreddit = Number.parseInt(env.POST_LIMIT_PER_SUBREDDIT ?? "30", 10);
   if (Number.isNaN(postLimitPerSubreddit) || postLimitPerSubreddit <= 0) {
     throw new Error("POST_LIMIT_PER_SUBREDDIT 必须是正整数");
@@ -77,6 +84,8 @@ export function loadRuntimeConfig(env: NodeJS.ProcessEnv = process.env): Runtime
     digest: {
       subreddits,
       keywords,
+      excludeKeywords,
+      minScore,
       postLimitPerSubreddit,
       digestDate,
       outputDir,

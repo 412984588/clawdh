@@ -18,6 +18,8 @@ export interface MatchedPost {
 export interface DigestConfig {
   subreddits: string[];
   keywords: string[];
+  excludeKeywords: string[];
+  minScore: number;
   postLimitPerSubreddit: number;
   digestDate: string;
   outputDir: string;

@@ -37,3 +37,70 @@ test("关键词在正文命中时也应返回", () => {
   assert.equal(matched.length, 1);
   assert.deepEqual(matched[0]?.matchedKeywords, ["kubernetes"]);
 });
+
+test("支持排除关键词过滤", () => {
+  const posts: RedditPost[] = [
+    {
+      ...basePost,
+      id: "3",
+      title: "Rust backend hiring thread",
+      selftext: "remote job",
+    },
+  ];
+
+  const matched = filterPostsByKeywords(posts, {
+    includeKeywords: ["rust"],
+    excludeKeywords: ["hiring", "job"],
+  });
+
+  assert.equal(matched.length, 0);
+});
+
+test("支持最小分数过滤", () => {
+  const posts: RedditPost[] = [
+    basePost,
+    {
+      ...basePost,
+      id: "4",
+      score: 25,
+      title: "Rust async tips",
+    },
+  ];
+
+  const matched = filterPostsByKeywords(posts, {
+    includeKeywords: ["rust"],
+    minScore: 20,
+  });
+
+  assert.equal(matched.length, 1);
+  assert.equal(matched[0]?.post.id, "4");
+});
+
+test("全量模式下也应应用排除关键词和分数阈值", () => {
+  const posts: RedditPost[] = [
+    {
+      ...basePost,
+      id: "5",
+      score: 30,
+      title: "General update",
+      selftext: "no keyword",
+    },
+    {
+      ...basePost,
+      id: "6",
+      score: 30,
+      title: "Job thread",
+      selftext: "hiring now",
+    },
+  ];
+
+  const matched = filterPostsByKeywords(posts, {
+    includeKeywords: [],
+    excludeKeywords: ["hiring"],
+    minScore: 20,
+  });
+
+  assert.equal(matched.length, 1);
+  assert.equal(matched[0]?.post.id, "5");
+  assert.deepEqual(matched[0]?.matchedKeywords, []);
+});

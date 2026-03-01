@@ -32,3 +32,28 @@ test("未指定 DIGEST_DATE 时应使用本地日期", () => {
     globalThis.Date = RealDate;
   }
 });
+
+test("应加载排除关键词和最小分数配置", () => {
+  const config = loadRuntimeConfig({
+    SUBREDDITS: "programming,technology",
+    KEYWORDS: "rust,ai",
+    EXCLUDE_KEYWORDS: "hiring,job",
+    MIN_SCORE: "15",
+  });
+
+  assert.deepEqual(config.digest.keywords, ["rust", "ai"]);
+  assert.deepEqual(config.digest.excludeKeywords, ["hiring", "job"]);
+  assert.equal(config.digest.minScore, 15);
+});
+
+test("MIN_SCORE 非法时应抛错", () => {
+  assert.throws(
+    () =>
+      loadRuntimeConfig({
+        SUBREDDITS: "programming",
+        KEYWORDS: "rust",
+        MIN_SCORE: "-1",
+      }),
+    /MIN_SCORE 必须是非负整数/,
+  );
+});

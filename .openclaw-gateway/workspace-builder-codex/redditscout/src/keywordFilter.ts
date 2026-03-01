@@ -1,23 +1,78 @@
 import { MatchedPost, RedditPost } from "./types.js";
 
+export interface KeywordFilterOptions {
+  includeKeywords: string[];
+  excludeKeywords?: string[];
+  minScore?: number;
+}
+
 function unique(items: string[]): string[] {
   return [...new Set(items)];
 }
 
-export function filterPostsByKeywords(posts: RedditPost[], keywords: string[]): MatchedPost[] {
-  // 关键词为空时直接透传，便于冷启动先观察社区数据。
-  if (keywords.length === 0) {
-    return posts.map((post) => ({ post, matchedKeywords: [] }));
+function normalizeOptions(
+  keywordsOrOptions: string[] | KeywordFilterOptions,
+): Required<KeywordFilterOptions> {
+  if (Array.isArray(keywordsOrOptions)) {
+    return {
+      includeKeywords: keywordsOrOptions,
+      excludeKeywords: [],
+      minScore: 0,
+    };
   }
 
+  return {
+    includeKeywords: keywordsOrOptions.includeKeywords,
+    excludeKeywords: keywordsOrOptions.excludeKeywords ?? [],
+    minScore: keywordsOrOptions.minScore ?? 0,
+  };
+}
+
+export function filterPostsByKeywords(
+  posts: RedditPost[],
+  keywordsOrOptions: string[] | KeywordFilterOptions,
+): MatchedPost[] {
+  const options = normalizeOptions(keywordsOrOptions);
+
   return posts
+    .filter((post) => post.score >= options.minScore)
     .map((post) => {
       const haystack = `${post.title}\n${post.selftext}`.toLowerCase();
-      const matchedKeywords = unique(keywords.filter((keyword) => haystack.includes(keyword)));
+      const excluded = options.excludeKeywords.some((keyword) => haystack.includes(keyword));
+
+      if (excluded) {
+        return {
+          post,
+          matchedKeywords: [],
+          excluded: true,
+        };
+      }
+
+      const matchedKeywords =
+        options.includeKeywords.length === 0
+          ? []
+          : unique(options.includeKeywords.filter((keyword) => haystack.includes(keyword)));
+
       return {
         post,
         matchedKeywords,
+        excluded: false,
       };
     })
-    .filter((item) => item.matchedKeywords.length > 0);
+    .filter((item) => {
+      if (item.excluded) {
+        return false;
+      }
+
+      // includeKeywords 为空时走全量模式，仅受最小分数和排除词影响。
+      if (options.includeKeywords.length === 0) {
+        return true;
+      }
+
+      return item.matchedKeywords.length > 0;
+    })
+    .map(({ post, matchedKeywords }) => ({
+      post,
+      matchedKeywords,
+    }));
 }
