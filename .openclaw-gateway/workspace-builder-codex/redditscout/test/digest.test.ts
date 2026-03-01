@@ -55,3 +55,8 @@ test("空结果应返回无命中提示", () => {
   const text = renderDigest([], "2026-03-01");
   assert.match(text, /今天没有命中关键词的新帖/);
 });
+
+test("被截断时应输出截断提示", () => {
+  const text = renderDigest([item], "2026-03-01", { truncatedCount: 3 });
+  assert.match(text, /已截断展示: 另有 3 条命中未展示/);
+});

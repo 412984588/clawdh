@@ -78,6 +78,11 @@ export function loadRuntimeConfig(env: NodeJS.ProcessEnv = process.env): Runtime
     throw new Error("MAX_POST_AGE_HOURS 必须是正整数");
   }
 
+  const maxMatches = Number.parseInt(env.MAX_MATCHES ?? "50", 10);
+  if (Number.isNaN(maxMatches) || maxMatches <= 0) {
+    throw new Error("MAX_MATCHES 必须是正整数");
+  }
+
   // 使用本地日期作为日报维度，避免 UTC 跨日导致摘要错位。
   const digestDate = env.DIGEST_DATE?.trim() || formatLocalDate(new Date());
 
@@ -93,6 +98,7 @@ export function loadRuntimeConfig(env: NodeJS.ProcessEnv = process.env): Runtime
       minScore,
       postLimitPerSubreddit,
       maxPostAgeHours,
+      maxMatches,
       digestDate,
       outputDir,
     },

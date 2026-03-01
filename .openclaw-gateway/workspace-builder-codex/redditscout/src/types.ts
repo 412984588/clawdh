@@ -22,6 +22,7 @@ export interface DigestConfig {
   minScore: number;
   postLimitPerSubreddit: number;
   maxPostAgeHours: number;
+  maxMatches: number;
   digestDate: string;
   outputDir: string;
 }

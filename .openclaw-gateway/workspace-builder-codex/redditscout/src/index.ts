@@ -4,6 +4,7 @@ import { loadRuntimeConfig } from "./config.js";
 import { renderDigest } from "./digest.js";
 import { notifyDigest } from "./notifiers/index.js";
 import { filterPostsByKeywords } from "./keywordFilter.js";
+import { applyMatchLimit } from "./matchLimiter.js";
 import { filterRecentPosts } from "./postAgeFilter.js";
 import { fetchSubredditPosts } from "./redditClient.js";
 import { RedditPost } from "./types.js";
@@ -91,6 +92,8 @@ export async function run(): Promise<void> {
   });
   filtered.sort((a, b) => b.post.createdUtc - a.post.createdUtc);
 
+  const limited = applyMatchLimit(filtered, config.digest.maxMatches);
+
   const outdatedCount = posts.length - recentPosts.length;
   if (outdatedCount > 0) {
     console.log(
@@ -98,7 +101,15 @@ export async function run(): Promise<void> {
     );
   }
 
-  const digestText = renderDigest(filtered, config.digest.digestDate);
+  if (limited.truncatedCount > 0) {
+    console.warn(
+      `[RedditScout] 命中 ${filtered.length} 条，受 MAX_MATCHES=${config.digest.maxMatches} 限制，仅推送前 ${limited.items.length} 条`,
+    );
+  }
+
+  const digestText = renderDigest(limited.items, config.digest.digestDate, {
+    truncatedCount: limited.truncatedCount,
+  });
 
   await persistDigest(config.digest.outputDir, config.digest.digestDate, digestText);
   await notifyDigest(
@@ -110,7 +121,7 @@ export async function run(): Promise<void> {
     digestText,
   );
 
-  console.log(`[RedditScout] 摘要完成：${filtered.length} 条命中`);
+  console.log(`[RedditScout] 摘要完成：推送 ${limited.items.length} 条（总命中 ${filtered.length}）`);
 }
 
 run().catch((error: unknown) => {

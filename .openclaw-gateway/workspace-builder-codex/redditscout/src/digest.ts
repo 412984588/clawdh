@@ -1,5 +1,9 @@
 import { MatchedPost } from "./types.js";
 
+export interface RenderDigestOptions {
+  truncatedCount?: number;
+}
+
 function truncate(text: string, maxLen: number): string {
   if (text.length <= maxLen) return text;
   return `${text.slice(0, maxLen - 1)}…`;
@@ -31,7 +35,11 @@ function formatPostLine(item: MatchedPost, index: number): string {
   return `${index + 1}. [r/${post.subreddit}] ${truncate(post.title, 120)}${keywordLabel}\n   ${post.permalink || post.url}`;
 }
 
-export function renderDigest(items: MatchedPost[], digestDate: string): string {
+export function renderDigest(
+  items: MatchedPost[],
+  digestDate: string,
+  options: RenderDigestOptions = {},
+): string {
   if (items.length === 0) {
     return `# RedditScout 日报 (${digestDate})\n\n今天没有命中关键词的新帖。`;
   }
@@ -50,8 +58,13 @@ export function renderDigest(items: MatchedPost[], digestDate: string): string {
     "",
     `命中帖子: ${items.length}`,
     `关键词热度: ${summarizeKeywords(items)}`,
-    "",
   ];
+
+  if ((options.truncatedCount ?? 0) > 0) {
+    lines.push(`已截断展示: 另有 ${options.truncatedCount} 条命中未展示（可调高 MAX_MATCHES）`);
+  }
+
+  lines.push("");
 
   const sortedSubreddits = [...bySubreddit.entries()].sort((a, b) => a[0].localeCompare(b[0]));
   for (const [subreddit, posts] of sortedSubreddits) {
