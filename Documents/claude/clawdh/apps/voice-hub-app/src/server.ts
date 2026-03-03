@@ -24,10 +24,12 @@ export class VoiceHubServer {
   private isRunning = false;
   private readonly ttsRequestTimeoutMs = 5000;
   private readonly ttsRetryCount = 2;
+  private readonly corsAllowlist: Set<string>;
 
   constructor(config: Config, runtime: VoiceRuntime) {
     this.config = config;
     this.runtime = runtime;
+    this.corsAllowlist = new Set(this.config.corsAllowedOrigins);
 
     this.server = Fastify({
       logger: {
@@ -36,7 +38,9 @@ export class VoiceHubServer {
     });
 
     this.server.register(cors, {
-      origin: true,
+      origin: (origin, callback) => {
+        callback(null, this.isCorsOriginAllowed(origin));
+      },
     });
 
     this.server.register(websocket);
@@ -53,6 +57,20 @@ export class VoiceHubServer {
       timestamp: Date.now(),
       uptime: process.uptime(),
     }));
+
+    this.server.get('/ready', async (request, reply) => {
+      if (!this.runtime.isActive()) {
+        return reply.code(503).send({
+          status: 'not_ready',
+          timestamp: Date.now(),
+        });
+      }
+
+      return {
+        status: 'ready',
+        timestamp: Date.now(),
+      };
+    });
 
     // 会话管理
     this.server.post('/api/sessions', async (request, reply) => {
@@ -137,12 +155,27 @@ export class VoiceHubServer {
         if (!verifyWebhookSignature(payload, this.config.webhookSecret, signature, timestamp)) {
           return reply.code(401).send({ error: 'Unauthorized' });
         }
-      } else if (!legacySecret || !this.constantTimeEquals(legacySecret, this.config.webhookSecret)) {
-        return reply.code(401).send({ error: 'Unauthorized' });
+      } else {
+        if (!this.isLegacyWebhookHeaderEnabled()) {
+          return reply.code(401).send({ error: 'Legacy webhook header disabled' });
+        }
+
+        if (!legacySecret || !this.constantTimeEquals(legacySecret, this.config.webhookSecret)) {
+          return reply.code(401).send({ error: 'Unauthorized' });
+        }
       }
 
-      const result = await this.processWebhookPayload(payload);
-      return { success: true, ...result };
+      const result = await this.processWebhookPayload(payload, false);
+      const shadowMode = this.isWebhookShadowMode();
+
+      if (shadowMode) {
+        const shadowResult = await this.processWebhookPayload(payload, true);
+        if (JSON.stringify(shadowResult) !== JSON.stringify(result)) {
+          this.server.log.warn({ result, shadowResult }, 'Webhook shadow result mismatch');
+        }
+      }
+
+      return { success: true, shadowMode, ...result };
     });
 
     // 状态
@@ -316,13 +349,16 @@ export class VoiceHubServer {
     );
   }
 
-  private async processWebhookPayload(payload: WebhookPayload): Promise<Record<string, unknown>> {
+  private async processWebhookPayload(
+    payload: WebhookPayload,
+    dryRun: boolean
+  ): Promise<Record<string, unknown>> {
     switch (payload.event) {
       case 'backend_task.completed': {
         const sessionId = this.extractSessionId(payload);
         const announceText = this.extractAnnouncementText(payload);
         const announced = sessionId && announceText
-          ? await this.emitTts(sessionId, announceText)
+          ? await this.emitTts(sessionId, announceText, dryRun)
           : false;
         return { handled: true, event: payload.event, announced };
       }
@@ -330,7 +366,7 @@ export class VoiceHubServer {
         const sessionId = this.extractSessionId(payload);
         const announceText = this.extractNotificationText(payload);
         const announced = sessionId && announceText
-          ? await this.emitTts(sessionId, announceText)
+          ? await this.emitTts(sessionId, announceText, dryRun)
           : false;
         return { handled: true, event: payload.event, announced };
       }
@@ -395,10 +431,14 @@ export class VoiceHubServer {
     return null;
   }
 
-  private async emitTts(sessionId: string, text: string): Promise<boolean> {
+  private async emitTts(sessionId: string, text: string, dryRun: boolean): Promise<boolean> {
     const session = this.runtime.getSession(sessionId);
     if (!session) {
       return false;
+    }
+
+    if (dryRun) {
+      return true;
     }
 
     const synthesis = await this.synthesizeText(text);
@@ -505,5 +545,25 @@ export class VoiceHubServer {
 
   private sleep(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  private isCorsOriginAllowed(origin: string | undefined): boolean {
+    if (!origin) {
+      return true;
+    }
+
+    if (this.corsAllowlist.has('*')) {
+      return true;
+    }
+
+    return this.corsAllowlist.has(origin);
+  }
+
+  private isLegacyWebhookHeaderEnabled(): boolean {
+    return this.config.webhookLegacySecretHeader;
+  }
+
+  private isWebhookShadowMode(): boolean {
+    return this.config.webhookShadowMode;
   }
 }
