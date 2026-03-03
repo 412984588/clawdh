@@ -45,6 +45,11 @@ function getLineMetadata(content, matchIndex) {
 }
 
 export function shouldScanFileName(fileName) {
+  // 排除测试文件
+  if (fileName.includes('.test.') || fileName.includes('.spec.') || fileName.includes('.todo.')) {
+    return false;
+  }
+
   if (INCLUDED_FILES.has(fileName)) {
     return true;
   }
