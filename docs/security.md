@@ -33,7 +33,8 @@ pnpm secret-scan
 1. 在 `.env` 中配置 `WEBHOOK_SECRET`
 2. 后端发送请求时需包含 `X-Webhook-Signature` 与 `X-Webhook-Timestamp` 头
 3. 服务器会使用 `WEBHOOK_SECRET` 进行 HMAC-SHA256 签名验证
-4. 为兼容旧版本，仍接受 `X-Webhook-Secret` 头（建议尽快迁移）
+4. 默认拒绝旧版 `X-Webhook-Secret` 头，只有在 `WEBHOOK_LEGACY_SECRET_HEADER=true` 时才会临时放行
+5. 可通过 `WEBHOOK_SHADOW_MODE=true` 启用影子执行，验证 webhook 处理逻辑但不重复发送音频副作用
 
 ### 时间戳验证
 
@@ -76,12 +77,15 @@ Memory Bank 使用 SQLite WAL (Write-Ahead Logging) 模式：
 
 ### CORS 配置
 
-Web 服务器默认允许所有来源 (CORS: `*`)，生产环境应配置为特定域名：
+Web 服务器默认只允许本地开发来源：
 
-```typescript
-fastify.register(cors, {
-  origin: ['https://your-domain.com'],
-});
+- `http://localhost:3000`
+- `http://127.0.0.1:3000`
+
+生产环境请显式配置 `CORS_ALLOWED_ORIGINS`（逗号分隔）：
+
+```bash
+CORS_ALLOWED_ORIGINS=https://your-domain.com,https://admin.your-domain.com
 ```
 
 ### 速率限制
