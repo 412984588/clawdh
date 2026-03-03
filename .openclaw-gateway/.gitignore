@@ -1,0 +1,59 @@
+# App Factory .gitignore
+
+# 非工厂项目（在其他仓库管理）
+Documents/claude/
+Documents/通用/
+
+# 系统文件
+.Trash/
+.DS_Store
+*.log
+*.swp
+*.swo
+*~
+
+# 临时文件
+*.tmp
+*.temp
+.cache/
+
+# 依赖目录
+node_modules/
+dist/
+build/
+
+# 环境配置
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.sublime-*
+
+# 测试覆盖率
+coverage/
+.nyc_output/
+
+# 未跟踪的用户文件
+.ASUS/
+.CFUserTextEncoding
+.acpx/
+.agent-browser/
+.agent/
+
+# 日志文件
+logs/
+*.log
+
+# 备份文件
+*.backup
+*.bak
+archive/
+
+# 敏感信息
+secrets/
+*.key
+*.pem
+credentials.json
