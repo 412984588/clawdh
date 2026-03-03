@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Config } from '@voice-hub/shared-config';
 import type { VoiceRuntime } from '@voice-hub/core-runtime';
+import { signWebhookPayload } from '@voice-hub/backend-dispatcher';
 import { VoiceHubServer } from '../src/server.js';
 
 function createConfig(): Config {
@@ -18,6 +19,9 @@ function createConfig(): Config {
     webhookPort: 8911,
     webhookSecret: 'test-webhook-secret',
     webhookPath: '/webhook/callback',
+    webhookLegacySecretHeader: false,
+    webhookShadowMode: false,
+    corsAllowedOrigins: ['http://localhost:3000', 'http://127.0.0.1:3000'],
     memoryDbPath: './data/memory_bank.db',
     memoryWalEnabled: true,
     memoryBusyTimeout: 5000,
@@ -96,6 +100,45 @@ describe('VoiceHubServer route implementations', () => {
     runtime.getSession.mockReturnValue({ sessionId: 's1' });
     const server = new VoiceHubServer(createConfig(), runtime as unknown as VoiceRuntime);
     const fastify = (server as any).server;
+    const payload = {
+      id: 'evt_1',
+      event: 'backend_task.completed',
+      timestamp: Date.now(),
+      sessionId: 's1',
+      data: {
+        sessionId: 's1',
+        result: {
+          summary: 'Task done',
+          shouldAnnounce: true,
+        },
+      },
+    };
+    const signature = signWebhookPayload(
+      payload as any,
+      'test-webhook-secret',
+      String(payload.timestamp)
+    );
+
+    const response = await fastify.inject({
+      method: 'POST',
+      url: '/webhook/callback',
+      headers: {
+        'x-webhook-signature': signature,
+        'x-webhook-timestamp': String(payload.timestamp),
+      },
+      payload,
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(runtime.sendAudio).toHaveBeenCalledTimes(1);
+    expect(response.json().handled).toBe(true);
+  });
+
+  it('rejects legacy webhook header by default', async () => {
+    const runtime = createRuntimeMock();
+    runtime.getSession.mockReturnValue({ sessionId: 's1' });
+    const server = new VoiceHubServer(createConfig(), runtime as unknown as VoiceRuntime);
+    const fastify = (server as any).server;
 
     const response = await fastify.inject({
       method: 'POST',
@@ -104,22 +147,84 @@ describe('VoiceHubServer route implementations', () => {
         'x-webhook-secret': 'test-webhook-secret',
       },
       payload: {
-        id: 'evt_1',
-        event: 'backend_task.completed',
+        id: 'evt_legacy',
+        event: 'custom.notification',
         timestamp: Date.now(),
         sessionId: 's1',
-        data: {
-          sessionId: 's1',
-          result: {
-            summary: 'Task done',
-            shouldAnnounce: true,
-          },
-        },
+        data: { text: 'legacy' },
       },
     });
 
+    expect(response.statusCode).toBe(401);
+  });
+
+  it('supports ready route and returns 503 when runtime inactive', async () => {
+    const runtime = createRuntimeMock();
+    const server = new VoiceHubServer(createConfig(), runtime as unknown as VoiceRuntime);
+    const fastify = (server as any).server;
+
+    const ready = await fastify.inject({ method: 'GET', url: '/ready' });
+    expect(ready.statusCode).toBe(200);
+
+    runtime.isActive.mockReturnValue(false);
+    const notReady = await fastify.inject({ method: 'GET', url: '/ready' });
+    expect(notReady.statusCode).toBe(503);
+  });
+
+  it('enforces cors allowlist from config', async () => {
+    const config = createConfig();
+    config.corsAllowedOrigins = ['http://allowed.local'];
+    const runtime = createRuntimeMock();
+    const server = new VoiceHubServer(config, runtime as unknown as VoiceRuntime);
+    const fastify = (server as any).server;
+
+    const allowed = await fastify.inject({
+      method: 'GET',
+      url: '/health',
+      headers: { origin: 'http://allowed.local' },
+    });
+    expect(allowed.headers['access-control-allow-origin']).toBe('http://allowed.local');
+
+    const blocked = await fastify.inject({
+      method: 'GET',
+      url: '/health',
+      headers: { origin: 'http://blocked.local' },
+    });
+    expect(blocked.headers['access-control-allow-origin']).toBeUndefined();
+  });
+
+  it('runs webhook shadow mode without duplicating side effects', async () => {
+    const config = createConfig();
+    config.webhookShadowMode = true;
+    const runtime = createRuntimeMock();
+    runtime.getSession.mockReturnValue({ sessionId: 's1' });
+    const server = new VoiceHubServer(config, runtime as unknown as VoiceRuntime);
+    const fastify = (server as any).server;
+    const payload = {
+      id: 'evt_shadow',
+      event: 'custom.notification',
+      timestamp: Date.now(),
+      sessionId: 's1',
+      data: { text: 'shadow-notify' },
+    };
+    const signature = signWebhookPayload(
+      payload as any,
+      'test-webhook-secret',
+      String(payload.timestamp)
+    );
+
+    const response = await fastify.inject({
+      method: 'POST',
+      url: '/webhook/callback',
+      headers: {
+        'x-webhook-signature': signature,
+        'x-webhook-timestamp': String(payload.timestamp),
+      },
+      payload,
+    });
+
     expect(response.statusCode).toBe(200);
+    expect(response.json().shadowMode).toBe(true);
     expect(runtime.sendAudio).toHaveBeenCalledTimes(1);
-    expect(response.json().handled).toBe(true);
   });
 });
