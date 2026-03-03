@@ -264,7 +264,7 @@ export class VoiceRuntime {
     if (listeners) {
       for (const listener of listeners) {
         try {
-          listener(data || { type: event as any, timestamp: Date.now() });
+          listener(data || { type: event as RuntimeEvent['type'], timestamp: Date.now() });
         } catch (error) {
           this.logListenerError(event, error);
         }

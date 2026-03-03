@@ -83,7 +83,7 @@ export class DoubaoProvider extends BaseProvider {
           this.emitEvent({
             type: 'provider',
             timestamp: Date.now(),
-            eventId: crypto.randomUUID(),
+            eventId: randomUUID(),
             provider: 'doubao',
             subType: 'connected',
           });
