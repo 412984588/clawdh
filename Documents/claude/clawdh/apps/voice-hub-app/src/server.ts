@@ -415,12 +415,12 @@ export class VoiceHubServer {
   }
 
   private async synthesizeFromApi(text: string): Promise<AudioFrame | null> {
-    const ttsApiUrl = process.env.TTS_API_URL?.trim();
+    const ttsApiUrl = process.env.TTS_API_URL?.trim?.();
     if (!ttsApiUrl) {
       return null;
     }
 
-    const apiKey = process.env.TTS_API_KEY?.trim();
+    const apiKey = process.env.TTS_API_KEY?.trim?.();
     let lastError: Error | null = null;
 
     for (let attempt = 0; attempt <= this.ttsRetryCount; attempt++) {
