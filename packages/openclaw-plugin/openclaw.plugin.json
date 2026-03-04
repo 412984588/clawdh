@@ -109,7 +109,7 @@
 
   "configuration": {
     "env": [
-      { "name": "VOICE_PROVIDER", "description": "Voice provider: disabled, local-mock, doubao", "default": "local-mock" },
+      { "name": "VOICE_PROVIDER", "description": "Voice provider: disabled, local-mock, doubao, qwen-dashscope", "default": "local-mock" },
       { "name": "DISCORD_BOT_TOKEN", "description": "Discord bot token", "required": true },
       { "name": "DISCORD_GUILD_ID", "description": "Discord guild ID", "required": true },
       { "name": "WEBHOOK_PORT", "description": "Webhook server port", "default": "8848" },
