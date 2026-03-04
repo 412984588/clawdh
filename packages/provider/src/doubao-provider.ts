@@ -45,6 +45,7 @@ export class DoubaoProvider extends BaseProvider {
   private ws: WebSocket | null = null;
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private heartbeatInterval: ReturnType<typeof setInterval> | null = null;
+  private connectedEventEmitted = false;
 
   constructor(config: DoubaoConfig) {
     super(config);
@@ -59,6 +60,7 @@ export class DoubaoProvider extends BaseProvider {
     }
 
     this.setState(ProviderState.CONNECTING);
+    this.connectedEventEmitted = false;
 
     try {
       const url = new URL(this._config.url);
@@ -80,13 +82,7 @@ export class DoubaoProvider extends BaseProvider {
         this.ws.onopen = () => {
           this.setState(ProviderState.READY);
           this._stats.connectedAt = Date.now();
-          this.emitEvent({
-            type: 'provider',
-            timestamp: Date.now(),
-            eventId: randomUUID(),
-            provider: 'doubao',
-            subType: 'connected',
-          });
+          this.emitConnectedEventOnce();
           this.startHeartbeat();
           resolve();
         };
@@ -133,6 +129,7 @@ export class DoubaoProvider extends BaseProvider {
     }
 
     this.setState(ProviderState.CLOSED);
+    this.connectedEventEmitted = false;
     this.emitEvent({
       type: 'provider',
       timestamp: Date.now(),
@@ -206,13 +203,7 @@ export class DoubaoProvider extends BaseProvider {
 
       switch (message.type) {
         case 'session_started':
-          this.emitEvent({
-            type: 'provider',
-            timestamp: Date.now(),
-            eventId: randomUUID(),
-            provider: 'doubao',
-            subType: 'connected',
-          });
+          this.emitConnectedEventOnce();
           break;
 
         case 'audio':
@@ -285,6 +276,7 @@ export class DoubaoProvider extends BaseProvider {
   private handleDisconnect(): void {
     this.stopHeartbeat();
     this.setState(ProviderState.CLOSED);
+    this.connectedEventEmitted = false;
     this.emitEvent({
       type: 'provider',
       timestamp: Date.now(),
@@ -315,5 +307,20 @@ export class DoubaoProvider extends BaseProvider {
       clearInterval(this.heartbeatInterval);
       this.heartbeatInterval = null;
     }
+  }
+
+  private emitConnectedEventOnce(): void {
+    if (this.connectedEventEmitted) {
+      return;
+    }
+
+    this.connectedEventEmitted = true;
+    this.emitEvent({
+      type: 'provider',
+      timestamp: Date.now(),
+      eventId: randomUUID(),
+      provider: 'doubao',
+      subType: 'connected',
+    });
   }
 }
