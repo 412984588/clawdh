@@ -1,0 +1,263 @@
+{
+  "$schema": "https://cdn.anthropic.com/claude-code/manifest-schema.json",
+  "id": "voice-hub",
+  "name": "Voice Hub",
+  "version": "0.1.0",
+  "description": "Real-time voice interaction middleware for Claude Code - Discord voice + TTS/STT integration",
+  "author": "Voice Hub Team",
+  "license": "MIT",
+  "homepage": "https://github.com/voice-hub/voice-hub",
+  "repository": "https://github.com/voice-hub/voice-hub",
+
+  "type": "extension",
+  "category": "audio",
+
+  "entrypoint": {
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts"
+  },
+
+  "capabilities": {
+    "voiceInput": {
+      "description": "Receive voice input from Discord voice channel",
+      "enabled": true
+    },
+    "voiceOutput": {
+      "description": "Send voice output to Discord voice channel",
+      "enabled": true
+    },
+    "sessionManagement": {
+      "description": "Create, manage, and destroy voice sessions",
+      "enabled": true
+    },
+    "memoryStorage": {
+      "description": "Store session history and context",
+      "enabled": true
+    },
+    "backendDispatch": {
+      "description": "Dispatch events to backend via webhook",
+      "enabled": true
+    }
+  },
+
+  "commands": [
+    {
+      "name": "voice.start",
+      "description": "Start a new voice session",
+      "handler": "handleVoiceStart",
+      "params": {
+        "userId": {
+          "type": "string",
+          "description": "Optional user identifier",
+          "required": false
+        },
+        "channelId": {
+          "type": "string",
+          "description": "Discord voice channel ID",
+          "required": false
+        }
+      }
+    },
+    {
+      "name": "voice.stop",
+      "description": "Stop the current voice session",
+      "handler": "handleVoiceStop",
+      "params": {
+        "sessionId": {
+          "type": "string",
+          "description": "Session ID to stop",
+          "required": false
+        }
+      }
+    },
+    {
+      "name": "voice.status",
+      "description": "Get current voice session status",
+      "handler": "handleVoiceStatus",
+      "params": {
+        "sessionId": {
+          "type": "string",
+          "description": "Session ID (optional, defaults to current)",
+          "required": false
+        }
+      }
+    },
+    {
+      "name": "voice.text",
+      "description": "Send text to be spoken",
+      "handler": "handleVoiceText",
+      "params": {
+        "text": {
+          "type": "string",
+          "description": "The text to speak",
+          "required": true
+        },
+        "sessionId": {
+          "type": "string",
+          "description": "Session ID (optional, defaults to current)",
+          "required": false
+        }
+      }
+    },
+    {
+      "name": "voice.listen",
+      "description": "Start/stop listening for voice input",
+      "handler": "handleVoiceListen",
+      "params": {
+        "enabled": {
+          "type": "boolean",
+          "description": "true to start listening, false to stop",
+          "required": true
+        },
+        "sessionId": {
+          "type": "string",
+          "description": "Session ID (optional, defaults to current)",
+          "required": false
+        }
+      }
+    }
+  ],
+
+  "settings": [
+    {
+      "key": "voice.provider",
+      "title": "Voice Provider",
+      "description": "Select the voice service provider",
+      "type": "select",
+      "options": [
+        { "value": "disabled", "label": "Disabled" },
+        { "value": "local-mock", "label": "Local Mock (Testing)" },
+        { "value": "doubao", "label": "Doubao Realtime" }
+      ],
+      "default": "local-mock"
+    },
+    {
+      "key": "voice.autoStart",
+      "title": "Auto-start Listening",
+      "description": "Automatically start listening when session is created",
+      "type": "boolean",
+      "default": false
+    },
+    {
+      "key": "voice.saveAudio",
+      "title": "Save Audio Files",
+      "description": "Save audio recordings to disk for debugging",
+      "type": "boolean",
+      "default": false
+    },
+    {
+      "key": "voice.sampleRate",
+      "title": "Audio Sample Rate",
+      "description": "Audio sample rate in Hz",
+      "type": "select",
+      "options": [
+        { "value": "16000", "label": "16 kHz" },
+        { "value": "24000", "label": "24 kHz" },
+        { "value": "48000", "label": "48 kHz" }
+      ],
+      "default": "24000"
+    }
+  ],
+
+  "env": [
+    {
+      "name": "VOICE_PROVIDER",
+      "description": "Voice provider: disabled, local-mock, doubao",
+      "required": false,
+      "default": "local-mock"
+    },
+    {
+      "name": "DISCORD_BOT_TOKEN",
+      "description": "Discord bot token for voice integration",
+      "required": true
+    },
+    {
+      "name": "DISCORD_GUILD_ID",
+      "description": "Discord guild ID",
+      "required": true
+    },
+    {
+      "name": "DISCORD_VOICE_CHANNEL_ID",
+      "description": "Default Discord voice channel ID",
+      "required": false
+    },
+    {
+      "name": "DOUBAO_REALTIME_WS_URL",
+      "description": "Doubao realtime WebSocket URL",
+      "required": false
+    },
+    {
+      "name": "DOUBAO_APP_ID",
+      "description": "Doubao app ID",
+      "required": false
+    },
+    {
+      "name": "DOUBAO_ACCESS_TOKEN",
+      "description": "Doubao access token",
+      "required": false
+    },
+    {
+      "name": "MEMORY_DB_PATH",
+      "description": "Path to SQLite database",
+      "required": false,
+      "default": "./data/voice-hub.db"
+    },
+    {
+      "name": "WEBHOOK_PORT",
+      "description": "Webhook server port",
+      "required": false,
+      "default": "8848"
+    },
+    {
+      "name": "WEBHOOK_SECRET",
+      "description": "Webhook signature secret for HMAC verification",
+      "required": true
+    }
+  ],
+
+  "notifications": [
+    {
+      "event": "session.started",
+      "message": "Voice session started",
+      "type": "info"
+    },
+    {
+      "event": "session.ended",
+      "message": "Voice session ended",
+      "type": "info"
+    },
+    {
+      "event": "listening.started",
+      "message": "Now listening for voice input...",
+      "type": "info"
+    },
+    {
+      "event": "listening.stopped",
+      "message": "Stopped listening",
+      "type": "info"
+    },
+    {
+      "event": "error",
+      "message": "Voice error occurred",
+      "type": "error"
+    }
+  ],
+
+  "compatibility": {
+    "claudeCode": ">=1.0.0",
+    "node": ">=22.12.0"
+  },
+
+  "dependencies": {
+    "runtime": ["@voice-hub/core-runtime"],
+    "optional": [
+      "@voice-hub/openclaw-plugin",
+      "@voice-hub/claude-mcp-server"
+    ]
+  },
+
+  "installation": {
+    "type": "npm",
+    "package": "@voice-hub/claude-marketplace"
+  }
+}

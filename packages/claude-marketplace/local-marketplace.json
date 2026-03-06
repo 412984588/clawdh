@@ -1,0 +1,11 @@
+{
+  "marketplace": "local",
+  "plugins": [
+    {
+      "id": "voice-hub",
+      "name": "Voice Hub",
+      "version": "0.2.0",
+      "root": "${CLAUDE_PLUGIN_ROOT}"
+    }
+  ]
+}

@@ -32,15 +32,10 @@ pnpm build
 # 复制文件
 echo "📋 复制插件文件..."
 cp -r "$PLUGIN_DIR/dist" "$PLUGINS_DIR/"
+cp -r "$PLUGIN_DIR/src" "$PLUGINS_DIR/"
 cp "$PLUGIN_DIR/package.json" "$PLUGINS_DIR/"
 cp "$PLUGIN_DIR/openclaw.plugin.json" "$PLUGINS_DIR/"
 cp "$PLUGIN_DIR/tsconfig.json" "$PLUGINS_DIR/" 2>/dev/null || true
-
-# 创建符号链接到 node_modules（如果使用 workspace）
-if [ -L "$PROJECT_ROOT/node_modules/@voice-hub/openclaw-plugin" ]; then
-  echo "🔗 检测到 workspace，创建引用..."
-  echo "@voice-hub/openclaw-plugin=file:$PROJECT_ROOT/packages/openclaw-plugin" > "$PLUGINS_DIR/package.json"
-fi
 
 # 注册到 OpenClaw
 MANIFEST_FILE="$OPENCLAW_DIR/plugins/manifest.json"
@@ -60,5 +55,5 @@ echo "✅ 安装完成！"
 echo ""
 echo "📌 下一步："
 echo "   1. 配置环境变量 (见 .env.example)"
-echo "   2. 重启 OpenClaw: openclaw restart"
-echo "   3. 验证: openclaw plugin list"
+echo "   2. 运行 smoke: ./scripts/smoke-openclaw-install.sh"
+echo "   3. 在 OpenClaw 中验证插件是否可见"

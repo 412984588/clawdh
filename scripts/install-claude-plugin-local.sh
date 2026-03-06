@@ -32,57 +32,14 @@ pnpm build
 # 复制文件
 echo "📋 复制插件文件..."
 cp -r "$PLUGIN_DIR/dist" "$PLUGINS_DIR/"
+cp -r "$PLUGIN_DIR/src" "$PLUGINS_DIR/"
+cp -r "$PLUGIN_DIR/.claude-plugin" "$PLUGINS_DIR/"
+cp -r "$PLUGIN_DIR/.claude" "$PLUGINS_DIR/"
+cp -r "$PLUGIN_DIR/skills" "$PLUGINS_DIR/"
+cp -r "$PLUGIN_DIR/bin" "$PLUGINS_DIR/"
 cp "$PLUGIN_DIR/package.json" "$PLUGINS_DIR/"
-cp "$PLUGIN_DIR/.claude-plugin/manifest.json" "$PLUGINS_DIR/"
-
-# 创建插件入口点 (使用 CLAUDE_PLUGIN_ROOT 环境变量)
-cat > "$PLUGINS_DIR/index.js" << 'EOF'
-/**
- * Voice Hub Claude Code Plugin Entry Point
- *
- * 这个文件作为 Claude Code 插件的入口点
- * 实际实现在 dist/index.js 中
- */
-
-import { VoiceHubPlugin } from './dist/index.js';
-
-// 创建插件实例
-const plugin = new VoiceHubPlugin({
-  pluginRoot: process.env.CLAUDE_PLUGIN_ROOT,
-});
-
-// 导出 Claude Code 需要的接口
-export const commands = plugin.getCommands();
-export const settings = plugin.getSettings();
-export const handlers = plugin.getHandlers();
-
-export default plugin;
-EOF
-
-# 创建环境变量配置示例
-cat > "$PLUGINS_DIR/.env.example" << 'EOF'
-# Voice Hub Claude Code Plugin Configuration
-
-# Discord Configuration (必需)
-DISCORD_BOT_TOKEN=your_discord_bot_token_here
-DISCORD_GUILD_ID=your_discord_guild_id
-DISCORD_VOICE_CHANNEL_ID=your_voice_channel_id
-
-# Voice Provider (disabled, local-mock, doubao)
-VOICE_PROVIDER=local-mock
-
-# Doubao Configuration (如果使用 doubao)
-DOUBAO_REALTIME_WS_URL=wss://...
-DOUBAO_APP_ID=your_app_id
-DOUBAO_ACCESS_TOKEN=your_access_token
-
-# Memory Storage
-MEMORY_DB_PATH=./data/voice-hub.db
-
-# Webhook Server
-WEBHOOK_PORT=8848
-WEBHOOK_SECRET=your_webhook_secret_here
-EOF
+cp "$PLUGIN_DIR/local-marketplace.json" "$PLUGINS_DIR/"
+cp "$PROJECT_ROOT/.env.example" "$PLUGINS_DIR/.env.example"
 
 # 注册到 Claude Code (如果支持)
 REGISTRY_FILE="$CLAUDE_DIR/plugins/registry.json"
@@ -90,7 +47,7 @@ if [ -f "$REGISTRY_FILE" ]; then
   echo "📝 注册插件到 Claude Code..."
   if command -v jq &> /dev/null; then
     jq --arg id "voice-hub" --arg path "$PLUGINS_DIR" \
-      '.plugins[$id] = {"path": $path, "enabled": true, "version": "0.1.0"}' \
+      '.plugins[$id] = {"path": $path, "enabled": true, "version": "0.2.0"}' \
       "$REGISTRY_FILE" > "$REGISTRY_FILE.tmp" && mv "$REGISTRY_FILE.tmp" "$REGISTRY_FILE"
   else
     echo "⚠️  jq 未安装，请手动注册插件"
@@ -100,7 +57,6 @@ fi
 echo "✅ 安装完成！"
 echo ""
 echo "📌 下一步："
-echo "   1. 配置环境变量: cp $PLUGINS_DIR/.env.example $CLAUDE_DIR/plugins/voice-hub/.env"
-echo "   2. 编辑 .env 文件填入真实配置"
-echo "   3. 重启 Claude Code"
-echo "   4. 在 Claude Code 中启用插件: Settings > Plugins > Voice Hub"
+echo "   1. 运行 smoke: ./scripts/smoke-claude-plugin-install.sh"
+echo "   2. 配置环境变量: cp $PLUGINS_DIR/.env.example $CLAUDE_DIR/plugins/voice-hub/.env"
+echo "   3. 重启 Claude Code 并重新加载插件"

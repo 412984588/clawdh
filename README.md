@@ -1,126 +1,78 @@
-# Voice Hub - 全双工语音中间层
+# Voice Hub
 
-> Discord + OpenClaw + Claude Code 双插件实时语音系统
+Discord 语音桥接守护进程，带 provider 注册表、会话隔离、Memory Bank、OpenClaw 插件和 Claude Code 插件。
 
-## 简介
+## 当前实现
 
-Voice Hub 是一个可安装、可本地联调、可开源分发的实时语音中间层系统。它实现了：
+- `apps/bridge-daemon`：生产入口和 CLI。
+- `apps/voice-hub-app`：HTTP/WebSocket/API 服务器与 Discord 集成。
+- `packages/core-runtime`：provider 无关的会话运行时。
+- `packages/provider-*`：分 provider 适配层。
+- `packages/memory-bank`：SQLite/WAL 记忆与 webhook 幂等存储。
+- `packages/openclaw-plugin`：OpenClaw 自包含插件壳。
+- `packages/claude-marketplace`：Claude Code 自包含插件根目录。
 
-- **前台**：Discord 语音机器人
-- **实时语音**：火山引擎豆包端到端实时语音模型（Omni 方向）
-- **后台执行**：OpenClaw / Claude Code / 外部 worker
-- **核心体验**：像打电话一样实时对话，支持打断
+## 支持的 provider
 
-## 特性
-
-- ✅ 全双工实时语音对话
-- ✅ 支持用户打断（Barge-in）
-- ✅ 异步后台任务分发
-- ✅ Memory Bank 记录坑点与成功模式
-- ✅ BYOK（Bring Your Own Key）- 无内置密钥
-- ✅ OpenClaw 插件支持
-- ✅ Claude Code 插件支持
-- ✅ Webhook 安全验签
-- ✅ 会话隔离与防串台
+- `local-mock`
+- `local-pipeline`
+- `openai-realtime`
+- `gemini-live`
+- `hume-evi`
+- `azure-voice-live`
+- `volcengine-realtime`
+- `qwen-dashscope`：兼容保留，不在主矩阵内
 
 ## 快速开始
 
-### 前置要求
-
-- Node.js >= 22.12.0
-- pnpm >= 9.0.0
-- Discord Bot Token
-
-### 安装
-
 ```bash
-# 克隆仓库
-git clone https://github.com/your-org/clawdh.git
-cd clawdh
-
-# 安装依赖
 pnpm install
-
-# 配置环境变量
 cp .env.example .env
-# 编辑 .env 填入你的密钥
-
-# 构建
+pnpm doctor
+pnpm typecheck
 pnpm build
-
-# 运行测试
 pnpm test
 ```
 
-### 本地开发
+启动守护进程：
 
 ```bash
-# 启动开发服务器
-pnpm --filter @voice-hub/app dev
-
-# 或者使用 doctor 检查配置
-pnpm doctor
-
-# 发布前门禁检查
-pnpm release:gate
+node apps/bridge-daemon/dist/cli.js start
+node apps/bridge-daemon/dist/cli.js status
 ```
 
-## 插件
-
-Voice Hub 提供两个插件，分别用于 OpenClaw 和 Claude Code 集成：
-
-### OpenClaw 插件
-
-位于 `packages/openclaw-plugin/`，提供 OpenClaw 系统的语音中间层接口。
+本地安装插件：
 
 ```bash
-# 本地安装到 OpenClaw
-./scripts/install-openclaw-local.sh
+pnpm install-openclaw-local
+pnpm install-claude-local
 ```
 
-**功能**：
-- 会话管理（创建/销毁）
-- 语音输入/输出
-- 音频数据传输
-- 状态查询
+## 关键默认值
 
-详见：[OpenClaw 插件文档](docs/plugins/openclaw.md)
-
-### Claude Code 插件
-
-位于 `packages/claude-marketplace/`，提供 Claude Code Marketplace 集成。
-
-```bash
-# 本地安装到 Claude Code
-./scripts/install-claude-plugin-local.sh
-```
-
-**功能**：
-- `voice.start` - 启动语音会话
-- `voice.stop` - 停止语音会话
-- `voice.status` - 获取会话状态
-- `voice.text` - 发送文本转语音
-- `voice.listen` - 开始/停止监听
-
-详见：[Claude Code 插件文档](docs/plugins/claude-code.md)
+- Node：`>=22.12.0`
+- pnpm：`>=9`
+- 默认 DB：`~/.voice-hub/voice-hub.db`
+- 默认 webhook/API 路径：`/webhook/openclaw_callback`
+- 默认端口：`8911`
+- 默认模式：`PRECISION_MODE_DEFAULT=natural`
 
 ## 文档
 
-- [架构说明](docs/architecture.md)
-- [安装指南](docs/install.md)
-- [安全说明](docs/security.md)
-- [插件开发](docs/plugins/)
-- [故障排查](docs/troubleshooting.md)
+- [安装](docs/install.md)
+- [架构](docs/architecture.md)
+- [Provider Matrix](docs/provider-matrix.md)
+- [Provider 鉴权](docs/provider-auth.md)
+- [Provider Fallbacks](docs/provider-fallbacks.md)
+- [运行模式](docs/runtime-modes.md)
+- [运维](docs/operations.md)
+- [隐私与保留](docs/privacy-retention.md)
+- [插件开发](docs/plugin-dev.md)
+- [OpenClaw 安装说明](README.openclaw.md)
+- [Claude Code 安装说明](README.claude-code.md)
+- [开发者说明](README.dev.md)
+- [审计记录](docs/audit-codex-final.md)
 
-## BYOK 声明
+## BYOK
 
-本项目采用 **BYOK (Bring Your Own Key)** 模式：
-
-- ❌ 仓库中不包含任何真实 API 密钥
-- ✅ 用户自行配置所需密钥
-- ✅ 支持 `.env` 文件配置
-- ✅ 支持 provider 切换（disabled, local-mock, doubao）
-
-## 许可证
-
-MIT License - 详见 [LICENSE](LICENSE)
+仓库不提供任何共享密钥。所有外部 provider 都要求你自己配置凭证；`doctor --probe-live` 只在你显式提供真实凭证后才有意义。
