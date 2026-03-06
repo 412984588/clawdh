@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Config } from '@voice-hub/shared-config';
 import type { VoiceRuntime } from '@voice-hub/core-runtime';
 import { signWebhookPayload } from '@voice-hub/backend-dispatcher';
+import { createHmac } from 'node:crypto';
 import { VoiceHubServer } from '../src/server.js';
 
 function createConfig(): Config {
@@ -13,12 +14,32 @@ function createConfig(): Config {
     doubaoRealtimeWsUrl: undefined,
     doubaoAppId: undefined,
     doubaoAccessToken: undefined,
+    volcengineRealtimeWsUrl: undefined,
+    volcengineAppId: undefined,
+    volcengineAccessToken: undefined,
+    openaiRealtimeWsUrl: undefined,
+    openaiApiKey: undefined,
+    openaiRealtimeModel: 'gpt-4o-realtime-preview',
+    geminiLiveWsUrl: undefined,
+    geminiApiKey: undefined,
+    geminiLiveModel: 'gemini-live-2.5-flash-preview',
+    humeEviWsUrl: undefined,
+    humeApiKey: undefined,
+    humeConfigId: undefined,
+    azureVoiceLiveWsUrl: undefined,
+    azureVoiceLiveApiKey: undefined,
+    azureVoiceLiveDeployment: undefined,
+    qwenRealtimeWsUrl: undefined,
+    qwenApiKey: undefined,
+    qwenModel: undefined,
+    qwenVoice: undefined,
+    qwenRegion: 'intl',
     backendDispatchUrl: undefined,
     backendTimeoutMs: 30000,
     backendMaxRetries: 3,
     webhookPort: 8911,
     webhookSecret: 'test-webhook-secret',
-    webhookPath: '/webhook/callback',
+    webhookPath: '/webhook/openclaw_callback',
     voiceHubApiKey: undefined,
     webhookLegacySecretHeader: false,
     webhookShadowMode: false,
@@ -37,6 +58,7 @@ function createConfig(): Config {
     sessionTimeoutMs: 300000,
     sessionMaxReconnectAttempts: 5,
     sessionReconnectDelayMs: 2000,
+    precisionModeDefault: 'natural',
     voiceProvider: 'local-mock',
   };
 }
@@ -54,6 +76,35 @@ function createRuntimeMock() {
     isActive: vi.fn().mockReturnValue(true),
     getActiveSessionCount: vi.fn().mockReturnValue(0),
   };
+}
+
+function createMemoryStoreMock() {
+  return {
+    markWebhookProcessed: vi.fn().mockReturnValue(true),
+    queuePendingAnnouncement: vi.fn(),
+  };
+}
+
+async function eventually(assertion: () => void, attempts = 20): Promise<void> {
+  let lastError: unknown;
+
+  for (let index = 0; index < attempts; index++) {
+    try {
+      assertion();
+      return;
+    } catch (error) {
+      lastError = error;
+      await new Promise((resolve) => setTimeout(resolve, 5));
+    }
+  }
+
+  throw lastError;
+}
+
+function signRawWebhookPayload(rawBody: string, secret: string, timestamp: string): string {
+  const hmac = createHmac('sha256', secret);
+  hmac.update(`${timestamp}.${rawBody}`);
+  return `sha256=${hmac.digest('hex')}`;
 }
 
 describe('VoiceHubServer route implementations', () => {
@@ -100,7 +151,12 @@ describe('VoiceHubServer route implementations', () => {
   it('handles completed webhook and triggers announcement tts', async () => {
     const runtime = createRuntimeMock();
     runtime.getSession.mockReturnValue({ sessionId: 's1' });
-    const server = new VoiceHubServer(createConfig(), runtime as unknown as VoiceRuntime);
+    const memoryStore = createMemoryStoreMock();
+    const server = new VoiceHubServer(
+      createConfig(),
+      runtime as unknown as VoiceRuntime,
+      memoryStore as any,
+    );
     const fastify = (server as any).server;
     const payload = {
       id: 'evt_1',
@@ -123,8 +179,51 @@ describe('VoiceHubServer route implementations', () => {
 
     const response = await fastify.inject({
       method: 'POST',
-      url: '/webhook/callback',
+      url: '/webhook/openclaw_callback',
       headers: {
+        'x-webhook-id': 'evt_1',
+        'x-webhook-signature': signature,
+        'x-webhook-timestamp': String(payload.timestamp),
+      },
+      payload,
+    });
+
+    expect(response.statusCode).toBe(202);
+    expect(response.json().accepted).toBe(true);
+    await eventually(() => {
+      expect(runtime.sendAudio).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it('deduplicates webhook deliveries before side effects', async () => {
+    const runtime = createRuntimeMock();
+    runtime.getSession.mockReturnValue({ sessionId: 's1' });
+    const memoryStore = createMemoryStoreMock();
+    memoryStore.markWebhookProcessed.mockReturnValue(false);
+    const server = new VoiceHubServer(
+      createConfig(),
+      runtime as unknown as VoiceRuntime,
+      memoryStore as any,
+    );
+    const fastify = (server as any).server;
+    const payload = {
+      id: 'evt_dup',
+      event: 'custom.notification',
+      timestamp: Date.now(),
+      sessionId: 's1',
+      data: { text: 'duplicate' },
+    };
+    const signature = signWebhookPayload(
+      payload as any,
+      'test-webhook-secret',
+      String(payload.timestamp)
+    );
+
+    const response = await fastify.inject({
+      method: 'POST',
+      url: '/webhook/openclaw_callback',
+      headers: {
+        'x-webhook-id': 'evt_dup',
         'x-webhook-signature': signature,
         'x-webhook-timestamp': String(payload.timestamp),
       },
@@ -132,8 +231,48 @@ describe('VoiceHubServer route implementations', () => {
     });
 
     expect(response.statusCode).toBe(200);
-    expect(runtime.sendAudio).toHaveBeenCalledTimes(1);
-    expect(response.json().handled).toBe(true);
+    expect(response.json().deduplicated).toBe(true);
+    expect(runtime.sendAudio).not.toHaveBeenCalled();
+  });
+
+  it('stores pending announcements when target session is gone', async () => {
+    const runtime = createRuntimeMock();
+    runtime.getSession.mockReturnValue(null);
+    const memoryStore = createMemoryStoreMock();
+    const server = new VoiceHubServer(
+      createConfig(),
+      runtime as unknown as VoiceRuntime,
+      memoryStore as any,
+    );
+    const fastify = (server as any).server;
+    const payload = {
+      id: 'evt_pending',
+      event: 'custom.notification',
+      timestamp: Date.now(),
+      sessionId: 'missing-session',
+      data: { text: 'later please' },
+    };
+    const signature = signWebhookPayload(
+      payload as any,
+      'test-webhook-secret',
+      String(payload.timestamp)
+    );
+
+    const response = await fastify.inject({
+      method: 'POST',
+      url: '/webhook/openclaw_callback',
+      headers: {
+        'x-webhook-id': 'evt_pending',
+        'x-webhook-signature': signature,
+        'x-webhook-timestamp': String(payload.timestamp),
+      },
+      payload,
+    });
+
+    expect(response.statusCode).toBe(202);
+    await eventually(() => {
+      expect(memoryStore.queuePendingAnnouncement).toHaveBeenCalledTimes(1);
+    });
   });
 
   it('rejects legacy webhook header by default', async () => {
@@ -144,7 +283,7 @@ describe('VoiceHubServer route implementations', () => {
 
     const response = await fastify.inject({
       method: 'POST',
-      url: '/webhook/callback',
+      url: '/webhook/openclaw_callback',
       headers: {
         'x-webhook-secret': 'test-webhook-secret',
       },
@@ -158,6 +297,80 @@ describe('VoiceHubServer route implementations', () => {
     });
 
     expect(response.statusCode).toBe(401);
+  });
+
+  it('accepts webhook signatures computed from the original raw json body', async () => {
+    const runtime = createRuntimeMock();
+    runtime.getSession.mockReturnValue({ sessionId: 's1' });
+    const server = new VoiceHubServer(createConfig(), runtime as unknown as VoiceRuntime);
+    const fastify = (server as any).server;
+    const rawPayload = JSON.stringify({
+      id: 'evt_raw',
+      event: 'custom.notification',
+      timestamp: Date.now(),
+      sessionId: 's1',
+      data: { text: 'raw-body' },
+    }, null, 2);
+    const payload = JSON.parse(rawPayload) as {
+      timestamp: number;
+    };
+    const signature = signRawWebhookPayload(
+      rawPayload,
+      'test-webhook-secret',
+      String(payload.timestamp),
+    );
+
+    const response = await fastify.inject({
+      method: 'POST',
+      url: '/webhook/openclaw_callback',
+      headers: {
+        'content-type': 'application/json',
+        'x-webhook-id': 'evt_raw',
+        'x-webhook-signature': signature,
+        'x-webhook-timestamp': String(payload.timestamp),
+      },
+      payload: rawPayload,
+    });
+
+    expect(response.statusCode).toBe(202);
+    await eventually(() => {
+      expect(runtime.sendAudio).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it('rejects signatures computed from a reserialized payload when raw json differs', async () => {
+    const runtime = createRuntimeMock();
+    runtime.getSession.mockReturnValue({ sessionId: 's1' });
+    const server = new VoiceHubServer(createConfig(), runtime as unknown as VoiceRuntime);
+    const fastify = (server as any).server;
+    const rawPayload = JSON.stringify({
+      id: 'evt_compact_mismatch',
+      event: 'custom.notification',
+      timestamp: Date.now(),
+      sessionId: 's1',
+      data: { text: 'mismatch' },
+    }, null, 2);
+    const payload = JSON.parse(rawPayload);
+    const signature = signWebhookPayload(
+      payload as any,
+      'test-webhook-secret',
+      String(payload.timestamp),
+    );
+
+    const response = await fastify.inject({
+      method: 'POST',
+      url: '/webhook/openclaw_callback',
+      headers: {
+        'content-type': 'application/json',
+        'x-webhook-id': 'evt_compact_mismatch',
+        'x-webhook-signature': signature,
+        'x-webhook-timestamp': String(payload.timestamp),
+      },
+      payload: rawPayload,
+    });
+
+    expect(response.statusCode).toBe(401);
+    expect(runtime.sendAudio).not.toHaveBeenCalled();
   });
 
   it('supports ready route and returns 503 when runtime inactive', async () => {
@@ -274,7 +487,8 @@ describe('VoiceHubServer route implementations', () => {
     config.webhookShadowMode = true;
     const runtime = createRuntimeMock();
     runtime.getSession.mockReturnValue({ sessionId: 's1' });
-    const server = new VoiceHubServer(config, runtime as unknown as VoiceRuntime);
+    const memoryStore = createMemoryStoreMock();
+    const server = new VoiceHubServer(config, runtime as unknown as VoiceRuntime, memoryStore as any);
     const fastify = (server as any).server;
     const payload = {
       id: 'evt_shadow',
@@ -291,16 +505,53 @@ describe('VoiceHubServer route implementations', () => {
 
     const response = await fastify.inject({
       method: 'POST',
-      url: '/webhook/callback',
+      url: '/webhook/openclaw_callback',
       headers: {
+        'x-webhook-id': 'evt_shadow',
         'x-webhook-signature': signature,
         'x-webhook-timestamp': String(payload.timestamp),
       },
       payload,
     });
 
-    expect(response.statusCode).toBe(200);
+    expect(response.statusCode).toBe(202);
     expect(response.json().shadowMode).toBe(true);
-    expect(runtime.sendAudio).toHaveBeenCalledTimes(1);
+    await eventually(() => {
+      expect(runtime.sendAudio).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it('supports explicit webhook path overrides for compatibility', async () => {
+    const config = createConfig();
+    config.webhookPath = '/webhook/callback';
+    const runtime = createRuntimeMock();
+    runtime.getSession.mockReturnValue({ sessionId: 's1' });
+    const server = new VoiceHubServer(config, runtime as unknown as VoiceRuntime);
+    const fastify = (server as any).server;
+    const payload = {
+      id: 'evt_legacy_path',
+      event: 'custom.notification',
+      timestamp: Date.now(),
+      sessionId: 's1',
+      data: { text: 'legacy-path' },
+    };
+    const signature = signWebhookPayload(
+      payload as any,
+      'test-webhook-secret',
+      String(payload.timestamp),
+    );
+
+    const response = await fastify.inject({
+      method: 'POST',
+      url: '/webhook/callback',
+      headers: {
+        'x-webhook-id': 'evt_legacy_path',
+        'x-webhook-signature': signature,
+        'x-webhook-timestamp': String(payload.timestamp),
+      },
+      payload,
+    });
+
+    expect(response.statusCode).toBe(202);
   });
 });

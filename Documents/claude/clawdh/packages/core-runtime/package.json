@@ -3,12 +3,12 @@
   "version": "0.1.0",
   "type": "module",
   "description": "核心运行时 - 会话管理、状态机、事件路由",
-  "main": "./src/index.js",
-  "types": "./src/index.d.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./src/index.d.ts",
-      "import": "./src/index.js"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
     }
   },
   "files": [
@@ -18,7 +18,7 @@
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit",
-    "test": "vitest --run --passWithNoTests",
+    "test": "vitest --run",
     "test:watch": "vitest",
     "lint": "eslint src",
     "format": "prettier -w src"
@@ -26,7 +26,8 @@
   "dependencies": {
     "@voice-hub/shared-types": "workspace:*",
     "@voice-hub/shared-config": "workspace:*",
-    "@voice-hub/provider": "workspace:*",
+    "@voice-hub/provider-contracts": "workspace:*",
+    "@voice-hub/provider-registry": "workspace:*",
     "@voice-hub/memory-bank": "workspace:*",
     "@voice-hub/backend-dispatcher": "workspace:*",
     "eventemitter3": "^5.0.1"

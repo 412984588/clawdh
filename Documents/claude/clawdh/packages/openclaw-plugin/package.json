@@ -1,24 +1,25 @@
 {
   "name": "@voice-hub/openclaw-plugin",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "description": "OpenClaw 插件壳 - 集成到 OpenClaw 系统",
-  "main": "./src/index.js",
-  "types": "./src/index.d.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./src/index.d.ts",
-      "import": "./src/index.js"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
     }
   },
   "files": [
     "dist",
-    "src"
+    "src",
+    "openclaw.plugin.json"
   ],
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit",
-    "test": "vitest --run --passWithNoTests",
+    "test": "vitest --run",
     "test:watch": "vitest",
     "lint": "eslint src",
     "format": "prettier -w src",
@@ -34,11 +35,18 @@
   },
   "openclaw": {
     "type": "voice-hub",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "capabilities": [
       "voice.input",
       "voice.output",
       "session.manage"
     ]
-  }
+  },
+  "openclaw.extensions": [
+    {
+      "id": "voice-hub",
+      "entry": "./dist/index.js",
+      "manifest": "./openclaw.plugin.json"
+    }
+  ]
 }

@@ -7,28 +7,41 @@
 import type { Config } from '@voice-hub/shared-config';
 import type { VoiceRuntime } from '@voice-hub/core-runtime';
 import { SessionState, type AudioFrame, type WebhookPayload } from '@voice-hub/shared-types';
+import { AudioFormatNormalizer } from '@voice-hub/audio-engine';
+import type { MemoryStore } from '@voice-hub/memory-bank';
 import {
   isWebhookTimestampFresh,
-  verifyWebhookSignature,
+  verifyWebhookSignatureMessage,
 } from '@voice-hub/backend-dispatcher';
 import Fastify from 'fastify';
 import websocket from '@fastify/websocket';
 import cors from '@fastify/cors';
-import { randomUUID, timingSafeEqual } from 'node:crypto';
+import { createHash, randomUUID, timingSafeEqual } from 'node:crypto';
+import { PassThrough } from 'node:stream';
+
+declare module 'fastify' {
+  interface FastifyRequest {
+    rawBody?: string;
+  }
+}
 
 /** Voice Hub Web 服务器 */
 export class VoiceHubServer {
   private config: Config;
   private runtime: VoiceRuntime;
+  private memoryStore: MemoryStore | null;
   private server: ReturnType<typeof Fastify>;
   private isRunning = false;
   private readonly ttsRequestTimeoutMs = 5000;
   private readonly ttsRetryCount = 2;
   private readonly corsAllowlist: Set<string>;
+  private webhookQueue: Array<{ payload: WebhookPayload; shadowMode: boolean }> = [];
+  private processingWebhookQueue = false;
 
-  constructor(config: Config, runtime: VoiceRuntime) {
+  constructor(config: Config, runtime: VoiceRuntime, memoryStore?: MemoryStore) {
     this.config = config;
     this.runtime = runtime;
+    this.memoryStore = memoryStore ?? null;
     this.corsAllowlist = new Set(this.config.corsAllowedOrigins);
 
     this.server = Fastify({
@@ -44,6 +57,31 @@ export class VoiceHubServer {
     });
 
     this.server.register(websocket);
+    this.server.addHook('preParsing', (request, reply, payload, done) => {
+      const path = request.url.split('?')[0] ?? request.url;
+      if (path !== this.config.webhookPath) {
+        done(null, payload);
+        return;
+      }
+
+      const stream = new PassThrough();
+      const chunks: Buffer[] = [];
+
+      payload.on('data', (chunk) => {
+        const buffer = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+        chunks.push(buffer);
+        stream.write(buffer);
+      });
+      payload.on('end', () => {
+        request.rawBody = Buffer.concat(chunks).toString('utf8');
+        stream.end();
+      });
+      payload.on('error', (error) => {
+        stream.destroy(error as Error);
+      });
+
+      done(null, stream);
+    });
     this.server.addHook('onRequest', async (request, reply) => {
       const path = request.url.split('?')[0] ?? request.url;
       if (!this.shouldProtectRoute(path)) {
@@ -156,18 +194,23 @@ export class VoiceHubServer {
         return reply.code(400).send({ error: 'audioBase64 is required' });
       }
 
-      const pcm = this.decodeRawPcm16(body.audioBase64);
-      if (!pcm) {
+      let frame;
+      try {
+        frame = AudioFormatNormalizer.fromBase64Pcm16(
+          body.audioBase64,
+          this.normalizePositiveInteger(body.sampleRate, this.config.audioSampleRate),
+          this.normalizePositiveInteger(body.channels, this.config.audioChannels),
+          {
+            targetSampleRate: this.config.audioSampleRate,
+            targetChannels: this.config.audioChannels,
+            timestamp: Date.now(),
+            sequence: Date.now() % Number.MAX_SAFE_INTEGER,
+            source: 'discord',
+          },
+        );
+      } catch {
         return reply.code(400).send({ error: 'Invalid audioBase64 payload' });
       }
-
-      const frame: AudioFrame = {
-        data: pcm,
-        sampleRate: this.normalizePositiveInteger(body.sampleRate, this.config.audioSampleRate),
-        channels: this.normalizePositiveInteger(body.channels, this.config.audioChannels),
-        timestamp: Date.now(),
-        sequence: Date.now() % Number.MAX_SAFE_INTEGER,
-      };
 
       await this.runtime.sendAudio(sessionId, frame);
       return { success: true, samples: frame.data.length };
@@ -188,7 +231,12 @@ export class VoiceHubServer {
       }
 
       const synthesis = await this.synthesizeText(text.trim());
-      await this.runtime.sendAudio(sessionId, synthesis.frame);
+      await this.runtime.sendAudio(sessionId, {
+        ...synthesis.frame,
+        encoding: 'pcm16',
+        littleEndian: true,
+        source: 'tts',
+      });
 
       return {
         success: true,
@@ -203,6 +251,7 @@ export class VoiceHubServer {
       const signature = this.getSingleHeaderValue(request.headers['x-webhook-signature']);
       const timestamp = this.getSingleHeaderValue(request.headers['x-webhook-timestamp']);
       const legacySecret = this.getSingleHeaderValue(request.headers['x-webhook-secret']);
+      const deliveryId = this.getSingleHeaderValue(request.headers['x-webhook-id']) ?? (this.isWebhookPayload(payload) ? payload.id : null);
 
       if (!this.isWebhookPayload(payload)) {
         return reply.code(400).send({ error: 'Invalid webhook payload' });
@@ -213,7 +262,12 @@ export class VoiceHubServer {
           return reply.code(401).send({ error: 'Stale webhook timestamp' });
         }
 
-        if (!verifyWebhookSignature(payload, this.config.webhookSecret, signature, timestamp)) {
+        const rawBody = request.rawBody;
+        if (typeof rawBody !== 'string') {
+          return reply.code(400).send({ error: 'Missing raw webhook payload' });
+        }
+
+        if (!verifyWebhookSignatureMessage(rawBody, this.config.webhookSecret, signature, timestamp)) {
           return reply.code(401).send({ error: 'Unauthorized' });
         }
       } else {
@@ -226,17 +280,36 @@ export class VoiceHubServer {
         }
       }
 
-      const result = await this.processWebhookPayload(payload, false);
       const shadowMode = this.isWebhookShadowMode();
+      const eventId = payload.id;
+      if (deliveryId && this.memoryStore) {
+        const marked = this.memoryStore.markWebhookProcessed({
+          deliveryId,
+          eventId,
+          eventType: payload.event,
+          payloadHash: this.buildPayloadHash(payload),
+          processedAt: Date.now(),
+        });
 
-      if (shadowMode) {
-        const shadowResult = await this.processWebhookPayload(payload, true);
-        if (JSON.stringify(shadowResult) !== JSON.stringify(result)) {
-          this.server.log.warn({ result, shadowResult }, 'Webhook shadow result mismatch');
+        if (!marked) {
+          return reply.code(200).send({
+            success: true,
+            accepted: false,
+            deduplicated: true,
+            shadowMode,
+          });
         }
       }
 
-      return { success: true, shadowMode, ...result };
+      this.webhookQueue.push({ payload, shadowMode });
+      void this.drainWebhookQueue();
+
+      return reply.code(202).send({
+        success: true,
+        accepted: true,
+        deduplicated: false,
+        shadowMode,
+      });
     });
 
     // 状态
@@ -499,6 +572,12 @@ export class VoiceHubServer {
   private async emitTts(sessionId: string, text: string, dryRun: boolean): Promise<boolean> {
     const session = this.runtime.getSession(sessionId);
     if (!session) {
+      this.memoryStore?.queuePendingAnnouncement({
+        sessionId,
+        text,
+        priority: 'queued',
+        dedupeKey: `webhook:${sessionId}:${text}`,
+      });
       return false;
     }
 
@@ -507,7 +586,12 @@ export class VoiceHubServer {
     }
 
     const synthesis = await this.synthesizeText(text);
-    await this.runtime.sendAudio(sessionId, synthesis.frame);
+    await this.runtime.sendAudio(sessionId, {
+      ...synthesis.frame,
+      encoding: 'pcm16',
+      littleEndian: true,
+      source: 'tts',
+    });
     return true;
   }
 
@@ -552,7 +636,13 @@ export class VoiceHubServer {
 
         const sampleRate = Number(body.sampleRate ?? this.config.audioSampleRate);
         const channels = Number(body.channels ?? this.config.audioChannels);
-        return this.decodePcm16(audioBase64, sampleRate, channels);
+        return AudioFormatNormalizer.fromBase64Pcm16(audioBase64, sampleRate, channels, {
+          targetSampleRate: this.config.audioSampleRate,
+          targetChannels: this.config.audioChannels,
+          timestamp: Date.now(),
+          sequence: Date.now() % Number.MAX_SAFE_INTEGER,
+          source: 'tts',
+        });
       } catch (error) {
         lastError = error as Error;
         if (attempt < this.ttsRetryCount) {
@@ -563,24 +653,6 @@ export class VoiceHubServer {
 
     this.server.log.warn({ err: lastError }, 'TTS API failed, falling back to local synth');
     return null;
-  }
-
-  private decodePcm16(audioBase64: string, sampleRate: number, channels: number): AudioFrame {
-    const buffer = Buffer.from(audioBase64, 'base64');
-    const length = Math.floor(buffer.byteLength / 2);
-    const pcm = new Int16Array(length);
-
-    for (let i = 0; i < length; i++) {
-      pcm[i] = buffer.readInt16LE(i * 2);
-    }
-
-    return {
-      data: pcm,
-      sampleRate,
-      channels,
-      timestamp: Date.now(),
-      sequence: Date.now() % Number.MAX_SAFE_INTEGER,
-    };
   }
 
   private synthesizeFallback(text: string): AudioFrame {
@@ -610,6 +682,34 @@ export class VoiceHubServer {
 
   private sleep(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  private async drainWebhookQueue(): Promise<void> {
+    if (this.processingWebhookQueue) {
+      return;
+    }
+
+    this.processingWebhookQueue = true;
+    try {
+      while (this.webhookQueue.length > 0) {
+        const item = this.webhookQueue.shift();
+        if (!item) {
+          continue;
+        }
+
+        const result = await this.processWebhookPayload(item.payload, false);
+        if (item.shadowMode) {
+          const shadowResult = await this.processWebhookPayload(item.payload, true);
+          if (JSON.stringify(shadowResult) !== JSON.stringify(result)) {
+            this.server.log.warn({ result, shadowResult }, 'Webhook shadow result mismatch');
+          }
+        }
+      }
+    } catch (error) {
+      this.server.log.error({ err: error }, 'Webhook queue processing failed');
+    } finally {
+      this.processingWebhookQueue = false;
+    }
   }
 
   private isCorsOriginAllowed(origin: string | undefined): boolean {
@@ -658,32 +758,14 @@ export class VoiceHubServer {
     return false;
   }
 
-  private decodeRawPcm16(audioBase64: string): Int16Array | null {
-    const normalized = audioBase64.trim();
-    if (
-      normalized.length === 0 ||
-      normalized.length % 4 !== 0 ||
-      !/^[A-Za-z0-9+/]+={0,2}$/.test(normalized)
-    ) {
-      return null;
-    }
-
-    const buffer = Buffer.from(normalized, 'base64');
-    if (buffer.byteLength === 0 || buffer.byteLength % 2 !== 0) {
-      return null;
-    }
-
-    const pcm = new Int16Array(buffer.byteLength / 2);
-    for (let i = 0; i < pcm.length; i++) {
-      pcm[i] = buffer.readInt16LE(i * 2);
-    }
-    return pcm;
-  }
-
   private normalizePositiveInteger(value: number | undefined, fallback: number): number {
     if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0) {
       return fallback;
     }
     return Math.floor(value);
+  }
+
+  private buildPayloadHash(payload: WebhookPayload): string {
+    return createHash('sha256').update(JSON.stringify(payload)).digest('hex');
   }
 }
