@@ -13,6 +13,13 @@ const DEFAULT_CORS_ALLOWED_ORIGINS = [
 
 const TRUE_VALUES = new Set(["1", "true", "yes", "on"]);
 const FALSE_VALUES = new Set(["0", "false", "no", "off", ""]);
+const emptyStringToUndefined = (value: unknown) => {
+  if (typeof value === "string" && value.trim() === "") {
+    return undefined;
+  }
+
+  return value;
+};
 
 const envBoolean = (defaultValue: boolean) =>
   z
@@ -45,6 +52,12 @@ const envBoolean = (defaultValue: boolean) =>
     }, z.boolean())
     .default(defaultValue);
 
+const optionalString = () =>
+  z.preprocess(emptyStringToUndefined, z.string().min(1).optional());
+
+const optionalUrl = () =>
+  z.preprocess(emptyStringToUndefined, z.string().url().optional());
+
 function resolveDefaultMemoryDbPath(): string {
   const home = homedir();
   return join(home, ".voice-hub", "voice-hub.db");
@@ -61,50 +74,53 @@ export const configSchema = z.object({
   DISCORD_VOICE_CHANNEL_ID: z
     .string()
     .min(1, "DISCORD_VOICE_CHANNEL_ID 不能为空"),
-  DISCORD_CLIENT_ID: z.string().min(1, "DISCORD_CLIENT_ID 不能为空").optional(),
+  DISCORD_CLIENT_ID: z.preprocess(
+    emptyStringToUndefined,
+    z.string().min(1, "DISCORD_CLIENT_ID 不能为空").optional(),
+  ),
 
   // Doubao Realtime Voice
-  DOUBAO_REALTIME_WS_URL: z.string().url().optional(),
-  DOUBAO_APP_ID: z.string().min(1).optional(),
-  DOUBAO_ACCESS_TOKEN: z.string().min(1).optional(),
+  DOUBAO_REALTIME_WS_URL: optionalUrl(),
+  DOUBAO_APP_ID: optionalString(),
+  DOUBAO_ACCESS_TOKEN: optionalString(),
 
   // Volcengine Realtime Voice
-  VOLCENGINE_REALTIME_WS_URL: z.string().url().optional(),
-  VOLCENGINE_APP_ID: z.string().min(1).optional(),
-  VOLCENGINE_ACCESS_TOKEN: z.string().min(1).optional(),
+  VOLCENGINE_REALTIME_WS_URL: optionalUrl(),
+  VOLCENGINE_APP_ID: optionalString(),
+  VOLCENGINE_ACCESS_TOKEN: optionalString(),
 
   // OpenAI Realtime
-  OPENAI_REALTIME_WS_URL: z.string().url().optional(),
-  OPENAI_API_KEY: z.string().min(1).optional(),
+  OPENAI_REALTIME_WS_URL: optionalUrl(),
+  OPENAI_API_KEY: optionalString(),
   OPENAI_REALTIME_MODEL: z.string().min(1).default("gpt-4o-realtime-preview"),
 
   // Gemini Live
-  GEMINI_LIVE_WS_URL: z.string().url().optional(),
-  GEMINI_API_KEY: z.string().min(1).optional(),
+  GEMINI_LIVE_WS_URL: optionalUrl(),
+  GEMINI_API_KEY: optionalString(),
   GEMINI_LIVE_MODEL: z.string().min(1).default("gemini-live-2.5-flash-preview"),
 
   // Hume EVI
-  HUME_EVI_WS_URL: z.string().url().optional(),
-  HUME_API_KEY: z.string().min(1).optional(),
-  HUME_CONFIG_ID: z.string().min(1).optional(),
+  HUME_EVI_WS_URL: optionalUrl(),
+  HUME_API_KEY: optionalString(),
+  HUME_CONFIG_ID: optionalString(),
 
   // Azure Voice Live
-  AZURE_VOICE_LIVE_WS_URL: z.string().url().optional(),
-  AZURE_VOICE_LIVE_API_KEY: z.string().min(1).optional(),
-  AZURE_VOICE_LIVE_DEPLOYMENT: z.string().min(1).optional(),
+  AZURE_VOICE_LIVE_WS_URL: optionalUrl(),
+  AZURE_VOICE_LIVE_API_KEY: optionalString(),
+  AZURE_VOICE_LIVE_DEPLOYMENT: optionalString(),
 
   // Qwen Realtime Voice (DashScope)
   QWEN_REALTIME_WS_URL: z
     .string()
     .url()
     .default("wss://dashscope-intl.aliyuncs.com/api-ws/v1/realtime"),
-  QWEN_API_KEY: z.string().min(1).optional(),
+  QWEN_API_KEY: optionalString(),
   QWEN_MODEL: z.string().min(1).default("qwen3-omni-flash-realtime"),
-  QWEN_VOICE: z.string().min(1).optional(),
+  QWEN_VOICE: optionalString(),
   QWEN_REGION: z.enum(["intl", "cn"]).default("intl"),
 
   // Backend Dispatcher
-  BACKEND_DISPATCH_URL: z.string().url().optional(),
+  BACKEND_DISPATCH_URL: optionalUrl(),
   BACKEND_TIMEOUT_MS: z.coerce.number().int().positive().default(30000),
   BACKEND_MAX_RETRIES: z.coerce.number().int().min(0).max(10).default(3),
 
@@ -112,7 +128,10 @@ export const configSchema = z.object({
   WEBHOOK_PORT: z.coerce.number().int().positive().max(65535).default(8911),
   WEBHOOK_SECRET: z.string().min(16).default("change-me-in-production"),
   WEBHOOK_PATH: z.string().default("/webhook/openclaw_callback"),
-  VOICE_HUB_API_KEY: z.string().trim().min(1).optional(),
+  VOICE_HUB_API_KEY: z.preprocess(
+    emptyStringToUndefined,
+    z.string().trim().min(1).optional(),
+  ),
   WEBHOOK_LEGACY_SECRET_HEADER: envBoolean(false),
   WEBHOOK_SHADOW_MODE: envBoolean(false),
   CORS_ALLOWED_ORIGINS: z
@@ -120,7 +139,7 @@ export const configSchema = z.object({
     .default(DEFAULT_CORS_ALLOWED_ORIGINS.join(",")),
 
   // Memory Bank
-  MEMORY_DB_PATH: z.string().optional(),
+  MEMORY_DB_PATH: z.preprocess(emptyStringToUndefined, z.string().optional()),
   MEMORY_WAL_ENABLED: envBoolean(true),
   MEMORY_BUSY_TIMEOUT: z.coerce.number().int().positive().default(5000),
 
