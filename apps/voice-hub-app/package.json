@@ -14,7 +14,7 @@
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit",
-    "test": "vitest --run --passWithNoTests",
+    "test": "vitest --run",
     "test:watch": "vitest",
     "lint": "eslint src",
     "format": "prettier -w src",
@@ -22,9 +22,17 @@
     "dev": "tsx watch src/cli.ts"
   },
   "dependencies": {
+    "@voice-hub/audio-engine": "workspace:*",
     "@voice-hub/shared-types": "workspace:*",
     "@voice-hub/shared-config": "workspace:*",
-    "@voice-hub/provider": "workspace:*",
+    "@voice-hub/provider-registry": "workspace:*",
+    "@voice-hub/provider-openai-realtime": "workspace:*",
+    "@voice-hub/provider-gemini-live": "workspace:*",
+    "@voice-hub/provider-hume-evi": "workspace:*",
+    "@voice-hub/provider-azure-voice-live": "workspace:*",
+    "@voice-hub/provider-volcengine-realtime": "workspace:*",
+    "@voice-hub/provider-local-mock": "workspace:*",
+    "@voice-hub/provider-local-pipeline": "workspace:*",
     "@voice-hub/memory-bank": "workspace:*",
     "@voice-hub/backend-dispatcher": "workspace:*",
     "@voice-hub/core-runtime": "workspace:*",

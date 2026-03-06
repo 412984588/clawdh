@@ -4,13 +4,23 @@
  * Voice Hub 主应用入口
  */
 
-import { loadConfig, validateConfigForProvider } from '@voice-hub/shared-config';
-import { createProvider } from '@voice-hub/provider';
-import { DatabaseManager, MemoryStore } from '@voice-hub/memory-bank';
-import { Dispatcher } from '@voice-hub/backend-dispatcher';
-import { VoiceRuntime } from '@voice-hub/core-runtime';
-import { VoiceHubServer } from './server.js';
-import { DiscordBot } from './discord-bot.js';
+import {
+  loadConfig,
+  validateConfigForProvider,
+} from "@voice-hub/shared-config";
+import { DatabaseManager, MemoryStore } from "@voice-hub/memory-bank";
+import { Dispatcher } from "@voice-hub/backend-dispatcher";
+import { VoiceRuntime } from "@voice-hub/core-runtime";
+import { ProviderRegistry } from "@voice-hub/provider-registry";
+import { createLocalMockProvider } from "@voice-hub/provider-local-mock";
+import { createLocalPipelineProvider } from "@voice-hub/provider-local-pipeline";
+import { createOpenAIRealtimeProvider } from "@voice-hub/provider-openai-realtime";
+import { createGeminiLiveProvider } from "@voice-hub/provider-gemini-live";
+import { createHumeEviProvider } from "@voice-hub/provider-hume-evi";
+import { createAzureVoiceLiveProvider } from "@voice-hub/provider-azure-voice-live";
+import { createVolcengineRealtimeProvider } from "@voice-hub/provider-volcengine-realtime";
+import { VoiceHubServer } from "./server.js";
+import { DiscordBot } from "./discord-bot.js";
 
 /** Voice Hub 应用类 */
 export class VoiceHubApp {
@@ -27,7 +37,7 @@ export class VoiceHubApp {
     // 验证配置
     const validation = validateConfigForProvider(this.config);
     if (!validation.valid) {
-      throw new Error(`Configuration error:\n${validation.errors.join('\n')}`);
+      throw new Error(`Configuration error:\n${validation.errors.join("\n")}`);
     }
 
     // 初始化数据库
@@ -54,13 +64,119 @@ export class VoiceHubApp {
       });
     }
 
-    // 创建提供商
-    const provider = createProvider(this.config, 'default-session');
+    // 创建 provider registry
+    const providerRegistry = new ProviderRegistry();
+    const localMock = createLocalMockProvider();
+    const localPipeline = createLocalPipelineProvider();
+    providerRegistry.register({
+      id: localMock.id,
+      create: () => createLocalMockProvider(),
+      capabilities: localMock.getCapabilities(),
+    });
+    providerRegistry.register({
+      id: localPipeline.id,
+      create: () => createLocalPipelineProvider(),
+      capabilities: localPipeline.getCapabilities(),
+    });
+
+    if (this.config.openaiRealtimeWsUrl && this.config.openaiApiKey) {
+      const openai = createOpenAIRealtimeProvider({
+        url: this.config.openaiRealtimeWsUrl,
+        apiKey: this.config.openaiApiKey,
+        model: this.config.openaiRealtimeModel,
+      });
+      providerRegistry.register({
+        id: openai.id,
+        create: () =>
+          createOpenAIRealtimeProvider({
+            url: this.config.openaiRealtimeWsUrl!,
+            apiKey: this.config.openaiApiKey!,
+            model: this.config.openaiRealtimeModel,
+          }),
+        capabilities: openai.getCapabilities(),
+      });
+    }
+
+    if (this.config.geminiLiveWsUrl && this.config.geminiApiKey) {
+      const gemini = createGeminiLiveProvider({
+        url: this.config.geminiLiveWsUrl,
+        apiKey: this.config.geminiApiKey,
+        model: this.config.geminiLiveModel,
+      });
+      providerRegistry.register({
+        id: gemini.id,
+        create: () =>
+          createGeminiLiveProvider({
+            url: this.config.geminiLiveWsUrl!,
+            apiKey: this.config.geminiApiKey!,
+            model: this.config.geminiLiveModel,
+          }),
+        capabilities: gemini.getCapabilities(),
+      });
+    }
+
+    if (this.config.humeEviWsUrl && this.config.humeApiKey) {
+      const hume = createHumeEviProvider({
+        url: this.config.humeEviWsUrl,
+        apiKey: this.config.humeApiKey,
+        configId: this.config.humeConfigId,
+      });
+      providerRegistry.register({
+        id: hume.id,
+        create: () =>
+          createHumeEviProvider({
+            url: this.config.humeEviWsUrl!,
+            apiKey: this.config.humeApiKey!,
+            configId: this.config.humeConfigId,
+          }),
+        capabilities: hume.getCapabilities(),
+      });
+    }
+
+    if (this.config.azureVoiceLiveWsUrl && this.config.azureVoiceLiveApiKey) {
+      const azure = createAzureVoiceLiveProvider({
+        url: this.config.azureVoiceLiveWsUrl,
+        apiKey: this.config.azureVoiceLiveApiKey,
+        deployment: this.config.azureVoiceLiveDeployment,
+      });
+      providerRegistry.register({
+        id: azure.id,
+        create: () =>
+          createAzureVoiceLiveProvider({
+            url: this.config.azureVoiceLiveWsUrl!,
+            apiKey: this.config.azureVoiceLiveApiKey!,
+            deployment: this.config.azureVoiceLiveDeployment,
+          }),
+        capabilities: azure.getCapabilities(),
+      });
+    }
+
+    if (
+      this.config.volcengineRealtimeWsUrl &&
+      this.config.volcengineAppId &&
+      this.config.volcengineAccessToken
+    ) {
+      const volcengine = createVolcengineRealtimeProvider({
+        url: this.config.volcengineRealtimeWsUrl,
+        appId: this.config.volcengineAppId,
+        accessToken: this.config.volcengineAccessToken,
+      });
+      providerRegistry.register({
+        id: volcengine.id,
+        create: () =>
+          createVolcengineRealtimeProvider({
+            url: this.config.volcengineRealtimeWsUrl!,
+            appId: this.config.volcengineAppId!,
+            accessToken: this.config.volcengineAccessToken!,
+          }),
+        capabilities: volcengine.getCapabilities(),
+      });
+    }
 
     // 创建运行时
     this.runtime = new VoiceRuntime({
       config: this.config,
-      provider: provider || undefined,
+      providerRegistry,
       memoryStore: this.memoryStore,
       dispatcher: this.dispatcher || undefined,
     });
@@ -69,16 +185,20 @@ export class VoiceHubApp {
     this.discordBot = new DiscordBot(this.config, this.runtime);
 
     // 创建 Web 服务器
-    this.server = new VoiceHubServer(this.config, this.runtime);
+    this.server = new VoiceHubServer(
+      this.config,
+      this.runtime,
+      this.memoryStore,
+    );
   }
 
   /** 启动应用 */
   async start(): Promise<void> {
     if (this.isRunning) {
-      throw new Error('Voice Hub is already running');
+      throw new Error("Voice Hub is already running");
     }
 
-    this.logInfo('Starting Voice Hub...');
+    this.logInfo("Starting Voice Hub...");
     let runtimeStarted = false;
     let discordStarted = false;
     let serverStarted = false;
@@ -94,7 +214,7 @@ export class VoiceHubApp {
       if (this.discordBot) {
         await this.discordBot.start();
         discordStarted = true;
-        this.logInfo('Discord bot connected');
+        this.logInfo("Discord bot connected");
       }
 
       // 启动 Web 服务器
@@ -105,19 +225,19 @@ export class VoiceHubApp {
       }
 
       this.isRunning = true;
-      this.logInfo('Voice Hub is running');
+      this.logInfo("Voice Hub is running");
     } catch (error) {
       // 启动失败时回滚已经启动的组件
       if (serverStarted && this.server) {
-        await this.stopSafely(() => this.server!.stop(), 'web server');
+        await this.stopSafely(() => this.server!.stop(), "web server");
       }
 
       if (discordStarted && this.discordBot) {
-        await this.stopSafely(() => this.discordBot!.stop(), 'discord bot');
+        await this.stopSafely(() => this.discordBot!.stop(), "discord bot");
       }
 
       if (runtimeStarted && this.runtime) {
-        await this.stopSafely(() => this.runtime!.stop(), 'runtime');
+        await this.stopSafely(() => this.runtime!.stop(), "runtime");
       }
 
       this.isRunning = false;
@@ -131,7 +251,7 @@ export class VoiceHubApp {
       return;
     }
 
-    this.logInfo('Stopping Voice Hub...');
+    this.logInfo("Stopping Voice Hub...");
 
     // 停止 Web 服务器
     if (this.server) {
@@ -152,7 +272,7 @@ export class VoiceHubApp {
     this.database.close();
 
     this.isRunning = false;
-    this.logInfo('Voice Hub stopped');
+    this.logInfo("Voice Hub stopped");
   }
 
   /** 获取运行状态 */
@@ -172,12 +292,18 @@ export class VoiceHubApp {
     process.stdout.write(`[voice-hub-app] ${message}\n`);
   }
 
-  private async stopSafely(stopFn: () => Promise<void>, component: string): Promise<void> {
+  private async stopSafely(
+    stopFn: () => Promise<void>,
+    component: string,
+  ): Promise<void> {
     try {
       await stopFn();
     } catch (error) {
-      const detail = error instanceof Error ? (error.stack ?? error.message) : String(error);
-      process.stderr.write(`[voice-hub-app] Failed to rollback ${component}: ${detail}\n`);
+      const detail =
+        error instanceof Error ? (error.stack ?? error.message) : String(error);
+      process.stderr.write(
+        `[voice-hub-app] Failed to rollback ${component}: ${detail}\n`,
+      );
     }
   }
 }
