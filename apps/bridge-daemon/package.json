@@ -1,0 +1,48 @@
+{
+  "name": "@voice-hub/bridge-daemon",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Voice Hub bridge daemon",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "bin": {
+    "voice-hub-bridge": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest --run",
+    "lint": "eslint src test",
+    "format": "prettier -w src test",
+    "start": "node dist/cli.js"
+  },
+  "dependencies": {
+    "@voice-hub/audio-engine": "workspace:*",
+    "@voice-hub/backend-dispatcher": "workspace:*",
+    "@voice-hub/core-runtime": "workspace:*",
+    "@voice-hub/memory-bank": "workspace:*",
+    "@voice-hub/provider-registry": "workspace:*",
+    "@voice-hub/shared-config": "workspace:*",
+    "@voice-hub/shared-types": "workspace:*",
+    "@fastify/cors": "^10.0.1",
+    "@fastify/websocket": "^11.0.0",
+    "@discordjs/voice": "^0.19.0",
+    "discord.js": "^14.17.3",
+    "fastify": "^5.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.12.0",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.5"
+  }
+}

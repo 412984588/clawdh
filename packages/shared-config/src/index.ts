@@ -5,9 +5,9 @@
  * 提供环境变量解析、配置验证、默认值
  */
 
-import { z } from 'zod';
-import { configSchema, internalConfigSchema } from './schema.js';
-import { CONSTANTS } from './constants.js';
+import { z } from "zod";
+import { configSchema, internalConfigSchema } from "./schema.js";
+import { CONSTANTS } from "./constants.js";
 
 export interface Config {
   // Discord
@@ -16,10 +16,40 @@ export interface Config {
   discordVoiceChannelId: string;
   discordClientId: string;
 
-  // Doubao
+  // Volcengine / Doubao
   doubaoRealtimeWsUrl?: string;
   doubaoAppId?: string;
   doubaoAccessToken?: string;
+  volcengineRealtimeWsUrl?: string;
+  volcengineAppId?: string;
+  volcengineAccessToken?: string;
+
+  // OpenAI Realtime
+  openaiRealtimeWsUrl?: string;
+  openaiApiKey?: string;
+  openaiRealtimeModel?: string;
+
+  // Gemini Live
+  geminiLiveWsUrl?: string;
+  geminiApiKey?: string;
+  geminiLiveModel?: string;
+
+  // Hume EVI
+  humeEviWsUrl?: string;
+  humeApiKey?: string;
+  humeConfigId?: string;
+
+  // Azure Voice Live
+  azureVoiceLiveWsUrl?: string;
+  azureVoiceLiveApiKey?: string;
+  azureVoiceLiveDeployment?: string;
+
+  // Qwen DashScope
+  qwenRealtimeWsUrl?: string;
+  qwenApiKey?: string;
+  qwenModel?: string;
+  qwenVoice?: string;
+  qwenRegion?: "intl" | "cn";
 
   // Backend
   backendDispatchUrl?: string;
@@ -41,8 +71,8 @@ export interface Config {
   memoryBusyTimeout: number;
 
   // Logging
-  logLevel: 'debug' | 'info' | 'warn' | 'error';
-  logFormat: 'json' | 'pretty';
+  logLevel: "debug" | "info" | "warn" | "error";
+  logFormat: "json" | "pretty";
   logPretty: boolean;
 
   // Audio
@@ -56,9 +86,20 @@ export interface Config {
   sessionTimeoutMs: number;
   sessionMaxReconnectAttempts: number;
   sessionReconnectDelayMs: number;
+  precisionModeDefault: "natural" | "precision";
 
   // Provider
-  voiceProvider: 'disabled' | 'local-mock' | 'doubao';
+  voiceProvider:
+    | "disabled"
+    | "local-mock"
+    | "doubao"
+    | "openai-realtime"
+    | "gemini-live"
+    | "hume-evi"
+    | "azure-voice-live"
+    | "volcengine-realtime"
+    | "local-pipeline"
+    | "qwen-dashscope";
 }
 
 export { configSchema, CONSTANTS };
@@ -86,12 +127,12 @@ export function loadConfig(): Config {
     return parsed as Config;
   } catch (error) {
     if (error instanceof z.ZodError) {
-      writeErrorLine('配置验证失败:');
+      writeErrorLine("配置验证失败:");
       for (const issue of error.issues) {
-        writeErrorLine(`  - ${issue.path.join('.')}: ${issue.message}`);
+        writeErrorLine(`  - ${issue.path.join(".")}: ${issue.message}`);
       }
     }
-    throw new Error('配置验证失败，请检查 .env 文件');
+    throw new Error("配置验证失败，请检查 .env 文件");
   }
 }
 
@@ -106,22 +147,84 @@ export function validateConfigForProvider(config: Config): {
 
   // 基础 Discord 配置
   if (!config.discordBotToken) {
-    errors.push('DISCORD_BOT_TOKEN 是必需的');
+    errors.push("DISCORD_BOT_TOKEN 是必需的");
   }
   if (!config.discordGuildId) {
-    errors.push('DISCORD_GUILD_ID 是必需的');
+    errors.push("DISCORD_GUILD_ID 是必需的");
   }
   if (!config.discordVoiceChannelId) {
-    errors.push('DISCORD_VOICE_CHANNEL_ID 是必需的');
+    errors.push("DISCORD_VOICE_CHANNEL_ID 是必需的");
   }
 
   // Provider 特定配置
-  if (config.voiceProvider === 'doubao') {
-    if (!config.doubaoAppId) {
-      errors.push('DOUBAO_APP_ID 在使用 doubao provider 时是必需的');
+  if (config.voiceProvider === "volcengine-realtime") {
+    if (!config.volcengineRealtimeWsUrl) {
+      errors.push(
+        "VOLCENGINE_REALTIME_WS_URL 在使用 volcengine-realtime provider 时是必需的",
+      );
     }
-    if (!config.doubaoAccessToken) {
-      errors.push('DOUBAO_ACCESS_TOKEN 在使用 doubao provider 时是必需的');
+    if (!config.volcengineAppId) {
+      errors.push(
+        "VOLCENGINE_APP_ID 在使用 volcengine-realtime provider 时是必需的",
+      );
+    }
+    if (!config.volcengineAccessToken) {
+      errors.push(
+        "VOLCENGINE_ACCESS_TOKEN 在使用 volcengine-realtime provider 时是必需的",
+      );
+    }
+  }
+
+  if (config.voiceProvider === "openai-realtime") {
+    if (!config.openaiRealtimeWsUrl) {
+      errors.push(
+        "OPENAI_REALTIME_WS_URL 在使用 openai-realtime provider 时是必需的",
+      );
+    }
+    if (!config.openaiApiKey) {
+      errors.push("OPENAI_API_KEY 在使用 openai-realtime provider 时是必需的");
+    }
+  }
+
+  if (config.voiceProvider === "gemini-live") {
+    if (!config.geminiLiveWsUrl) {
+      errors.push("GEMINI_LIVE_WS_URL 在使用 gemini-live provider 时是必需的");
+    }
+    if (!config.geminiApiKey) {
+      errors.push("GEMINI_API_KEY 在使用 gemini-live provider 时是必需的");
+    }
+  }
+
+  if (config.voiceProvider === "hume-evi") {
+    if (!config.humeEviWsUrl) {
+      errors.push("HUME_EVI_WS_URL 在使用 hume-evi provider 时是必需的");
+    }
+    if (!config.humeApiKey) {
+      errors.push("HUME_API_KEY 在使用 hume-evi provider 时是必需的");
+    }
+  }
+
+  if (config.voiceProvider === "azure-voice-live") {
+    if (!config.azureVoiceLiveWsUrl) {
+      errors.push(
+        "AZURE_VOICE_LIVE_WS_URL 在使用 azure-voice-live provider 时是必需的",
+      );
+    }
+    if (!config.azureVoiceLiveApiKey) {
+      errors.push(
+        "AZURE_VOICE_LIVE_API_KEY 在使用 azure-voice-live provider 时是必需的",
+      );
+    }
+  }
+
+  if (config.voiceProvider === "qwen-dashscope") {
+    if (!config.qwenRealtimeWsUrl) {
+      errors.push(
+        "QWEN_REALTIME_WS_URL 在使用 qwen-dashscope provider 时是必需的",
+      );
+    }
+    if (!config.qwenApiKey) {
+      errors.push("QWEN_API_KEY 在使用 qwen-dashscope provider 时是必需的");
     }
   }
 
@@ -131,5 +234,5 @@ export function validateConfigForProvider(config: Config): {
   };
 }
 
-export * from './schema.js';
-export * from './constants.js';
+export * from "./schema.js";
+export * from "./constants.js";
