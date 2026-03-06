@@ -2,6 +2,12 @@
 
 Discord 语音桥接守护进程，带 provider 注册表、会话隔离、Memory Bank、OpenClaw 插件和 Claude Code 插件。
 
+## 状态
+
+- 当前为 `alpha / developer preview`
+- 推荐先用 `local-mock` 完成本地启动与插件安装验证
+- Discord 语音与外部 realtime provider 的端到端能力，仍需要你自己的真实凭证做联调
+
 ## 当前实现
 
 - `apps/bridge-daemon`：生产入口和 CLI。
