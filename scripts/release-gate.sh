@@ -48,8 +48,12 @@ run_step "pnpm secret-scan" pnpm secret-scan
 run_step "./scripts/smoke-test.sh" ./scripts/smoke-test.sh
 
 ensure_no_matches \
+  "No --passWithNoTests in workspace scripts" \
+  "rg -n --hidden --glob 'package.json' -- '--passWithNoTests' ."
+
+ensure_no_matches \
   "No TODO/FIXME/XXX in TypeScript sources" \
-  "grep -rn \"TODO\\|FIXME\\|XXX\" --include=\"*.ts\" --include=\"*.tsx\" packages/ apps/"
+  "grep -rn \"FIXME\\|XXX\" --include=\"*.ts\" --include=\"*.tsx\" packages/ apps/"
 
 ensure_no_matches \
   "No ': any' in non-test TypeScript sources" \

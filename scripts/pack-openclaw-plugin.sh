@@ -33,6 +33,7 @@ mkdir -p "$TMP_DIR"
 # 复制必要文件
 echo "📋 复制文件..."
 cp -r "$PLUGIN_DIR/dist" "$TMP_DIR/"
+cp -r "$PLUGIN_DIR/src" "$TMP_DIR/"
 cp "$PLUGIN_DIR/package.json" "$TMP_DIR/"
 cp "$PLUGIN_DIR/openclaw.plugin.json" "$TMP_DIR/"
 cp "$PLUGIN_DIR/README.md" "$TMP_DIR/" 2>/dev/null || echo "# Voice Hub OpenClaw Plugin" > "$TMP_DIR/README.md"

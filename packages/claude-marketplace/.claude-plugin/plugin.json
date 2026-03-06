@@ -1,0 +1,17 @@
+{
+  "id": "voice-hub",
+  "name": "Voice Hub",
+  "version": "0.2.0",
+  "description": "Provider-agnostic realtime voice bridge for Claude Code",
+  "entry": "${CLAUDE_PLUGIN_ROOT}/src/index.js",
+  "settings": "${CLAUDE_PLUGIN_ROOT}/.claude/settings.json",
+  "skills": [
+    "${CLAUDE_PLUGIN_ROOT}/skills/scaffold/SKILL.md",
+    "${CLAUDE_PLUGIN_ROOT}/skills/doctor/SKILL.md",
+    "${CLAUDE_PLUGIN_ROOT}/skills/provider-doctor/SKILL.md",
+    "${CLAUDE_PLUGIN_ROOT}/skills/provider-matrix/SKILL.md",
+    "${CLAUDE_PLUGIN_ROOT}/skills/pack-openclaw/SKILL.md",
+    "${CLAUDE_PLUGIN_ROOT}/skills/install-openclaw-local/SKILL.md",
+    "${CLAUDE_PLUGIN_ROOT}/skills/run-dev/SKILL.md"
+  ]
+}

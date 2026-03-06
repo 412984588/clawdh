@@ -1,0 +1,8 @@
+{
+  "pluginRoot": "${CLAUDE_PLUGIN_ROOT}",
+  "commands": {
+    "doctor": "node ${CLAUDE_PLUGIN_ROOT}/bin/doctor.js",
+    "provider-matrix": "node ${CLAUDE_PLUGIN_ROOT}/bin/provider-matrix.js",
+    "run-dev": "node ${CLAUDE_PLUGIN_ROOT}/bin/run-dev.js"
+  }
+}

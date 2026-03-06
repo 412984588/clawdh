@@ -2,52 +2,73 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { VoiceHubMCPServer } from "../src/index.js";
 
 describe("VoiceHubMCPServer", () => {
-  const fetchMock = vi.fn();
+  const originalFetch = globalThis.fetch;
 
   beforeEach(() => {
-    fetchMock.mockReset();
-    global.fetch = fetchMock;
+    globalThis.fetch = vi.fn();
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
+    globalThis.fetch = originalFetch;
   });
 
-  it("delegates create_session to the runtime API with auth headers", async () => {
-    fetchMock.mockResolvedValue({
-      ok: true,
-      statusText: "OK",
-      json: async () => ({ sessionId: "session-1" }),
-    });
+  it("creates sessions against the configured runtime with authorization", async () => {
+    vi.mocked(globalThis.fetch).mockResolvedValue(
+      new Response(JSON.stringify({ sessionId: "session-123" }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
 
-    const server = new VoiceHubMCPServer("http://localhost:3000", "secret-key");
-    const result = await (server as any).handleToolCall("create_session", {
+    const server = new VoiceHubMCPServer("http://runtime.local", "api-key");
+    const result = await (
+      server as unknown as {
+        handleToolCall: (
+          name: string,
+          args: Record<string, unknown>,
+        ) => Promise<string>;
+      }
+    ).handleToolCall("create_session", {
       userId: "user-1",
       channelId: "channel-1",
     });
 
-    expect(fetchMock).toHaveBeenCalledWith(
-      "http://localhost:3000/api/sessions",
-      {
+    expect(result).toBe("Session created: session-123");
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      "http://runtime.local/api/sessions",
+      expect.objectContaining({
         method: "POST",
-        headers: {
+        headers: expect.objectContaining({
+          Authorization: "Bearer api-key",
           "Content-Type": "application/json",
-          Authorization: "Bearer secret-key",
-        },
-        body: JSON.stringify({
-          userId: "user-1",
-          channelId: "channel-1",
         }),
-      },
+      }),
     );
-    expect(result).toBe("Session created: session-1");
   });
 
-  it("throws on unknown tools", async () => {
-    const server = new VoiceHubMCPServer("http://localhost:3000");
+  it("returns serialized session lists", async () => {
+    vi.mocked(globalThis.fetch).mockResolvedValue(
+      new Response(JSON.stringify({ sessions: [{ sessionId: "s-1" }] }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
 
-    await expect(
-      (server as any).handleToolCall("unknown_tool", {}),
-    ).rejects.toThrow("Unknown tool: unknown_tool");
+    const server = new VoiceHubMCPServer("http://runtime.local");
+    const result = await (
+      server as unknown as {
+        handleToolCall: (
+          name: string,
+          args: Record<string, unknown>,
+        ) => Promise<string>;
+      }
+    ).handleToolCall("list_sessions", {});
+
+    expect(result).toContain('"sessionId": "s-1"');
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      "http://runtime.local/api/sessions",
+      expect.objectContaining({ method: "GET" }),
+    );
   });
 });

@@ -1,6 +1,6 @@
 {
   "name": "@voice-hub/claude-marketplace",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "description": "Claude Code Marketplace 集成",
   "main": "./dist/index.js",
@@ -13,7 +13,12 @@
   },
   "files": [
     "dist",
-    "src"
+    "src",
+    ".claude-plugin",
+    ".claude",
+    "skills",
+    "bin",
+    "local-marketplace.json"
   ],
   "scripts": {
     "build": "tsc",

@@ -1,150 +1,87 @@
-# Voice Hub 架构说明
+# 架构说明
 
-## 系统概述
+## 包结构
 
-Voice Hub 是一个模块化的实时语音中间层系统，采用 Monorepo 结构管理多个 npm 包。
+```text
+apps/
+  bridge-daemon              生产 CLI，start/stop/status/doctor/provider 子命令
+  voice-hub-app              Fastify API/WebSocket + Discord bot + webhook 入口
 
+packages/
+  shared-types               Canonical runtime/provider/audio/webhook types
+  shared-config              环境变量 schema 与默认值
+  audio-engine               正常化音频边界、pump、watchdog、自检
+  provider-contracts         provider 接口与能力协商基础
+  provider-registry          provider 注册、选择、fallback 视图
+  provider-openai-realtime
+  provider-gemini-live
+  provider-hume-evi
+  provider-azure-voice-live
+  provider-volcengine-realtime
+  provider-local-mock
+  provider-local-pipeline
+  provider-test-kit          provider 一致性测试工具
+  memory-bank                SQLite/WAL + 任务/坑点/成功模式/webhook 幂等
+  backend-dispatcher         后端分发与 webhook 签名校验
+  core-runtime               provider 无关运行时与会话所有权
+  openclaw-plugin            OpenClaw 插件壳
+  claude-mcp-server          Claude MCP server
+  claude-marketplace         Claude Code 插件根目录
+  provider                   兼容层
 ```
-clawdh/
-├── packages/           # 核心库
-│   ├── shared-types/   # 共享类型定义
-│   ├── shared-config/  # 共享配置管理
-│   ├── audio-engine/   # 音频处理引擎
-│   ├── provider/       # 语音提供商抽象层
-│   ├── memory-bank/    # 会话记忆存储
-│   ├── backend-dispatcher/ # 后端分发器
-│   ├── core-runtime/   # 核心运行时
-│   ├── openclaw-plugin/    # OpenClaw 插件壳
-│   ├── claude-mcp-server/  # Claude MCP Server
-│   └── claude-marketplace/ # Claude Code Marketplace
-└── apps/
-    └── voice-hub-app/  # 主应用
-```
 
-## 核心组件
+## 关键边界
 
-### 1. Audio Engine (`@voice-hub/audio-engine`)
+- `core-runtime` 只依赖 canonical provider 接口，不消费厂商私有协议字段。
+- `audio-engine` 暴露 `AudioFormatNormalizer`，统一把音频收口到 `NormalizedAudioFrame`。
+- `memory-bank` 负责 `processed_webhooks` 与 `pending_announcements`，让 webhook 路由 fail-closed。
+- `provider-registry` 负责 provider 选择优先级与能力快照。
 
-负责 Discord 音频的收发、编解码、重采样等。
+## 选择与所有权
 
-- **AudioIngressPump**: 接收 Discord 音频流
-- **AudioEgressPump**: 发送音频到 Discord
-- **Packetizer**: 将音频帧分割为 UDP 数据包
-- **Resampler**: 采样率和声道转换
-- **JitterBuffer**: 网络抖动缓冲
+provider 选择优先级：
 
-### 2. Provider (`@voice-hub/provider`)
+1. 显式 session override
+2. channel override
+3. guild override
+4. workspace override
+5. 默认 `VOICE_PROVIDER`
 
-语音提供商抽象层，支持多种实时语音服务。
+会话所有权：
 
-- **IAudioProvider**: 提供商接口
-- **DoubaoProvider**: 豆包实时语音实现
-- **LocalMockProvider**: 本地 Mock（测试用）
-- **createProvider()**: 提供商工厂函数
-
-### 3. Memory Bank (`@voice-hub/memory-bank`)
-
-基于 SQLite + WAL 模式的会话记忆存储。
-
-- **MemoryStore**: 记忆存储 API
-- **DatabaseManager**: 数据库连接管理
-- 支持会话管理、对话历史、事件记录
-
-### 4. Backend Dispatcher (`@voice-hub/backend-dispatcher`)
-
-后端分发器，将事件分发到 OpenClaw/Claude-Code Webhook。
-
-- **Dispatcher**: 单个后端分发
-- **LoadBalancedDispatcher**: 负载均衡分发
-- 支持重试、超时、指数退避
-
-### 5. Core Runtime (`@voice-hub/core-runtime`)
-
-核心运行时，整合所有组件。
-
-- **VoiceRuntime**: 主运行时类
-- **SessionManager**: 会话管理
-- **StateMachine**: 会话状态机
-
-### 6. Plugins
-
-- **OpenClaw Plugin**: OpenClaw 系统集成
-- **Claude MCP Server**: Model Context Protocol 服务器
-- **Claude Marketplace**: Claude Code 插件清单
+- 单 session 单 owner
+- 非 owner backend dispatch 会被拒绝
+- 管理员可 override
+- 会话关闭和静默超时会释放 owner
 
 ## 数据流
 
-```
-Discord Voice Channel
-       ↓
-AudioEngine (收发/编解码)
-       ↓
-Provider (实时语音处理)
-       ↓
-CoreRuntime (会话管理/状态机)
-       ↓
-BackendDispatcher (分发到后端)
-       ↓
-OpenClaw / Claude Code / Workers
-       ↓
-MemoryBank (存储会话记忆)
+```text
+Discord ingress
+  -> audio-engine normalize
+  -> core-runtime session
+  -> selected provider adapter
+  -> backend-dispatcher / tool bridge
+  -> memory-bank persistence
+  -> pending announcement recovery
+  -> audio-engine egress
 ```
 
-## 状态机
+## webhook 路由
 
-```
-┌─────────┐
-│  IDLE   │ ← 会话创建
-└────┬────┘
-     │
-     ↓
-┌───────────┐
-│ LISTENING │ ← 开始监听
-└─────┬─────┘
-      │
-      ↓ (收到用户语音)
-┌──────────────┐
-│  PROCESSING  │ ← 处理中
-└──────┬───────┘
-       │
-       ↓
-┌──────────────┐
-│  RESPONDING  │ ← 返回响应
-└──────┬───────┘
-       │
-       ↓
-┌─────────┐
-│  IDLE   │ ← 回到空闲
-└─────────┘
-```
+- 路由：`/webhook/openclaw_callback`
+- 校验：HMAC-SHA256 + 时间窗 + delivery id 去重
+- 存储：`processed_webhooks`
+- 缺失目标会话时落 `pending_announcements`
+- ACK 优先，慢处理走内部异步队列
 
-## 配置系统
+## 数据库表
 
-所有配置通过环境变量加载，由 `@voice-hub/shared-config` 统一管理：
+- `pitfalls`
+- `successful_patterns`
+- `task_runs`
+- `task_keywords`
+- `processed_webhooks`
+- `pending_announcements`
 
-```bash
-# Discord 配置
-DISCORD_BOT_TOKEN=
-DISCORD_GUILD_ID=
-DISCORD_VOICE_CHANNEL_ID=
-
-# 语音提供商
-VOICE_PROVIDER=disabled|local-mock|doubao
-
-# 豆包配置
-DOUBAO_REALTIME_WS_URL=
-DOUBAO_APP_ID=
-DOUBAO_ACCESS_TOKEN=
-
-# 记忆存储
-MEMORY_DB_PATH=./data/memory_bank.db
-MEMORY_WAL_ENABLED=true
-
-# Webhook 安全与调试
-WEBHOOK_SECRET=
-WEBHOOK_LEGACY_SECRET_HEADER=false
-WEBHOOK_SHADOW_MODE=false
-
-# CORS 允许列表（逗号分隔）
-CORS_ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
-```
+默认路径：`~/.voice-hub/voice-hub.db`
