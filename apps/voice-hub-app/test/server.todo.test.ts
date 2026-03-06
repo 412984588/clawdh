@@ -153,9 +153,9 @@ describe("VoiceHubServer route implementations", () => {
       payload: rawBody,
     });
 
-    expect(response.statusCode).toBe(200);
+    expect(response.statusCode).toBe(202);
     expect(runtime.sendAudio).toHaveBeenCalledTimes(1);
-    expect(response.json().handled).toBe(true);
+    expect(response.json().accepted).toBe(true);
   });
 
   it("rejects signatures generated from a reserialized payload", async () => {
@@ -231,8 +231,8 @@ describe("VoiceHubServer route implementations", () => {
       payload: rawBody,
     });
 
-    expect(response.statusCode).toBe(200);
-    expect(response.json().handled).toBe(true);
+    expect(response.statusCode).toBe(202);
+    expect(response.json().accepted).toBe(true);
   });
 
   it("rejects legacy webhook header by default", async () => {
@@ -428,7 +428,7 @@ describe("VoiceHubServer route implementations", () => {
       payload: rawBody,
     });
 
-    expect(response.statusCode).toBe(200);
+    expect(response.statusCode).toBe(202);
     expect(response.json().shadowMode).toBe(true);
     expect(runtime.sendAudio).toHaveBeenCalledTimes(1);
   });

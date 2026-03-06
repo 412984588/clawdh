@@ -4,30 +4,30 @@
  * 记忆存储类型定义
  */
 
-import type { SessionState, TurnMetadata } from '@voice-hub/shared-types';
+import type { SessionState, TurnMetadata } from "@voice-hub/shared-types";
 
 /** 记忆条目类型 */
 export enum MemoryType {
   /** 用户消息 */
-  USER = 'user',
+  USER = "user",
   /** 助手消息 */
-  ASSISTANT = 'assistant',
+  ASSISTANT = "assistant",
   /** 系统消息 */
-  SYSTEM = 'system',
+  SYSTEM = "system",
   /** 事件日志 */
-  EVENT = 'event',
+  EVENT = "event",
   /** 错误日志 */
-  ERROR = 'error',
+  ERROR = "error",
 }
 
 /** 记忆条目状态 */
 export enum MemoryStatus {
   /** 活跃 */
-  ACTIVE = 'active',
+  ACTIVE = "active",
   /** 已归档 */
-  ARCHIVED = 'archived',
+  ARCHIVED = "archived",
   /** 已删除 */
-  DELETED = 'deleted',
+  DELETED = "deleted",
 }
 
 /** 记忆条目 */
@@ -85,9 +85,9 @@ export interface QueryOptions {
   /** 偏移量 */
   offset?: number;
   /** 排序 */
-  orderBy?: 'createdAt' | 'startTime' | 'updatedAt';
+  orderBy?: "createdAt" | "startTime" | "updatedAt";
   /** 排序方向 */
-  order?: 'ASC' | 'DESC';
+  order?: "ASC" | "DESC";
   /** 类型过滤 */
   types?: MemoryType[];
   /** 状态过滤 */
@@ -109,7 +109,9 @@ export interface MemoryBankConfig {
   /** 是否启用外键约束 */
   foreignKeys: boolean;
   /** 日志级别 */
-  logLevel?: 'debug' | 'info' | 'warn' | 'error';
+  logLevel?: "debug" | "info" | "warn" | "error";
+  /** 是否持久化 transcript */
+  persistTranscripts?: boolean;
 }
 
 /** 统计信息 */
@@ -124,4 +126,92 @@ export interface MemoryStats {
   entriesByType: Record<MemoryType, number>;
   /** 数据库大小（字节） */
   dbSize: number;
+}
+
+export interface PitfallRecord {
+  id: string;
+  keyword: string;
+  summary: string;
+  detail?: string;
+  createdAt: number;
+}
+
+export interface SuccessfulPatternRecord {
+  id: string;
+  keyword: string;
+  summary: string;
+  detail?: string;
+  createdAt: number;
+}
+
+export interface TaskRunRecord {
+  id: string;
+  taskId: string;
+  keyword: string;
+  status: "success" | "failed" | "running" | "cancelled";
+  summary: string;
+  happenedAt: number;
+}
+
+export interface ProcessedWebhookRecord {
+  id: string;
+  deliveryId: string;
+  eventId: string;
+  eventType: string;
+  payloadHash?: string;
+  processedAt: number;
+}
+
+export interface PendingAnnouncementRecord {
+  id: string;
+  sessionId?: string;
+  conversationId?: string;
+  providerId?: string;
+  text: string;
+  priority: "immediate" | "after-current-turn" | "queued";
+  dedupeKey?: string;
+  ttlMs: number;
+  createdAt: number;
+  resolvedAt?: number;
+}
+
+export interface CreatePitfallInput {
+  keyword: string;
+  summary: string;
+  detail?: string;
+  createdAt?: number;
+}
+
+export interface CreateSuccessfulPatternInput {
+  keyword: string;
+  summary: string;
+  detail?: string;
+  createdAt?: number;
+}
+
+export interface AppendTaskRunInput {
+  taskId: string;
+  keyword: string;
+  status: TaskRunRecord["status"];
+  summary: string;
+  happenedAt?: number;
+}
+
+export interface ProcessedWebhookInput {
+  deliveryId: string;
+  eventId: string;
+  eventType: string;
+  payloadHash?: string;
+  processedAt?: number;
+}
+
+export interface QueuePendingAnnouncementInput {
+  sessionId?: string;
+  conversationId?: string;
+  providerId?: string;
+  text: string;
+  priority?: PendingAnnouncementRecord["priority"];
+  dedupeKey?: string;
+  ttlMs?: number;
+  createdAt?: number;
 }

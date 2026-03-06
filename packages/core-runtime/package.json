@@ -26,7 +26,8 @@
   "dependencies": {
     "@voice-hub/shared-types": "workspace:*",
     "@voice-hub/shared-config": "workspace:*",
-    "@voice-hub/provider": "workspace:*",
+    "@voice-hub/provider-contracts": "workspace:*",
+    "@voice-hub/provider-registry": "workspace:*",
     "@voice-hub/memory-bank": "workspace:*",
     "@voice-hub/backend-dispatcher": "workspace:*",
     "eventemitter3": "^5.0.1"

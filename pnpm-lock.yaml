@@ -89,6 +89,9 @@ importers:
       "@fastify/websocket":
         specifier: ^11.0.0
         version: 11.2.0
+      "@voice-hub/audio-engine":
+        specifier: workspace:*
+        version: link:../../packages/audio-engine
       "@voice-hub/backend-dispatcher":
         specifier: workspace:*
         version: link:../../packages/backend-dispatcher
@@ -98,9 +101,30 @@ importers:
       "@voice-hub/memory-bank":
         specifier: workspace:*
         version: link:../../packages/memory-bank
-      "@voice-hub/provider":
+      "@voice-hub/provider-azure-voice-live":
         specifier: workspace:*
-        version: link:../../packages/provider
+        version: link:../../packages/provider-azure-voice-live
+      "@voice-hub/provider-gemini-live":
+        specifier: workspace:*
+        version: link:../../packages/provider-gemini-live
+      "@voice-hub/provider-hume-evi":
+        specifier: workspace:*
+        version: link:../../packages/provider-hume-evi
+      "@voice-hub/provider-local-mock":
+        specifier: workspace:*
+        version: link:../../packages/provider-local-mock
+      "@voice-hub/provider-local-pipeline":
+        specifier: workspace:*
+        version: link:../../packages/provider-local-pipeline
+      "@voice-hub/provider-openai-realtime":
+        specifier: workspace:*
+        version: link:../../packages/provider-openai-realtime
+      "@voice-hub/provider-registry":
+        specifier: workspace:*
+        version: link:../../packages/provider-registry
+      "@voice-hub/provider-volcengine-realtime":
+        specifier: workspace:*
+        version: link:../../packages/provider-volcengine-realtime
       "@voice-hub/shared-config":
         specifier: workspace:*
         version: link:../../packages/shared-config
@@ -217,9 +241,12 @@ importers:
       "@voice-hub/memory-bank":
         specifier: workspace:*
         version: link:../memory-bank
-      "@voice-hub/provider":
+      "@voice-hub/provider-contracts":
         specifier: workspace:*
-        version: link:../provider
+        version: link:../provider-contracts
+      "@voice-hub/provider-registry":
+        specifier: workspace:*
+        version: link:../provider-registry
       "@voice-hub/shared-config":
         specifier: workspace:*
         version: link:../shared-config

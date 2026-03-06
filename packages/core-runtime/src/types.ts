@@ -4,10 +4,16 @@
  * 核心运行时类型定义
  */
 
-import type { SessionState, AudioFrame, ProviderEvent } from '@voice-hub/shared-types';
-import type { IAudioProvider } from '@voice-hub/provider';
-import type { MemoryStore } from '@voice-hub/memory-bank';
-import type { Dispatcher } from '@voice-hub/backend-dispatcher';
+import type {
+  AnnouncementPriority,
+  NormalizedAudioFrame,
+  PrecisionMode,
+  RealtimeProviderEvent,
+  RealtimeVoiceProvider,
+  SessionState,
+} from "@voice-hub/shared-types";
+import type { MemoryStore } from "@voice-hub/memory-bank";
+import type { Dispatcher } from "@voice-hub/backend-dispatcher";
 
 /** 会话事件 */
 export interface RuntimeSessionEvent {
@@ -24,17 +30,17 @@ export interface RuntimeSessionEvent {
 /** 会话事件类型 */
 export enum SessionEventType {
   /** 会话创建 */
-  CREATED = 'created',
+  CREATED = "created",
   /** 会话启动 */
-  STARTED = 'started',
+  STARTED = "started",
   /** 会话停止 */
-  STOPPED = 'stopped',
+  STOPPED = "stopped",
   /** 会话销毁 */
-  DESTROYED = 'destroyed',
+  DESTROYED = "destroyed",
   /** 状态变更 */
-  STATE_CHANGED = 'state_changed',
+  STATE_CHANGED = "state_changed",
   /** 错误 */
-  ERROR = 'error',
+  ERROR = "error",
 }
 
 /** 运行时配置 */
@@ -53,26 +59,45 @@ export interface RuntimeConfig {
   enableMemoryStore: boolean;
   /** 是否启用后端分发 */
   enableBackendDispatch: boolean;
+  /** 默认精确模式 */
+  precisionModeDefault: PrecisionMode;
+}
+
+/** 会话创建输入 */
+export interface CreateSessionInput {
+  guildId?: string;
+  voiceChannelId?: string;
+  discordUserId?: string;
+  providerId?: string;
+  precisionMode?: PrecisionMode;
+  userId?: string;
+  channelId?: string;
+  conversationId?: string;
+  agentId?: string;
 }
 
 /** 会话上下文 */
 export interface SessionContext {
-  /** 会话 ID */
   sessionId: string;
-  /** 用户 ID */
+  guildId?: string;
+  voiceChannelId?: string;
+  discordUserId?: string;
   userId?: string;
-  /** 频道 ID */
   channelId?: string;
-  /** 创建时间 */
+  providerId?: string;
+  conversationId?: string;
+  backendJobId?: string;
+  agentId?: string;
+  ownerUserId?: string;
   createdAt: number;
-  /** 最后活跃时间 */
   lastActiveAt: number;
+  precisionMode: PrecisionMode;
 }
 
 /** 会话管理器接口 */
 export interface ISessionManager {
   /** 创建会话 */
-  createSession(userId?: string, channelId?: string): Promise<string>;
+  createSession(input?: CreateSessionInput): Promise<string>;
   /** 销毁会话 */
   destroySession(sessionId: string): Promise<void>;
   /** 获取会话 */
@@ -97,8 +122,29 @@ export interface IStateMachine {
 
 /** 运行时事件 */
 export interface RuntimeEvent {
-  type: 'session_created' | 'session_destroyed' | 'state_changed' | 'audio_received' | 'audio_sent' | 'error';
+  type:
+    | "session_created"
+    | "session_destroyed"
+    | "state_changed"
+    | "audio_received"
+    | "audio_sent"
+    | "error"
+    | "provider_event"
+    | "owner_claimed"
+    | "owner_released"
+    | "backend_task_dispatched";
   sessionId?: string;
   timestamp: number;
   data?: unknown;
+}
+
+export interface SessionProviderBinding {
+  provider: RealtimeVoiceProvider;
+  providerEventListener: (event: RealtimeProviderEvent) => void;
+}
+
+export interface AnnouncementRequest {
+  text: string;
+  priority?: AnnouncementPriority;
+  metadata?: Record<string, unknown>;
 }

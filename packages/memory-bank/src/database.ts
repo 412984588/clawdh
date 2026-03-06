@@ -49,6 +49,79 @@ CREATE INDEX IF NOT EXISTS idx_memories_type ON memories(type);
 CREATE INDEX IF NOT EXISTS idx_memories_status ON memories(status);
 CREATE INDEX IF NOT EXISTS idx_memories_start_time ON memories(start_time);
 
+CREATE TABLE IF NOT EXISTS pitfalls (
+  id TEXT PRIMARY KEY,
+  keyword TEXT NOT NULL,
+  summary TEXT NOT NULL,
+  detail TEXT,
+  created_at INTEGER NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_pitfalls_keyword ON pitfalls(keyword);
+CREATE INDEX IF NOT EXISTS idx_pitfalls_created_at ON pitfalls(created_at DESC);
+
+CREATE TABLE IF NOT EXISTS successful_patterns (
+  id TEXT PRIMARY KEY,
+  keyword TEXT NOT NULL,
+  summary TEXT NOT NULL,
+  detail TEXT,
+  created_at INTEGER NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_successful_patterns_keyword ON successful_patterns(keyword);
+CREATE INDEX IF NOT EXISTS idx_successful_patterns_created_at ON successful_patterns(created_at DESC);
+
+CREATE TABLE IF NOT EXISTS task_runs (
+  id TEXT PRIMARY KEY,
+  task_id TEXT NOT NULL,
+  keyword TEXT NOT NULL,
+  status TEXT NOT NULL CHECK(status IN ('success', 'failed', 'running', 'cancelled')),
+  summary TEXT NOT NULL,
+  happened_at INTEGER NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_task_runs_task_id ON task_runs(task_id);
+CREATE INDEX IF NOT EXISTS idx_task_runs_keyword ON task_runs(keyword);
+CREATE INDEX IF NOT EXISTS idx_task_runs_happened_at ON task_runs(happened_at DESC);
+
+CREATE TABLE IF NOT EXISTS task_keywords (
+  keyword TEXT PRIMARY KEY,
+  last_seen_at INTEGER NOT NULL,
+  success_count INTEGER NOT NULL DEFAULT 0,
+  failure_count INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS processed_webhooks (
+  id TEXT PRIMARY KEY,
+  delivery_id TEXT NOT NULL,
+  event_id TEXT NOT NULL,
+  event_type TEXT NOT NULL,
+  payload_hash TEXT,
+  processed_at INTEGER NOT NULL,
+  UNIQUE(delivery_id, event_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_processed_webhooks_processed_at ON processed_webhooks(processed_at DESC);
+
+CREATE TABLE IF NOT EXISTS pending_announcements (
+  id TEXT PRIMARY KEY,
+  session_id TEXT,
+  conversation_id TEXT,
+  provider_id TEXT,
+  text TEXT NOT NULL,
+  priority TEXT NOT NULL CHECK(priority IN ('immediate', 'after-current-turn', 'queued')),
+  dedupe_key TEXT,
+  ttl_ms INTEGER NOT NULL,
+  created_at INTEGER NOT NULL,
+  resolved_at INTEGER
+);
+
+CREATE INDEX IF NOT EXISTS idx_pending_announcements_created_at ON pending_announcements(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_pending_announcements_resolved_at ON pending_announcements(resolved_at);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_pending_announcements_dedupe_key
+  ON pending_announcements(dedupe_key)
+  WHERE dedupe_key IS NOT NULL;
+
 -- 触发器：自动更新 updated_at
 CREATE TRIGGER IF NOT EXISTS update_sessions_timestamp
 AFTER UPDATE ON sessions
@@ -68,6 +141,7 @@ export class DatabaseManager {
   private db: Database.Database | null = null;
   private config: MemoryBankConfig;
   private isInitialized = false;
+  private writeQueue: Promise<void> = Promise.resolve();
 
   constructor(config: MemoryBankConfig) {
     this.config = config;
@@ -106,6 +180,7 @@ export class DatabaseManager {
 
     // 执行初始化脚本
     this.db.exec(SCHEMA);
+    this.seedDefaults();
 
     this.isInitialized = true;
   }
@@ -167,6 +242,21 @@ export class DatabaseManager {
     return this.getConnection().transaction(fn)();
   }
 
+  async enqueueWrite<T>(fn: (db: Database.Database) => T): Promise<T> {
+    const run = this.writeQueue.then(() => fn(this.getConnection()));
+    this.writeQueue = run.then(
+      () => undefined,
+      () => undefined,
+    );
+    return run;
+  }
+
+  checkpoint(
+    mode: "PASSIVE" | "FULL" | "RESTART" | "TRUNCATE" = "PASSIVE",
+  ): void {
+    this.getConnection().pragma(`wal_checkpoint(${mode})`);
+  }
+
   /** 检查表是否存在 */
   tableExists(tableName: string): boolean {
     const stmt = this.getConnection().prepare(
@@ -203,5 +293,29 @@ export class DatabaseManager {
       })
       .join(" ");
     process.stdout.write(`[memory-bank][sqlite] ${message}\n`);
+  }
+
+  private seedDefaults(): void {
+    const now = Date.now();
+    const statement = this.getConnection().prepare(`
+      INSERT OR IGNORE INTO successful_patterns (id, keyword, summary, detail, created_at)
+      VALUES (?, ?, ?, ?, ?)
+    `);
+
+    statement.run(
+      "seed-successful-pattern-webhook-ack",
+      "webhook",
+      "Fast ACK plus async processing keeps the voice path responsive.",
+      "Persist replay-safe delivery ids before executing side effects.",
+      now,
+    );
+
+    statement.run(
+      "seed-successful-pattern-audio-pump",
+      "audio",
+      "Keep DB and webhook work off the audio pump.",
+      "Use queues between realtime ingress/egress and slower subsystems.",
+      now,
+    );
   }
 }
