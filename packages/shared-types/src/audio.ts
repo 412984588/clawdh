@@ -19,13 +19,30 @@ export interface AudioFrame {
 }
 
 /**
+ * 规范化音频编码格式
+ */
+export type AudioEncoding = "pcm16" | "linear16" | "opus" | "mulaw";
+
+/**
+ * 规范化音频帧
+ */
+export interface NormalizedAudioFrame extends AudioFrame {
+  /** 编码格式 */
+  encoding: AudioEncoding;
+  /** 是否为小端序 */
+  littleEndian: boolean;
+  /** 原始来源 */
+  source?: "discord" | "provider" | "tts" | "webhook" | "local";
+}
+
+/**
  * 音频包方向
  */
 export enum AudioDirection {
   /** 入站音频 (用户说话) */
-  INGRESS = 'ingress',
+  INGRESS = "ingress",
   /** 出站音频 (AI 回复) */
-  EGRESS = 'egress',
+  EGRESS = "egress",
 }
 
 /**

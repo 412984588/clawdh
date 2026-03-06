@@ -37,6 +37,54 @@ export default defineConfig({
         replacement: fromRoot("./packages/openclaw-plugin/src/index.ts"),
       },
       {
+        find: "@voice-hub/provider-azure-voice-live",
+        replacement: fromRoot(
+          "./packages/provider-azure-voice-live/src/index.ts",
+        ),
+      },
+      {
+        find: "@voice-hub/provider-contracts",
+        replacement: fromRoot("./packages/provider-contracts/src/index.ts"),
+      },
+      {
+        find: "@voice-hub/provider-gemini-live",
+        replacement: fromRoot("./packages/provider-gemini-live/src/index.ts"),
+      },
+      {
+        find: "@voice-hub/provider-hume-evi",
+        replacement: fromRoot("./packages/provider-hume-evi/src/index.ts"),
+      },
+      {
+        find: "@voice-hub/provider-local-mock",
+        replacement: fromRoot("./packages/provider-local-mock/src/index.ts"),
+      },
+      {
+        find: "@voice-hub/provider-local-pipeline",
+        replacement: fromRoot(
+          "./packages/provider-local-pipeline/src/index.ts",
+        ),
+      },
+      {
+        find: "@voice-hub/provider-openai-realtime",
+        replacement: fromRoot(
+          "./packages/provider-openai-realtime/src/index.ts",
+        ),
+      },
+      {
+        find: "@voice-hub/provider-registry",
+        replacement: fromRoot("./packages/provider-registry/src/index.ts"),
+      },
+      {
+        find: "@voice-hub/provider-test-kit",
+        replacement: fromRoot("./packages/provider-test-kit/src/index.ts"),
+      },
+      {
+        find: "@voice-hub/provider-volcengine-realtime",
+        replacement: fromRoot(
+          "./packages/provider-volcengine-realtime/src/index.ts",
+        ),
+      },
+      {
         find: "@voice-hub/provider",
         replacement: fromRoot("./packages/provider/src/index.ts"),
       },
@@ -63,6 +111,12 @@ export default defineConfig({
       {
         find: "@voice-hub/shared-types/provider",
         replacement: fromRoot("./packages/shared-types/src/provider.ts"),
+      },
+      {
+        find: "@voice-hub/shared-types/realtime-provider",
+        replacement: fromRoot(
+          "./packages/shared-types/src/realtime-provider.ts",
+        ),
       },
       {
         find: "@voice-hub/shared-types/session",
