@@ -1,24 +1,26 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { Dispatcher } from '../src/dispatcher.js';
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { createHmac } from "node:crypto";
+import { Dispatcher } from "../src/dispatcher.js";
 import {
   signWebhookPayload,
+  verifyWebhookSignatureMessage,
   verifyWebhookSignature,
-} from '../src/signature.js';
+} from "../src/signature.js";
 
-describe('Dispatcher webhook security headers', () => {
+describe("Dispatcher webhook security headers", () => {
   const payload = {
-    id: 'evt_1',
-    event: 'backend_task.completed',
+    id: "evt_1",
+    event: "backend_task.completed",
     timestamp: 1_700_000_000_000,
     data: { ok: true },
   };
 
   const config = {
-    url: 'https://example.com/webhook',
+    url: "https://example.com/webhook",
     timeoutMs: 3000,
     maxRetries: 0,
     retryDelayMs: 1,
-    secret: 'ut-secret',
+    secret: "ut-secret",
     exponentialBackoff: false,
   };
 
@@ -33,14 +35,14 @@ describe('Dispatcher webhook security headers', () => {
     vi.restoreAllMocks();
   });
 
-  it('sends signature + timestamp headers instead of raw secret', async () => {
+  it("sends signature + timestamp headers instead of raw secret", async () => {
     fetchMock.mockResolvedValue({
       ok: true,
       status: 200,
       headers: {
-        get: () => 'application/json',
+        get: () => "application/json",
       },
-      json: async () => ({ status: 'ok' }),
+      json: async () => ({ status: "ok" }),
     });
 
     const dispatcher = new Dispatcher(config);
@@ -50,43 +52,72 @@ describe('Dispatcher webhook security headers', () => {
     const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
     const headers = init.headers as Record<string, string>;
 
-    expect(headers['X-Webhook-Signature']).toMatch(/^sha256=/);
-    expect(headers['X-Webhook-Timestamp']).toBe(String(payload.timestamp));
-    expect(headers['X-Webhook-Secret']).toBeUndefined();
+    expect(headers["X-Webhook-Signature"]).toMatch(/^sha256=/);
+    expect(headers["X-Webhook-Timestamp"]).toBe(String(payload.timestamp));
+    expect(headers["X-Webhook-Secret"]).toBeUndefined();
   });
 });
 
-describe('Webhook signature helpers', () => {
+describe("Webhook signature helpers", () => {
   const payload = {
-    id: 'evt_2',
-    event: 'custom.notification',
+    id: "evt_2",
+    event: "custom.notification",
     timestamp: 1_700_000_000_001,
-    data: { message: 'hello' },
+    data: { message: "hello" },
   };
 
-  it('creates verifiable signatures', () => {
+  it("creates verifiable signatures", () => {
     const timestamp = String(payload.timestamp);
-    const signature = signWebhookPayload(payload, 'secret-a', timestamp);
+    const signature = signWebhookPayload(payload, "secret-a", timestamp);
 
-    expect(signature.startsWith('sha256=')).toBe(true);
-    expect(verifyWebhookSignature(payload, 'secret-a', signature, timestamp)).toBe(true);
+    expect(signature.startsWith("sha256=")).toBe(true);
+    expect(
+      verifyWebhookSignature(payload, "secret-a", signature, timestamp),
+    ).toBe(true);
   });
 
-  it('rejects signature with wrong secret', () => {
+  it("rejects signature with wrong secret", () => {
     const timestamp = String(payload.timestamp);
-    const signature = signWebhookPayload(payload, 'secret-a', timestamp);
+    const signature = signWebhookPayload(payload, "secret-a", timestamp);
 
-    expect(verifyWebhookSignature(payload, 'secret-b', signature, timestamp)).toBe(false);
+    expect(
+      verifyWebhookSignature(payload, "secret-b", signature, timestamp),
+    ).toBe(false);
+  });
+
+  it("verifies signatures against the raw message body", () => {
+    const timestamp = String(payload.timestamp);
+    const rawBody = JSON.stringify(payload, null, 2);
+    const signature = createHmac("sha256", "secret-a")
+      .update(`${timestamp}.${rawBody}`)
+      .digest("hex");
+
+    expect(
+      verifyWebhookSignatureMessage(
+        rawBody,
+        "secret-a",
+        `sha256=${signature}`,
+        timestamp,
+      ),
+    ).toBe(true);
+    expect(
+      verifyWebhookSignatureMessage(
+        JSON.stringify(payload),
+        "secret-a",
+        `sha256=${signature}`,
+        timestamp,
+      ),
+    ).toBe(false);
   });
 });
 
-describe('Dispatcher timeout isolation', () => {
+describe("Dispatcher timeout isolation", () => {
   const config = {
-    url: 'https://example.com/webhook',
+    url: "https://example.com/webhook",
     timeoutMs: 3000,
     maxRetries: 0,
     retryDelayMs: 1,
-    secret: 'ut-secret',
+    secret: "ut-secret",
     exponentialBackoff: false,
   };
 
@@ -101,23 +132,23 @@ describe('Dispatcher timeout isolation', () => {
     vi.restoreAllMocks();
   });
 
-  it('isolates timeout cancellation between concurrent dispatch calls', async () => {
+  it("isolates timeout cancellation between concurrent dispatch calls", async () => {
     fetchMock.mockImplementation((_url: string, init?: RequestInit) => {
       const signal = init?.signal as AbortSignal;
 
       return new Promise((resolve, reject) => {
-        const onAbort = () => reject(new Error('This operation was aborted'));
-        signal.addEventListener('abort', onAbort, { once: true });
+        const onAbort = () => reject(new Error("This operation was aborted"));
+        signal.addEventListener("abort", onAbort, { once: true });
 
         setTimeout(() => {
-          signal.removeEventListener('abort', onAbort);
+          signal.removeEventListener("abort", onAbort);
           resolve({
             ok: true,
             status: 200,
             headers: {
-              get: () => 'application/json',
+              get: () => "application/json",
             },
-            json: async () => ({ status: 'ok' }),
+            json: async () => ({ status: "ok" }),
           });
         }, 60);
       });
@@ -127,29 +158,32 @@ describe('Dispatcher timeout isolation', () => {
 
     const firstCall = dispatcher.dispatch(
       {
-        id: 'evt-timeout-1',
-        event: 'custom.notification',
+        id: "evt-timeout-1",
+        event: "custom.notification",
         timestamp: 1_700_000_000_100,
       },
       {
         timeout: 15,
         maxRetries: 0,
-      }
+      },
     );
 
     const secondCall = dispatcher.dispatch(
       {
-        id: 'evt-timeout-2',
-        event: 'custom.notification',
+        id: "evt-timeout-2",
+        event: "custom.notification",
         timestamp: 1_700_000_000_101,
       },
       {
         timeout: 250,
         maxRetries: 0,
-      }
+      },
     );
 
-    const [firstResult, secondResult] = await Promise.all([firstCall, secondCall]);
+    const [firstResult, secondResult] = await Promise.all([
+      firstCall,
+      secondCall,
+    ]);
 
     expect(firstResult.success).toBe(false);
     expect(firstResult.error).toMatch(/abort/i);

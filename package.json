@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "build": "pnpm -r --filter './packages/**' --filter './apps/**' run build",
-    "typecheck": "pnpm -r --filter './packages/**' --filter './apps/**' run typecheck",
+    "typecheck": "pnpm build && pnpm -r --filter './packages/**' --filter './apps/**' run typecheck",
     "test": "pnpm -r --filter './packages/**' --filter './apps/**' run test",
     "lint": "pnpm -r --filter './packages/**' --filter './apps/**' run lint",
     "format": "pnpm -r --filter './packages/**' --filter './apps/**' run format",
