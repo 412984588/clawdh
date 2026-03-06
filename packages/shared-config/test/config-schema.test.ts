@@ -76,4 +76,55 @@ describe("internal config transform", () => {
 
     expect(parsed.webhookPath).toBe("/webhook/openclaw_callback");
   });
+
+  it("treats blank optional provider fields as omitted values", () => {
+    const parsed = internalConfigSchema.parse({
+      ...minimalEnv,
+      DOUBAO_REALTIME_WS_URL: "",
+      DOUBAO_APP_ID: "",
+      DOUBAO_ACCESS_TOKEN: "",
+      VOLCENGINE_REALTIME_WS_URL: "",
+      VOLCENGINE_APP_ID: "",
+      VOLCENGINE_ACCESS_TOKEN: "",
+      OPENAI_REALTIME_WS_URL: "",
+      OPENAI_API_KEY: "",
+      GEMINI_LIVE_WS_URL: "",
+      GEMINI_API_KEY: "",
+      HUME_EVI_WS_URL: "",
+      HUME_API_KEY: "",
+      HUME_CONFIG_ID: "",
+      AZURE_VOICE_LIVE_WS_URL: "",
+      AZURE_VOICE_LIVE_API_KEY: "",
+      AZURE_VOICE_LIVE_DEPLOYMENT: "",
+      QWEN_API_KEY: "",
+      QWEN_VOICE: "",
+      BACKEND_DISPATCH_URL: "",
+      VOICE_HUB_API_KEY: "",
+      MEMORY_DB_PATH: "",
+    });
+
+    expect(parsed.doubaoRealtimeWsUrl).toBeUndefined();
+    expect(parsed.doubaoAppId).toBeUndefined();
+    expect(parsed.doubaoAccessToken).toBeUndefined();
+    expect(parsed.volcengineRealtimeWsUrl).toBeUndefined();
+    expect(parsed.volcengineAppId).toBeUndefined();
+    expect(parsed.volcengineAccessToken).toBeUndefined();
+    expect(parsed.openaiRealtimeWsUrl).toBeUndefined();
+    expect(parsed.openaiApiKey).toBeUndefined();
+    expect(parsed.geminiLiveWsUrl).toBeUndefined();
+    expect(parsed.geminiApiKey).toBeUndefined();
+    expect(parsed.humeEviWsUrl).toBeUndefined();
+    expect(parsed.humeApiKey).toBeUndefined();
+    expect(parsed.humeConfigId).toBeUndefined();
+    expect(parsed.azureVoiceLiveWsUrl).toBeUndefined();
+    expect(parsed.azureVoiceLiveApiKey).toBeUndefined();
+    expect(parsed.azureVoiceLiveDeployment).toBeUndefined();
+    expect(parsed.qwenApiKey).toBeUndefined();
+    expect(parsed.qwenVoice).toBeUndefined();
+    expect(parsed.backendDispatchUrl).toBeUndefined();
+    expect(parsed.voiceHubApiKey).toBeUndefined();
+    expect(parsed.memoryDbPath).toBe(
+      join(homedir(), ".voice-hub", "voice-hub.db"),
+    );
+  });
 });
