@@ -63,6 +63,7 @@ function safeDebug(logger: EngineLogger, message: string): void {
 
 // ========== 常量定义 ==========
 
+// ---------- 行动类型 ----------
 /** 行动类型常量 */
 const ActionType = {
   INIT: "init",
@@ -80,6 +81,15 @@ const DEFAULT_MAINTENANCE_ACTIONS = [
   "清理缓存文件",
 ] as const;
 
+/** 行动关键词映射 */
+const ActionKeywords = {
+  ANALYZE: "分析",
+  CHECK: "检查",
+  GENERATE: "生成",
+  CODE: "代码",
+} as const;
+
+// ---------- 日志消息 ----------
 /** 日志消息模板 */
 const LogMessages = {
   ENGINE_STARTED: "🦞 永动循环已启动（后台运行）",
@@ -109,6 +119,19 @@ const LogMessages = {
     `速率: ${metrics.rate} 循环/秒`,
 } as const;
 
+// ---------- 响应消息 ----------
+/** 响应消息模板 */
+const ResponseMessages = {
+  STATE_FILE_EXISTS: (lastModified: string) => `状态文件存在，最后更新: ${lastModified}`,
+  STATE_FILE_NOT_EXISTS: "状态文件不存在，等待首次循环",
+  SUGGESTION_LOGGED: (suggestion: string) => `已记录建议: ${suggestion}`,
+  WORKSPACE_ANALYSIS_COMPLETE: "工作区分析完成",
+  CODEBASE_ANALYSIS_COMPLETE: "代码库分析完成",
+  ACTION_COMPLETED: (action: string) => `已完成: ${action}`,
+  ACTION_EXECUTED: (action: string) => `已执行: ${action}`,
+} as const;
+
+// ---------- 文件名 ----------
 /** MISSION 文件相关常量 */
 const MissionFileNames = {
   MISSION: "MISSION_PARTNER.md",
@@ -123,6 +146,22 @@ const StateFileNames = {
   TEMP_SUFFIX: ".tmp",
 } as const;
 
+/** 文件扩展名常量 */
+const FileExtensions = {
+  TYPESCRIPT: ".ts",
+  JAVASCRIPT: ".js",
+  JSON: ".json",
+  MARKDOWN: ".md",
+} as const;
+
+// ---------- MISSION 解析 ----------
+/** MISSION 文件部分名称 */
+const MissionSections = {
+  TASKS: "## 具体任务",
+  ALTERNATIVE_TASKS: "## 具体任务",
+} as const;
+
+// ---------- 系统配置 ----------
 /** 时间常量（毫秒） */
 const TimeConstants = {
   FIVE_MINUTES_MS: 5 * 60 * 1000,
@@ -135,6 +174,7 @@ const FormatConstants = {
   TIMEZONE: 'UTC',
 } as const;
 
+// ---------- 业务数据 ----------
 /** 优化建议列表 */
 const OPTIMIZATION_SUGGESTIONS = [
   "建议：添加单元测试覆盖核心功能",
@@ -144,39 +184,6 @@ const OPTIMIZATION_SUGGESTIONS = [
   "建议：集成 LLM API 实现智能决策",
   "建议：添加性能监控指标"
 ] as const;
-
-/** 响应消息模板 */
-const ResponseMessages = {
-  STATE_FILE_EXISTS: (lastModified: string) => `状态文件存在，最后更新: ${lastModified}`,
-  STATE_FILE_NOT_EXISTS: "状态文件不存在，等待首次循环",
-  SUGGESTION_LOGGED: (suggestion: string) => `已记录建议: ${suggestion}`,
-  WORKSPACE_ANALYSIS_COMPLETE: "工作区分析完成",
-  CODEBASE_ANALYSIS_COMPLETE: "代码库分析完成",
-  ACTION_COMPLETED: (action: string) => `已完成: ${action}`,
-  ACTION_EXECUTED: (action: string) => `已执行: ${action}`,
-} as const;
-
-/** MISSION 文件部分名称 */
-const MissionSections = {
-  TASKS: "## 具体任务",
-  ALTERNATIVE_TASKS: "## 具体任务",
-} as const;
-
-/** 文件扩展名常量 */
-const FileExtensions = {
-  TYPESCRIPT: ".ts",
-  JAVASCRIPT: ".js",
-  JSON: ".json",
-  MARKDOWN: ".md",
-} as const;
-
-/** 行动关键词映射 */
-const ActionKeywords = {
-  ANALYZE: "分析",
-  CHECK: "检查",
-  GENERATE: "生成",
-  CODE: "代码",
-} as const;
 
 /**
  * 龙虾永动引擎服务类
