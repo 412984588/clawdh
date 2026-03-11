@@ -182,7 +182,7 @@ export {
 /**
  * 🦞 引擎版本信息
  */
-export const ENGINE_VERSION = "2.25.0";
+export const ENGINE_VERSION = "2.26.0";
 
 /**
  * 🦞 引擎功能矩阵
@@ -259,6 +259,8 @@ export const ENGINE_FEATURES = {
   adaptflowOrchestrator: true,
   // v2.25 新增
   cbsOrchestrator: true,
+  // v2.26 新增
+  myantfarmOrchestrator: true,
 } as const;
 
 // ========== 火焰图收集器 (v2.1) ==========
@@ -1017,6 +1019,37 @@ export {
   createCBSOrchestrator,
   CBSTemplates,
 } from "./cbs-orchestrator.js";
+
+// ========== MyAntFarm 多代理决策支持编排器 (v2.26) ==========
+import {
+  MyAntFarmOrchestrator,
+  DQDimension,
+  MyAntFarmAgentType,
+  MyAntFarmAgentState,
+  DecisionQualityScore,
+  AgentOutput,
+  IdentifiedRisk,
+  RemediationStep,
+  IncidentBrief,
+  MyAntFarmConfig,
+  createMyAntFarmOrchestrator,
+  MyAntFarmTemplates,
+} from "./myantfarm-orchestrator.js";
+
+export {
+  MyAntFarmOrchestrator,
+  DQDimension,
+  MyAntFarmAgentType,
+  MyAntFarmAgentState,
+  DecisionQualityScore,
+  AgentOutput,
+  IdentifiedRisk,
+  RemediationStep,
+  IncidentBrief,
+  MyAntFarmConfig,
+  createMyAntFarmOrchestrator,
+  MyAntFarmTemplates,
+} from "./myantfarm-orchestrator.js";
 
 /**
  * 🦞 创建完整引擎（包含所有组件）
