@@ -135,6 +135,27 @@ const FormatConstants = {
   TIMEZONE: 'UTC',
 } as const;
 
+/** 优化建议列表 */
+const OPTIMIZATION_SUGGESTIONS = [
+  "建议：添加单元测试覆盖核心功能",
+  "建议：完善错误处理机制",
+  "建议：优化上下文压缩算法",
+  "建议：添加更多行动类型",
+  "建议：集成 LLM API 实现智能决策",
+  "建议：添加性能监控指标"
+] as const;
+
+/** 响应消息模板 */
+const ResponseMessages = {
+  STATE_FILE_EXISTS: (lastModified: string) => `状态文件存在，最后更新: ${lastModified}`,
+  STATE_FILE_NOT_EXISTS: "状态文件不存在，等待首次循环",
+  SUGGESTION_LOGGED: (suggestion: string) => `已记录建议: ${suggestion}`,
+  WORKSPACE_ANALYSIS_COMPLETE: "工作区分析完成",
+  CODEBASE_ANALYSIS_COMPLETE: "代码库分析完成",
+  ACTION_COMPLETED: (action: string) => `已完成: ${action}`,
+  ACTION_EXECUTED: (action: string) => `已执行: ${action}`,
+} as const;
+
 /** MISSION 文件部分名称 */
 const MissionSections = {
   TASKS: "## 具体任务",
@@ -614,7 +635,7 @@ export class PerpetualEngineService {
         return await this.executeConcreteAction(action.description, ctx);
 
       default:
-        return { summary: `已执行: ${action.description}` };
+        return { summary: ResponseMessages.ACTION_EXECUTED(action.description) };
     }
   }
 
@@ -639,7 +660,7 @@ export class PerpetualEngineService {
       }
     }
 
-    return { summary: `已完成: ${description}` };
+    return { summary: ResponseMessages.ACTION_COMPLETED(description) };
   }
 
   /**
@@ -658,9 +679,9 @@ export class PerpetualEngineService {
       await fs.access(statePath);
       const stat = await fs.stat(statePath);
       const lastModified = new Date(stat.mtime).toLocaleString(FormatConstants.LOCALE);
-      return `状态文件存在，最后更新: ${lastModified}`;
+      return ResponseMessages.STATE_FILE_EXISTS(lastModified);
     } catch {
-      return `状态文件不存在，等待首次循环`;
+      return ResponseMessages.STATE_FILE_NOT_EXISTS;
     }
   }
 
@@ -668,23 +689,14 @@ export class PerpetualEngineService {
    * 生成优化建议（带日志记录）
    */
   private async generateSuggestion(ctx: OpenClawPluginServiceContext): Promise<string> {
-    const suggestions = [
-      "建议：添加单元测试覆盖核心功能",
-      "建议：完善错误处理机制",
-      "建议：优化上下文压缩算法",
-      "建议：添加更多行动类型",
-      "建议：集成 LLM API 实现智能决策",
-      "建议：添加性能监控指标"
-    ];
-
-    const suggestion = suggestions[this.loopCountValue % suggestions.length];
+    const suggestion = OPTIMIZATION_SUGGESTIONS[this.loopCountValue % OPTIMIZATION_SUGGESTIONS.length];
 
     // 异步写入日志文件（不阻塞主循环）
     this.writeSuggestionLog(ctx, suggestion).catch(err => {
       safeDebug(this.api.logger,`建议日志写入失败: ${err instanceof Error ? err.message : String(err)}`);
     });
 
-    return `已记录建议: ${suggestion}`;
+    return ResponseMessages.SUGGESTION_LOGGED(suggestion);
   }
 
   /**
@@ -726,7 +738,9 @@ export class PerpetualEngineService {
       return `${label}分析: TS(${stats.ts}) JS(${stats.js}) JSON(${stats.json}) MD(${stats.md})`;
     } catch (error) {
       safeDebug(this.api.logger, `${label}分析失败: ${error instanceof Error ? error.message : String(error)}`);
-      return `${label}分析完成`;
+      return label === "工作区"
+        ? ResponseMessages.WORKSPACE_ANALYSIS_COMPLETE
+        : ResponseMessages.CODEBASE_ANALYSIS_COMPLETE;
     }
   }
 
