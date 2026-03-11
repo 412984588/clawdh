@@ -40,6 +40,16 @@ import { AsyncContextTracker, createAsyncTracker, getGlobalTracker, trackAsync, 
 import { ChainOfThought, TreeOfThought, GraphChainOfThought, DynamicRecursiveCoT, createChainOfThought, createTreeOfThought, withCoT, ReasoningState, ChainConfig } from "./chain-of-thought.js";
 import { ReflectedMetadata, RegisterMetadata, LogCalls, ValidateParams, EnableValidation, Cache, Measure, RetryOnFailure, AutoBind, Decorators, getMetrics, createDecoratorComposer } from "./decorator-metadata.js";
 import { HTNPlanner, createHTNPlanner, createHTNMethod, createHTNTask, GENERAL_DOMAIN, TaskStatus, HTNTaskType } from "./htn-planner.js";
+import {
+  IncrementalLearningEngine,
+  createIncrementalLearningEngine,
+  globalIncrementalLearner,
+  LearningType,
+  MemoryType,
+  LearningState,
+  ExperienceEntry,
+  IncrementalLearningConfig,
+} from "./incremental-learning.js";
 
 // ========== 零延迟循环引擎 ==========
 export {
@@ -153,7 +163,7 @@ export {
 /**
  * 🦞 引擎版本信息
  */
-export const ENGINE_VERSION = "2.4.0";
+export const ENGINE_VERSION = "2.5.0";
 
 /**
  * 🦞 引擎功能矩阵
@@ -188,6 +198,8 @@ export const ENGINE_FEATURES = {
   decoratorMetadata: true,
   // v2.4 新增
   htnPlanner: true,
+  // v2.5 新增
+  incrementalLearning: true,
 } as const;
 
 // ========== 火焰图收集器 (v2.1) ==========
@@ -335,6 +347,18 @@ export {
   HTNExecutionResult,
   HTNPlannerConfig,
 } from "./htn-planner.js";
+
+// ========== 增量学习引擎 (v2.5) ==========
+export {
+  IncrementalLearningEngine,
+  createIncrementalLearningEngine,
+  globalIncrementalLearner,
+  LearningType,
+  MemoryType,
+  LearningState,
+  ExperienceEntry,
+  IncrementalLearningConfig,
+} from "./incremental-learning.js";
 
 /**
  * 🦞 创建完整引擎（包含所有组件）
