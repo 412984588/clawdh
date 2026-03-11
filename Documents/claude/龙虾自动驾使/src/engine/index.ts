@@ -182,7 +182,7 @@ export {
 /**
  * 🦞 引擎版本信息
  */
-export const ENGINE_VERSION = "2.20.0";
+export const ENGINE_VERSION = "2.21.0";
 
 /**
  * 🦞 引擎功能矩阵
@@ -249,6 +249,8 @@ export const ENGINE_FEATURES = {
   symphonyOrchestrator: true,
   // v2.20 新增
   moyaOrchestrator: true,
+  // v2.21 新增
+  crotoOrchestrator: true,
 } as const;
 
 // ========== 火焰图收集器 (v2.1) ==========
@@ -846,6 +848,41 @@ export {
   createMOYAOrchestrator,
   MOYATemplates,
 } from "./moya-orchestrator.js";
+
+// ========== Croto 跨团队编排器 (v2.21) ==========
+import {
+  CrotoOrchestrator,
+  CrotoTeamType,
+  CrotoTeamState,
+  CrotoAgentRole,
+  CrotoAgent,
+  CrotoTeam,
+  CrotoTask,
+  CrotoSubtask,
+  CrotoProposal,
+  CrotoCollaboration,
+  CrotoOrchestrationResult,
+  CrotoConfig,
+  createCrotoOrchestrator,
+  CrotoTemplates,
+} from "./croto-orchestrator.js";
+
+export {
+  CrotoOrchestrator,
+  CrotoTeamType,
+  CrotoTeamState,
+  CrotoAgentRole,
+  CrotoAgent,
+  CrotoTeam,
+  CrotoTask,
+  CrotoSubtask,
+  CrotoProposal,
+  CrotoCollaboration,
+  CrotoOrchestrationResult,
+  CrotoConfig,
+  createCrotoOrchestrator,
+  CrotoTemplates,
+} from "./croto-orchestrator.js";
 
 /**
  * 🦞 创建完整引擎（包含所有组件）
