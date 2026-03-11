@@ -17,11 +17,23 @@
  * ```
  *
  * @version 1.0.0
+ * @since 2025-03-11
  * @author Claude Code
+ *
+ * @remarks
+ * 该引擎设计用于 OpenClaw 插件系统，提供 24/7/365 的自主运行能力。
+ * 使用状态持久化机制确保服务重启后能够恢复之前的循环状态。
  */
 
+// ========== 导入模块 ==========
+
+/** 类型导入 */
 import type { OpenClawPluginServiceContext, PluginCommandContext } from "../types.js";
+
+/** 配置导入 */
 import { EngineConfig, DEFAULT_CONFIG } from "../config.js";
+
+/** Node.js 内置模块 */
 import fs from "fs/promises";
 import path from "path";
 
