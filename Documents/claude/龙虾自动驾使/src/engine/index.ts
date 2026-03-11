@@ -182,7 +182,7 @@ export {
 /**
  * 🦞 引擎版本信息
  */
-export const ENGINE_VERSION = "2.16.0";
+export const ENGINE_VERSION = "2.17.0";
 
 /**
  * 🦞 引擎功能矩阵
@@ -241,6 +241,8 @@ export const ENGINE_FEATURES = {
   haloOrchestrator: true,
   // v2.16 新增
   orchestraOrchestrator: true,
+  // v2.17 新增
+  puppeteerOrchestrator: true,
 } as const;
 
 // ========== 火焰图收集器 (v2.1) ==========
@@ -720,6 +722,35 @@ export {
   createAgentOrchestrator,
   OrchestraTemplates,
 } from "./orchestra-orchestrator.js";
+
+// ========== Puppeteer 演化编排器 (v2.17) ==========
+import {
+  PuppeteerOrchestrator,
+  PuppetRole,
+  OrchestrationAction,
+  PuppetTaskState,
+  AgentAction,
+  PuppeteerOrchestrationState,
+  AgentCapability,
+  OrchestrationDecision,
+  PuppeteerConfig,
+  createPuppeteerOrchestrator,
+  PuppeteerTemplates,
+} from "./puppeteer-orchestrator.js";
+
+export {
+  PuppeteerOrchestrator,
+  PuppetRole,
+  OrchestrationAction,
+  PuppetTaskState,
+  AgentAction,
+  PuppeteerOrchestrationState,
+  AgentCapability,
+  OrchestrationDecision,
+  PuppeteerConfig,
+  createPuppeteerOrchestrator,
+  PuppeteerTemplates,
+} from "./puppeteer-orchestrator.js";
 
 /**
  * 🦞 创建完整引擎（包含所有组件）
