@@ -182,7 +182,7 @@ export {
 /**
  * 🦞 引擎版本信息
  */
-export const ENGINE_VERSION = "2.35.0";
+export const ENGINE_VERSION = "2.36.0";
 
 /**
  * 🦞 引擎功能矩阵
@@ -279,6 +279,8 @@ export const ENGINE_FEATURES = {
   epochOrchestrator: true,
   // v2.35 新增
   masfactoryOrchestrator: true,
+  // v2.36 新增
+  alphaevolveOrchestrator: true,
 } as const;
 
 // ========== 火焰图收集器 (v2.1) ==========
@@ -1391,6 +1393,41 @@ export {
   createMASFactoryOrchestrator,
   MASFactoryTemplates,
 } from "./masfactory-orchestrator.js";
+
+// ========== AlphaEvolve 进化算法编排器 (v2.36) ==========
+import {
+  AlphaEvolveOrchestrator,
+  AlphaEvolveAlgorithm,
+  RegretAccumulatorType,
+  PolicyExtractionType,
+  PolicyAccumulatorType,
+  Regret,
+  Strategy,
+  StrategyProfile,
+  VADCFRConfig,
+  SHORPSROConfig,
+  AlphaEvolveConfig,
+  EvolutionResult,
+  createAlphaEvolveOrchestrator,
+  AlphaEvolveTemplates,
+} from "./alphaevolve-orchestrator.js";
+
+export {
+  AlphaEvolveOrchestrator,
+  AlphaEvolveAlgorithm,
+  RegretAccumulatorType,
+  PolicyExtractionType,
+  PolicyAccumulatorType,
+  Regret,
+  Strategy,
+  StrategyProfile,
+  VADCFRConfig,
+  SHORPSROConfig,
+  AlphaEvolveConfig,
+  EvolutionResult,
+  createAlphaEvolveOrchestrator,
+  AlphaEvolveTemplates,
+} from "./alphaevolve-orchestrator.js";
 
 /**
  * 🦞 创建完整引擎（包含所有组件）
