@@ -63,15 +63,31 @@ function safeDebug(logger: EngineLogger, message: string): void {
 
 // ========== 常量定义 ==========
 
-// ---------- 行动类型 ----------
-/** 行动类型常量 */
+/**
+ * 行动类型常量
+ *
+ * 定义引擎执行循环中支持的各种行动类型。
+ * 每种类型对应不同的执行逻辑和恢复策略。
+ *
+ * @internal
+ */
 const ActionType = {
+  /** 初始化行动：启动时执行一次 */
   INIT: "init",
+  /** 错误恢复行动：检测到错误后执行 */
   ERROR_RECOVERY: "error_recovery",
+  /** 正常执行行动：常规的业务操作 */
   EXECUTE: "execute",
 } as const;
 
-/** 默认维护任务列表 */
+/**
+ * 默认维护任务列表
+ *
+ * 当没有其他明确行动时，引擎会循环执行这些维护任务。
+ * 任务按顺序执行，可通过配置调整执行频率。
+ *
+ * @internal
+ */
 const DEFAULT_MAINTENANCE_ACTIONS = [
   "分析工作区文件结构",
   "检查代码质量",
@@ -81,29 +97,58 @@ const DEFAULT_MAINTENANCE_ACTIONS = [
   "清理缓存文件",
 ] as const;
 
-/** 行动关键词映射 */
+/**
+ * 行动关键词映射
+ *
+ * 将行动描述中的关键词映射到具体的处理方法。
+ * 用于 `executeConcreteAction` 方法中的处理器选择。
+ *
+ * @internal
+ */
 const ActionKeywords = {
+  /** 分析类行动：触发工作区分析 */
   ANALYZE: "分析",
+  /** 检查类行动：触发状态检查 */
   CHECK: "检查",
+  /** 生成类行动：触发建议生成 */
   GENERATE: "生成",
+  /** 代码类行动：触发代码库分析 */
   CODE: "代码",
 } as const;
 
-// ---------- 日志消息 ----------
-/** 日志消息模板 */
+/**
+ * 日志消息模板
+ *
+ * 提供标准化的日志消息模板，支持参数化输出。
+ * 所有消息都使用 emoji 前缀以便于快速识别。
+ *
+ * @internal
+ */
 const LogMessages = {
+  /** 引擎启动完成 */
   ENGINE_STARTED: "🦞 永动循环已启动（后台运行）",
+  /** 引擎已停止 */
   ENGINE_STOPPED: "🛑 永动循环已停止",
+  /** 引擎就绪，等待启动命令 */
   ENGINE_READY: "🦞 永动引擎服务已就绪，等待 /start_partner 命令",
+  /** 循环开始 */
   LOOP_STARTED: "🔄 永动循环开始",
+  /** @param count 总循环次数 */
   LOOP_ENDED: (count: number) => `🔄 永动循环结束，总循环次数: ${count}`,
+  /** @param count 恢复的循环计数 */
   STATUS_RECOVERED: (count: number) => `📂 恢复之前状态: ${count} 次循环`,
+  /** @param count 当前循环编号 */
   STATE_PERSISTED: (count: number) => `💾 状态已持久化: 循环 ${count}`,
+  /** 无状态文件可恢复 */
   NO_STATE_FILE: "没有可恢复的状态文件",
+  /** @param actions 行动数量 */
+  /** @param errors 错误数量 */
   CONTEXT_COMPRESSED: (actions: number, errors: number) =>
     `📦 上下文已压缩: ${actions} 行动, ${errors} 错误`,
+  /** @param seconds 无响应秒数 */
   HEALTH_CHECK_STALL: (seconds: number) =>
     `⚠️ 健康检查: 循环可能已卡死 (${seconds}秒无响应)`,
+  /** @param metrics 性能指标对象 */
   PERFORMANCE_METRICS: (metrics: {
     total: number;
     avg: number;
@@ -119,63 +164,130 @@ const LogMessages = {
     `速率: ${metrics.rate} 循环/秒`,
 } as const;
 
-// ---------- 响应消息 ----------
-/** 响应消息模板 */
+/**
+ * 响应消息模板
+ *
+ * 用于向用户返回操作结果的标准化消息模板。
+ *
+ * @internal
+ */
 const ResponseMessages = {
+  /** @param lastModified 最后修改时间 */
   STATE_FILE_EXISTS: (lastModified: string) => `状态文件存在，最后更新: ${lastModified}`,
+  /** 状态文件不存在时的提示 */
   STATE_FILE_NOT_EXISTS: "状态文件不存在，等待首次循环",
+  /** @param suggestion 建议内容 */
   SUGGESTION_LOGGED: (suggestion: string) => `已记录建议: ${suggestion}`,
+  /** 工作区分析完成 */
   WORKSPACE_ANALYSIS_COMPLETE: "工作区分析完成",
+  /** 代码库分析完成 */
   CODEBASE_ANALYSIS_COMPLETE: "代码库分析完成",
+  /** @param action 完成的行动 */
   ACTION_COMPLETED: (action: string) => `已完成: ${action}`,
+  /** @param action 执行的行动 */
   ACTION_EXECUTED: (action: string) => `已执行: ${action}`,
 } as const;
 
-// ---------- 文件名 ----------
-/** MISSION 文件相关常量 */
+/**
+ * MISSION 文件相关常量
+ *
+ * 定义存储长期目标和权限边界的文件名。
+ *
+ * @internal
+ */
 const MissionFileNames = {
+  /** 任务描述文件 */
   MISSION: "MISSION_PARTNER.md",
+  /** 权限边界文件 */
   BOUNDARIES: "BOUNDARIES_PARTNER.md",
 } as const;
 
-/** 状态文件相关常量 */
+/**
+ * 状态文件相关常量
+ *
+ * 定义引擎运行时状态持久化使用的文件名。
+ *
+ * @internal
+ */
 const StateFileNames = {
+  /** 引擎状态文件 */
   ENGINE_STATE: "engine-state.json",
+  /** 状态存储目录 */
   STATE_DIR: ".lobster-engine",
+  /** 建议日志文件 */
   SUGGESTIONS_LOG: "suggestions.log",
+  /** 临时文件后缀（用于原子写入） */
   TEMP_SUFFIX: ".tmp",
 } as const;
 
-/** 文件扩展名常量 */
+/**
+ * 文件扩展名常量
+ *
+ * 用于文件类型统计和识别。
+ *
+ * @internal
+ */
 const FileExtensions = {
+  /** TypeScript 源文件 */
   TYPESCRIPT: ".ts",
+  /** JavaScript 源文件 */
   JAVASCRIPT: ".js",
+  /** JSON 配置文件 */
   JSON: ".json",
+  /** Markdown 文档文件 */
   MARKDOWN: ".md",
 } as const;
 
-// ---------- MISSION 解析 ----------
-/** MISSION 文件部分名称 */
+/**
+ * MISSION 文件部分标识
+ *
+ * 定义需要在 MISSION 文件中查找的章节标题。
+ *
+ * @internal
+ */
 const MissionSections = {
+  /** 主要任务章节标识 */
   TASKS: "## 具体任务",
+  /** 备用任务章节标识 */
   ALTERNATIVE_TASKS: "## 具体任务",
 } as const;
 
-// ---------- 系统配置 ----------
-/** 时间常量（毫秒） */
+/**
+ * 时间常量（毫秒）
+ *
+ * 定义引擎中使用的时间相关常量。
+ *
+ * @internal
+ */
 const TimeConstants = {
+  /** 5分钟的毫秒数（用于判断最近错误） */
   FIVE_MINUTES_MS: 5 * 60 * 1000,
+  /** 1秒的毫秒数（用于计算循环速率） */
   ONE_SECOND_MS: 1000,
 } as const;
 
-/** 格式化常量 */
+/**
+ * 格式化常量
+ *
+ * 定义日期时间格式化使用的区域设置。
+ *
+ * @internal
+ */
 const FormatConstants = {
+  /** 本地化设置（简体中文） */
   LOCALE: 'zh-CN',
+  /** 时区设置 */
   TIMEZONE: 'UTC',
 } as const;
 
-// ---------- 业务数据 ----------
-/** 优化建议列表 */
+/**
+ * 优化建议列表
+ *
+ * 引擎循环中会轮播显示这些优化建议。
+ * 建议会记录到 suggestions.log 文件中。
+ *
+ * @internal
+ */
 const OPTIMIZATION_SUGGESTIONS = [
   "建议：添加单元测试覆盖核心功能",
   "建议：完善错误处理机制",
