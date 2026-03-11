@@ -182,7 +182,7 @@ export {
 /**
  * 🦞 引擎版本信息
  */
-export const ENGINE_VERSION = "2.14.0";
+export const ENGINE_VERSION = "2.15.0";
 
 /**
  * 🦞 引擎功能矩阵
@@ -237,6 +237,8 @@ export const ENGINE_FEATURES = {
   aegeanOrchestrator: true,
   // v2.14 新增
   multiturnOrchestrator: true,
+  // v2.15 新增
+  haloOrchestrator: true,
 } as const;
 
 // ========== 火焰图收集器 (v2.1) ==========
@@ -652,6 +654,39 @@ export {
   createMultiTurnOrchestrator,
   MultiTurnTemplates,
 } from "./multiturn-orchestrator.js";
+
+// ========== HALO 分层编排器 (v2.15) ==========
+import {
+  HALOOrchestrator,
+  AgentLevel,
+  MCTSNodeType,
+  WorkflowActionType,
+  SubTask,
+  AgentRole,
+  MCTSNode,
+  WorkflowAction,
+  PromptRefinement,
+  HALOOutput,
+  HALOConfig,
+  createHALOOrchestrator,
+  HALOTemplates,
+} from "./halo-orchestrator.js";
+
+export {
+  HALOOrchestrator,
+  AgentLevel,
+  MCTSNodeType,
+  WorkflowActionType,
+  SubTask,
+  AgentRole,
+  MCTSNode,
+  WorkflowAction,
+  PromptRefinement,
+  HALOOutput,
+  HALOConfig,
+  createHALOOrchestrator,
+  HALOTemplates,
+} from "./halo-orchestrator.js";
 
 /**
  * 🦞 创建完整引擎（包含所有组件）
