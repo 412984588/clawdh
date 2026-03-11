@@ -182,7 +182,7 @@ export {
 /**
  * 🦞 引擎版本信息
  */
-export const ENGINE_VERSION = "2.33.0";
+export const ENGINE_VERSION = "2.34.0";
 
 /**
  * 🦞 引擎功能矩阵
@@ -275,6 +275,8 @@ export const ENGINE_FEATURES = {
   marsOrchestrator: true,
   // v2.33 新增
   latentmasOrchestrator: true,
+  // v2.34 新增
+  epochOrchestrator: true,
 } as const;
 
 // ========== 火焰图收集器 (v2.1) ==========
@@ -1291,6 +1293,47 @@ export {
   createLatentMASOrchestrator,
   LatentMASTemplates,
 } from "./latentmas-orchestrator.js";
+
+// ========== EPOCH 多轮系统优化编排器 (v2.34) ==========
+import {
+  EPOCHOrchestrator,
+  EPOCHTaskType,
+  EPOCHRole,
+  EPOCHRoundState,
+  EPOCHVerdict,
+  EPOCHRoundRecord,
+  EPOCHInvestigationReport,
+  EPOCHMetrics,
+  EPOCHDelta,
+  EPOCHBaselineSystem,
+  EPOCHBaselineDesign,
+  EPOCHOptimizationTrajectory,
+  EPOCHEvaluationInterface,
+  EPOCHRunSummary,
+  EPOCHConfig,
+  createEPOCHOrchestrator,
+  EPOCHTemplates,
+} from "./epoch-orchestrator.js";
+
+export {
+  EPOCHOrchestrator,
+  EPOCHTaskType,
+  EPOCHRole,
+  EPOCHRoundState,
+  EPOCHVerdict,
+  EPOCHRoundRecord,
+  EPOCHInvestigationReport,
+  EPOCHMetrics,
+  EPOCHDelta,
+  EPOCHBaselineSystem,
+  EPOCHBaselineDesign,
+  EPOCHOptimizationTrajectory,
+  EPOCHEvaluationInterface,
+  EPOCHRunSummary,
+  EPOCHConfig,
+  createEPOCHOrchestrator,
+  EPOCHTemplates,
+} from "./epoch-orchestrator.js";
 
 /**
  * 🦞 创建完整引擎（包含所有组件）
