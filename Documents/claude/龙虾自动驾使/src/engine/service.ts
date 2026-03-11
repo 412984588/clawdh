@@ -92,6 +92,41 @@ const LogMessages = {
   NO_STATE_FILE: "没有可恢复的状态文件",
   CONTEXT_COMPRESSED: (actions: number, errors: number) =>
     `📦 上下文已压缩: ${actions} 行动, ${errors} 错误`,
+  HEALTH_CHECK_STALL: (seconds: number) =>
+    `⚠️ 健康检查: 循环可能已卡死 (${seconds}秒无响应)`,
+  PERFORMANCE_METRICS: (metrics: {
+    total: number;
+    avg: number;
+    min: number;
+    max: number;
+    rate: number;
+  }) =>
+    `📊 性能指标: ` +
+    `总循环: ${metrics.total}, ` +
+    `平均: ${metrics.avg}ms, ` +
+    `最快: ${metrics.min}ms, ` +
+    `最慢: ${metrics.max}ms, ` +
+    `速率: ${metrics.rate} 循环/秒`,
+} as const;
+
+/** MISSION 文件相关常量 */
+const MissionFileNames = {
+  MISSION: "MISSION_PARTNER.md",
+  BOUNDARIES: "BOUNDARIES_PARTNER.md",
+} as const;
+
+/** MISSION 文件部分名称 */
+const MissionSections = {
+  TASKS: "## 具体任务",
+  ALTERNATIVE_TASKS: "## 具体任务",
+} as const;
+
+/** 文件扩展名常量 */
+const FileExtensions = {
+  TYPESCRIPT: ".ts",
+  JAVASCRIPT: ".js",
+  JSON: ".json",
+  MARKDOWN: ".md",
 } as const;
 
 /**
@@ -372,8 +407,8 @@ export class PerpetualEngineService {
     boundaries: string;
   }> {
     const workspaceDir = ctx.workspaceDir || process.cwd();
-    const missionPath = path.join(workspaceDir, "MISSION_PARTNER.md");
-    const boundariesPath = path.join(workspaceDir, "BOUNDARIES_PARTNER.md");
+    const missionPath = path.join(workspaceDir, MissionFileNames.MISSION);
+    const boundariesPath = path.join(workspaceDir, MissionFileNames.BOUNDARIES);
 
     try {
       const [mission, boundaries] = await Promise.all([
@@ -517,7 +552,7 @@ export class PerpetualEngineService {
     let inTasksSection = false;
 
     for (const line of lines) {
-      if (line.includes('## 具体任务') || line.includes('## 具体任务')) {
+      if (line.includes(MissionSections.TASKS) || line.includes(MissionSections.ALTERNATIVE_TASKS)) {
         inTasksSection = true;
         continue;
       }
@@ -678,10 +713,10 @@ export class PerpetualEngineService {
   private countFileTypes(files: string[]): { ts: number; js: number; json: number; md: number } {
     const stats = { ts: 0, js: 0, json: 0, md: 0 };
     for (const file of files) {
-      if (file.endsWith('.ts')) stats.ts++;
-      else if (file.endsWith('.js')) stats.js++;
-      else if (file.endsWith('.json')) stats.json++;
-      else if (file.endsWith('.md')) stats.md++;
+      if (file.endsWith(FileExtensions.TYPESCRIPT)) stats.ts++;
+      else if (file.endsWith(FileExtensions.JAVASCRIPT)) stats.js++;
+      else if (file.endsWith(FileExtensions.JSON)) stats.json++;
+      else if (file.endsWith(FileExtensions.MARKDOWN)) stats.md++;
     }
     return stats;
   }
@@ -795,7 +830,7 @@ export class PerpetualEngineService {
       const timeSinceLastLoop = Date.now() - this.lastLoopTime;
       if (timeSinceLastLoop > this.config.stallThreshold && this.isRunningValue) {
         this.api.logger.warn(
-          `⚠️ 健康检查: 循环可能已卡死 (${Math.round(timeSinceLastLoop / 1000)}秒无响应)`
+          LogMessages.HEALTH_CHECK_STALL(Math.round(timeSinceLastLoop / 1000))
         );
         // 注意：不自动停止，让用户决定
       }
@@ -874,43 +909,81 @@ export class PerpetualEngineService {
     }
     return stats;
   }
+  /**
+   * 记录性能指标
+   */
   private logPerformanceMetrics(): void {
     this.api.logger.info(
-      `📊 性能指标: ` +
-      `总循环: ${this.loopCountValue}, ` +
-      `平均: ${this.loopMetrics.avgTime}ms, ` +
-      `最快: ${this.loopMetrics.minTime}ms, ` +
-      `最慢: ${this.loopMetrics.maxTime}ms, ` +
-      `速率: ${this.getLoopsPerSecond()} 循环/秒`
+      LogMessages.PERFORMANCE_METRICS({
+        total: this.loopCountValue,
+        avg: this.loopMetrics.avgTime,
+        min: this.loopMetrics.minTime === Infinity ? 0 : this.loopMetrics.minTime,
+        max: this.loopMetrics.maxTime,
+        rate: this.getLoopsPerSecond(),
+      })
     );
   }
 }
 
+/**
+ * 行动记录接口
+ * @internal
+ */
 interface ActionRecord {
+  /** 循环编号 */
   loop: number;
+  /** 执行的行动描述 */
   action: string;
+  /** 执行结果摘要 */
   result: string;
+  /** 时间戳 */
   timestamp: number;
 }
 
+/**
+ * 错误记录接口
+ * @internal
+ */
 interface ErrorRecord {
+  /** 循环编号 */
   loop: number;
+  /** 错误消息 */
   error: string;
+  /** 时间戳 */
   timestamp: number;
+  /** 错误分类 */
+  category?: ErrorCategory;
+  /** 是否已解决 */
+  resolved?: boolean;
 }
 
+/**
+ * 上下文状态接口
+ * @internal
+ */
 interface ContextState {
+  /** 行动记录列表 */
   actions: ActionRecord[];
+  /** 错误记录列表 */
   errors: ErrorRecord[];
 }
 
-// 错误类型分类
+/**
+ * 错误类型分类枚举
+ * @internal
+ */
 enum ErrorCategory {
+  /** 未知错误 */
   UNKNOWN = "unknown",
+  /** 文件IO错误 */
   FILE_IO = "file_io",
+  /** 解析错误 */
   PARSE = "parse",
+  /** 网络错误 */
   NETWORK = "network",
+  /** 权限错误 */
   PERMISSION = "permission",
+  /** 超时错误 */
   TIMEOUT = "timeout",
 }
 
@@ -923,11 +996,3 @@ const RecoveryMessages: Record<ErrorCategory, string> = {
   [ErrorCategory.TIMEOUT]: "增加超时时间，简化操作",
   [ErrorCategory.UNKNOWN]: "记录并跳过错误",
 };
-
-interface ErrorRecord {
-  loop: number;
-  error: string;
-  timestamp: number;
-  category?: ErrorCategory;
-  resolved?: boolean;
-}
