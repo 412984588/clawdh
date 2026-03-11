@@ -312,7 +312,40 @@ const OPTIMIZATION_SUGGESTIONS = [
 /**
  * 龙虾永动引擎服务类
  *
- * 负责管理零延迟循环、状态持久化、错误分类恢复等功能。
+ * 实现零延迟的 `while(isRunning)` 死循环，支持：
+ *
+ * - **狂暴异常处理**：任何错误转化为提示词，立即继续下一轮
+ * - **智能错误分类**：6种错误类型自动识别和恢复
+ * - **状态持久化**：原子写入，重启后自动恢复
+ * - **性能监控**：实时追踪循环速率和内存使用
+ * - **健康检查**：自动检测循环是否卡死
+ *
+ * @example
+ * ```ts
+ * // 创建并启动引擎
+ * const engine = new PerpetualEngineService(api, {
+ *   compressInterval: 5,
+ *   enableHealthCheck: true
+ * });
+ * await engine.start(context);
+ *
+ * // 查询引擎状态
+ * console.log(engine.isRunning()); // true
+ * console.log(engine.getLoopCount()); // 循环次数
+ *
+ * // 停止引擎
+ * engine.stopLoop();
+ * ```
+ *
+ * @remarks
+ * 该引擎设计用于拥有无限 Token 和极高 API 频次上限的场景，
+ * 因此**禁止使用任何心跳机制、sleep 或人为延迟**。
+ *
+ * @throws {Error} 当状态文件读取失败但目录权限正确时
+ * @throws {Error} 当状态文件损坏无法解析时（将使用默认状态）
+ *
+ * @seealso {@link EngineConfig} 引擎配置选项
+ * @seealso {@link ErrorCategory} 支持的错误类型
  */
 export class PerpetualEngineService {
   /** 引擎运行状态 */
