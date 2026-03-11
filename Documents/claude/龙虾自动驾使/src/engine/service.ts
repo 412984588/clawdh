@@ -890,24 +890,23 @@ export class PerpetualEngineService {
 
   /**
    * 分类错误类型
+   *
+   * 根据错误消息中的关键词匹配预定义的分类规则。
+   *
+   * @param errorMsg 错误消息
+   * @returns 错误分类
    */
   private categorizeError(errorMsg: string): ErrorCategory {
     const lower = errorMsg.toLowerCase();
-    if (lower.includes('enoent') || lower.includes('eacces') || lower.includes('file')) {
-      return ErrorCategory.FILE_IO;
+
+    for (const rule of ErrorClassificationRules) {
+      for (const pattern of rule.patterns) {
+        if (lower.includes(pattern)) {
+          return rule.category;
+        }
+      }
     }
-    if (lower.includes('syntax') || lower.includes('parse') || lower.includes('json')) {
-      return ErrorCategory.PARSE;
-    }
-    if (lower.includes('network') || lower.includes('fetch') || lower.includes('request')) {
-      return ErrorCategory.NETWORK;
-    }
-    if (lower.includes('permission') || lower.includes('unauthorized') || lower.includes('forbidden')) {
-      return ErrorCategory.PERMISSION;
-    }
-    if (lower.includes('timeout') || lower.includes('timed out')) {
-      return ErrorCategory.TIMEOUT;
-    }
+
     return ErrorCategory.UNKNOWN;
   }
 
@@ -1007,6 +1006,30 @@ enum ErrorCategory {
   /** 超时错误 */
   TIMEOUT = "timeout",
 }
+
+/** 错误分类规则 */
+const ErrorClassificationRules = [
+  {
+    patterns: ["enoent", "eacces", "file"],
+    category: ErrorCategory.FILE_IO,
+  },
+  {
+    patterns: ["syntax", "parse", "json"],
+    category: ErrorCategory.PARSE,
+  },
+  {
+    patterns: ["network", "fetch", "request"],
+    category: ErrorCategory.NETWORK,
+  },
+  {
+    patterns: ["permission", "unauthorized", "forbidden"],
+    category: ErrorCategory.PERMISSION,
+  },
+  {
+    patterns: ["timeout", "timed out"],
+    category: ErrorCategory.TIMEOUT,
+  },
+] as const;
 
 /** 错误恢复消息模板 */
 const RecoveryMessages: Record<ErrorCategory, string> = {
