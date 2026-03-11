@@ -551,7 +551,7 @@ export class PerpetualEngineService {
    *
    * @param mission MISSION 文件内容
    * @param _boundaries BOUNDARIES 文件内容（未使用，保留用于未来扩展）
-   * @returns Promise 包含行动描述和类型
+   * @returns Promise<{ description: string; type: string }> 包含行动描述和类型
    */
   private async planNextAction(mission: string, _boundaries: string): Promise<{
     description: string;
@@ -603,7 +603,7 @@ export class PerpetualEngineService {
    * - `unknown`: 未知错误 → 记录并跳过
    *
    * @param error 错误记录
-   * @returns 恢复行动描述
+   * @returns {{ description: string }} 恢复行动描述
    */
   private getErrorRecoveryAction(error: ErrorRecord): {
     description: string;
@@ -621,6 +621,12 @@ export class PerpetualEngineService {
 
   /**
    * 从 MISSION 解析行动列表
+   *
+   * 解析 MISSION 文件中 "## 具体任务" 部分的任务列表。
+   * 每个任务应该是 "数字. 描述" 的格式。
+   *
+   * @param mission MISSION 文件内容
+   * @returns 解析出的任务列表
    */
   private parseMissionActions(mission: string): string[] {
     const actions: string[] = [];
@@ -645,6 +651,12 @@ export class PerpetualEngineService {
 
   /**
    * 执行行动
+   *
+   * 根据行动类型分发到相应的处理逻辑。
+   *
+   * @param action 行动描述和类型
+   * @param ctx 服务上下文
+   * @returns Promise<{ summary: string }> 执行结果摘要
    */
   private async executeAction(
     action: { description: string; type: string },
@@ -668,6 +680,13 @@ export class PerpetualEngineService {
 
   /**
    * 执行具体行动（根据描述匹配处理器）
+   *
+   * 根据行动描述中的关键词匹配相应的处理器。
+   * 支持的关键词：分析、检查、生成、代码。
+   *
+   * @param description 行动描述
+   * @param ctx 服务上下文
+   * @returns Promise<{ summary: string }> 执行结果摘要
    */
   private async executeConcreteAction(
     description: string,
@@ -692,13 +711,23 @@ export class PerpetualEngineService {
 
   /**
    * 分析工作区状态（带缓存）
+   *
+   * 使用通用目录分析方法，标签为"工作区"。
+   *
+   * @param ctx 服务上下文
+   * @returns Promise<string> 分析结果
    */
   private async analyzeWorkspace(ctx: OpenClawPluginServiceContext): Promise<string> {
     return this.analyzeDirectory(ctx, "工作区");
   }
 
   /**
-   * 检查状态
+   * 检查状态文件
+   *
+   * 检查状态文件是否存在并返回其最后修改时间。
+   *
+   * @param ctx 服务上下文
+   * @returns Promise<string> 状态信息
    */
   private async checkStatus(ctx: OpenClawPluginServiceContext): Promise<string> {
     const statePath = path.join(ctx.stateDir, StateFileNames.ENGINE_STATE);
@@ -714,6 +743,11 @@ export class PerpetualEngineService {
 
   /**
    * 生成优化建议（带日志记录）
+   *
+   * 从预定义的建议列表中循环选择，并异步写入日志文件。
+   *
+   * @param ctx 服务上下文
+   * @returns Promise<string> 建议记录结果
    */
   private async generateSuggestion(ctx: OpenClawPluginServiceContext): Promise<string> {
     const suggestion = OPTIMIZATION_SUGGESTIONS[this.loopCountValue % OPTIMIZATION_SUGGESTIONS.length];
@@ -728,6 +762,13 @@ export class PerpetualEngineService {
 
   /**
    * 异步写入建议日志
+   *
+   * 将建议追加写入到日志文件，不阻塞主循环。
+   * 写入失败时静默处理，不影响主流程。
+   *
+   * @param ctx 服务上下文
+   * @param suggestion 建议内容
+   * @returns Promise<void>
    */
   private async writeSuggestionLog(ctx: OpenClawPluginServiceContext, suggestion: string): Promise<void> {
     try {
@@ -742,6 +783,11 @@ export class PerpetualEngineService {
 
   /**
    * 分析代码库并生成优化报告
+   *
+   * 使用通用目录分析方法，标签为"代码库"。
+   *
+   * @param ctx 服务上下文
+   * @returns Promise<string> 分析结果
    */
   private async analyzeCodebase(ctx: OpenClawPluginServiceContext): Promise<string> {
     return this.analyzeDirectory(ctx, "代码库");
@@ -750,9 +796,12 @@ export class PerpetualEngineService {
   /**
    * 通用目录分析方法
    *
+   * 获取目录中的文件列表并统计各类型文件的数量。
+   * 使用缓存机制避免频繁的文件系统操作。
+   *
    * @param ctx 服务上下文
-   * @param label 分析结果标签
-   * @returns 分析结果字符串
+   * @param label 分析结果标签（如"工作区"或"代码库"）
+   * @returns Promise<string> 分析结果字符串
    */
   private async analyzeDirectory(
     ctx: OpenClawPluginServiceContext,
@@ -775,6 +824,12 @@ export class PerpetualEngineService {
 
   /**
    * 获取缓存的文件列表
+   *
+   * 使用 TTL 缓存机制避免频繁的文件系统操作。
+   * 如果缓存未过期，直接返回缓存数据；否则重新读取目录。
+   *
+   * @param dir 目录路径
+   * @returns Promise<string[]> 文件名列表
    */
   private async getCachedFiles(dir: string): Promise<string[]> {
     const now = Date.now();
@@ -791,6 +846,11 @@ export class PerpetualEngineService {
 
   /**
    * 统计文件类型
+   *
+   * 遍历文件列表，根据扩展名统计各类型文件的数量。
+   *
+   * @param files 文件名列表
+   * @returns {{ ts: number; js: number; json: number; md: number }} 各类型文件计数
    */
   private countFileTypes(files: string[]): { ts: number; js: number; json: number; md: number } {
     const stats = { ts: 0, js: 0, json: 0, md: 0 };
