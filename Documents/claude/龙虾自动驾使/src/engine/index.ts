@@ -182,7 +182,7 @@ export {
 /**
  * 🦞 引擎版本信息
  */
-export const ENGINE_VERSION = "2.8.0";
+export const ENGINE_VERSION = "2.9.0";
 
 /**
  * 🦞 引擎功能矩阵
@@ -225,6 +225,8 @@ export const ENGINE_FEATURES = {
   teaOrchestrator: true,
   // v2.8 新增
   sclOrchestrator: true,
+  // v2.9 新增
+  omasOrchestrator: true,
 } as const;
 
 // ========== 火焰图收集器 (v2.1) ==========
@@ -452,6 +454,35 @@ export {
   ReflectionResult as SCLReflectionResult,
   ReasoningResult as SCLReasoningResult,
 } from "./structured-cognitive-loop.js";
+
+// ========== OMAS 编排器 (v2.9) ==========
+import {
+  OMASOrchestrator,
+  AgentType as OMASAgentType,
+  AgentState as OMASAgentState,
+  OMASTask,
+  ExecutionPlan as OMASExecutionPlan,
+  AgentDefinition,
+  PolicyConstraint,
+  MCPToolCall,
+  A2AMessage,
+  OrchestrationState,
+  createOMASOrchestrator,
+} from "./omas-orchestrator.js";
+
+export {
+  OMASOrchestrator,
+  AgentType as OMASAgentType,
+  AgentState as OMASAgentState,
+  OMASTask,
+  ExecutionPlan as OMASExecutionPlan,
+  AgentDefinition,
+  PolicyConstraint,
+  MCPToolCall,
+  A2AMessage,
+  OrchestrationState,
+  createOMASOrchestrator,
+} from "./omas-orchestrator.js";
 
 /**
  * 🦞 创建完整引擎（包含所有组件）
