@@ -33,6 +33,9 @@ import { FlameGraphCollector } from "./flame-graph-collector.js";
 import { SupervisorAgent, AgentStatus, AgentType } from "./supervisor-agent.js";
 import { Blackboard, createBlackboard } from "./blackboard.js";
 import { SwarmAgent } from "./swarm-agent.js";
+import { ReActAgent, createReActAgent, ReActTools } from "./react-agent.js";
+import { RecursiveSelfImprovement, createRecursiveSelfImprovement, selfImproving } from "./recursive-self-improvement.js";
+import { HybridOrchestrator, createHybridOrchestrator, AutoScalingHybridOrchestrator, createAutoScalingOrchestrator } from "./hybrid-orchestrator.js";
 
 // ========== 零延迟循环引擎 ==========
 export {
@@ -146,7 +149,7 @@ export {
 /**
  * 🦞 引擎版本信息
  */
-export const ENGINE_VERSION = "2.1.0";
+export const ENGINE_VERSION = "2.2.0";
 
 /**
  * 🦞 引擎功能矩阵
@@ -167,6 +170,11 @@ export const ENGINE_FEATURES = {
   supervisorAgent: true,
   blackboard: true,
   swarmAgent: true,
+  // v2.2 新增
+  reactAgent: true,
+  recursiveSelfImprovement: true,
+  hybridOrchestrator: true,
+  autoScaling: true,
 } as const;
 
 // ========== 火焰图收集器 (v2.1) ==========
@@ -218,6 +226,39 @@ export {
   SwarmStatistics,
   createSwarmAgent,
 } from "./swarm-agent.js";
+
+// ========== ReAct 智能体 (v2.2) ==========
+export {
+  ReActAgent,
+  ThoughtStep,
+  ReActTool,
+  ReActState,
+  createReActAgent,
+  ReActTools,
+} from "./react-agent.js";
+
+// ========== 递归自我改进 (v2.2) ==========
+export {
+  RecursiveSelfImprovement,
+  ImprovementProposal,
+  PerformanceMetrics,
+  ImprovementHistory,
+  createRecursiveSelfImprovement,
+  selfImproving,
+} from "./recursive-self-improvement.js";
+
+// ========== 混合编排器 (v2.2) ==========
+export {
+  HybridOrchestrator,
+  HybridTask,
+  TaskResult,
+  TaskType,
+  TaskPriority,
+  WorkerStats,
+  createHybridOrchestrator,
+  AutoScalingHybridOrchestrator,
+  createAutoScalingOrchestrator,
+} from "./hybrid-orchestrator.js";
 
 /**
  * 🦞 创建完整引擎（包含所有组件）
