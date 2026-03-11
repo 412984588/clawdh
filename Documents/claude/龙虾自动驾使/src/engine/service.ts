@@ -495,8 +495,17 @@ export class PerpetualEngineService {
    * 尝试读取持久化的状态文件，恢复循环计数和上下文。
    * 如果状态文件不存在或读取失败，静默跳过。
    *
+   * @private
+   *
    * @param ctx 服务上下文
    * @returns Promise<void>
+   *
+   * @remarks
+   * 恢复的数据包括：
+   * - 循环计数器（loopCount）
+   * - 行动记录列表（actions）
+   * - 错误记录列表（errors）
+   * - 最后更新时间（lastUpdate）
    */
   private async recoverState(ctx: OpenClawPluginServiceContext): Promise<void> {
     const statePath = path.join(ctx.stateDir, StateFileNames.ENGINE_STATE);
