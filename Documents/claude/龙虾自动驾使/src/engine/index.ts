@@ -182,7 +182,7 @@ export {
 /**
  * 🦞 引擎版本信息
  */
-export const ENGINE_VERSION = "2.28.0";
+export const ENGINE_VERSION = "2.29.0";
 
 /**
  * 🦞 引擎功能矩阵
@@ -265,6 +265,8 @@ export const ENGINE_FEATURES = {
   automlAgentOrchestrator: true,
   // v2.28 新增
   lmarsOrchestrator: true,
+  // v2.29 新增
+  rapoOrchestrator: true,
 } as const;
 
 // ========== 火焰图收集器 (v2.1) ==========
@@ -1124,6 +1126,37 @@ export {
   createLMARSOrchestrator,
   LMARSTemplates,
 } from "./lmars-orchestrator.js";
+
+// ========== RAPO 推理感知提示编排器 (v2.29) ==========
+import {
+  RAPOOrchestrator,
+  RAPOReasoningState,
+  PromptType,
+  AgentExpertise,
+  StateSpaceCoordinate,
+  ReasoningTrace,
+  PromptTemplate,
+  RoutingDecision,
+  RAPOConsensusResult,
+  RAPOConfig,
+  createRAPOOrchestrator,
+  RAPOTemplates,
+} from "./rapo-orchestrator.js";
+
+export {
+  RAPOOrchestrator,
+  RAPOReasoningState,
+  PromptType,
+  AgentExpertise,
+  StateSpaceCoordinate,
+  ReasoningTrace,
+  PromptTemplate,
+  RoutingDecision,
+  RAPOConsensusResult,
+  RAPOConfig,
+  createRAPOOrchestrator,
+  RAPOTemplates,
+} from "./rapo-orchestrator.js";
 
 /**
  * 🦞 创建完整引擎（包含所有组件）
