@@ -182,7 +182,7 @@ export {
 /**
  * 🦞 引擎版本信息
  */
-export const ENGINE_VERSION = "2.10.0";
+export const ENGINE_VERSION = "2.11.0";
 
 /**
  * 🦞 引擎功能矩阵
@@ -229,6 +229,8 @@ export const ENGINE_FEATURES = {
   omasOrchestrator: true,
   // v2.10 新增
   neuroSymbolicController: true,
+  // v2.11 新增
+  orchmasOrchestrator: true,
 } as const;
 
 // ========== 火焰图收集器 (v2.1) ==========
@@ -516,6 +518,39 @@ export {
   createNeuroSymbolicController,
   CommonConstraints,
 } from "./neuro-symbolic-controller.js";
+
+// ========== OrchMAS 编排器 (v2.11) ==========
+import {
+  OrchestMASOrchestrator,
+  TaskType as OrchestTaskType,
+  TaskComplexity,
+  DomainType as OrchestDomainType,
+  OrchestMASTask,
+  ReasoningStep,
+  ReasoningPipeline,
+  ExpertAgentConfig,
+  OrchestAgentMessage,
+  OrchestMASConfig,
+  createOrchestMASOrchestrator,
+  createTask,
+  TaskTemplates,
+} from "./orchmas-orchestrator.js";
+
+export {
+  OrchestMASOrchestrator,
+  TaskType as OrchestTaskType,
+  TaskComplexity,
+  DomainType as OrchestDomainType,
+  OrchestMASTask,
+  ReasoningStep,
+  ReasoningPipeline,
+  ExpertAgentConfig,
+  OrchestAgentMessage,
+  OrchestMASConfig,
+  createOrchestMASOrchestrator,
+  createTask,
+  TaskTemplates,
+} from "./orchmas-orchestrator.js";
 
 /**
  * 🦞 创建完整引擎（包含所有组件）
