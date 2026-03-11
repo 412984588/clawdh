@@ -36,6 +36,9 @@ import { SwarmAgent } from "./swarm-agent.js";
 import { ReActAgent, createReActAgent, ReActTools } from "./react-agent.js";
 import { RecursiveSelfImprovement, createRecursiveSelfImprovement, selfImproving } from "./recursive-self-improvement.js";
 import { HybridOrchestrator, createHybridOrchestrator, AutoScalingHybridOrchestrator, createAutoScalingOrchestrator } from "./hybrid-orchestrator.js";
+import { AsyncContextTracker, createAsyncTracker, getGlobalTracker, trackAsync, limitAsyncDepth } from "./async-context-tracker.js";
+import { ChainOfThought, TreeOfThought, createChainOfThought, createTreeOfThought, withCoT, ReasoningState, ChainConfig } from "./chain-of-thought.js";
+import { ReflectedMetadata, RegisterMetadata, LogCalls, ValidateParams, EnableValidation, Cache, Measure, RetryOnFailure, AutoBind, Decorators, getMetrics, createDecoratorComposer } from "./decorator-metadata.js";
 
 // ========== 零延迟循环引擎 ==========
 export {
@@ -149,7 +152,7 @@ export {
 /**
  * 🦞 引擎版本信息
  */
-export const ENGINE_VERSION = "2.2.0";
+export const ENGINE_VERSION = "2.3.0";
 
 /**
  * 🦞 引擎功能矩阵
@@ -175,6 +178,11 @@ export const ENGINE_FEATURES = {
   recursiveSelfImprovement: true,
   hybridOrchestrator: true,
   autoScaling: true,
+  // v2.3 新增
+  asyncContextTracker: true,
+  chainOfThought: true,
+  treeOfThought: true,
+  decoratorMetadata: true,
 } as const;
 
 // ========== 火焰图收集器 (v2.1) ==========
@@ -259,6 +267,50 @@ export {
   AutoScalingHybridOrchestrator,
   createAutoScalingOrchestrator,
 } from "./hybrid-orchestrator.js";
+
+// ========== 异步上下文追踪器 (v2.3) ==========
+export {
+  AsyncContextTracker,
+  ContextInfo,
+  AsyncResourceStats,
+  AsyncTrackerConfig,
+  createAsyncTracker,
+  getGlobalTracker,
+  trackAsync,
+  limitAsyncDepth,
+} from "./async-context-tracker.js";
+
+// ========== 思维链推理器 (v2.3) ==========
+export {
+  ChainOfThought,
+  TreeOfThought,
+  ThoughtStep as CoTThoughtStep,
+  ReasoningState,
+  ReasoningResult,
+  ChainConfig,
+  createChainOfThought,
+  createTreeOfThought,
+  withCoT,
+} from "./chain-of-thought.js";
+
+// ========== 装饰器元数据 (v2.3) ==========
+export {
+  ReflectedMetadata,
+  TypeMetadata,
+  DecoratorMetadata,
+  RegisterMetadata,
+  LogCalls,
+  ValidateParams,
+  EnableValidation,
+  Cache,
+  Measure,
+  RetryOnFailure,
+  AutoBind,
+  Decorators,
+  getMetrics,
+  createDecoratorComposer,
+  createDecoratedClass,
+} from "./decorator-metadata.js";
 
 /**
  * 🦞 创建完整引擎（包含所有组件）
