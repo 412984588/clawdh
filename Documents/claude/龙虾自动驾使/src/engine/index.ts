@@ -182,7 +182,7 @@ export {
 /**
  * 🦞 引擎版本信息
  */
-export const ENGINE_VERSION = "2.31.0";
+export const ENGINE_VERSION = "2.32.0";
 
 /**
  * 🦞 引擎功能矩阵
@@ -271,6 +271,8 @@ export const ENGINE_FEATURES = {
   mosaicOrchestrator: true,
   // v2.31 新增
   freemadOrchestrator: true,
+  // v2.32 新增
+  marsOrchestrator: true,
 } as const;
 
 // ========== 火焰图收集器 (v2.1) ==========
@@ -1221,6 +1223,39 @@ export {
   createFreeMADOrchestrator,
   FreeMADTemplates,
 } from "./freemad-orchestrator.js";
+
+// ========== MARS 多代理评审系统编排器 (v2.32) ==========
+import {
+  MARSOrchestrator,
+  MARSReasoningType,
+  MARSReviewDecision,
+  MARSReasoningStep,
+  MARSReasoningTrace,
+  MARSReviewResult,
+  MARSMetaReviewResult,
+  MARSAuthorResponse,
+  MARSReasoningSession,
+  MARSReviewerConfig,
+  MARSConfig,
+  createMARSOrchestrator,
+  MARSTemplates,
+} from "./mars-orchestrator.js";
+
+export {
+  MARSOrchestrator,
+  MARSReasoningType,
+  MARSReviewDecision,
+  MARSReasoningStep,
+  MARSReasoningTrace,
+  MARSReviewResult,
+  MARSMetaReviewResult,
+  MARSAuthorResponse,
+  MARSReasoningSession,
+  MARSReviewerConfig,
+  MARSConfig,
+  createMARSOrchestrator,
+  MARSTemplates,
+} from "./mars-orchestrator.js";
 
 /**
  * 🦞 创建完整引擎（包含所有组件）
