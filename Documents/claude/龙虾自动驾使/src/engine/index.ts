@@ -182,7 +182,7 @@ export {
 /**
  * 🦞 引擎版本信息
  */
-export const ENGINE_VERSION = "2.30.0";
+export const ENGINE_VERSION = "2.31.0";
 
 /**
  * 🦞 引擎功能矩阵
@@ -269,6 +269,8 @@ export const ENGINE_FEATURES = {
   rapoOrchestrator: true,
   // v2.30 新增
   mosaicOrchestrator: true,
+  // v2.31 新增
+  freemadOrchestrator: true,
 } as const;
 
 // ========== 火焰图收集器 (v2.1) ==========
@@ -1188,6 +1190,37 @@ export {
   createMOSAICOrchestrator,
   MOSAICTemplates,
 } from "./mosaic-orchestrator.js";
+
+// ========== Free-MAD 无共识多代理辩论编排器 (v2.31) ==========
+import {
+  FreeMADOrchestrator,
+  DebatePhase,
+  FreeMADAgentState,
+  ReasoningTrajectoryPoint,
+  FreeMADAgentResponse,
+  TrajectoryScore,
+  ScoringWeights,
+  AntiConformityMechanism,
+  FreeMADResult,
+  FreeMADConfig,
+  createFreeMADOrchestrator,
+  FreeMADTemplates,
+} from "./freemad-orchestrator.js";
+
+export {
+  FreeMADOrchestrator,
+  DebatePhase,
+  FreeMADAgentState,
+  ReasoningTrajectoryPoint,
+  FreeMADAgentResponse,
+  TrajectoryScore,
+  ScoringWeights,
+  AntiConformityMechanism,
+  FreeMADResult,
+  FreeMADConfig,
+  createFreeMADOrchestrator,
+  FreeMADTemplates,
+} from "./freemad-orchestrator.js";
 
 /**
  * 🦞 创建完整引擎（包含所有组件）
