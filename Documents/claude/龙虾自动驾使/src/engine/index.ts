@@ -182,7 +182,7 @@ export {
 /**
  * 🦞 引擎版本信息
  */
-export const ENGINE_VERSION = "2.12.0";
+export const ENGINE_VERSION = "2.13.0";
 
 /**
  * 🦞 引擎功能矩阵
@@ -233,6 +233,8 @@ export const ENGINE_FEATURES = {
   orchmasOrchestrator: true,
   // v2.12 新增
   adaptorchOrchestrator: true,
+  // v2.13 新增
+  aegeanOrchestrator: true,
 } as const;
 
 // ========== 火焰图收集器 (v2.1) ==========
@@ -592,6 +594,31 @@ export {
   createAdaptOrchOrchestrator,
   AdaptOrchTemplates,
 } from "./adaptorch-orchestrator.js";
+
+// ========== Aegean 共识协议编排器 (v2.13) ==========
+import {
+  AegeanOrchestrator,
+  QuorumThreshold,
+  AgentResponse,
+  QuorumState,
+  RefinementRound,
+  AegeanOutput,
+  AegeanConfig,
+  createAegeanOrchestrator,
+  AegeanTemplates,
+} from "./aegean-orchestrator.js";
+
+export {
+  AegeanOrchestrator,
+  QuorumThreshold,
+  AgentResponse,
+  QuorumState,
+  RefinementRound,
+  AegeanOutput,
+  AegeanConfig,
+  createAegeanOrchestrator,
+  AegeanTemplates,
+} from "./aegean-orchestrator.js";
 
 /**
  * 🦞 创建完整引擎（包含所有组件）
