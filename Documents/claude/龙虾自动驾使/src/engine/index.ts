@@ -182,7 +182,7 @@ export {
 /**
  * 🦞 引擎版本信息
  */
-export const ENGINE_VERSION = "2.9.0";
+export const ENGINE_VERSION = "2.10.0";
 
 /**
  * 🦞 引擎功能矩阵
@@ -227,6 +227,8 @@ export const ENGINE_FEATURES = {
   sclOrchestrator: true,
   // v2.9 新增
   omasOrchestrator: true,
+  // v2.10 新增
+  neuroSymbolicController: true,
 } as const;
 
 // ========== 火焰图收集器 (v2.1) ==========
@@ -483,6 +485,37 @@ export {
   OrchestrationState,
   createOMASOrchestrator,
 } from "./omas-orchestrator.js";
+
+// ========== 神经符号闭环控制器 (v2.10) ==========
+import {
+  NeuroSymbolicController,
+  ControlMode as NeuroControlMode,
+  ControlState as NeuroControlState,
+  SymbolicReasoningRequest,
+  SymbolicConstraint,
+  SymbolicReasoningResult,
+  NeuralControlOutput,
+  ControlCommand,
+  StabilityMetrics,
+  NeuroSymbolicControllerConfig,
+  createNeuroSymbolicController,
+  CommonConstraints,
+} from "./neuro-symbolic-controller.js";
+
+export {
+  NeuroSymbolicController,
+  ControlMode as NeuroControlMode,
+  ControlState as NeuroControlState,
+  SymbolicReasoningRequest,
+  SymbolicConstraint,
+  SymbolicReasoningResult,
+  NeuralControlOutput,
+  ControlCommand,
+  StabilityMetrics,
+  NeuroSymbolicControllerConfig,
+  createNeuroSymbolicController,
+  CommonConstraints,
+} from "./neuro-symbolic-controller.js";
 
 /**
  * 🦞 创建完整引擎（包含所有组件）
