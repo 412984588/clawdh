@@ -182,7 +182,7 @@ export {
 /**
  * 🦞 引擎版本信息
  */
-export const ENGINE_VERSION = "2.11.0";
+export const ENGINE_VERSION = "2.12.0";
 
 /**
  * 🦞 引擎功能矩阵
@@ -231,6 +231,8 @@ export const ENGINE_FEATURES = {
   neuroSymbolicController: true,
   // v2.11 新增
   orchmasOrchestrator: true,
+  // v2.12 新增
+  adaptorchOrchestrator: true,
 } as const;
 
 // ========== 火焰图收集器 (v2.1) ==========
@@ -551,6 +553,45 @@ export {
   createTask,
   TaskTemplates,
 } from "./orchmas-orchestrator.js";
+
+// ========== AdaptOrch 编排器 (v2.12) ==========
+import {
+  AdaptOrchOrchestrator,
+  CanonicalTopology,
+  CouplingStrength,
+  Subtask,
+  DependencyEdge,
+  TaskDependencyDAG,
+  DAGStructure,
+  TopologyRouteDecision,
+  ExecutionPlan,
+  ExecutionStage,
+  ConsistencyScore,
+  SynthesisResult,
+  TopologyExecutionResult,
+  AdaptOrchConfig,
+  createAdaptOrchOrchestrator,
+  AdaptOrchTemplates,
+} from "./adaptorch-orchestrator.js";
+
+export {
+  AdaptOrchOrchestrator,
+  CanonicalTopology,
+  CouplingStrength,
+  Subtask,
+  DependencyEdge,
+  TaskDependencyDAG,
+  DAGStructure,
+  TopologyRouteDecision,
+  ExecutionPlan,
+  ExecutionStage,
+  ConsistencyScore,
+  SynthesisResult,
+  TopologyExecutionResult,
+  AdaptOrchConfig,
+  createAdaptOrchOrchestrator,
+  AdaptOrchTemplates,
+} from "./adaptorch-orchestrator.js";
 
 /**
  * 🦞 创建完整引擎（包含所有组件）
