@@ -115,6 +115,14 @@ const MissionFileNames = {
   BOUNDARIES: "BOUNDARIES_PARTNER.md",
 } as const;
 
+/** 状态文件相关常量 */
+const StateFileNames = {
+  ENGINE_STATE: "engine-state.json",
+  STATE_DIR: ".lobster-engine",
+  SUGGESTIONS_LOG: "suggestions.log",
+  TEMP_SUFFIX: ".tmp",
+} as const;
+
 /** MISSION 文件部分名称 */
 const MissionSections = {
   TASKS: "## 具体任务",
@@ -212,7 +220,7 @@ export class PerpetualEngineService {
     const serviceContext: OpenClawPluginServiceContext = {
       config: _ctx.config,
       workspaceDir: undefined, // 命令上下文可能没有这个
-      stateDir: path.join(process.cwd(), ".lobster-engine"),
+      stateDir: path.join(process.cwd(), StateFileNames.STATE_DIR),
       logger: this.api.logger,
     };
 
@@ -246,7 +254,7 @@ export class PerpetualEngineService {
    * 从磁盘恢复状态
    */
   private async recoverState(ctx: OpenClawPluginServiceContext): Promise<void> {
-    const statePath = path.join(ctx.stateDir, "engine-state.json");
+    const statePath = path.join(ctx.stateDir, StateFileNames.ENGINE_STATE);
     try {
       await fs.access(statePath);
     } catch {
@@ -633,7 +641,7 @@ export class PerpetualEngineService {
    * 检查状态
    */
   private async checkStatus(ctx: OpenClawPluginServiceContext): Promise<string> {
-    const statePath = path.join(ctx.stateDir, "engine-state.json");
+    const statePath = path.join(ctx.stateDir, StateFileNames.ENGINE_STATE);
     try {
       await fs.access(statePath);
       const stat = await fs.stat(statePath);
@@ -672,7 +680,7 @@ export class PerpetualEngineService {
    */
   private async writeSuggestionLog(ctx: OpenClawPluginServiceContext, suggestion: string): Promise<void> {
     try {
-      const logPath = path.join(ctx.stateDir, "suggestions.log");
+      const logPath = path.join(ctx.stateDir, StateFileNames.SUGGESTIONS_LOG);
       const timestamp = new Date().toISOString();
       await fs.mkdir(ctx.stateDir, { recursive: true });
       await fs.appendFile(logPath, `[${timestamp}] ${suggestion}\n`);
@@ -777,8 +785,8 @@ export class PerpetualEngineService {
    * 持久化状态到磁盘（带原子写入）
    */
   private async persistState(ctx: OpenClawPluginServiceContext): Promise<void> {
-    const statePath = path.join(ctx.stateDir, "engine-state.json");
-    const tmpPath = statePath + '.tmp';
+    const statePath = path.join(ctx.stateDir, StateFileNames.ENGINE_STATE);
+    const tmpPath = statePath + StateFileNames.TEMP_SUFFIX;
 
     try {
       await fs.mkdir(ctx.stateDir, { recursive: true });
