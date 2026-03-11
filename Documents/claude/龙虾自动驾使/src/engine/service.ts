@@ -243,8 +243,10 @@ export class PerpetualEngineService {
    * 从命令启动引擎
    *
    * 检查运行状态，设置中断控制器，构造服务上下文，并启动异步循环。
+   * 如果引擎已在运行，则记录警告并直接返回。
    *
    * @param ctx 命令上下文
+   * @returns Promise<void>
    */
   async startFromCommand(_ctx: PluginCommandContext): Promise<void> {
     if (this.isRunningValue) {
@@ -283,15 +285,22 @@ export class PerpetualEngineService {
    * Gateway 启动时自动调用，尝试恢复之前的状态。
    *
    * @param ctx 服务上下文
+   * @returns Promise<void>
    */
   async start(ctx: OpenClawPluginServiceContext): Promise<void> {
     // 尝试恢复之前的状态
     await this.recoverState(ctx);
-    this.api.logger.info("🦞 永动引擎服务已就绪，等待 /start_partner 命令");
+    this.api.logger.info(LogMessages.ENGINE_READY);
   }
 
   /**
    * 从磁盘恢复状态
+   *
+   * 尝试读取持久化的状态文件，恢复循环计数和上下文。
+   * 如果状态文件不存在或读取失败，静默跳过。
+   *
+   * @param ctx 服务上下文
+   * @returns Promise<void>
    */
   private async recoverState(ctx: OpenClawPluginServiceContext): Promise<void> {
     const statePath = path.join(ctx.stateDir, StateFileNames.ENGINE_STATE);
@@ -334,7 +343,7 @@ export class PerpetualEngineService {
    *
    * Gateway 停止时调用，停止所有后台循环和健康检查。
    *
-   * @param ctx 服务上下文
+   * @param _ctx 服务上下文（未使用）
    */
   stopService(_ctx: OpenClawPluginServiceContext): void {
     this.stopLoop();
@@ -344,6 +353,7 @@ export class PerpetualEngineService {
    * 停止循环
    *
    * 设置 isRunning 为 false，中断 abortController，并清理健康检查定时器。
+   * 循环将在下一次迭代时自然退出。
    */
   stopLoop(): void {
     this.isRunningValue = false;
@@ -367,7 +377,8 @@ export class PerpetualEngineService {
    * 6. 定期汇报状态
    *
    * @param ctx 服务上下文
-   * @param signal 中断信号
+   * @param signal 中断信号（用于优雅退出）
+   * @returns Promise<void>
    */
   private async runLoop(
     ctx: OpenClawPluginServiceContext,
