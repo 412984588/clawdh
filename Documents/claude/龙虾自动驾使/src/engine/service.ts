@@ -1210,8 +1210,9 @@ export class PerpetualEngineService {
    * @returns {boolean} 是否有最近错误（5分钟内）
    */
   hasRecentErrors(): boolean {
-    if (this.context.errors.length === 0) return false;
-    const lastError = this.context.errors[this.context.errors.length - 1];
+    const errors = this.context.errors;
+    if (errors.length === 0) return false;
+    const lastError = errors[errors.length - 1];
     const fiveMinutesAgo = Date.now() - TimeConstants.FIVE_MINUTES_MS;
     return lastError.timestamp > fiveMinutesAgo;
   }
