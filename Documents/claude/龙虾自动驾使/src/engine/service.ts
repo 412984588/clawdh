@@ -865,6 +865,9 @@ export class PerpetualEngineService {
 
   /**
    * 压缩上下文（使用配置的限制）
+   *
+   * 当行动或错误记录超过配置的最大值时，保留最新的记录。
+   * 使用 slice 操作确保数组不会无限增长。
    */
   private compressContext(): void {
     // 使用配置中的最大值
@@ -879,6 +882,12 @@ export class PerpetualEngineService {
 
   /**
    * 发送汇报
+   *
+   * 记录当前循环的状态信息并持久化状态到磁盘。
+   *
+   * @param ctx 服务上下文
+   * @param status 包含循环编号、行动和结果的状态对象
+   * @returns Promise<void>
    */
   private async sendReport(
     ctx: OpenClawPluginServiceContext,
@@ -896,6 +905,12 @@ export class PerpetualEngineService {
 
   /**
    * 持久化状态到磁盘（带原子写入）
+   *
+   * 使用先写临时文件再重命名的方式确保持久化的原子性。
+   * 防止写入过程中断导致状态文件损坏。
+   *
+   * @param ctx 服务上下文
+   * @returns Promise<void>
    */
   private async persistState(ctx: OpenClawPluginServiceContext): Promise<void> {
     const statePath = path.join(ctx.stateDir, StateFileNames.ENGINE_STATE);
@@ -926,18 +941,37 @@ export class PerpetualEngineService {
 
   // ========== 状态查询方法 ==========
 
+  /**
+   * 检查引擎是否正在运行
+   * @returns {boolean} 运行状态
+   */
   isRunning(): boolean {
     return this.isRunningValue;
   }
 
+  /**
+   * 获取循环计数
+   * @returns {number} 总循环次数
+   */
   getLoopCount(): number {
     return this.loopCountValue;
   }
 
+  /**
+   * 获取上下文大小（字符数）
+   * @returns {number} 上下文 JSON 字符串长度
+   */
   getContextSize(): number {
     return JSON.stringify(this.context).length;
   }
 
+  /**
+   * 检查是否有最近的错误
+   *
+   * 判断最后一个错误是否发生在5分钟内。
+   *
+   * @returns {boolean} 是否有最近错误
+   */
   hasRecentErrors(): boolean {
     if (this.context.errors.length === 0) return false;
     const lastError = this.context.errors[this.context.errors.length - 1];
@@ -947,6 +981,7 @@ export class PerpetualEngineService {
 
   /**
    * 获取平均循环时间（毫秒）
+   * @returns {number} 平均耗时（毫秒）
    */
   getAvgLoopTime(): number {
     return this.loopMetrics.avgTime;
@@ -954,6 +989,7 @@ export class PerpetualEngineService {
 
   /**
    * 获取循环速率（每秒循环数）
+   * @returns {number} 每秒循环次数
    */
   getLoopsPerSecond(): number {
     if (this.loopMetrics.avgTime === 0) return 0;
@@ -963,7 +999,10 @@ export class PerpetualEngineService {
   // ========== 性能监控方法 ==========
 
   /**
-   * 启动健康检查
+   * 启动健康检查定时器
+   *
+   * 定期检查循环是否卡死（超过配置的阈值时间无响应）。
+   * 只有在配置启用时才会启动。
    */
   private startHealthCheck(): void {
     if (!this.config.enableHealthCheck) return;
@@ -980,7 +1019,9 @@ export class PerpetualEngineService {
   }
 
   /**
-   * 停止健康检查
+   * 停止健康检查定时器
+   *
+   * 清理定时器资源，防止内存泄漏。
    */
   private stopHealthCheck(): void {
     if (this.healthCheckInterval) {
@@ -991,6 +1032,11 @@ export class PerpetualEngineService {
 
   /**
    * 记录循环时间
+   *
+   * 更新性能指标：总耗时、最快、最慢、平均时间。
+   * 使用移动平均值计算平均循环时间。
+   *
+   * @private
    */
   private recordLoopTime(): void {
     const elapsed = Date.now() - this.loopStartTime;
@@ -1006,16 +1052,40 @@ export class PerpetualEngineService {
   }
 
   /**
-   * 记录性能指标
+   * 记录性能指标到日志
+   *
+   * 输出包含以下信息的性能日志：
+   * - 总循环次数
+   * - 平均循环时间（毫秒）
+   * - 最快/最慢循环时间
+   * - 每秒循环次数（速率）
+   *
+   * @private
+   *
+   * @example
+   * // 日志输出示例：
+   * // 📊 性能指标: 总计=1000 平均=5ms 最快=1ms 最慢=50ms 速率=200循环/秒
    */
+  private logPerformanceMetrics(): void {
+    this.api.logger.info(
+      LogMessages.PERFORMANCE_METRICS({
+        total: this.loopCountValue,
+        avg: this.loopMetrics.avgTime,
+        min: this.loopMetrics.minTime === Infinity ? 0 : this.loopMetrics.minTime,
+        max: this.loopMetrics.maxTime,
+        rate: this.getLoopsPerSecond(),
+      })
+    );
+  }
 
   /**
    * 分类错误类型
    *
    * 根据错误消息中的关键词匹配预定义的分类规则。
+   * 使用规则数组遍历，支持可扩展的错误类型。
    *
    * @param errorMsg 错误消息
-   * @returns 错误分类
+   * @returns {ErrorCategory} 错误分类枚举值
    */
   private categorizeError(errorMsg: string): ErrorCategory {
     const lower = errorMsg.toLowerCase();
@@ -1032,7 +1102,18 @@ export class PerpetualEngineService {
   }
 
   /**
-   * 获取内存使用情况（MB）
+   * 获取内存使用情况
+   *
+   * 返回当前进程的堆内存使用量（单位：MB）。
+   * 使用 heapUsed 值计算，保留两位小数。
+   *
+   * @returns {number} 内存使用量（MB）
+   *
+   * @example
+   * ```ts
+   * const memory = engine.getMemoryUsage();
+   * console.log(`内存使用: ${memory} MB`);
+   * ```
    */
   getMemoryUsage(): number {
     const usage = process.memoryUsage();
@@ -1041,6 +1122,17 @@ export class PerpetualEngineService {
 
   /**
    * 获取按类型分组的错误统计
+   *
+   * 遍历上下文中的错误记录，按错误类型分组统计数量。
+   * 返回的键为错误分类（如 "file_io", "parse" 等）。
+   *
+   * @returns {Record<string, number>} 错误类型到数量的映射
+   *
+   * @example
+   * ```ts
+   * const stats = engine.getErrorStats();
+   * console.log(stats); // { file_io: 2, parse: 1, unknown: 0 }
+   * ```
    */
   getErrorStats(): Record<string, number> {
     const stats: Record<string, number> = {};
@@ -1049,20 +1141,6 @@ export class PerpetualEngineService {
       stats[category] = (stats[category] || 0) + 1;
     }
     return stats;
-  }
-  /**
-   * 记录性能指标
-   */
-  private logPerformanceMetrics(): void {
-    this.api.logger.info(
-      LogMessages.PERFORMANCE_METRICS({
-        total: this.loopCountValue,
-        avg: this.loopMetrics.avgTime,
-        min: this.loopMetrics.minTime === Infinity ? 0 : this.loopMetrics.minTime,
-        max: this.loopMetrics.maxTime,
-        rate: this.getLoopsPerSecond(),
-      })
-    );
   }
 }
 
