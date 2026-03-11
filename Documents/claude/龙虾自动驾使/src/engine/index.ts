@@ -182,7 +182,7 @@ export {
 /**
  * 🦞 引擎版本信息
  */
-export const ENGINE_VERSION = "2.32.0";
+export const ENGINE_VERSION = "2.33.0";
 
 /**
  * 🦞 引擎功能矩阵
@@ -273,6 +273,8 @@ export const ENGINE_FEATURES = {
   freemadOrchestrator: true,
   // v2.32 新增
   marsOrchestrator: true,
+  // v2.33 新增
+  latentmasOrchestrator: true,
 } as const;
 
 // ========== 火焰图收集器 (v2.1) ==========
@@ -1256,6 +1258,39 @@ export {
   createMARSOrchestrator,
   MARSTemplates,
 } from "./mars-orchestrator.js";
+
+// ========== LatentMAS 潜在协作编排器 (v2.33) ==========
+import {
+  LatentMASOrchestrator,
+  LatentMASConfigType,
+  LatentMASStage,
+  LatentStateType,
+  LatentMASAgentRole,
+  LatentThought,
+  KVCacheMemory,
+  InputOutputAlignment,
+  LatentMASAgent,
+  LatentMASCollaborationSession,
+  LatentMASConfig,
+  createLatentMASOrchestrator,
+  LatentMASTemplates,
+} from "./latentmas-orchestrator.js";
+
+export {
+  LatentMASOrchestrator,
+  LatentMASConfigType,
+  LatentMASStage,
+  LatentStateType,
+  LatentMASAgentRole,
+  LatentThought,
+  KVCacheMemory,
+  InputOutputAlignment,
+  LatentMASAgent,
+  LatentMASCollaborationSession,
+  LatentMASConfig,
+  createLatentMASOrchestrator,
+  LatentMASTemplates,
+} from "./latentmas-orchestrator.js";
 
 /**
  * 🦞 创建完整引擎（包含所有组件）
