@@ -420,8 +420,22 @@ export class PerpetualEngineService {
    * 检查运行状态，设置中断控制器，构造服务上下文，并启动异步循环。
    * 如果引擎已在运行，则记录警告并直接返回。
    *
-   * @param ctx 命令上下文
-   * @returns Promise<void>
+   * @public
+   *
+   * @param ctx 命令上下文，包含配置和状态目录等信息
+   * @returns Promise<void> 异步启动完成
+   *
+   * @example
+   * ```ts
+   * // 在命令处理器中使用
+   * api.registerCommand({
+   *   name: "start_engine",
+   *   handler: async (ctx) => {
+   *     await engine.startFromCommand(ctx);
+   *     return { text: "引擎已启动" };
+   *   }
+   * });
+   * ```
    */
   async startFromCommand(_ctx: PluginCommandContext): Promise<void> {
     if (this.isRunningValue) {
@@ -458,9 +472,16 @@ export class PerpetualEngineService {
    * 服务启动时调用
    *
    * Gateway 启动时自动调用，尝试恢复之前的状态。
+   * 此方法不会启动循环，只是准备引擎状态。
    *
-   * @param ctx 服务上下文
-   * @returns Promise<void>
+   * @public
+   *
+   * @param ctx 服务上下文，包含配置、工作区目录、状态目录等
+   * @returns Promise<void> 异步启动完成
+   *
+   * @remarks
+   * 与 `startFromCommand` 不同，此方法不启动循环。
+   * 需要通过命令触发 `startFromCommand` 来开始循环。
    */
   async start(ctx: OpenClawPluginServiceContext): Promise<void> {
     // 尝试恢复之前的状态
@@ -529,6 +550,23 @@ export class PerpetualEngineService {
    *
    * 设置 isRunning 为 false，中断 abortController，并清理健康检查定时器。
    * 循环将在下一次迭代时自然退出。
+   *
+   * @public
+   *
+   * @example
+   * ```ts
+   * // 在命令处理器中使用
+   * api.registerCommand({
+   *   name: "stop_engine",
+   *   handler: async () => {
+   *     engine.stopLoop();
+   *     return { text: "引擎已停止" };
+   *   }
+   * });
+   * ```
+   *
+   * @remarks
+   * 停止操作是异步的，循环可能在调用后短暂继续运行直到下一次条件检查。
    */
   stopLoop(): void {
     this.isRunningValue = false;
