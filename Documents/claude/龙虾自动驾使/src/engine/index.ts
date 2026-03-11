@@ -182,7 +182,7 @@ export {
 /**
  * 🦞 引擎版本信息
  */
-export const ENGINE_VERSION = "2.18.0";
+export const ENGINE_VERSION = "2.19.0";
 
 /**
  * 🦞 引擎功能矩阵
@@ -245,6 +245,8 @@ export const ENGINE_FEATURES = {
   puppeteerOrchestrator: true,
   // v2.18 新增
   bayesianOrchestrator: true,
+  // v2.19 新增
+  symphonyOrchestrator: true,
 } as const;
 
 // ========== 火焰图收集器 (v2.1) ==========
@@ -778,6 +780,37 @@ export {
   createBayesianOrchestrator,
   BayesianTemplates,
 } from "./bayesian-orchestrator.js";
+
+// ========== Symphony 去中心化编排器 (v2.19) ==========
+import {
+  SymphonyOrchestrator,
+  SymphonyAgentType,
+  SymphonyAgentState,
+  SymphonyMessageType,
+  SymphonyAgentInfo,
+  SymphonyMessage,
+  SymphonyTask,
+  ConsensusResult,
+  NetworkTopology,
+  SymphonyConfig,
+  createSymphonyOrchestrator,
+  SymphonyTemplates,
+} from "./symphony-orchestrator.js";
+
+export {
+  SymphonyOrchestrator,
+  SymphonyAgentType,
+  SymphonyAgentState,
+  SymphonyMessageType,
+  SymphonyAgentInfo,
+  SymphonyMessage,
+  SymphonyTask,
+  ConsensusResult,
+  NetworkTopology,
+  SymphonyConfig,
+  createSymphonyOrchestrator,
+  SymphonyTemplates,
+} from "./symphony-orchestrator.js";
 
 /**
  * 🦞 创建完整引擎（包含所有组件）
