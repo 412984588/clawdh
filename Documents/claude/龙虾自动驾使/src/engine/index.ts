@@ -37,7 +37,7 @@ import { ReActAgent, createReActAgent, ReActTools } from "./react-agent.js";
 import { RecursiveSelfImprovement, createRecursiveSelfImprovement, selfImproving } from "./recursive-self-improvement.js";
 import { HybridOrchestrator, createHybridOrchestrator, AutoScalingHybridOrchestrator, createAutoScalingOrchestrator } from "./hybrid-orchestrator.js";
 import { AsyncContextTracker, createAsyncTracker, getGlobalTracker, trackAsync, limitAsyncDepth } from "./async-context-tracker.js";
-import { ChainOfThought, TreeOfThought, createChainOfThought, createTreeOfThought, withCoT, ReasoningState, ChainConfig } from "./chain-of-thought.js";
+import { ChainOfThought, TreeOfThought, GraphChainOfThought, DynamicRecursiveCoT, createChainOfThought, createTreeOfThought, withCoT, ReasoningState, ChainConfig } from "./chain-of-thought.js";
 import { ReflectedMetadata, RegisterMetadata, LogCalls, ValidateParams, EnableValidation, Cache, Measure, RetryOnFailure, AutoBind, Decorators, getMetrics, createDecoratorComposer } from "./decorator-metadata.js";
 
 // ========== 零延迟循环引擎 ==========
@@ -182,6 +182,8 @@ export const ENGINE_FEATURES = {
   asyncContextTracker: true,
   chainOfThought: true,
   treeOfThought: true,
+  graphChainOfThought: true,
+  dynamicRecursiveCoT: true,
   decoratorMetadata: true,
 } as const;
 
@@ -284,6 +286,8 @@ export {
 export {
   ChainOfThought,
   TreeOfThought,
+  GraphChainOfThought,
+  DynamicRecursiveCoT,
   ThoughtStep as CoTThoughtStep,
   ReasoningState,
   ReasoningResult,

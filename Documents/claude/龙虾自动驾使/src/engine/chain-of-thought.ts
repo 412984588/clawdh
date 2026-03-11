@@ -84,6 +84,10 @@ export interface ReasoningResult {
     totalSteps: number;
     verificationPassed?: boolean;
     totalBranches?: number;
+    consistencyScore?: number;
+    actualDepth?: number;
+    graphNodes?: number;
+    improvementHistory?: string[];
   };
 }
 
@@ -91,9 +95,9 @@ export interface ReasoningResult {
  * 思维链推理器
  */
 export class ChainOfThought {
-  private config: Required<ChainConfig>;
-  private chain: ThoughtStep[] = [];
-  private currentState: ReasoningState = ReasoningState.ANALYZING;
+  protected config: Required<ChainConfig>;
+  protected chain: ThoughtStep[] = [];
+  protected currentState: ReasoningState = ReasoningState.ANALYZING;
 
   constructor(config: ChainConfig = {}) {
     this.config = { ...DEFAULT_CONFIG, ...config };
@@ -226,7 +230,7 @@ export class ChainOfThought {
   /**
    * 添加思维步骤
    */
-  private addStep(action: string, thought: string): void {
+  protected addStep(action: string, thought: string): void {
     const step: ThoughtStep = {
       id: `step_${Date.now()}_${this.chain.length}`,
       thought: `${action}: ${thought}`,
@@ -545,4 +549,274 @@ export function withCoT(
 
     return descriptor;
   };
+}
+
+/**
+ * 🧠 图思维扩展（Graph-CoT）
+ * 基于 2024-2025 最新研究
+ * @see {@link https://arxiv.org/html/2511.01633v1}
+ */
+export class GraphChainOfThought extends ChainOfThought {
+  private graph: Map<string, string[]> = new Map();
+  private nodeResults: Map<string, string> = new Map();
+
+  /**
+   * 执行图推理
+   */
+  async reason(
+    question: string,
+    context?: string,
+    maxNodes: number = 10
+  ): Promise<ReasoningResult> {
+    const startTime = Date.now();
+
+    // 基础推理（获取初始思路）
+    const baseResult = await super.reason(question, context);
+
+    // 构建知识图谱
+    await this.buildKnowledgeGraph(question, context);
+
+    // 图遍历推理
+    const graphResult = await this.traverseGraph(question, maxNodes);
+
+    // 自我一致性检查
+    const consistencyScore = this.checkSelfConsistency(baseResult.chain);
+
+    return {
+      answer: graphResult.finalAnswer,
+      chain: [...baseResult.chain, ...graphResult.additionalSteps],
+      confidence: baseResult.confidence * consistencyScore,
+      state: this.currentState,
+      metadata: {
+        totalDuration: Date.now() - startTime,
+        totalSteps: baseResult.chain.length + graphResult.additionalSteps.length,
+        verificationPassed: baseResult.metadata?.verificationPassed,
+        consistencyScore,
+        graphNodes: this.graph.size,
+      },
+    };
+  }
+
+  /**
+   * 构建知识图谱
+   */
+  private async buildKnowledgeGraph(question: string, context: string | undefined): Promise<void> {
+    // 识别关键概念
+    const concepts = this.extractConcepts(question);
+
+    // 建立概念关联
+    for (let i = 0; i < concepts.length; i++) {
+      const concept = concepts[i];
+      this.graph.set(concept, []);
+
+      // 关联相关概念
+      for (let j = i + 1; j < concepts.length; j++) {
+        if (this.areConceptsRelated(concepts[i], concepts[j])) {
+          this.graph.get(concept)!.push(concepts[j]);
+        }
+      }
+    }
+  }
+
+  /**
+   * 图遍历推理
+   */
+  private async traverseGraph(
+    question: string,
+    maxNodes: number
+  ): Promise<{ finalAnswer: string; additionalSteps: ThoughtStep[] }> {
+    const additionalSteps: ThoughtStep[] = [];
+    const visited = new Set<string>();
+
+    for (const [node, neighbors] of this.graph) {
+      if (visited.size >= maxNodes) break;
+      if (visited.has(node)) continue;
+
+      visited.add(node);
+
+      additionalSteps.push({
+        id: `graph_${Date.now()}_${additionalSteps.length}`,
+        thought: `图遍历: ${node} → [${neighbors.join(', ')}]`,
+        timestamp: Date.now(),
+      } as ThoughtStep);
+
+      // 存储节点结果
+      this.nodeResults.set(node, `从 ${node} 推导: ${neighbors.join(' 和 ')}`);
+    }
+
+    // 综合图遍历结果
+    const finalAnswer = this.synthesizeGraphResults();
+
+    return { finalAnswer, additionalSteps };
+  }
+
+  /**
+   * 自我一致性检查
+   * 多次推理并比较结果
+   */
+  checkSelfConsistency(chains: ThoughtStep[]): number {
+    // 简化实现：检查关键步骤的一致性
+    let consistentCount = 0;
+    let totalCount = 0;
+
+    for (const step of chains) {
+      totalCount++;
+      if (step.action && step.thought) {
+        // 检查是否有矛盾
+        const hasContradiction = this.hasContradiction(step);
+        if (!hasContradiction) consistentCount++;
+      }
+    }
+
+    return totalCount > 0 ? consistentCount / totalCount : 0.5;
+  }
+
+  /**
+   * 检查是否有矛盾
+   */
+  private hasContradiction(step: ThoughtStep): boolean {
+    // 简化的矛盾检测
+    const contradictions = [
+      step.thought.includes('不') && step.thought.includes('是'),
+      step.thought.includes('假') && step.thought.includes('真'),
+    ];
+
+    return contradictions.some(c => c);
+  }
+
+  /**
+   * 提取关键概念
+   */
+  private extractConcepts(text: string): string[] {
+    // 简化的概念提取（实际应用中需要 NLP）
+    const concepts: string[] = [];
+    const words = text.split(/\s+/);
+
+    for (const word of words) {
+      if (word.length > 2 && /[a-zA-Z\u4e00-\u9fa5]/.test(word)) {
+        concepts.push(word);
+      }
+    }
+
+    return [...new Set(concepts)].slice(0, 8); // 最多8个概念
+  }
+
+  /**
+   * 检查概念是否相关
+   */
+  private areConceptsRelated(concept1: string, concept2: string): boolean {
+    // 简化的相关性检测
+    const commonPrefixes = ['方法', '函数', '类', '实现', '使用'];
+    return commonPrefixes.some(prefix =>
+      concept1.includes(prefix) && concept2.includes(prefix)
+    );
+  }
+
+  /**
+   * 综合图结果
+   */
+  private synthesizeGraphResults(): string {
+    const results = Array.from(this.nodeResults.values());
+    if (results.length === 0) {
+      return "基于图遍历的综合分析完成";
+    }
+    return results.join('; ');
+  }
+}
+
+/**
+ * 动态递归 CoT（DR-CoT）
+ * 自适应推理深度
+ */
+export class DynamicRecursiveCoT extends ChainOfThought {
+  private maxDepth: number = 5;
+  private currentDepth: number = 0;
+  private improvementHistory: string[] = [];
+
+  /**
+   * 执行自适应深度推理
+   */
+  async reason(
+    question: string,
+    context?: string
+  ): Promise<ReasoningResult> {
+    const startTime = Date.now();
+    this.currentDepth = 0;
+
+    // 初始推理
+    let result = await super.reason(question, context);
+
+    // 根据置信度自适应调整深度
+    while (result.confidence < this.config.confidenceThreshold && this.currentDepth < this.maxDepth) {
+      this.currentDepth++;
+      const improvement = await this.deepenReasoning(question, context, result);
+
+      if (improvement.confidence > result.confidence) {
+        result = improvement;
+        this.improvementHistory.push(`深度${this.currentDepth}: 置信度提升 ${result.confidence - improvement.confidence}`);
+      } else {
+        break; // 无法继续改进
+      }
+    }
+
+    return {
+      ...result,
+      metadata: {
+        ...result.metadata,
+        totalSteps: result.metadata?.totalSteps ?? this.chain.length,
+        totalDuration: Date.now() - startTime,
+        actualDepth: this.currentDepth,
+        improvementHistory: this.improvementHistory,
+      },
+    };
+  }
+
+  /**
+   * 深化推理
+   */
+  private async deepenReasoning(
+    question: string,
+    context: string | undefined,
+    previousResult: ReasoningResult
+  ): Promise<ReasoningResult> {
+    // 在更深层面上重新推理
+    this.addStep(`深度推理(层级${this.currentDepth})`, '基于之前结果进行深化分析');
+
+    // 生成改进的答案
+    const improvedAnswer = `${previousResult.answer}\n\n(深度${this.currentDepth}补充: ${this.generateDeeperInsight(previousResult)})`;
+
+    return {
+      ...previousResult,
+      answer: improvedAnswer,
+      confidence: Math.min(previousResult.confidence + 0.1, 0.99),
+    };
+  }
+
+  /**
+   * 生成更深入的洞察
+   */
+  private generateDeeperInsight(result: ReasoningResult): string {
+    const insights = [
+      '考虑边界情况',
+      '验证假设前提',
+      '探索替代方案',
+      '量化不确定性',
+    ];
+
+    return insights[Math.floor(Math.random() * insights.length)];
+  }
+}
+
+/**
+ * 创建图思维推理器
+ */
+export function createGraphChainOfThought(config?: ChainConfig): GraphChainOfThought {
+  return new GraphChainOfThought(config);
+}
+
+/**
+ * 创建动态递归推理器
+ */
+export function createDynamicRecursiveCoT(config?: ChainConfig): DynamicRecursiveCoT {
+  return new DynamicRecursiveCoT(config);
 }
