@@ -182,7 +182,7 @@ export {
 /**
  * 🦞 引擎版本信息
  */
-export const ENGINE_VERSION = "2.26.0";
+export const ENGINE_VERSION = "2.27.0";
 
 /**
  * 🦞 引擎功能矩阵
@@ -261,6 +261,8 @@ export const ENGINE_FEATURES = {
   cbsOrchestrator: true,
   // v2.26 新增
   myantfarmOrchestrator: true,
+  // v2.27 新增
+  automlAgentOrchestrator: true,
 } as const;
 
 // ========== 火焰图收集器 (v2.1) ==========
@@ -1050,6 +1052,39 @@ export {
   createMyAntFarmOrchestrator,
   MyAntFarmTemplates,
 } from "./myantfarm-orchestrator.js";
+
+// ========== AutoML-Agent 全流水线 AutoML 编排器 (v2.27) ==========
+import {
+  AutoMLAgentOrchestrator,
+  AutoMLTaskType,
+  AutoMLAgentRole,
+  AutoMLTaskState,
+  PlanType,
+  VerificationStage,
+  AutoMLSubTask,
+  ExecutionPlan as AutoMLExecutionPlan,
+  VerificationResult as AutoMLVerificationResult,
+  AutoMLResult,
+  AutoMLConfig,
+  createAutoMLAgentOrchestrator,
+  AutoMLTemplates,
+} from "./automl-agent-orchestrator.js";
+
+export {
+  AutoMLAgentOrchestrator,
+  AutoMLTaskType,
+  AutoMLAgentRole,
+  AutoMLTaskState,
+  PlanType,
+  VerificationStage,
+  AutoMLSubTask,
+  ExecutionPlan as AutoMLExecutionPlan,
+  VerificationResult as AutoMLVerificationResult,
+  AutoMLResult,
+  AutoMLConfig,
+  createAutoMLAgentOrchestrator,
+  AutoMLTemplates,
+} from "./automl-agent-orchestrator.js";
 
 /**
  * 🦞 创建完整引擎（包含所有组件）
