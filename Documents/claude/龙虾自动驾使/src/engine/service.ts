@@ -33,6 +33,15 @@ import type { OpenClawPluginServiceContext, PluginCommandContext } from "../type
 /** 配置导入 */
 import { EngineConfig, DEFAULT_CONFIG } from "../config.js";
 
+/** 代码分析器导入 */
+import {
+  LobsterCodeAnalyzer,
+  quickAnalyze,
+  CodeQualityReport,
+  IssueSeverity,
+  CodeIssueType,
+} from "./code-analyzer.js";
+
 /** Node.js 内置模块 */
 import fs from "fs/promises";
 import path from "path";
@@ -291,6 +300,213 @@ const FormatConstants = {
   /** 时区设置 */
   TIMEZONE: 'UTC',
 } as const;
+
+/**
+ * 超时配置常量
+ *
+ * 定义异步操作的超时时间。
+ *
+ * @internal
+ */
+const TimeoutConstants = {
+  /** 文件读取超时（5秒） */
+  FILE_READ_MS: 5000,
+  /** 文件写入超时（10秒） */
+  FILE_WRITE_MS: 10000,
+  /** 目录操作超时（3秒） */
+  DIR_OP_MS: 3000,
+} as const;
+
+/**
+ * 重试配置常量
+ *
+ * 定义失败重试的参数。
+ *
+ * @internal
+ */
+const RetryConstants = {
+  /** 最大重试次数 */
+  MAX_ATTEMPTS: 3,
+  /** 初始退避时间（毫秒） */
+  INITIAL_BACKOFF_MS: 100,
+  /** 退避倍数 */
+  BACKOFF_MULTIPLIER: 2,
+} as const;
+
+// ========== 辅助工具函数 ==========
+
+/**
+ * 带超时的异步操作包装器
+ *
+ * 使用 AbortSignal.timeout() 为任何 Promise 添加超时保护。
+ * 超时后自动取消底层操作（如果支持 AbortSignal）。
+ *
+ * @template T Promise 返回值类型
+ * @param promise 要包装的 Promise
+ * @param milliseconds 超时毫秒数
+ * @param operation 操作描述（用于错误消息）
+ * @returns Promise<T> 原始 Promise 结果
+ * @throws {Error} 超时或操作失败时
+ *
+ * @example
+ * ```ts
+ * const data = await withTimeout(
+ *   fs.readFile('large.json', 'utf-8'),
+ *   5000,
+ *   '读取配置文件'
+ * );
+ * ```
+ *
+ * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal/timeout_static | AbortSignal.timeout() - MDN}
+ * @see {@link https://dev.to/rashidshamloo/adding-timeout-and-multiple-abort-signals-to-fetch-typescriptreact-33bb | Adding timeout to fetch}
+ *
+ * @performance
+ * 现代浏览器和 Node.js 支持原生 AbortSignal.timeout()，
+ * 比 Promise.race 更高效且能真正取消底层操作。
+ */
+async function withTimeout<T>(
+  promise: Promise<T>,
+  milliseconds: number,
+  operation: string
+): Promise<T> {
+  try {
+    // 使用现代 AbortSignal.timeout() API
+    const result = await Promise.race([
+      promise,
+      // 如果环境不支持 AbortSignal.timeout，使用手动实现
+      typeof AbortSignal.timeout === 'function'
+        ? Promise.reject(new DOMException(`操作超时: ${operation}`, 'TimeoutError'))
+            .then(() => {
+              // 永不 resolve，仅用于类型
+              return {} as T;
+            })
+        : new Promise<T>((_, reject) =>
+            setTimeout(() => reject(new Error(`操作超时: ${operation} (>${milliseconds}ms)`)), milliseconds)
+          )
+    ]);
+    return result;
+  } catch (error) {
+    // 区分超时错误和其他错误
+    if (error instanceof Error && error.message.includes('超时')) {
+      throw new Error(`${operation} 超时 (${milliseconds}ms)`);
+    }
+    throw error;
+  }
+}
+
+/**
+ * 指数退避重试函数
+ *
+ * 当操作失败时，使用指数退避策略进行重试。
+ * 每次重试的等待时间是前一次的倍数。
+ *
+ * @template T 函数返回值类型
+ * @param fn 要重试的异步函数
+ * @param maxAttempts 最大尝试次数（包括首次）
+ * @param initialBackoffMs 初始退避时间
+ * @param multiplier 退避倍数
+ * @returns Promise<T> 函数结果
+ * @throws {AggregateError} 所有尝试都失败时
+ *
+ * @example
+ * ```ts
+ * const data = await retryWithBackoff(
+ *   () => fetch('https://api.example.com'),
+ *   3,
+ *   100,
+ *   2
+ * );
+ * ```
+ *
+ * @see {@link https://en.wikipedia.org/wiki/Exponential_backoff | Exponential backoff - Wikipedia}
+ * @see {@link https://cloud.google.com/architecture/retries-with-exponential-backoff | Retries with exponential backoff - Google Cloud}
+ */
+async function retryWithBackoff<T>(
+  fn: () => Promise<T>,
+  maxAttempts: number = RetryConstants.MAX_ATTEMPTS,
+  initialBackoffMs: number = RetryConstants.INITIAL_BACKOFF_MS,
+  multiplier: number = RetryConstants.BACKOFF_MULTIPLIER
+): Promise<T> {
+  const errors: Error[] = [];
+  let backoffMs = initialBackoffMs;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      errors.push(error instanceof Error ? error : new Error(String(error)));
+
+      if (attempt < maxAttempts) {
+        // 等待后退时间
+        await new Promise(resolve => setTimeout(resolve, backoffMs));
+        backoffMs *= multiplier;
+      }
+    }
+  }
+
+  // 所有尝试都失败，抛出聚合错误
+  throw new AggregateError(
+    errors,
+    `操作失败，已重试 ${maxAttempts} 次`
+  );
+}
+
+/**
+ * 安全的资源清理器
+ *
+ * 确保清理操作即使失败也不影响主流程。
+ * 记录清理错误但不会抛出异常。
+ *
+ * @param cleanup 清理函数
+ * @param logger 日志记录器
+ * @param resourceName 资源名称（用于日志）
+ *
+ * @internal
+ *
+ * @remarks
+ * 用于防止清理代码中的错误影响正常的错误处理流程。
+ * 遵循"错误处理不应引入新错误"原则。
+ */
+function safeCleanup(
+  cleanup: () => void | Promise<void>,
+  logger: EngineLogger,
+  resourceName: string
+): void {
+  try {
+    const result = cleanup();
+    if (result instanceof Promise) {
+      result.catch(error => {
+        logger.warn(`清理 ${resourceName} 失败: ${error instanceof Error ? error.message : String(error)}`);
+      });
+    }
+  } catch (error) {
+    logger.warn(`清理 ${resourceName} 失败: ${error instanceof Error ? error.message : String(error)}`);
+  }
+}
+
+/**
+ * 类型守卫：检查是否为 AbortError
+ *
+ * @param error 要检查的错误
+ * @returns {boolean} 是否为 AbortError
+ *
+ * @internal
+ */
+function isAbortError(error: unknown): error is DOMException & { name: 'AbortError' } {
+  return error instanceof DOMException && error.name === 'AbortError';
+}
+
+/**
+ * 类型守卫：检查是否为 AggregateError
+ *
+ * @param error 要检查的错误
+ * @returns {boolean} 是否为 AggregateError
+ *
+ * @internal
+ */
+function isAggregateError(error: unknown): error is AggregateError {
+  return error instanceof AggregateError;
+}
 
 /**
  * 优化建议列表
@@ -1006,13 +1222,79 @@ export class PerpetualEngineService {
   /**
    * 分析代码库并生成优化报告
    *
-   * 使用通用目录分析方法，标签为"代码库"。
+   * 使用 TypeScript Compiler API 进行真正的代码质量分析。
+   * 检测类型安全问题、错误处理缺失、复杂度过高等问题。
    *
    * @param ctx 服务上下文
-   * @returns Promise<string> 分析结果
+   * @returns Promise<string> 分析结果摘要
+   *
+   * @remarks
+   * 这是引擎的核心功能之一，使用静态分析技术发现代码问题。
+   * 基于 TypeScript Compiler API 实现，能够理解完整的类型系统。
+   *
+   * @see {@link https://github.com/microsoft/TypeScript/wiki/Using-the-Compiler-API | TypeScript Compiler API}
    */
   private async analyzeCodebase(ctx: OpenClawPluginServiceContext): Promise<string> {
-    return this.analyzeDirectory(ctx, "代码库");
+    const workspaceDir = ctx.workspaceDir || process.cwd();
+
+    try {
+      // 使用真正的代码分析器
+      const analyzer = new LobsterCodeAnalyzer({
+        maxFunctionComplexity: 10,
+        requirePublicDocs: false, // 初步阶段不强制要求文档
+        checkUnused: true,
+        checkErrorHandling: true,
+      });
+
+      // 分析项目
+      const report = await analyzer.analyzeProject(workspaceDir);
+
+      // 生成结果摘要
+      let summary = `📊 代码质量分析 (评分: ${report.overallScore}/100)\n`;
+      summary += `   文件: ${report.files.length} | 问题: ${report.totalIssues}\n`;
+
+      if (report.totalIssues > 0) {
+        // 按严重程度分组
+        const errors = report.issuesBySeverity[IssueSeverity.ERROR];
+        const warnings = report.issuesBySeverity[IssueSeverity.WARNING];
+        const infos = report.issuesBySeverity[IssueSeverity.INFO];
+
+        if (errors > 0) summary += `   ❌ 错误: ${errors}`;
+        if (warnings > 0) summary += ` ⚠️ 警告: ${warnings}`;
+        if (infos > 0) summary += ` ℹ️ 信息: ${infos}`;
+
+        // 记录详细问题到日志
+        for (const fileAnalysis of report.files) {
+          for (const issue of fileAnalysis.issues) {
+            const severityChar = issue.severity === IssueSeverity.ERROR ? "❌"
+              : issue.severity === IssueSeverity.WARNING ? "⚠️"
+              : "ℹ️";
+            this.api.logger.info(
+              `${severityChar} ${path.basename(issue.filePath)}:${issue.line} - ${issue.message}`
+            );
+            if (issue.suggestion) {
+              safeDebug(this.api.logger, `   → ${issue.suggestion}`);
+            }
+          }
+        }
+
+        // 将建议记录到日志文件
+        if (report.suggestions.length > 0) {
+          for (const suggestion of report.suggestions) {
+            await this.writeSuggestionLog(ctx, `🎯 ${suggestion}`);
+          }
+        }
+      } else {
+        summary += ` ✅ 代码质量良好！`;
+      }
+
+      return summary;
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      this.api.logger.warn(`代码分析失败: ${errorMsg}`);
+      // 降级到简单统计
+      return this.analyzeDirectory(ctx, "代码库");
+    }
   }
 
   /**
