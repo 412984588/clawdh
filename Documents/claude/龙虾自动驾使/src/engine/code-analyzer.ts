@@ -18,6 +18,7 @@
 import ts from "typescript";
 import fs from "fs/promises";
 import path from "path";
+import { FileAnalysisCache, memoize } from "./ast-cache.js";
 
 /**
  * 代码问题类型
@@ -89,8 +90,28 @@ export interface FileAnalysis {
   linesOfCode: number;
   /** 函数数量 */
   functionCount: number;
-  /** 复杂度评分 (0-100) */
+  /** 圈复杂度评分 (0-100) */
   complexityScore: number;
+  /** 认知复杂度 (Cognitive Complexity) */
+  cognitiveComplexity: number;
+  /** 最大嵌套深度 */
+  maxNestingDepth: number;
+  /** 可维护性指数 (Maintainability Index) */
+  maintainabilityIndex: number;
+}
+
+/**
+ * 函数复杂度详情
+ */
+export interface FunctionComplexityDetail {
+  /** 函数名称 */
+  name: string;
+  /** 圈复杂度 */
+  cyclomatic: number;
+  /** 认知复杂度 */
+  cognitive: number;
+  /** 嵌套深度 */
+  nestingDepth: number;
 }
 
 /**
@@ -145,8 +166,26 @@ export class LobsterCodeAnalyzer {
   private program: ts.Program | null = null;
   private typeChecker: ts.TypeChecker | null = null;
 
+  // 认知复杂度计算的状态
+  private cognitiveNestingLevel = 0;
+  private cognitiveComplexity = 0;
+
+  // 性能优化：文件分析缓存
+  private analysisCache: FileAnalysisCache<FileAnalysis>;
+  // 复杂度计算缓存
+  private complexityCache = new Map<string, number>();
+
   constructor(config: Partial<AnalyzerConfig> = {}) {
     this.config = { ...DEFAULT_ANALYZER_CONFIG, ...config };
+    this.analysisCache = new FileAnalysisCache({ maxSize: 500, ttl: 10 * 60 * 1000 });
+  }
+
+  /**
+   * 重置认知复杂度状态
+   */
+  private resetCognitiveState(): void {
+    this.cognitiveNestingLevel = 0;
+    this.cognitiveComplexity = 0;
   }
 
   /**
@@ -183,31 +222,83 @@ export class LobsterCodeAnalyzer {
   }
 
   /**
-   * 分析单个源文件
+   * 分析单个源文件（带缓存优化）
    */
   private analyzeSourceFile(sourceFile: ts.SourceFile): FileAnalysis | null {
+    const filePath = sourceFile.fileName;
+    const fileContent = sourceFile.getFullText();
+
+    // 检查缓存
+    const cached = this.analysisCache.get(filePath, fileContent);
+    if (cached) {
+      return cached;
+    }
+
+    // 执行分析...
     const issues: CodeIssue[] = [];
     let functionCount = 0;
-    let totalComplexity = 0;
+    let totalCyclomaticComplexity = 0;
+    let totalCognitiveComplexity = 0;
+    let maxNestingDepth = 0;
+    let totalHalsteadVolume = 0; // 用于可维护性指数计算
 
     // 遍历 AST
     const visit = (node: ts.Node) => {
       // 检测函数
       if (ts.isFunctionDeclaration(node) || ts.isMethodDeclaration(node)) {
         functionCount++;
-        const complexity = this.calculateCyclomaticComplexity(node);
-        totalComplexity += complexity;
 
-        // 检查复杂度
-        if (complexity > this.config.maxFunctionComplexity) {
+        // 计算圈复杂度
+        const cyclomaticComplexity = this.calculateCyclomaticComplexity(node);
+        totalCyclomaticComplexity += cyclomaticComplexity;
+
+        // 计算认知复杂度（重置状态）
+        this.resetCognitiveState();
+        const cognitiveComplexity = this.calculateCognitiveComplexity(node);
+        totalCognitiveComplexity += cognitiveComplexity;
+
+        // 计算嵌套深度
+        const nestingDepth = this.calculateNestingDepth(node);
+        if (nestingDepth > maxNestingDepth) {
+          maxNestingDepth = nestingDepth;
+        }
+
+        // 检查圈复杂度
+        if (cyclomaticComplexity > this.config.maxFunctionComplexity) {
           issues.push({
             type: CodeIssueType.HIGH_COMPLEXITY,
             severity: IssueSeverity.WARNING,
             filePath: sourceFile.fileName,
             line: sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile)).line + 1,
             column: sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile)).character + 1,
-            message: `函数复杂度过高 (${complexity})`,
-            suggestion: `建议将函数拆分为更小的单元，当前复杂度 ${complexity} 超过阈值 ${this.config.maxFunctionComplexity}`,
+            message: `函数圈复杂度过高 (${cyclomaticComplexity})`,
+            suggestion: `建议将函数拆分为更小的单元，当前复杂度 ${cyclomaticComplexity} 超过阈值 ${this.config.maxFunctionComplexity}`,
+          });
+        }
+
+        // 检查认知复杂度（阈值设为15）
+        if (cognitiveComplexity > 15) {
+          issues.push({
+            type: CodeIssueType.HIGH_COMPLEXITY,
+            severity: IssueSeverity.WARNING,
+            filePath: sourceFile.fileName,
+            line: sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile)).line + 1,
+            column: sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile)).character + 1,
+            message: `函数认知复杂度过高 (${cognitiveComplexity})`,
+            suggestion: `认知复杂度 ${cognitiveComplexity} 超过阈值15，建议简化嵌套逻辑`,
+          });
+        }
+
+        // 检查嵌套深度（阈值设为4）
+        if (nestingDepth > 4) {
+          issues.push({
+            type: CodeIssueType.HIGH_COMPLEXITY,
+            severity: IssueSeverity.INFO,
+            filePath: sourceFile.fileName,
+            line: sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile)).line + 1,
+            column: sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile)).character + 1,
+            message: `函数嵌套深度过深 (${nestingDepth}层)`,
+            suggestion: `嵌套深度 ${nestingDepth} 超过推荐值4，考虑使用早返回或提取函数`,
           });
         }
 
@@ -305,21 +396,202 @@ export class LobsterCodeAnalyzer {
     visit(sourceFile);
 
     const linesOfCode = sourceFile.text.split("\n").length;
-    const complexityScore = Math.max(0, 100 - totalComplexity);
+    const cyclomaticScore = Math.max(0, 100 - totalCyclomaticComplexity);
 
-    return {
+    // 计算可维护性指数 (Microsoft Maintainability Index)
+    // MI = max(0, (171 - 5.2 * ln(HV) - 0.23 * CC - 16.2 * ln(LOC)) * 100 / 171)
+    // 简化版本: MI = 100 - sqrt(CC^2 + (Cognitive^2)/4 + Nesting^2)
+    const maintainabilityIndex = this.calculateMaintainabilityIndex(
+      totalCyclomaticComplexity,
+      totalCognitiveComplexity,
+      maxNestingDepth,
+      linesOfCode
+    );
+
+    const result: FileAnalysis = {
       filePath: sourceFile.fileName,
       issues,
       linesOfCode,
       functionCount,
-      complexityScore,
+      complexityScore: cyclomaticScore,
+      cognitiveComplexity: totalCognitiveComplexity,
+      maxNestingDepth,
+      maintainabilityIndex,
     };
+
+    // 缓存分析结果
+    this.analysisCache.set(sourceFile.fileName, sourceFile.getFullText(), result);
+
+    return result;
   }
 
   /**
-   * 计算圈复杂度
+   * 计算认知复杂度 (Cognitive Complexity)
+   *
+   * 基于 SonarQube 认知复杂度规范:
+   * - 嵌套结构增加复杂度
+   * - 逻辑反转（else, catch）增加额外复杂度
+   * - break, continue, return 增加复杂度
+   *
+   * @see {@link https://www.sonarsource.com/resources/cognitive-complexity/}
+   */
+  private calculateCognitiveComplexity(functionNode: ts.FunctionLikeDeclaration): number {
+    this.resetCognitiveState();
+
+    const visit = (node: ts.Node, nestingLevel = 0): void => {
+      // 基础复杂度增量
+      const increment = nestingLevel + 1;
+
+      switch (node.kind) {
+        // 二元选择结构
+        case ts.SyntaxKind.IfStatement:
+          this.cognitiveComplexity += increment;
+          // else 分支额外增加复杂度（逻辑反转）
+          const ifStmt = node as ts.IfStatement;
+          if (ifStmt.elseStatement) {
+            this.cognitiveComplexity += 1;
+          }
+          break;
+
+        // 循环结构
+        case ts.SyntaxKind.WhileStatement:
+        case ts.SyntaxKind.ForStatement:
+        case ts.SyntaxKind.ForInStatement:
+        case ts.SyntaxKind.ForOfStatement:
+        case ts.SyntaxKind.DoStatement:
+          this.cognitiveComplexity += increment;
+          break;
+
+        // 三元运算符
+        case ts.SyntaxKind.ConditionalExpression:
+          this.cognitiveComplexity += increment;
+          break;
+
+        // Switch 语句
+        case ts.SyntaxKind.SwitchStatement:
+          this.cognitiveComplexity += increment;
+          break;
+
+        // 逻辑运算符 (&&, ||)
+        case ts.SyntaxKind.BinaryExpression:
+          const binExpr = node as ts.BinaryExpression;
+          if (binExpr.operatorToken.kind === ts.SyntaxKind.AmpersandAmpersandToken ||
+              binExpr.operatorToken.kind === ts.SyntaxKind.BarBarToken) {
+            this.cognitiveComplexity += 1;
+          }
+          break;
+
+        // catch 块（逻辑反转）
+        case ts.SyntaxKind.CatchClause:
+          this.cognitiveComplexity += 1;
+          break;
+      }
+
+      // 递归访问子节点，增加嵌套层级
+      if (ts.isFunctionDeclaration(node) || ts.isArrowFunction(node) ||
+          ts.isFunctionExpression(node) || ts.isMethodDeclaration(node)) {
+        // 不进入嵌套函数
+        const funcBody = (node as any).body;
+        if (funcBody) {
+          ts.forEachChild(funcBody, child => visit(child, 0));
+        }
+      } else {
+        ts.forEachChild(node, child => {
+          const newNestingLevel = this.incrementsNesting(node.kind) ? nestingLevel + 1 : nestingLevel;
+          visit(child, newNestingLevel);
+        });
+      }
+    };
+
+    if (functionNode.body) {
+      visit(functionNode.body, 0);
+    }
+
+    return this.cognitiveComplexity;
+  }
+
+  /**
+   * 判断节点是否增加嵌套层级
+   */
+  private incrementsNesting(kind: ts.SyntaxKind): boolean {
+    return kind === ts.SyntaxKind.Block ||
+           kind === ts.SyntaxKind.CaseClause ||
+           kind === ts.SyntaxKind.DefaultClause;
+  }
+
+  /**
+   * 计算最大嵌套深度
+   */
+  private calculateNestingDepth(functionNode: ts.FunctionLikeDeclaration): number {
+    let maxDepth = 0;
+    let currentDepth = 0;
+
+    const visit = (node: ts.Node): void => {
+      // 进入嵌套结构
+      if (this.incrementsNesting(node.kind)) {
+        currentDepth++;
+        if (currentDepth > maxDepth) {
+          maxDepth = currentDepth;
+        }
+      }
+
+      // 跳过嵌套函数
+      if ((ts.isFunctionDeclaration(node) || ts.isArrowFunction(node) ||
+           ts.isFunctionExpression(node) || ts.isMethodDeclaration(node)) &&
+          node !== functionNode) {
+        return;
+      }
+
+      ts.forEachChild(node, visit);
+
+      // 离开嵌套结构
+      if (this.incrementsNesting(node.kind)) {
+        currentDepth--;
+      }
+    };
+
+    if (functionNode.body) {
+      visit(functionNode.body);
+    }
+
+    return maxDepth;
+  }
+
+  /**
+   * 计算可维护性指数 (Maintainability Index)
+   *
+   * 基于 Microsoft MI 的简化版本
+   * 考虑因素: 圈复杂度、认知复杂度、嵌套深度、代码行数
+   *
+   * @returns 0-100 的分数，100 表示最易维护
+   */
+  private calculateMaintainabilityIndex(
+    cyclomatic: number,
+    cognitive: number,
+    nesting: number,
+    loc: number
+  ): number {
+    // 归一化各指标到 0-100 范围
+    const ccScore = Math.max(0, 100 - cyclomatic * 2); // 圈复杂度权重
+    const cogScore = Math.max(0, 100 - cognitive); // 认知复杂度权重
+    const nestScore = Math.max(0, 100 - nesting * 10); // 嵌套深度权重
+    const locScore = Math.max(0, 100 - Math.log10(loc + 1) * 10); // 代码行数权重
+
+    // 加权平均
+    return Math.round((ccScore * 0.3 + cogScore * 0.3 + nestScore * 0.2 + locScore * 0.2));
+  }
+
+  /**
+   * 计算圈复杂度（带缓存）
    */
   private calculateCyclomaticComplexity(functionNode: ts.FunctionLikeDeclaration): number {
+    // 创建缓存键（基于节点位置）
+    const cacheKey = `cc_${functionNode.getStart()}_${functionNode.getEnd()}`;
+
+    if (this.complexityCache.has(cacheKey)) {
+      return this.complexityCache.get(cacheKey)!;
+    }
+
     let complexity = 1; // 基础复杂度
 
     const visit = (node: ts.Node) => {
@@ -339,6 +611,9 @@ export class LobsterCodeAnalyzer {
     };
 
     visit(functionNode.body || functionNode);
+
+    // 缓存结果
+    this.complexityCache.set(cacheKey, complexity);
     return complexity;
   }
 
@@ -498,6 +773,13 @@ export async function quickAnalyze(projectPath: string): Promise<string> {
   const analyzer = new LobsterCodeAnalyzer();
   const report = await analyzer.analyzeProject(projectPath);
 
+  // 计算汇总指标
+  const totalCognitive = report.files.reduce((sum, f) => sum + f.cognitiveComplexity, 0);
+  const avgMaintainability = report.files.length > 0
+    ? Math.round(report.files.reduce((sum, f) => sum + f.maintainabilityIndex, 0) / report.files.length)
+    : 0;
+  const maxNesting = Math.max(...report.files.map(f => f.maxNestingDepth), 0);
+
   return `
 📊 代码质量分析报告
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -505,6 +787,12 @@ export async function quickAnalyze(projectPath: string): Promise<string> {
 📁 分析文件: ${report.files.length}
 🔍 总问题数: ${report.totalIssues}
 ⭐ 质量评分: ${report.overallScore}/100
+
+复杂度指标:
+  • 圈复杂度 (Cyclomatic): ${report.files.reduce((s, f) => s + (100 - f.complexityScore), 0) / 100 | 0}
+  • 认知复杂度 (Cognitive): ${totalCognitive}
+  • 最大嵌套深度: ${maxNesting} 层
+  • 可维护性指数: ${avgMaintainability}/100
 
 问题分类:
   ${Object.entries(report.issuesByType)
