@@ -182,7 +182,7 @@ export {
 /**
  * 🦞 引擎版本信息
  */
-export const ENGINE_VERSION = "2.21.0";
+export const ENGINE_VERSION = "2.25.0";
 
 /**
  * 🦞 引擎功能矩阵
@@ -251,6 +251,14 @@ export const ENGINE_FEATURES = {
   moyaOrchestrator: true,
   // v2.21 新增
   crotoOrchestrator: true,
+  // v2.22 新增
+  maltOrchestrator: true,
+  // v2.23 新增
+  mamrOrchestrator: true,
+  // v2.24 新增
+  adaptflowOrchestrator: true,
+  // v2.25 新增
+  cbsOrchestrator: true,
 } as const;
 
 // ========== 火焰图收集器 (v2.1) ==========
@@ -883,6 +891,132 @@ export {
   createCrotoOrchestrator,
   CrotoTemplates,
 } from "./croto-orchestrator.js";
+
+// ========== MALT 多代理推理增强编排器 (v2.22) ==========
+import {
+  MALTOrchestrator,
+  MALTReasoningStepType,
+  MALTReasoningState,
+  MALTIntermediateResult,
+  MALTReflectionFeedback,
+  MALTReasoningChain,
+  MALTAgent,
+  MALTTrainingSample,
+  MALTConfig,
+  createMALTOrchestrator,
+  MALTTemplates,
+} from "./malt-orchestrator.js";
+
+export {
+  MALTOrchestrator,
+  MALTReasoningStepType,
+  MALTReasoningState,
+  MALTIntermediateResult,
+  MALTReflectionFeedback,
+  MALTReasoningChain,
+  MALTAgent,
+  MALTTrainingSample,
+  MALTConfig,
+  createMALTOrchestrator,
+  MALTTemplates,
+} from "./malt-orchestrator.js";
+
+// ========== Dr. MAMR 多智能体元推理框架 (v2.23) ==========
+import {
+  MAMROrchestrator,
+  MAMRAgentRole,
+  MAMRAgentState,
+  MAMRContributionType,
+  MAMRLazyBehaviorType,
+  MAMRAgent,
+  MAMRMetaPlan,
+  MAMRReasoningStep,
+  MAMRContribution,
+  MAMRLazyBehavior,
+  MAMRReasoningResult,
+  MAMRContributionSummary,
+  MAMRConfig,
+  createMAMROrchestrator,
+  MAMRTemplates,
+} from "./mamr-orchestrator.js";
+
+export {
+  MAMROrchestrator,
+  MAMRAgentRole,
+  MAMRAgentState,
+  MAMRContributionType,
+  MAMRLazyBehaviorType,
+  MAMRAgent,
+  MAMRMetaPlan,
+  MAMRReasoningStep,
+  MAMRContribution,
+  MAMRLazyBehavior,
+  MAMRReasoningResult,
+  MAMRContributionSummary,
+  MAMRConfig,
+  createMAMROrchestrator,
+  MAMRTemplates,
+} from "./mamr-orchestrator.js";
+
+// ========== AdaptFlow 自适应工作流元学习编排器 (v2.24) ==========
+import {
+  AdaptFlowOrchestrator,
+  AdaptFlowNodeType,
+  AdaptFlowNodeState,
+  AdaptFlowMetaPhase,
+  AdaptFlowNode,
+  AdaptFlowWorkflow,
+  AdaptFlowPerformanceMetrics,
+  AdaptFlowMetaTask,
+  AdaptFlowSample,
+  AdaptFlowFastAdaptResult,
+  AdaptFlowConfig,
+  createAdaptFlowOrchestrator,
+  AdaptFlowTemplates,
+} from "./adaptflow-orchestrator.js";
+
+export {
+  AdaptFlowOrchestrator,
+  AdaptFlowNodeType,
+  AdaptFlowNodeState,
+  AdaptFlowMetaPhase,
+  AdaptFlowNode,
+  AdaptFlowWorkflow,
+  AdaptFlowPerformanceMetrics,
+  AdaptFlowMetaTask,
+  AdaptFlowSample,
+  AdaptFlowFastAdaptResult,
+  AdaptFlowConfig,
+  createAdaptFlowOrchestrator,
+  AdaptFlowTemplates,
+} from "./adaptflow-orchestrator.js";
+
+// ========== CBS 协作束搜索编排器 (v2.25) ==========
+import {
+  CBSOrchestrator,
+  CBSReasoningType,
+  CBSSpanState,
+  CBSCandidatePath,
+  CBSSpan,
+  CBSBeamConfig,
+  CBSReasoningResult,
+  CBSConfig,
+  createCBSOrchestrator,
+  CBSTemplates,
+} from "./cbs-orchestrator.js";
+
+export {
+  CBSOrchestrator,
+  CBSReasoningType,
+  CBSSpanState,
+  CBSCandidatePath,
+  CBSSpan,
+  CBSBeamConfig,
+  CBSReasoningResult,
+  CBSConfig,
+  createCBSOrchestrator,
+  CBSTemplates,
+} from "./cbs-orchestrator.js";
 
 /**
  * 🦞 创建完整引擎（包含所有组件）
