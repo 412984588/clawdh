@@ -182,7 +182,7 @@ export {
 /**
  * 🦞 引擎版本信息
  */
-export const ENGINE_VERSION = "2.15.0";
+export const ENGINE_VERSION = "2.16.0";
 
 /**
  * 🦞 引擎功能矩阵
@@ -239,6 +239,8 @@ export const ENGINE_FEATURES = {
   multiturnOrchestrator: true,
   // v2.15 新增
   haloOrchestrator: true,
+  // v2.16 新增
+  orchestraOrchestrator: true,
 } as const;
 
 // ========== 火焰图收集器 (v2.1) ==========
@@ -687,6 +689,37 @@ export {
   createHALOOrchestrator,
   HALOTemplates,
 } from "./halo-orchestrator.js";
+
+// ========== AgentOrchestra 分层编排器 (v2.16) ==========
+import {
+  AgentOrchestrator,
+  OrchestraRole,
+  OrchestraTaskStatus,
+  ModalityType,
+  TEAAction,
+  OrchestraSubTask,
+  PlanningNode,
+  OrchestraAgentMessage,
+  OrchestraOutput,
+  OrchestraConfig,
+  createAgentOrchestrator,
+  OrchestraTemplates,
+} from "./orchestra-orchestrator.js";
+
+export {
+  AgentOrchestrator,
+  OrchestraRole,
+  OrchestraTaskStatus,
+  ModalityType,
+  TEAAction,
+  OrchestraSubTask,
+  PlanningNode,
+  OrchestraAgentMessage,
+  OrchestraOutput,
+  OrchestraConfig,
+  createAgentOrchestrator,
+  OrchestraTemplates,
+} from "./orchestra-orchestrator.js";
 
 /**
  * 🦞 创建完整引擎（包含所有组件）
