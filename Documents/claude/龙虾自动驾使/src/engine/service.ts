@@ -464,10 +464,11 @@ export class PerpetualEngineService {
   /**
    * 加载 MISSION 和 BOUNDARIES 文件
    *
-   * 尝试从工作目录加载配置文件，失败时返回默认值。
+   * 尝试从工作目录加载配置文件，如果文件不存在或读取失败，
+   * 则使用默认值作为后备。
    *
    * @param ctx 服务上下文
-   * @returns MISSION 和 BOUNDARIES 内容
+   * @returns Promise 包含 MISSION 和 BOUNDARIES 内容
    */
   private async loadMissionFiles(ctx: OpenClawPluginServiceContext): Promise<{
     mission: string;
@@ -494,7 +495,11 @@ export class PerpetualEngineService {
   }
 
   /**
-   * 默认 MISSION
+   * 获取默认 MISSION 内容
+   *
+   * 当 MISSION_PARTNER.md 文件不存在时使用此默认值。
+   *
+   * @returns 默认 MISSION 内容
    */
   private getDefaultMission(): string {
     return `# MISSION - 龙虾永动引擎
@@ -514,7 +519,11 @@ export class PerpetualEngineService {
   }
 
   /**
-   * 默认 BOUNDARIES
+   * 获取默认 BOUNDARIES 内容
+   *
+   * 当 BOUNDARIES_PARTNER.md 文件不存在时使用此默认值。
+   *
+   * @returns 默认 BOUNDARIES 内容
    */
   private getDefaultBoundaries(): string {
     return `# BOUNDARIES - 安全边界
@@ -541,10 +550,10 @@ export class PerpetualEngineService {
    * 4. 默认维护 → 预定义维护任务
    *
    * @param mission MISSION 文件内容
-   * @param boundaries BOUNDARIES 文件内容
-   * @returns 行动描述和类型
+   * @param _boundaries BOUNDARIES 文件内容（未使用，保留用于未来扩展）
+   * @returns Promise 包含行动描述和类型
    */
-  private async planNextAction(mission: string, boundaries: string): Promise<{
+  private async planNextAction(mission: string, _boundaries: string): Promise<{
     description: string;
     type: string;
   }> {
