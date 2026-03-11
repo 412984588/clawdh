@@ -123,6 +123,18 @@ const StateFileNames = {
   TEMP_SUFFIX: ".tmp",
 } as const;
 
+/** 时间常量（毫秒） */
+const TimeConstants = {
+  FIVE_MINUTES_MS: 5 * 60 * 1000,
+  ONE_SECOND_MS: 1000,
+} as const;
+
+/** 格式化常量 */
+const FormatConstants = {
+  LOCALE: 'zh-CN',
+  TIMEZONE: 'UTC',
+} as const;
+
 /** MISSION 文件部分名称 */
 const MissionSections = {
   TASKS: "## 具体任务",
@@ -645,7 +657,7 @@ export class PerpetualEngineService {
     try {
       await fs.access(statePath);
       const stat = await fs.stat(statePath);
-      const lastModified = new Date(stat.mtime).toLocaleString('zh-CN');
+      const lastModified = new Date(stat.mtime).toLocaleString(FormatConstants.LOCALE);
       return `状态文件存在，最后更新: ${lastModified}`;
     } catch {
       return `状态文件不存在，等待首次循环`;
@@ -828,7 +840,7 @@ export class PerpetualEngineService {
   hasRecentErrors(): boolean {
     if (this.context.errors.length === 0) return false;
     const lastError = this.context.errors[this.context.errors.length - 1];
-    const fiveMinutesAgo = Date.now() - 5 * 60 * 1000;
+    const fiveMinutesAgo = Date.now() - TimeConstants.FIVE_MINUTES_MS;
     return lastError.timestamp > fiveMinutesAgo;
   }
 
@@ -844,7 +856,7 @@ export class PerpetualEngineService {
    */
   getLoopsPerSecond(): number {
     if (this.loopMetrics.avgTime === 0) return 0;
-    return Math.round(1000 / this.loopMetrics.avgTime * 100) / 100;
+    return Math.round(TimeConstants.ONE_SECOND_MS / this.loopMetrics.avgTime * 100) / 100;
   }
 
   // ========== 性能监控方法 ==========
@@ -859,7 +871,7 @@ export class PerpetualEngineService {
       const timeSinceLastLoop = Date.now() - this.lastLoopTime;
       if (timeSinceLastLoop > this.config.stallThreshold && this.isRunningValue) {
         this.api.logger.warn(
-          LogMessages.HEALTH_CHECK_STALL(Math.round(timeSinceLastLoop / 1000))
+          LogMessages.HEALTH_CHECK_STALL(Math.round(timeSinceLastLoop / TimeConstants.ONE_SECOND_MS))
         );
         // 注意：不自动停止，让用户决定
       }
