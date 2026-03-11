@@ -50,6 +50,25 @@ import {
   ExperienceEntry,
   IncrementalLearningConfig,
 } from "./incremental-learning.js";
+import {
+  AgentCard,
+  AgentFormatParser,
+  ConstraintManifoldProjector,
+  createAgentCard,
+  createCodeReviewerAgent,
+  AgentFormatUtils,
+  ConstraintType,
+  ConstraintPredicate,
+  ConstraintManifold,
+  ContractSchema,
+  MCPServerBinding,
+  LocalAgentRef,
+  ActionSpace,
+  ExecutionPolicy,
+  BudgetConfig,
+  AgentMetadata,
+  AgentInterface,
+} from "./agent-format.js";
 
 // ========== 零延迟循环引擎 ==========
 export {
@@ -163,7 +182,7 @@ export {
 /**
  * 🦞 引擎版本信息
  */
-export const ENGINE_VERSION = "2.5.0";
+export const ENGINE_VERSION = "2.8.0";
 
 /**
  * 🦞 引擎功能矩阵
@@ -200,6 +219,12 @@ export const ENGINE_FEATURES = {
   htnPlanner: true,
   // v2.5 新增
   incrementalLearning: true,
+  // v2.6 新增
+  agenticFormat: true,
+  // v2.7 新增
+  teaOrchestrator: true,
+  // v2.8 新增
+  sclOrchestrator: true,
 } as const;
 
 // ========== 火焰图收集器 (v2.1) ==========
@@ -359,6 +384,74 @@ export {
   ExperienceEntry,
   IncrementalLearningConfig,
 } from "./incremental-learning.js";
+
+// ========== AgenticFormat 标准 (v2.6) ==========
+export {
+  AgentCard,
+  AgentFormatParser,
+  ConstraintManifoldProjector,
+  createAgentCard,
+  createCodeReviewerAgent,
+  AgentFormatUtils,
+  ConstraintType,
+  ConstraintPredicate,
+  ConstraintManifold,
+  ContractSchema,
+  MCPServerBinding,
+  LocalAgentRef,
+  ActionSpace,
+  ExecutionPolicy,
+  BudgetConfig,
+  AgentMetadata,
+  AgentInterface,
+} from "./agent-format.js";
+
+// ========== TEA Protocol 编排器 (v2.7) ==========
+export {
+  TEAOrchestrator,
+  createTEAOrchestrator,
+  DecompositionStrategies,
+  AgentRole as TEAAgentRole,
+  TaskPriority as TEATaskPriority,
+  TaskState as TEATaskState,
+  AgentState as TEAAgentState,
+  Layer,
+  TEATask,
+  TEAAgent,
+  ExecutionPlan as TEAExecutionPlan,
+  OrchestrationStats,
+} from "./tea-orchestrator.js";
+import {
+  StructuredCognitiveLoop,
+  createStructuredCognitiveLoop,
+  CognitiveModules,
+  CognitivePhase,
+  ReasoningMode,
+  MemoryType as SCLMemoryType,
+  CognitiveState,
+  PerceptionInput,
+  RetrievalResult,
+  ReasoningResult,
+  ActionPlan,
+  ReflectionResult,
+  SCLConfig,
+} from "./structured-cognitive-loop.js";
+
+// ========== 结构化认知循环 (v2.8) ==========
+export {
+  StructuredCognitiveLoop,
+  createStructuredCognitiveLoop,
+  CognitiveModules,
+  CognitivePhase,
+  ReasoningMode,
+  MemoryType as SCLMemoryType,
+  CognitiveState,
+  PerceptionInput,
+  RetrievalResult as SCLRetrievalResult,
+  ActionPlan as SCLActionPlan,
+  ReflectionResult as SCLReflectionResult,
+  ReasoningResult as SCLReasoningResult,
+} from "./structured-cognitive-loop.js";
 
 /**
  * 🦞 创建完整引擎（包含所有组件）
