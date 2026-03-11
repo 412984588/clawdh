@@ -1,7 +1,23 @@
 /**
- * 永动引擎服务
+ * 🦞 龙虾永动引擎服务
  *
- * 核心逻辑：零延迟 while(isRunning) 死循环
+ * 核心特性：
+ * - 零延迟 `while(isRunning)` 死循环，无 sleep 无心跳
+ * - 狂暴异常处理：任何错误转化为提示词，立即继续
+ * - 智能错误分类：6种错误类型自动识别和恢复
+ * - 状态持久化：原子写入，重启后恢复
+ *
+ * @example
+ * ```ts
+ * const engine = new PerpetualEngineService(api, {
+ *   compressInterval: 5,
+ *   enableHealthCheck: true
+ * });
+ * await engine.start(context);
+ * ```
+ *
+ * @version 1.0.0
+ * @author Claude Code
  */
 
 import type { OpenClawPluginServiceContext, PluginCommandContext } from "../types.js";
@@ -9,57 +25,135 @@ import { EngineConfig, DEFAULT_CONFIG } from "../config.js";
 import fs from "fs/promises";
 import path from "path";
 
-// 简化的日志接口（确保方法存在）
+/**
+ * 简化的日志接口
+ * @internal
+ */
 interface EngineLogger {
+  /** 记录信息日志 */
   info: (message: string) => void;
+  /** 记录警告日志 */
   warn: (message: string) => void;
+  /** 记录错误日志 */
   error: (message: string) => void;
+  /** 记录调试日志（可选） */
   debug?: (message: string) => void;
 }
 
-// 简化的 API 接口，避免 any 类型
+/**
+ * 简化的 API 接口
+ * @internal
+ */
 interface EngineApi {
+  /** 日志记录器 */
   logger: EngineLogger;
 }
 
-// 辅助函数：安全调用 debug
+/**
+ * 安全调用 debug 日志
+ * @param logger 日志记录器
+ * @param message 日志消息
+ * @internal
+ */
 function safeDebug(logger: EngineLogger, message: string): void {
   if (logger.debug) {
     logger.debug(message);
   }
 }
 
+// ========== 常量定义 ==========
+
+/** 行动类型常量 */
+const ActionType = {
+  INIT: "init",
+  ERROR_RECOVERY: "error_recovery",
+  EXECUTE: "execute",
+} as const;
+
+/** 默认维护任务列表 */
+const DEFAULT_MAINTENANCE_ACTIONS = [
+  "分析工作区文件结构",
+  "检查代码质量",
+  "生成优化建议",
+  "验证配置完整性",
+  "更新运行状态",
+  "清理缓存文件",
+] as const;
+
+/** 日志消息模板 */
+const LogMessages = {
+  ENGINE_STARTED: "🦞 永动循环已启动（后台运行）",
+  ENGINE_STOPPED: "🛑 永动循环已停止",
+  ENGINE_READY: "🦞 永动引擎服务已就绪，等待 /start_partner 命令",
+  LOOP_STARTED: "🔄 永动循环开始",
+  LOOP_ENDED: (count: number) => `🔄 永动循环结束，总循环次数: ${count}`,
+  STATUS_RECOVERED: (count: number) => `📂 恢复之前状态: ${count} 次循环`,
+  STATE_PERSISTED: (count: number) => `💾 状态已持久化: 循环 ${count}`,
+  NO_STATE_FILE: "没有可恢复的状态文件",
+  CONTEXT_COMPRESSED: (actions: number, errors: number) =>
+    `📦 上下文已压缩: ${actions} 行动, ${errors} 错误`,
+} as const;
+
+/**
+ * 龙虾永动引擎服务类
+ *
+ * 负责管理零延迟循环、状态持久化、错误分类恢复等功能。
+ */
 export class PerpetualEngineService {
+  /** 引擎运行状态 */
   private isRunningValue = false;
+  /** 循环计数器 */
   private loopCountValue = 0;
+  /** 上下文状态（行动和错误记录） */
   private context: ContextState = { actions: [], errors: [] };
+  /** OpenClaw API 引用 */
   private api: EngineApi;
+  /** 中断控制器 */
   private abortController: AbortController | null = null;
+  /** 文件列表缓存 */
   private fileCache: Map<string, { data: string[]; timestamp: number }> = new Map();
 
-  // 配置
+  // ========== 配置 ==========
+  /** 引擎配置 */
   private config: EngineConfig;
 
-  // 性能监控
+  // ========== 性能监控 ==========
+  /** 当前循环开始时间 */
   private loopStartTime: number = 0;
+  /** 性能指标统计 */
   private loopMetrics: {
+    /** 总耗时（毫秒） */
     totalTime: number;
+    /** 最快循环（毫秒） */
     minTime: number;
+    /** 最慢循环（毫秒） */
     maxTime: number;
+    /** 平均耗时（毫秒） */
     avgTime: number;
   } = { totalTime: 0, minTime: Infinity, maxTime: 0, avgTime: 0 };
 
-  // 健康检查
+  // ========== 健康检查 ==========
+  /** 上次循环时间戳 */
   private lastLoopTime: number = Date.now();
+  /** 健康检查定时器 */
   private healthCheckInterval: NodeJS.Timeout | null = null;
 
+  /**
+   * 创建永动引擎实例
+   * @param api OpenClaw API
+   * @param config 可选配置
+   */
   constructor(api: EngineApi, config?: Partial<EngineConfig>) {
     this.api = api;
     this.config = { ...DEFAULT_CONFIG, ...config };
   }
 
   /**
-   * 从命令启动（交互式场景）
+   * 从命令启动引擎
+   *
+   * 检查运行状态，设置中断控制器，构造服务上下文，并启动异步循环。
+   *
+   * @param ctx 命令上下文
    */
   async startFromCommand(_ctx: PluginCommandContext): Promise<void> {
     if (this.isRunningValue) {
@@ -89,11 +183,15 @@ export class PerpetualEngineService {
       this.stopHealthCheck();
     });
 
-    this.api.logger.info("🦞 永动循环已启动（后台运行）");
+    this.api.logger.info(LogMessages.ENGINE_STARTED);
   }
 
   /**
-   * 服务启动时调用（Gateway 启动场景）
+   * 服务启动时调用
+   *
+   * Gateway 启动时自动调用，尝试恢复之前的状态。
+   *
+   * @param ctx 服务上下文
    */
   async start(ctx: OpenClawPluginServiceContext): Promise<void> {
     // 尝试恢复之前的状态
@@ -109,7 +207,7 @@ export class PerpetualEngineService {
     try {
       await fs.access(statePath);
     } catch {
-      safeDebug(this.api.logger,"没有可恢复的状态文件");
+      safeDebug(this.api.logger, LogMessages.NO_STATE_FILE);
       return;
     }
 
@@ -120,7 +218,7 @@ export class PerpetualEngineService {
       // 验证状态文件格式
       if (typeof state.loopCount === 'number' && state.loopCount > 0) {
         this.loopCountValue = state.loopCount;
-        this.api.logger.info(`📂 恢复之前状态: ${state.loopCount} 次循环`);
+        this.api.logger.info(LogMessages.STATUS_RECOVERED(state.loopCount));
       }
 
       // 恢复上下文（验证格式）
@@ -142,6 +240,10 @@ export class PerpetualEngineService {
 
   /**
    * 停止服务
+   *
+   * Gateway 停止时调用，停止所有后台循环和健康检查。
+   *
+   * @param ctx 服务上下文
    */
   stopService(_ctx: OpenClawPluginServiceContext): void {
     this.stopLoop();
@@ -149,6 +251,8 @@ export class PerpetualEngineService {
 
   /**
    * 停止循环
+   *
+   * 设置 isRunning 为 false，中断 abortController，并清理健康检查定时器。
    */
   stopLoop(): void {
     this.isRunningValue = false;
@@ -157,11 +261,22 @@ export class PerpetualEngineService {
       this.abortController = null;
     }
     this.stopHealthCheck();
-    this.api.logger.info("🛑 永动循环已停止");
+    this.api.logger.info(LogMessages.ENGINE_STOPPED);
   }
 
   /**
    * 核心循环：零延迟 while(isRunning)
+   *
+   * 主循环逻辑：
+   * 1. 加载 MISSION 和 BOUNDARIES
+   * 2. 生成下一步行动
+   * 3. 执行行动
+   * 4. 更新状态和性能指标
+   * 5. 定期压缩上下文
+   * 6. 定期汇报状态
+   *
+   * @param ctx 服务上下文
+   * @param signal 中断信号
    */
   private async runLoop(
     ctx: OpenClawPluginServiceContext,
@@ -246,6 +361,11 @@ export class PerpetualEngineService {
 
   /**
    * 加载 MISSION 和 BOUNDARIES 文件
+   *
+   * 尝试从工作目录加载配置文件，失败时返回默认值。
+   *
+   * @param ctx 服务上下文
+   * @returns MISSION 和 BOUNDARIES 内容
    */
   private async loadMissionFiles(ctx: OpenClawPluginServiceContext): Promise<{
     mission: string;
@@ -311,7 +431,16 @@ export class PerpetualEngineService {
 
   /**
    * 生成下一步行动
-   * 基于 MISSION、BOUNDARIES 和错误历史生成智能决策
+   *
+   * 决策优先级：
+   * 1. 未解决的错误 → 错误恢复行动
+   * 2. 首次循环 → 初始化
+   * 3. MISSION 任务 → 解析的任务列表
+   * 4. 默认维护 → 预定义维护任务
+   *
+   * @param mission MISSION 文件内容
+   * @param boundaries BOUNDARIES 文件内容
+   * @returns 行动描述和类型
    */
   private async planNextAction(mission: string, boundaries: string): Promise<{
     description: string;
@@ -344,16 +473,7 @@ export class PerpetualEngineService {
     const actions = this.parseMissionActions(mission);
 
     // 优先级4：默认维护行动
-    const maintenanceActions = [
-      "分析工作区文件结构",
-      "检查代码质量",
-      "生成优化建议",
-      "验证配置完整性",
-      "更新运行状态",
-      "清理缓存文件",
-    ];
-
-    const selectedActions = actions.length > 0 ? actions : maintenanceActions;
+    const selectedActions = actions.length > 0 ? actions : [...DEFAULT_MAINTENANCE_ACTIONS];
     return {
       description: selectedActions[this.loopCountValue % selectedActions.length],
       type: "execute",
@@ -362,22 +482,30 @@ export class PerpetualEngineService {
 
   /**
    * 根据错误类型生成恢复行动
+   *
+   * 支持的错误类型：
+   * - `file_io`: 文件操作失败 → 重试并检查权限
+   * - `parse`: 数据解析失败 → 使用默认值
+   * - `network`: 网络请求失败 → 使用缓存
+   * - `permission`: 权限不足 → 降级到只读
+   * - `timeout`: 操作超时 → 简化操作
+   * - `unknown`: 未知错误 → 记录并跳过
+   *
+   * @param error 错误记录
+   * @returns 恢复行动描述
    */
   private getErrorRecoveryAction(error: ErrorRecord): {
     description: string;
   } {
-    const recovery: Record<ErrorCategory, string> = {
-      [ErrorCategory.FILE_IO]: "重试文件操作，检查文件路径权限",
-      [ErrorCategory.PARSE]: "验证数据格式，使用默认值继续",
-      [ErrorCategory.NETWORK]: "切换到离线模式，使用缓存数据",
-      [ErrorCategory.PERMISSION]: "降级操作，使用只读模式",
-      [ErrorCategory.TIMEOUT]: "增加超时时间，简化操作",
-      [ErrorCategory.UNKNOWN]: `记录并跳过: ${error.error.slice(0, 30)}...`,
-    };
+    const category = error.category || ErrorCategory.UNKNOWN;
+    let message = RecoveryMessages[category];
 
-    return {
-      description: recovery[error.category || ErrorCategory.UNKNOWN] || "继续执行",
-    };
+    // UNKNOWN 类型需要包含错误详情
+    if (category === ErrorCategory.UNKNOWN) {
+      message = `${message}: ${error.error.slice(0, 30)}...`;
+    }
+
+    return { description: message };
   }
 
   /**
@@ -569,7 +697,7 @@ export class PerpetualEngineService {
     if (this.context.errors.length > this.config.maxErrors) {
       this.context.errors = this.context.errors.slice(-this.config.maxErrors);
     }
-    safeDebug(this.api.logger,`📦 上下文已压缩: ${this.context.actions.length} 行动, ${this.context.errors.length} 错误`);
+    safeDebug(this.api.logger, LogMessages.CONTEXT_COMPRESSED(this.context.actions.length, this.context.errors.length));
   }
 
   /**
@@ -611,7 +739,7 @@ export class PerpetualEngineService {
       await fs.writeFile(tmpPath, stateData, 'utf-8');
       await fs.rename(tmpPath, statePath);
 
-      safeDebug(this.api.logger,`💾 状态已持久化: 循环 ${this.loopCountValue}`);
+      safeDebug(this.api.logger, LogMessages.STATE_PERSISTED(this.loopCountValue));
     } catch (error) {
       this.api.logger.warn(`状态持久化失败: ${error instanceof Error ? error.message : String(error)}`);
       // 清理临时文件
@@ -785,6 +913,16 @@ enum ErrorCategory {
   PERMISSION = "permission",
   TIMEOUT = "timeout",
 }
+
+/** 错误恢复消息模板 */
+const RecoveryMessages: Record<ErrorCategory, string> = {
+  [ErrorCategory.FILE_IO]: "重试文件操作，检查文件路径权限",
+  [ErrorCategory.PARSE]: "验证数据格式，使用默认值继续",
+  [ErrorCategory.NETWORK]: "切换到离线模式，使用缓存数据",
+  [ErrorCategory.PERMISSION]: "降级操作，使用只读模式",
+  [ErrorCategory.TIMEOUT]: "增加超时时间，简化操作",
+  [ErrorCategory.UNKNOWN]: "记录并跳过错误",
+};
 
 interface ErrorRecord {
   loop: number;
