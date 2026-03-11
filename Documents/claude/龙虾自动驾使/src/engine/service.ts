@@ -1258,70 +1258,124 @@ export class PerpetualEngineService {
 
 /**
  * 行动记录接口
+ *
+ * 记录引擎执行循环中的每次行动及其结果。
+ * 用于上下文压缩和状态恢复。
+ *
  * @internal
+ * @example
+ * ```ts
+ * const record: ActionRecord = {
+ *   loop: 1,
+ *   action: "分析工作区文件结构",
+ *   result: "工作区分析完成",
+ *   timestamp: Date.now()
+ * };
+ * ```
  */
 interface ActionRecord {
-  /** 循环编号 */
+  /** 发生该行动的循环编号（从1开始） */
   loop: number;
-  /** 执行的行动描述 */
+  /** 执行的行动描述文本 */
   action: string;
-  /** 执行结果摘要 */
+  /** 执行结果的简要摘要 */
   result: string;
-  /** 时间戳 */
+  /** 行动发生时的 Unix 时间戳（毫秒） */
   timestamp: number;
 }
 
 /**
  * 错误记录接口
+ *
+ * 记录引擎执行过程中遇到的错误及其分类。
+ * 支持错误类型识别和恢复策略选择。
+ *
  * @internal
+ * @example
+ * ```ts
+ * const record: ErrorRecord = {
+ *   loop: 5,
+ *   error: "ENOENT: no such file or directory",
+ *   timestamp: Date.now(),
+ *   category: ErrorCategory.FILE_IO,
+ *   resolved: false
+ * };
+ * ```
  */
 interface ErrorRecord {
-  /** 循环编号 */
+  /** 发生该错误的循环编号 */
   loop: number;
-  /** 错误消息 */
+  /** 原始错误消息内容 */
   error: string;
-  /** 时间戳 */
+  /** 错误发生时的 Unix 时间戳（毫秒） */
   timestamp: number;
-  /** 错误分类 */
+  /** 错误类型分类（用于恢复策略选择） */
   category?: ErrorCategory;
-  /** 是否已解决 */
+  /** 标记错误是否已通过恢复策略解决 */
   resolved?: boolean;
 }
 
 /**
  * 上下文状态接口
+ *
+ * 存储引擎运行时的所有状态信息。
+ * 在每次循环后压缩，并在重启时恢复。
+ *
  * @internal
+ * @example
+ * ```ts
+ * const context: ContextState = {
+ *   actions: [
+ *     { loop: 1, action: "分析工作区", result: "完成", timestamp: Date.now() }
+ *   ],
+ *   errors: []
+ * };
+ * ```
  */
 interface ContextState {
-  /** 行动记录列表 */
+  /** 所有行动记录列表（最新的在末尾） */
   actions: ActionRecord[];
-  /** 错误记录列表 */
+  /** 所有错误记录列表（最新的在末尾） */
   errors: ErrorRecord[];
 }
 
 /**
  * 错误类型分类枚举
+ *
+ * 定义引擎支持的所有错误类型分类。
+ * 每种类型对应不同的恢复策略。
+ *
  * @internal
+ * @see {@link RecoveryMessages} 获取每种类型的恢复策略
  */
 enum ErrorCategory {
-  /** 未知错误 */
+  /** 无法识别的错误类型，使用通用恢复策略 */
   UNKNOWN = "unknown",
-  /** 文件IO错误 */
+  /** 文件系统相关错误：ENOENT, EACCES 等 */
   FILE_IO = "file_io",
-  /** 解析错误 */
+  /** 数据解析错误：JSON 解析失败、格式错误等 */
   PARSE = "parse",
-  /** 网络错误 */
+  /** 网络请求错误：连接失败、DNS 解析失败等 */
   NETWORK = "network",
-  /** 权限错误 */
+  /** 权限相关错误：未授权、禁止访问等 */
   PERMISSION = "permission",
-  /** 超时错误 */
+  /** 操作超时错误：请求超时、响应过长等 */
   TIMEOUT = "timeout",
 }
 
-/** 错误分类规则 */
+/**
+ * 错误分类规则
+ *
+ * 定义错误消息关键词到错误类型的映射规则。
+ * 规则按优先级顺序匹配，第一个匹配的规则生效。
+ *
+ * @internal
+ */
 const ErrorClassificationRules = [
   {
+    /** 触发该分类的错误关键词列表 */
     patterns: ["enoent", "eacces", "file"],
+    /** 匹配时使用的错误分类 */
     category: ErrorCategory.FILE_IO,
   },
   {
@@ -1342,7 +1396,14 @@ const ErrorClassificationRules = [
   },
 ] as const;
 
-/** 错误恢复消息模板 */
+/**
+ * 错误恢复消息模板
+ *
+ * 为每种错误类型定义对应的恢复策略描述。
+ * 这些消息会显示给用户，说明引擎如何处理错误。
+ *
+ * @internal
+ */
 const RecoveryMessages: Record<ErrorCategory, string> = {
   [ErrorCategory.FILE_IO]: "重试文件操作，检查文件路径权限",
   [ErrorCategory.PARSE]: "验证数据格式，使用默认值继续",
