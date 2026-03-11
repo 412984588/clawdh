@@ -1156,7 +1156,10 @@ export class PerpetualEngineService {
 
   /**
    * 检查引擎是否正在运行
-   * @returns {boolean} 运行状态
+   *
+   * @public
+   * @readonly
+   * @returns {boolean} 运行状态，true 表示正在运行
    */
   isRunning(): boolean {
     return this.isRunningValue;
@@ -1164,7 +1167,10 @@ export class PerpetualEngineService {
 
   /**
    * 获取循环计数
-   * @returns {number} 总循环次数
+   *
+   * @public
+   * @readonly
+   * @returns {number} 总循环次数（从0开始计数）
    */
   getLoopCount(): number {
     return this.loopCountValue;
@@ -1172,6 +1178,12 @@ export class PerpetualEngineService {
 
   /**
    * 获取上下文大小（字符数）
+   *
+   * 计算当前上下文序列化后的字符串长度，
+   * 可用于监控内存使用情况。
+   *
+   * @public
+   * @readonly
    * @returns {number} 上下文 JSON 字符串长度
    */
   getContextSize(): number {
@@ -1182,8 +1194,11 @@ export class PerpetualEngineService {
    * 检查是否有最近的错误
    *
    * 判断最后一个错误是否发生在5分钟内。
+   * 可用于快速判断引擎健康状态。
    *
-   * @returns {boolean} 是否有最近错误
+   * @public
+   * @readonly
+   * @returns {boolean} 是否有最近错误（5分钟内）
    */
   hasRecentErrors(): boolean {
     if (this.context.errors.length === 0) return false;
@@ -1193,16 +1208,28 @@ export class PerpetualEngineService {
   }
 
   /**
-   * 获取平均循环时间（毫秒）
-   * @returns {number} 平均耗时（毫秒）
+   * 获取平均循环时间
+   *
+   * 返回所有已执行循环的平均耗时，
+   * 可用于性能监控和瓶颈分析。
+   *
+   * @public
+   * @readonly
+   * @returns {number} 平均耗时（毫秒），保留两位小数
    */
   getAvgLoopTime(): number {
     return this.loopMetrics.avgTime;
   }
 
   /**
-   * 获取循环速率（每秒循环数）
-   * @returns {number} 每秒循环次数
+   * 获取循环速率
+   *
+   * 根据平均循环时间计算每秒可执行的循环次数。
+   * 如果平均时间为0（尚未执行），返回0。
+   *
+   * @public
+   * @readonly
+   * @returns {number} 每秒循环次数，保留两位小数
    */
   getLoopsPerSecond(): number {
     if (this.loopMetrics.avgTime === 0) return 0;
