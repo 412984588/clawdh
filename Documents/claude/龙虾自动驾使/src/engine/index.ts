@@ -182,7 +182,7 @@ export {
 /**
  * 🦞 引擎版本信息
  */
-export const ENGINE_VERSION = "2.19.0";
+export const ENGINE_VERSION = "2.20.0";
 
 /**
  * 🦞 引擎功能矩阵
@@ -247,6 +247,8 @@ export const ENGINE_FEATURES = {
   bayesianOrchestrator: true,
   // v2.19 新增
   symphonyOrchestrator: true,
+  // v2.20 新增
+  moyaOrchestrator: true,
 } as const;
 
 // ========== 火焰图收集器 (v2.1) ==========
@@ -811,6 +813,39 @@ export {
   createSymphonyOrchestrator,
   SymphonyTemplates,
 } from "./symphony-orchestrator.js";
+
+// ========== MOYA 元编排器 (v2.20) ==========
+import {
+  MOYAOrchestrator,
+  MOYAAgentCapabilityLevel,
+  MOYADomain,
+  MOYAWorkflowState,
+  MOYAHumanInterventionType,
+  MOYAAgentDefinition,
+  SubOrchestrator,
+  MOYAWorkflow,
+  MOYAWorkflowStep,
+  HumanInterventionRequest,
+  MOYAConfig,
+  createMOYAOrchestrator,
+  MOYATemplates,
+} from "./moya-orchestrator.js";
+
+export {
+  MOYAOrchestrator,
+  MOYAAgentCapabilityLevel,
+  MOYADomain,
+  MOYAWorkflowState,
+  MOYAHumanInterventionType,
+  MOYAAgentDefinition,
+  SubOrchestrator,
+  MOYAWorkflow,
+  MOYAWorkflowStep,
+  HumanInterventionRequest,
+  MOYAConfig,
+  createMOYAOrchestrator,
+  MOYATemplates,
+} from "./moya-orchestrator.js";
 
 /**
  * 🦞 创建完整引擎（包含所有组件）
