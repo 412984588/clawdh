@@ -129,6 +129,14 @@ const FileExtensions = {
   MARKDOWN: ".md",
 } as const;
 
+/** 行动关键词映射 */
+const ActionKeywords = {
+  ANALYZE: "分析",
+  CHECK: "检查",
+  GENERATE: "生成",
+  CODE: "代码",
+} as const;
+
 /**
  * 龙虾永动引擎服务类
  *
@@ -576,31 +584,14 @@ export class PerpetualEngineService {
   ): Promise<{ summary: string }> {
     // 根据行动类型执行不同的逻辑
     switch (action.type) {
-      case "init":
+      case ActionType.INIT:
         return { summary: "引擎初始化完成，已加载 MISSION 和 BOUNDARIES" };
 
-      case "error_recovery":
+      case ActionType.ERROR_RECOVERY:
         return { summary: "已记录错误，将在下次循环中调整策略" };
 
-      case "execute":
-        // 实际执行一些有用的操作
-        if (action.description.includes("分析")) {
-          const analysis = await this.analyzeWorkspace(ctx);
-          return { summary: analysis };
-        }
-        if (action.description.includes("检查")) {
-          const check = await this.checkStatus(ctx);
-          return { summary: check };
-        }
-        if (action.description.includes("生成")) {
-          const suggestion = await this.generateSuggestion(ctx);
-          return { summary: suggestion };
-        }
-        if (action.description.includes("代码")) {
-          const codeAnalysis = await this.analyzeCodebase(ctx);
-          return { summary: codeAnalysis };
-        }
-        return { summary: `已完成: ${action.description}` };
+      case ActionType.EXECUTE:
+        return await this.executeConcreteAction(action.description, ctx);
 
       default:
         return { summary: `已执行: ${action.description}` };
@@ -608,18 +599,34 @@ export class PerpetualEngineService {
   }
 
   /**
+   * 执行具体行动（根据描述匹配处理器）
+   */
+  private async executeConcreteAction(
+    description: string,
+    ctx: OpenClawPluginServiceContext
+  ): Promise<{ summary: string }> {
+    const handlers = {
+      [ActionKeywords.ANALYZE]: () => this.analyzeWorkspace(ctx),
+      [ActionKeywords.CHECK]: () => this.checkStatus(ctx),
+      [ActionKeywords.GENERATE]: () => this.generateSuggestion(ctx),
+      [ActionKeywords.CODE]: () => this.analyzeCodebase(ctx),
+    };
+
+    for (const [keyword, handler] of Object.entries(handlers)) {
+      if (description.includes(keyword)) {
+        const result = await handler();
+        return { summary: result };
+      }
+    }
+
+    return { summary: `已完成: ${description}` };
+  }
+
+  /**
    * 分析工作区状态（带缓存）
    */
   private async analyzeWorkspace(ctx: OpenClawPluginServiceContext): Promise<string> {
-    const workspaceDir = ctx.workspaceDir || process.cwd();
-    try {
-      const files = await this.getCachedFiles(workspaceDir);
-      const stats = this.countFileTypes(files);
-      return `工作区分析: TS(${stats.ts}) JS(${stats.js}) JSON(${stats.json}) MD(${stats.md})`;
-    } catch (error) {
-      safeDebug(this.api.logger,`工作区分析失败: ${error instanceof Error ? error.message : String(error)}`);
-      return "工作区分析完成";
-    }
+    return this.analyzeDirectory(ctx, "工作区");
   }
 
   /**
@@ -678,14 +685,28 @@ export class PerpetualEngineService {
    * 分析代码库并生成优化报告
    */
   private async analyzeCodebase(ctx: OpenClawPluginServiceContext): Promise<string> {
+    return this.analyzeDirectory(ctx, "代码库");
+  }
+
+  /**
+   * 通用目录分析方法
+   *
+   * @param ctx 服务上下文
+   * @param label 分析结果标签
+   * @returns 分析结果字符串
+   */
+  private async analyzeDirectory(
+    ctx: OpenClawPluginServiceContext,
+    label: string
+  ): Promise<string> {
     const workspaceDir = ctx.workspaceDir || process.cwd();
     try {
       const files = await this.getCachedFiles(workspaceDir);
       const stats = this.countFileTypes(files);
-      return `代码库分析: TS(${stats.ts}) JS(${stats.js}) JSON(${stats.json}) MD(${stats.md})`;
+      return `${label}分析: TS(${stats.ts}) JS(${stats.js}) JSON(${stats.json}) MD(${stats.md})`;
     } catch (error) {
-      safeDebug(this.api.logger,`代码库分析失败: ${error instanceof Error ? error.message : String(error)}`);
-      return "代码库分析完成";
+      safeDebug(this.api.logger, `${label}分析失败: ${error instanceof Error ? error.message : String(error)}`);
+      return `${label}分析完成`;
     }
   }
 
