@@ -182,7 +182,7 @@ export {
 /**
  * 🦞 引擎版本信息
  */
-export const ENGINE_VERSION = "2.34.0";
+export const ENGINE_VERSION = "2.35.0";
 
 /**
  * 🦞 引擎功能矩阵
@@ -277,6 +277,8 @@ export const ENGINE_FEATURES = {
   latentmasOrchestrator: true,
   // v2.34 新增
   epochOrchestrator: true,
+  // v2.35 新增
+  masfactoryOrchestrator: true,
 } as const;
 
 // ========== 火焰图收集器 (v2.1) ==========
@@ -1334,6 +1336,61 @@ export {
   createEPOCHOrchestrator,
   EPOCHTemplates,
 } from "./epoch-orchestrator.js";
+
+// ========== MASFactory 图中心多代理编排器 (v2.35) ==========
+import {
+  MASFactoryOrchestrator,
+  MASFactoryNodeType,
+  MASFactoryNodeState,
+  MASFactoryGraphNode,
+  MASFactoryGraphEdge,
+  MASFactoryWorkflowGraph,
+  MASFactoryInterfaceType,
+  MASFactoryNodeConfig,
+  MASFactoryExecutionTrace,
+  MASFactoryFlowType,
+  MASFactoryNodeTemplate,
+  MASFactoryComposedGraph,
+  MASFactoryContextAdapter,
+  MASFactoryMessageAdapter,
+  VibeGraphingStage,
+  VibeGraphingResult,
+  MASFactoryExecutionResult,
+  MASFactoryAgentRole,
+  MASFactoryGraphTopology,
+  VibeGraphingFeedback,
+  MASFactoryScheduleResult,
+  MASFactoryConfig,
+  createMASFactoryOrchestrator,
+  MASFactoryTemplates,
+} from "./masfactory-orchestrator.js";
+
+export {
+  MASFactoryOrchestrator,
+  MASFactoryNodeType,
+  MASFactoryNodeState,
+  MASFactoryGraphNode,
+  MASFactoryGraphEdge,
+  MASFactoryWorkflowGraph,
+  MASFactoryInterfaceType,
+  MASFactoryNodeConfig,
+  MASFactoryExecutionTrace,
+  MASFactoryFlowType,
+  MASFactoryNodeTemplate,
+  MASFactoryComposedGraph,
+  MASFactoryContextAdapter,
+  MASFactoryMessageAdapter,
+  VibeGraphingStage,
+  VibeGraphingResult,
+  MASFactoryExecutionResult,
+  MASFactoryAgentRole,
+  MASFactoryGraphTopology,
+  VibeGraphingFeedback,
+  MASFactoryScheduleResult,
+  MASFactoryConfig,
+  createMASFactoryOrchestrator,
+  MASFactoryTemplates,
+} from "./masfactory-orchestrator.js";
 
 /**
  * 🦞 创建完整引擎（包含所有组件）
