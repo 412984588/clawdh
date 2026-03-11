@@ -182,7 +182,7 @@ export {
 /**
  * 🦞 引擎版本信息
  */
-export const ENGINE_VERSION = "2.29.0";
+export const ENGINE_VERSION = "2.30.0";
 
 /**
  * 🦞 引擎功能矩阵
@@ -267,6 +267,8 @@ export const ENGINE_FEATURES = {
   lmarsOrchestrator: true,
   // v2.29 新增
   rapoOrchestrator: true,
+  // v2.30 新增
+  mosaicOrchestrator: true,
 } as const;
 
 // ========== 火焰图收集器 (v2.1) ==========
@@ -1157,6 +1159,35 @@ export {
   createRAPOOrchestrator,
   RAPOTemplates,
 } from "./rapo-orchestrator.js";
+
+// ========== MOSAIC 科学编码多代理编排器 (v2.30) ==========
+import {
+  MOSAICOrchestrator,
+  ScientificTaskType,
+  MOSAICSubtaskState,
+  ScientificDomain,
+  CodeQualityMetrics,
+  MOSAICSubtask,
+  CodingAgent,
+  OrchestrationResult,
+  MOSAICConfig,
+  createMOSAICOrchestrator,
+  MOSAICTemplates,
+} from "./mosaic-orchestrator.js";
+
+export {
+  MOSAICOrchestrator,
+  ScientificTaskType,
+  MOSAICSubtaskState,
+  ScientificDomain,
+  CodeQualityMetrics,
+  MOSAICSubtask,
+  CodingAgent,
+  OrchestrationResult,
+  MOSAICConfig,
+  createMOSAICOrchestrator,
+  MOSAICTemplates,
+} from "./mosaic-orchestrator.js";
 
 /**
  * 🦞 创建完整引擎（包含所有组件）
