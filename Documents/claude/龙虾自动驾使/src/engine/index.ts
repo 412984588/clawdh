@@ -182,7 +182,7 @@ export {
 /**
  * 🦞 引擎版本信息
  */
-export const ENGINE_VERSION = "2.13.0";
+export const ENGINE_VERSION = "2.14.0";
 
 /**
  * 🦞 引擎功能矩阵
@@ -235,6 +235,8 @@ export const ENGINE_FEATURES = {
   adaptorchOrchestrator: true,
   // v2.13 新增
   aegeanOrchestrator: true,
+  // v2.14 新增
+  multiturnOrchestrator: true,
 } as const;
 
 // ========== 火焰图收集器 (v2.1) ==========
@@ -619,6 +621,37 @@ export {
   createAegeanOrchestrator,
   AegeanTemplates,
 } from "./aegean-orchestrator.js";
+
+// ========== Multi-Turn 多代理编排器 (v2.14) ==========
+import {
+  MultiTurnOrchestrator,
+  ActionType,
+  VotingIdentityDisclosure,
+  VoteTallyVisibility,
+  AgentState,
+  OrchestratorState,
+  VoteRecord,
+  DynamicEvent,
+  MultiTurnOutput,
+  MultiTurnConfig,
+  createMultiTurnOrchestrator,
+  MultiTurnTemplates,
+} from "./multiturn-orchestrator.js";
+
+export {
+  MultiTurnOrchestrator,
+  ActionType,
+  VotingIdentityDisclosure,
+  VoteTallyVisibility,
+  AgentState,
+  OrchestratorState,
+  VoteRecord,
+  DynamicEvent,
+  MultiTurnOutput,
+  MultiTurnConfig,
+  createMultiTurnOrchestrator,
+  MultiTurnTemplates,
+} from "./multiturn-orchestrator.js";
 
 /**
  * 🦞 创建完整引擎（包含所有组件）
