@@ -388,8 +388,26 @@ export class PerpetualEngineService {
 
   /**
    * 创建永动引擎实例
-   * @param api OpenClaw API
-   * @param config 可选配置
+   *
+   * 初始化引擎配置，合并用户自定义配置与默认配置。
+   * 引擎创建后处于停止状态，需要调用 `start()` 方法启动。
+   *
+   * @param api - OpenClaw API 对象，包含 logger 等必需接口
+   * @param config - 可选的部分配置，将与默认配置合并
+   *
+   * @example
+   * ```ts
+   * // 使用默认配置
+   * const engine = new PerpetualEngineService(api);
+   *
+   * // 使用自定义配置
+   * const engine = new PerpetualEngineService(api, {
+   *   compressInterval: 10,
+   *   enableHealthCheck: false
+   * });
+   * ```
+   *
+   * @throws {TypeError} 当 api.logger 缺失时
    */
   constructor(api: EngineApi, config?: Partial<EngineConfig>) {
     this.api = api;
