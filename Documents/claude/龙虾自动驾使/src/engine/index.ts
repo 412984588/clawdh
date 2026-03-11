@@ -182,7 +182,7 @@ export {
 /**
  * 🦞 引擎版本信息
  */
-export const ENGINE_VERSION = "2.17.0";
+export const ENGINE_VERSION = "2.18.0";
 
 /**
  * 🦞 引擎功能矩阵
@@ -243,6 +243,8 @@ export const ENGINE_FEATURES = {
   orchestraOrchestrator: true,
   // v2.17 新增
   puppeteerOrchestrator: true,
+  // v2.18 新增
+  bayesianOrchestrator: true,
 } as const;
 
 // ========== 火焰图收集器 (v2.1) ==========
@@ -751,6 +753,31 @@ export {
   createPuppeteerOrchestrator,
   PuppeteerTemplates,
 } from "./puppeteer-orchestrator.js";
+
+// ========== 贝叶斯编排器 (v2.18) ==========
+import {
+  BayesianOrchestrator,
+  LLMModelSpec,
+  BayesianBelief,
+  CostBenefitTradeoff,
+  AgentDecision as BayesianAgentDecision,
+  BayesianOrchestrationResult,
+  BayesianConfig,
+  createBayesianOrchestrator,
+  BayesianTemplates,
+} from "./bayesian-orchestrator.js";
+
+export {
+  BayesianOrchestrator,
+  LLMModelSpec,
+  BayesianBelief,
+  CostBenefitTradeoff,
+  AgentDecision as BayesianAgentDecision,
+  BayesianOrchestrationResult,
+  BayesianConfig,
+  createBayesianOrchestrator,
+  BayesianTemplates,
+} from "./bayesian-orchestrator.js";
 
 /**
  * 🦞 创建完整引擎（包含所有组件）
