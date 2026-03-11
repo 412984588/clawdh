@@ -182,7 +182,7 @@ export {
 /**
  * 🦞 引擎版本信息
  */
-export const ENGINE_VERSION = "2.27.0";
+export const ENGINE_VERSION = "2.28.0";
 
 /**
  * 🦞 引擎功能矩阵
@@ -263,6 +263,8 @@ export const ENGINE_FEATURES = {
   myantfarmOrchestrator: true,
   // v2.27 新增
   automlAgentOrchestrator: true,
+  // v2.28 新增
+  lmarsOrchestrator: true,
 } as const;
 
 // ========== 火焰图收集器 (v2.1) ==========
@@ -1085,6 +1087,43 @@ export {
   createAutoMLAgentOrchestrator,
   AutoMLTemplates,
 } from "./automl-agent-orchestrator.js";
+
+// ========== L-MARS 法律多代理工作流编排器 (v2.28) ==========
+import {
+  LMARSOrchestrator,
+  LMARSAgentRole,
+  LMARSMode,
+  EvidenceSourceType,
+  SufficiencyVerdict,
+  QuestionType,
+  StructuredQuery,
+  SearchResult,
+  JudgeResult,
+  WorkflowState,
+  UScoreComponents,
+  LMARSResult,
+  LMARSConfig,
+  createLMARSOrchestrator,
+  LMARSTemplates,
+} from "./lmars-orchestrator.js";
+
+export {
+  LMARSOrchestrator,
+  LMARSAgentRole,
+  LMARSMode,
+  EvidenceSourceType,
+  SufficiencyVerdict,
+  QuestionType,
+  StructuredQuery,
+  SearchResult,
+  JudgeResult,
+  WorkflowState,
+  UScoreComponents,
+  LMARSResult,
+  LMARSConfig,
+  createLMARSOrchestrator,
+  LMARSTemplates,
+} from "./lmars-orchestrator.js";
 
 /**
  * 🦞 创建完整引擎（包含所有组件）
