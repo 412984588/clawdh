@@ -1090,14 +1090,23 @@ export class PerpetualEngineService {
    *
    * 当行动或错误记录超过配置的最大值时，保留最新的记录。
    * 使用 slice 操作确保数组不会无限增长。
+   *
+   * @private
+   *
+   * @performance
+   * 避免频繁的数组长度访问，缓存长度值用于比较。
+   * 参考: https://dev.to/engrsakib/mastering-javascript-arrays-techniques-best-practices-and-advanced-uses-42mb
    */
   private compressContext(): void {
+    const { actions, errors } = this.context;
+    const { maxActions, maxErrors } = this.config;
+
     // 使用配置中的最大值
-    if (this.context.actions.length > this.config.maxActions) {
-      this.context.actions = this.context.actions.slice(-this.config.maxActions);
+    if (actions.length > maxActions) {
+      this.context.actions = actions.slice(-maxActions);
     }
-    if (this.context.errors.length > this.config.maxErrors) {
-      this.context.errors = this.context.errors.slice(-this.config.maxErrors);
+    if (errors.length > maxErrors) {
+      this.context.errors = errors.slice(-maxErrors);
     }
     safeDebug(this.api.logger, LogMessages.CONTEXT_COMPRESSED(this.context.actions.length, this.context.errors.length));
   }
@@ -1386,7 +1395,9 @@ export class PerpetualEngineService {
    */
   getErrorStats(): Record<string, number> {
     const stats: Record<string, number> = {};
-    for (const err of this.context.errors) {
+    const errors = this.context.errors; // 缓存数组引用，避免重复访问
+
+    for (const err of errors) {
       const category = err.category || ErrorCategory.UNKNOWN;
       stats[category] = (stats[category] || 0) + 1;
     }
