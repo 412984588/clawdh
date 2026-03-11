@@ -9,14 +9,19 @@
  * - 重试管理器
  * - Worker 线程池
  * - 遥测数据导出
+ * - 火焰图收集器 (v2.1)
+ * - 监督者代理 (v2.1)
+ * - 黑板模式 (v2.1)
+ * - 群体智能代理 (v2.1)
  *
- * @version 2.0.0
+ * @version 2.1.0
  * @since 2025-03-11
  * @author Claude Code
  */
 
 // ========== 类和类型导入 ==========
 import type { AdvancedEventLoopMetrics } from "./advanced-metrics.js";
+import type { FlameGraphData } from "./flame-graph-collector.js";
 import { ZeroLatencyLoopEngine } from "./zero-latency-loop.js";
 import { AdvancedMetricsCollector } from "./advanced-metrics.js";
 import { AdaptiveScheduler, LoadLevel } from "./adaptive-scheduler.js";
@@ -24,6 +29,10 @@ import { CircuitBreaker, CircuitState, CircuitBreakerConfig } from "./circuit-br
 import { RetryManager, RetryStrategy } from "./retry-manager.js";
 import { WorkerPool } from "./worker-pool.js";
 import { TelemetryCollector, TelemetryConfig } from "./telemetry.js";
+import { FlameGraphCollector } from "./flame-graph-collector.js";
+import { SupervisorAgent, AgentStatus, AgentType } from "./supervisor-agent.js";
+import { Blackboard, createBlackboard } from "./blackboard.js";
+import { SwarmAgent } from "./swarm-agent.js";
 
 // ========== 零延迟循环引擎 ==========
 export {
@@ -137,7 +146,7 @@ export {
 /**
  * 🦞 引擎版本信息
  */
-export const ENGINE_VERSION = "2.0.0";
+export const ENGINE_VERSION = "2.1.0";
 
 /**
  * 🦞 引擎功能矩阵
@@ -153,7 +162,62 @@ export const ENGINE_FEATURES = {
   codeAnalysis: true,
   autoFixing: true,
   contextCompression: true,
+  // v2.1 新增
+  flameGraphCollector: true,
+  supervisorAgent: true,
+  blackboard: true,
+  swarmAgent: true,
 } as const;
+
+// ========== 火焰图收集器 (v2.1) ==========
+export {
+  FlameGraphCollector,
+  FlameGraphNode,
+  FlameGraphData,
+  FunctionStats,
+  createFlameGraphCollector,
+  flameGraph,
+  getGlobalFlameGraphCollector,
+  startGlobalFlameGraphCollection,
+  stopGlobalFlameGraphCollection,
+} from "./flame-graph-collector.js";
+
+// ========== 监督者代理 (v2.1) ==========
+export {
+  SupervisorAgent,
+  AgentStatus,
+  AgentType,
+  AgentTask,
+  SupervisorConfig,
+  SupervisorStatus,
+  SupervisorEvent,
+  AssignmentStrategy,
+  createSupervisorAgent,
+  createAgentConfig,
+} from "./supervisor-agent.js";
+
+// ========== 黑板模式 (v2.1) ==========
+export {
+  Blackboard,
+  BlackboardEntry,
+  BlackboardEvent,
+  BlackboardConfig,
+  QueryOptions,
+  createBlackboard,
+  getGlobalBlackboard,
+  closeGlobalBlackboard,
+} from "./blackboard.js";
+
+// ========== 群体智能代理 (v2.1) ==========
+export {
+  SwarmAgent,
+  AgentMessage,
+  SwarmMemberState,
+  SwarmConfig,
+  SwarmTask,
+  SwarmStatistics,
+  createSwarmAgent,
+} from "./swarm-agent.js";
 
 /**
  * 🦞 创建完整引擎（包含所有组件）
