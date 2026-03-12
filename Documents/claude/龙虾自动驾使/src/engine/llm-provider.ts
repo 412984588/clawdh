@@ -117,11 +117,11 @@ export interface ILLMProvider {
 export class OpenAIProvider implements ILLMProvider {
   readonly provider = LLMProvider.OPENAI;
   readonly model: string;
-  private config: ModelConfig;
+  private _config: ModelConfig; // 保留用于未来实现
 
   constructor(config: ModelConfig) {
     this.model = config.model;
-    this.config = config;
+    this._config = config;
   }
 
   async generate(request: LLMRequest): Promise<LLMResponse> {
@@ -138,7 +138,7 @@ export class OpenAIProvider implements ILLMProvider {
     };
   }
 
-  async stream(request: LLMRequest, onChunk: (chunk: string) => void): Promise<LLMResponse> {
+  async stream(request: LLMRequest, _onChunk: (chunk: string) => void): Promise<LLMResponse> {
     // TODO: 实现 OpenAI 流式调用
     const response = await this.generate(request);
     return response;
@@ -153,11 +153,11 @@ export class OpenAIProvider implements ILLMProvider {
 export class AnthropicProvider implements ILLMProvider {
   readonly provider = LLMProvider.ANTHROPIC;
   readonly model: string;
-  private config: ModelConfig;
+  private _config: ModelConfig; // 保留用于未来实现
 
   constructor(config: ModelConfig) {
     this.model = config.model;
-    this.config = config;
+    this._config = config;
   }
 
   async generate(request: LLMRequest): Promise<LLMResponse> {
@@ -174,7 +174,7 @@ export class AnthropicProvider implements ILLMProvider {
     };
   }
 
-  async stream(request: LLMRequest, onChunk: (chunk: string) => void): Promise<LLMResponse> {
+  async stream(request: LLMRequest, _onChunk: (chunk: string) => void): Promise<LLMResponse> {
     // TODO: 实现 Anthropic 流式调用
     const response = await this.generate(request);
     return response;
@@ -190,11 +190,11 @@ export class AnthropicProvider implements ILLMProvider {
 export class OpenClawProvider implements ILLMProvider {
   readonly provider = LLMProvider.OPENCLAW;
   readonly model: string;
-  private config: ModelConfig;
+  private _config: ModelConfig; // 保留用于未来实现
 
   constructor(config: ModelConfig) {
     this.model = config.model;
-    this.config = config;
+    this._config = config;
   }
 
   async generate(request: LLMRequest): Promise<LLMResponse> {
@@ -211,7 +211,7 @@ export class OpenClawProvider implements ILLMProvider {
     };
   }
 
-  async stream(request: LLMRequest, onChunk: (chunk: string) => void): Promise<LLMResponse> {
+  async stream(request: LLMRequest, _onChunk: (chunk: string) => void): Promise<LLMResponse> {
     // TODO: 实现 OpenClaw 流式调用
     const response = await this.generate(request);
     return response;
@@ -226,11 +226,11 @@ export class OpenClawProvider implements ILLMProvider {
 export class OllamaProvider implements ILLMProvider {
   readonly provider = LLMProvider.OLLAMA;
   readonly model: string;
-  private config: ModelConfig;
+  private _config: ModelConfig; // 保留用于未来实现
 
   constructor(config: ModelConfig) {
     this.model = config.model;
-    this.config = config;
+    this._config = config;
   }
 
   async generate(request: LLMRequest): Promise<LLMResponse> {
@@ -242,7 +242,7 @@ export class OllamaProvider implements ILLMProvider {
     };
   }
 
-  async stream(request: LLMRequest, onChunk: (chunk: string) => void): Promise<LLMResponse> {
+  async stream(request: LLMRequest, _onChunk: (chunk: string) => void): Promise<LLMResponse> {
     // TODO: 实现 Ollama 流式调用
     const response = await this.generate(request);
     return response;
