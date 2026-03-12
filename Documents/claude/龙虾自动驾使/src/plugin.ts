@@ -281,5 +281,4 @@ export default function register(api: OpenClawPluginApi) {
 
   logger.info("🦞 龙虾永动引擎插件已加载");
   logger.info("📋 可用命令: /start_partner, /stop_partner, /partner_status, /partner_mission, /partner_analyze, /partner_compress, /partner_orchestrate, /partner_orchestrators");
-  logger.info("📋 可用命令: /start_partner, /stop_partner, /partner_status, /partner_mission, /partner_analyze, /partner_compress, /partner_orchestrate, /partner_orchestrators");
 }
