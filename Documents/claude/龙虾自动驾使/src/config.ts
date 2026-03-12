@@ -2,6 +2,61 @@
  * 引擎配置
  */
 
+/**
+ * 配置验证错误
+ */
+export class ConfigValidationError extends Error {
+  constructor(
+    public readonly field: string,
+    public readonly invalidValue: unknown,
+    message: string
+  ) {
+    super(message);
+    this.name = "ConfigValidationError";
+  }
+}
+
+/**
+ * 验证配置值范围
+ */
+export function validateConfig(config: EngineConfig): void {
+  const errors: string[] = [];
+
+  // 验证循环间隔
+  if (config.compressInterval < 1 || config.compressInterval > 100) {
+    errors.push(`compressInterval 必须在 1-100 之间，当前: ${config.compressInterval}`);
+  }
+  if (config.persistInterval < 1 || config.persistInterval > 1000) {
+    errors.push(`persistInterval 必须在 1-1000 之间，当前: ${config.persistInterval}`);
+  }
+  if (config.reportInterval < 1 || config.reportInterval > 1000) {
+    errors.push(`reportInterval 必须在 1-1000 之间，当前: ${config.reportInterval}`);
+  }
+
+  // 验证时间阈值
+  if (config.cacheTTL < 100 || config.cacheTTL > 60000) {
+    errors.push(`cacheTTL 必须在 100-60000ms 之间，当前: ${config.cacheTTL}`);
+  }
+  if (config.stallThreshold < 1000 || config.stallThreshold > 300000) {
+    errors.push(`stallThreshold 必须在 1000-300000ms 之间，当前: ${config.stallThreshold}`);
+  }
+  if (config.healthCheckInterval < 1000 || config.healthCheckInterval > 300000) {
+    errors.push(`healthCheckInterval 必须在 1000-300000ms 之间，当前: ${config.healthCheckInterval}`);
+  }
+
+  // 验证数量限制
+  if (config.maxActions < 1 || config.maxActions > 1000) {
+    errors.push(`maxActions 必须在 1-1000 之间，当前: ${config.maxActions}`);
+  }
+  if (config.maxErrors < 1 || config.maxErrors > 500) {
+    errors.push(`maxErrors 必须在 1-500 之间，当前: ${config.maxErrors}`);
+  }
+
+  if (errors.length > 0) {
+    throw new ConfigValidationError("multiple", config, errors.join("; "));
+  }
+}
+
 export interface EngineConfig {
   // 循环配置
   readonly compressInterval: number;    // 上下文压缩间隔（循环数）
@@ -45,7 +100,7 @@ export const DEFAULT_CONFIG: EngineConfig = {
  */
 export function loadConfig(openclawConfig?: Record<string, unknown>): EngineConfig {
   const config = openclawConfig || {};
-  return {
+  const loadedConfig: EngineConfig = {
     ...DEFAULT_CONFIG,
     // 优先使用OpenClaw配置，其次环境变量，最后默认值
     compressInterval: (config.compressInterval as number) ?? parseInt(process.env.LOBSTER_COMPRESS_INTERVAL || '') ?? DEFAULT_CONFIG.compressInterval,
@@ -60,4 +115,18 @@ export function loadConfig(openclawConfig?: Record<string, unknown>): EngineConf
     enableMetrics: (config.enableMetrics as boolean) ?? process.env.LOBSTER_METRICS !== 'false',
     enableCache: (config.enableCache as boolean) ?? process.env.LOBSTER_CACHE !== 'false',
   };
+
+  // 验证配置值范围
+  try {
+    validateConfig(loadedConfig);
+  } catch (error) {
+    if (error instanceof ConfigValidationError) {
+      console.warn(`⚠️ 配置验证失败，使用默认值: ${error.message}`);
+      // 返回安全的默认配置
+      return { ...DEFAULT_CONFIG };
+    }
+    throw error;
+  }
+
+  return loadedConfig;
 }
