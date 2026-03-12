@@ -179,10 +179,86 @@ export {
   PerpetualEngineService,
 } from "./service.js";
 
+// ========== UltraThink 深度思考引擎 (v2.38) ==========
+export {
+  UltraThinkEngine,
+  ThoughtNodeType,
+  ThoughtStatus,
+  ThoughtNode,
+  ThoughtBranch,
+  UltraThinkConfig,
+  DEFAULT_ULTRATHINK_CONFIG,
+  createUltraThink,
+} from "./ultrathink.js";
+
+// ========== Ralph Wiggum 循环调试引擎 (v2.38) ==========
+export {
+  RalphLoopEngine,
+  RalphPhase,
+  AttemptStatus,
+  FixStrategy,
+  RalphAttempt,
+  RalphLoopConfig,
+  DEFAULT_RALPH_CONFIG,
+  createRalphLoop,
+} from "./ralph-loop.js";
+
+// ========== Autopilot 自主控制器 (v2.40) ==========
+export {
+  AutopilotController,
+  AutopilotState,
+  AutopilotConfig,
+  DEFAULT_AUTOPILOT_CONFIG,
+  AutopilotSession,
+  createAutopilot,
+  quickAutopilot,
+} from "./autopilot.js";
+
+// ========== 成本监控系统 (v2.40) ==========
+export {
+  CostMonitor,
+  CostType,
+  CostRecord,
+  CostBudgetConfig,
+  CostStatistics,
+  BudgetStatus,
+  DEFAULT_BUDGET_CONFIG,
+  createCostMonitor,
+} from "./cost-monitor.js";
+
+// ========== LLM 提供商 (v2.40) ==========
+export {
+  LLMProvider,
+  ModelConfig,
+  LLMRequest,
+  LLMResponse,
+  ILLMProvider,
+  OpenAIProvider,
+  AnthropicProvider,
+  OpenClawProvider,
+  OllamaProvider,
+  LLMFactory,
+  generateText,
+  streamText,
+} from "./llm-provider.js";
+
+// ========== 通知系统 (v2.40) ==========
+export {
+  Notifier,
+  NotificationChannel,
+  NotificationLevel,
+  NotificationMessage,
+  DiscordConfig,
+  TelegramConfig,
+  NotifierConfig,
+  createNotifier,
+  createNotifierFromEnv,
+} from "./notifier.js";
+
 /**
  * 🦞 引擎版本信息
  */
-export const ENGINE_VERSION = "2.36.0";
+export const ENGINE_VERSION = "2.46.0";
 
 /**
  * 🦞 引擎功能矩阵
@@ -281,6 +357,24 @@ export const ENGINE_FEATURES = {
   masfactoryOrchestrator: true,
   // v2.36 新增
   alphaevolveOrchestrator: true,
+  // v2.37 新增
+  orchestratorRegistry: true,
+  unifiedOrchestratorInterface: true,
+  lazyOrchestratorLoading: true,
+  orchestratorRecommendation: true,
+  // v2.38 新增
+  ultraThinkEngine: true,
+  ralphLoopEngine: true,
+  deepReasoning: true,
+  autoDebugIteration: true,
+  // v2.40 新增
+  autopilotController: true,
+  dualEngineSystem: true,
+  autonomousFixing: true,
+  costMonitoring: true,
+  budgetControl: true,
+  llmProviderAbstraction: true,
+  notificationSystem: true,
 } as const;
 
 // ========== 火焰图收集器 (v2.1) ==========
@@ -1561,3 +1655,84 @@ export async function shutdownEngine(engine: FullEngine): Promise<void> {
     engine.metrics.shutdown();
   }
 }
+
+// ========== 编排器注册表 (v2.37) ==========
+/**
+ * @since 2025-03-11
+ * 统一管理所有多代理编排器，为永动引擎提供一致的调用接口
+ */
+import {
+  OrchestratorRegistry,
+  OrchestratorMetadata,
+  OrchestratorResult,
+  IOrchestratorAdapter,
+  OrchestratorFactory,
+  createFunctionAdapter,
+  initializeBuiltinOrchestrators,
+  recommendOrchestrator,
+  malt,
+  // 新增25个编排器便捷函数
+  qwenAgentic,
+  deepseekR1,
+  gptComposer,
+  claudeOrchestra,
+  llamaHerd,
+  mistralFusion,
+  geminiProtocol,
+  chainOfNotebook,
+  treeOfExecution,
+  graphRAG,
+  vectorOrchestra,
+  memoryMesh,
+  knowledgeGraphFlow,
+  debateProtocol,
+  consensusMechanism,
+  votingSystem,
+  ensembleMix,
+  streamingChain,
+  batchProcess,
+  pipelineFlow,
+  parallelGrid,
+  hierarchicalTask,
+  dynamicSwitch,
+  contextRouter,
+  metaOrchestrator,
+} from "./orchestrator-registry.js";
+
+export {
+  OrchestratorRegistry,
+  OrchestratorMetadata,
+  OrchestratorResult,
+  IOrchestratorAdapter,
+  OrchestratorFactory,
+  createFunctionAdapter,
+  initializeBuiltinOrchestrators,
+  recommendOrchestrator,
+  malt,
+  // 新增25个编排器便捷函数
+  qwenAgentic,
+  deepseekR1,
+  gptComposer,
+  claudeOrchestra,
+  llamaHerd,
+  mistralFusion,
+  geminiProtocol,
+  chainOfNotebook,
+  treeOfExecution,
+  graphRAG,
+  vectorOrchestra,
+  memoryMesh,
+  knowledgeGraphFlow,
+  debateProtocol,
+  consensusMechanism,
+  votingSystem,
+  ensembleMix,
+  streamingChain,
+  batchProcess,
+  pipelineFlow,
+  parallelGrid,
+  hierarchicalTask,
+  dynamicSwitch,
+  contextRouter,
+  metaOrchestrator,
+} from "./orchestrator-registry.js";

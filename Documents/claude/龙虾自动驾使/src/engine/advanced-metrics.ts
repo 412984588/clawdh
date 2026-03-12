@@ -7,7 +7,7 @@
  * @see {@link https://medium.com/@hadiyolworld007/node-js-performance-tuning-in-2026-event-loop-lag-fetch-backpressure-and-the-metrics-that-dff27b319415}
  */
 
-import { performance, PerformanceObserver } from "perf_hooks";
+import { PerformanceObserver } from "perf_hooks";
 import type { EventLoopMetrics } from "./zero-latency-loop.js";
 
 /**
@@ -230,8 +230,11 @@ export class AdvancedMetricsCollector {
    */
   getMetrics(): AdvancedEventLoopMetrics {
     const lags = this.samples.map(s => s.lag);
+    const memoryUsage = this.getMemoryUsage();
+    const cpuUsage = this.getCpuUsage();
+    const backpressureLevel = this.calculateBackpressure();
 
-    return {
+    const metrics: AdvancedEventLoopMetrics = {
       // 基础指标
       avgLag: lags.length > 0 ? lags.reduce((a, b) => a + b, 0) / lags.length : 0,
       maxLag: lags.length > 0 ? Math.max(...lags) : 0,
@@ -246,13 +249,18 @@ export class AdvancedMetricsCollector {
       totalLag: lags.reduce((a, b) => a + b, 0),
 
       // 系统指标
-      memoryUsage: this.getMemoryUsage(),
-      cpuUsage: this.getCpuUsage(),
-      backpressureLevel: this.calculateBackpressure(),
+      memoryUsage,
+      cpuUsage,
+      backpressureLevel,
 
-      // 健康状态
-      healthStatus: "healthy", // 临时值，下面会更新
+      // 健康状态 - 使用专用方法计算
+      healthStatus: "healthy",
     };
+
+    // 动态计算健康状态
+    metrics.healthStatus = this.calculateHealthStatus(metrics);
+
+    return metrics;
   }
 
   /**
@@ -283,29 +291,27 @@ export class AdvancedMetricsCollector {
       cpuUsage,
       backpressureLevel,
 
-      // 健康状态
-      healthStatus: "healthy" as "healthy" | "degraded" | "unhealthy",
+      // 健康状态 - 使用专用方法计算
+      healthStatus: this.calculateHealthStatus({
+        // 基础指标
+        avgLag: lags.length > 0 ? lags.reduce((a, b) => a + b, 0) / lags.length : 0,
+        maxLag: lags.length > 0 ? Math.max(...lags) : 0,
+        highLagCount: lags.filter(l => l >= this.config.p95LagWarning).length,
+        sampleCount: lags.length,
+        // 高级指标
+        p50Lag: this.calculatePercentile(50),
+        p95Lag: this.calculatePercentile(95),
+        p99Lag: this.calculatePercentile(99),
+        minLag: lags.length > 0 ? Math.min(...lags) : 0,
+        totalLag: lags.reduce((a, b) => a + b, 0),
+        // 系统指标
+        memoryUsage,
+        cpuUsage,
+        backpressureLevel,
+        // 健康状态（临时占位，会被覆盖）
+        healthStatus: "healthy",
+      }),
     };
-
-    // 计算健康状态
-    const { p95Lag, backpressureLevel: bpLevel } = baseMetrics;
-
-    // 检查危险条件
-    if (
-      p95Lag >= this.config.p95LagCritical ||
-      memoryUsage.heapUsed >= this.config.memoryCritical ||
-      bpLevel >= 8
-    ) {
-      baseMetrics.healthStatus = "unhealthy";
-    }
-    // 检查警告条件
-    else if (
-      p95Lag >= this.config.p95LagWarning ||
-      memoryUsage.heapUsed >= this.config.memoryWarning ||
-      bpLevel >= 5
-    ) {
-      baseMetrics.healthStatus = "degraded";
-    }
 
     return baseMetrics;
   }

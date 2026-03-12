@@ -43,14 +43,21 @@ export const DEFAULT_CONFIG: EngineConfig = {
 /**
  * 从环境变量加载配置
  */
-export function loadConfig(): EngineConfig {
+export function loadConfig(openclawConfig?: Record<string, unknown>): EngineConfig {
+  const config = openclawConfig || {};
   return {
     ...DEFAULT_CONFIG,
-    compressInterval: parseInt(process.env.LOBSTER_COMPRESS_INTERVAL || '') || DEFAULT_CONFIG.compressInterval,
-    persistInterval: parseInt(process.env.LOBSTER_PERSIST_INTERVAL || '') || DEFAULT_CONFIG.persistInterval,
-    cacheTTL: parseInt(process.env.LOBSTER_CACHE_TTL || '') || DEFAULT_CONFIG.cacheTTL,
-    enableHealthCheck: process.env.LOBSTER_HEALTH_CHECK !== 'false',
-    enableMetrics: process.env.LOBSTER_METRICS !== 'false',
-    enableCache: process.env.LOBSTER_CACHE !== 'false',
+    // 优先使用OpenClaw配置，其次环境变量，最后默认值
+    compressInterval: (config.compressInterval as number) ?? parseInt(process.env.LOBSTER_COMPRESS_INTERVAL || '') ?? DEFAULT_CONFIG.compressInterval,
+    persistInterval: (config.persistInterval as number) ?? parseInt(process.env.LOBSTER_PERSIST_INTERVAL || '') ?? DEFAULT_CONFIG.persistInterval,
+    reportInterval: (config.reportInterval as number) ?? parseInt(process.env.LOBSTER_REPORT_INTERVAL || '') ?? DEFAULT_CONFIG.reportInterval,
+    cacheTTL: (config.cacheTTL as number) ?? parseInt(process.env.LOBSTER_CACHE_TTL || '') ?? DEFAULT_CONFIG.cacheTTL,
+    stallThreshold: (config.stallThreshold as number) ?? parseInt(process.env.LOBSTER_STALL_THRESHOLD || '') ?? DEFAULT_CONFIG.stallThreshold,
+    healthCheckInterval: (config.healthCheckInterval as number) ?? parseInt(process.env.LOBSTER_HEALTH_CHECK_INTERVAL || '') ?? DEFAULT_CONFIG.healthCheckInterval,
+    maxActions: (config.maxActions as number) ?? parseInt(process.env.LOBSTER_MAX_ACTIONS || '') ?? DEFAULT_CONFIG.maxActions,
+    maxErrors: (config.maxErrors as number) ?? parseInt(process.env.LOBSTER_MAX_ERRORS || '') ?? DEFAULT_CONFIG.maxErrors,
+    enableHealthCheck: (config.enableHealthCheck as boolean) ?? process.env.LOBSTER_HEALTH_CHECK !== 'false',
+    enableMetrics: (config.enableMetrics as boolean) ?? process.env.LOBSTER_METRICS !== 'false',
+    enableCache: (config.enableCache as boolean) ?? process.env.LOBSTER_CACHE !== 'false',
   };
 }

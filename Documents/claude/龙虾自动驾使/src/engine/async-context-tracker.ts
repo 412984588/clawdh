@@ -10,10 +10,8 @@
 
 import {
   createHook,
-  AsyncResource,
   executionAsyncId,
   executionAsyncResource,
-  triggerAsyncId,
 } from "async_hooks";
 
 /**
@@ -129,6 +127,13 @@ export class AsyncContextTracker {
   }
 
   /**
+   * 获取活动状态
+   */
+  isActive(): boolean {
+    return this.active;
+  }
+
+  /**
    * 追踪初始化
    */
   private trackInit(
@@ -137,6 +142,8 @@ export class AsyncContextTracker {
     triggerAsyncId: number,
     resource: object
   ): void {
+    // 仅在活动状态下追踪
+    if (!this.active) return;
     const timestamp = Date.now();
 
     // 记录资源
@@ -183,6 +190,7 @@ export class AsyncContextTracker {
    * 追踪执行前
    */
   private trackBefore(asyncId: number): void {
+    if (!this.active) return;
     // 记录开始时间
     const link = this.getCurrentLink(asyncId);
     if (link) {
@@ -194,6 +202,7 @@ export class AsyncContextTracker {
    * 追踪执行后
    */
   private trackAfter(asyncId: number): void {
+    if (!this.active) return;
     const link = this.getCurrentLink(asyncId);
     if (link) {
       const duration = Date.now() - link.timestamp;
@@ -211,6 +220,7 @@ export class AsyncContextTracker {
    * 追踪销毁
    */
   private trackDestroy(asyncId: number): void {
+    if (!this.active) return;
     const resource = this.resources.get(asyncId);
     if (resource && this.config.enableResourceStats) {
       this.updateResourceStats(resource.type!, -1);
@@ -371,7 +381,7 @@ export class AsyncContextTracker {
   cleanup(): number {
     let cleaned = 0;
 
-    for (const [asyncId, resource] of this.resources) {
+    for (const asyncId of this.resources.keys()) {
       if (!this.chains.has(asyncId)) {
         this.resources.delete(asyncId);
         cleaned++;
@@ -435,7 +445,7 @@ export function getGlobalTracker(): AsyncContextTracker {
  */
 export function trackAsync(contextType?: string) {
   return function (
-    target: any,
+    _target: any,
     propertyKey: string,
     descriptor: PropertyDescriptor
   ) {
@@ -462,8 +472,8 @@ export function trackAsync(contextType?: string) {
  */
 export function limitAsyncDepth(maxDepth: number) {
   return function (
-    target: any,
-    propertyKey: string,
+    _target: any,
+    _propertyKey: string,
     descriptor: PropertyDescriptor
   ) {
     const originalMethod = descriptor.value;

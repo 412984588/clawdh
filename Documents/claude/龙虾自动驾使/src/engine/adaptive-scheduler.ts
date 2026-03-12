@@ -10,7 +10,6 @@
  */
 
 import type { AdvancedEventLoopMetrics } from "./advanced-metrics.js";
-import type { CircuitBreaker } from "./circuit-breaker.js";
 
 /**
  * 负载等级

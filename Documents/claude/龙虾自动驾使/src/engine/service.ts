@@ -49,6 +49,14 @@ import {
   createZeroLatencyLoop,
 } from "./zero-latency-loop.js";
 
+/** 编排器注册表导入 (v2.37) */
+import {
+  OrchestratorRegistry,
+  OrchestratorResult,
+  initializeBuiltinOrchestrators,
+  recommendOrchestrator,
+} from "./orchestrator-registry.js";
+
 /** Node.js 内置模块 */
 import fs from "fs/promises";
 import path from "path";
@@ -784,6 +792,11 @@ export class PerpetualEngineService {
         );
       },
     });
+
+    // 初始化编排器注册表 (v2.37)
+    this.initializeOrchestrators().catch(err => {
+      safeDebug(this.api.logger, `编排器初始化失败: ${err instanceof Error ? err.message : String(err)}`);
+    });
   }
 
   /**
@@ -1006,6 +1019,11 @@ export class PerpetualEngineService {
         // 5. 定期压缩上下文
         if (this.loopCountValue % this.config.compressInterval === 0 && this.loopCountValue > 0) {
           this.compressContext();
+        }
+
+        // 5.1 定期清理过期缓存（防止内存泄漏）
+        if (this.loopCountValue % (this.config.compressInterval * 2) === 0 && this.loopCountValue > 0) {
+          this.cleanExpiredCache();
         }
 
         // 6. 定期汇报（包含性能指标）
@@ -1243,6 +1261,123 @@ export class PerpetualEngineService {
     return actions;
   }
 
+  // ========== 编排器集成 (v2.37) ==========
+
+  /**
+   * 初始化编排器注册表
+   *
+   * 加载内置编排器并注册到全局注册表。
+   */
+  private async initializeOrchestrators(): Promise<void> {
+    try {
+      await initializeBuiltinOrchestrators();
+      this.api.logger.info(`🦞 编排器注册表初始化完成 (${OrchestratorRegistry.size} 个编排器)`);
+    } catch (error) {
+      this.api.logger.warn(`编排器初始化失败: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+
+  /**
+   * 调用编排器执行任务
+   *
+   * 根据任务描述推荐并执行合适的编排器。
+   *
+   * @param task 任务描述
+   * @param preferredOrchestrator 首选编排器（可选）
+   * @returns Promise<{ summary: string }> 执行结果摘要
+   */
+  public async executeWithOrchestrator(
+    task: string,
+    preferredOrchestrator?: string
+  ): Promise<{ summary: string }> {
+    try {
+      // 边界检查：处理空任务
+      const trimmedTask = task?.trim() || "";
+      if (!trimmedTask) {
+        return { summary: "⚠️ 任务描述不能为空\n用法: /partner_orchestrate <任务描述> [编排器ID]" };
+      }
+
+      // 如果指定了编排器，直接使用
+      let orchestratorId = preferredOrchestrator;
+
+      // 否则推荐编排器
+      if (!orchestratorId) {
+        const recommendations = await recommendOrchestrator(trimmedTask);
+        orchestratorId = recommendations[0] || 'malt'; // 默认使用 MALT
+      }
+
+      // 检查编排器是否已注册
+      if (!OrchestratorRegistry.has(orchestratorId)) {
+        return { summary: `⚠️ 编排器 "${orchestratorId}" 未注册` };
+      }
+
+      // 获取编排器元数据
+      const metadata = await OrchestratorRegistry.getMetadata(orchestratorId);
+      this.api.logger.info(`🔧 使用编排器: ${metadata?.name || orchestratorId}`);
+
+      // 执行编排器
+      const result = await OrchestratorRegistry.execute(orchestratorId, trimmedTask);
+
+      if (result.success) {
+        return {
+          summary: `✅ [${metadata?.name || orchestratorId}] 完成 (${result.duration}ms)\n` +
+                   `   输入: ${trimmedTask.slice(0, 50)}${trimmedTask.length > 50 ? '...' : ''}`
+        };
+      } else {
+        return {
+          summary: `❌ [${metadata?.name || orchestratorId}] 失败: ${result.error}`
+        };
+      }
+    } catch (error) {
+      return {
+        summary: `❌ 编排器执行异常: ${error instanceof Error ? error.message : String(error)}`
+      };
+    }
+  }
+
+  /**
+   * 判断是否应该使用编排器
+   *
+   * 根据任务描述的特征判断是否应该调用编排器。
+   *
+   * @param description 行动描述
+   * @returns {boolean} 是否应该使用编排器
+   */
+  private shouldUseOrchestrator(description: string): boolean {
+    // 包含特定关键词的任务使用编排器
+    const orchestratorKeywords = [
+      '推理', '分析', '协作', '优化', '进化', '求解',
+      '计算', '规划', '决策', '推理', '搜索', '学习',
+      '多步骤', '复杂', '深度', '反思', '验证'
+    ];
+
+    return orchestratorKeywords.some(keyword => description.includes(keyword));
+  }
+
+  /**
+   * 获取可用编排器列表（全部56个）
+   *
+   * @returns {string[]} 编排器 ID 列表
+   */
+  async getAvailableOrchestrators(): Promise<string[]> {
+    const orchestrators = await OrchestratorRegistry.list();
+    return orchestrators.map(m => m.id);
+  }
+
+  /**
+   * 获取编排器完整信息
+   *
+   * @returns 编排器详细信息列表
+   */
+  async getOrchestratorDetails(): Promise<Array<{id: string; name: string; description: string}>> {
+    const orchestrators = await OrchestratorRegistry.list();
+    return orchestrators.map(m => ({
+      id: m.id,
+      name: m.name,
+      description: m.description,
+    }));
+  }
+
   /**
    * 执行行动
    *
@@ -1278,6 +1413,8 @@ export class PerpetualEngineService {
    * 根据行动描述中的关键词匹配相应的处理器。
    * 支持的关键词：分析、检查、生成、代码。
    *
+   * v2.37 新增：支持调用编排器处理复杂任务
+   *
    * @param description 行动描述
    * @param ctx 服务上下文
    * @returns Promise<{ summary: string }> 执行结果摘要
@@ -1286,6 +1423,12 @@ export class PerpetualEngineService {
     description: string,
     ctx: OpenClawPluginServiceContext
   ): Promise<{ summary: string }> {
+    // v2.37: 优先检查是否应该使用编排器
+    if (this.shouldUseOrchestrator(description)) {
+      this.api.logger.info(`🔧 检测到复杂任务，使用编排器处理`);
+      return await this.executeWithOrchestrator(description);
+    }
+
     const handlers = {
       [ActionKeywords.ANALYZE]: () => this.analyzeWorkspace(ctx),
       [ActionKeywords.CHECK]: () => this.checkStatus(ctx),
@@ -1521,6 +1664,30 @@ export class PerpetualEngineService {
       else if (file.endsWith(FileExtensions.MARKDOWN)) stats.md++;
     }
     return stats;
+  }
+
+  /**
+   * 清理过期缓存条目
+   *
+   * 定期清理 fileCache 中过期的条目，防止内存泄漏。
+   *
+   * @private
+   */
+  private cleanExpiredCache(): void {
+    const now = Date.now();
+    const maxAge = this.config.cacheTTL * 2; // 缓存TTL的2倍作为最大过期时间
+    let cleaned = 0;
+
+    for (const [dir, cached] of this.fileCache.entries()) {
+      if (now - cached.timestamp > maxAge) {
+        this.fileCache.delete(dir);
+        cleaned++;
+      }
+    }
+
+    if (cleaned > 0 && this.api.logger.debug) {
+      this.api.logger.debug(`🧹 清理了 ${cleaned} 个过期缓存条目`);
+    }
   }
 
   /**
@@ -1840,6 +2007,36 @@ export class PerpetualEngineService {
       stats[category] = (stats[category] || 0) + 1;
     }
     return stats;
+  }
+
+  /**
+   * 🔄 动态更新引擎配置
+   *
+   * 允许在运行时更新配置，无需重启引擎。
+   *
+   * @param newConfig - 新的配置对象
+   */
+  updateConfig(newConfig: Partial<EngineConfig>): void {
+    const oldConfig = this.config;
+    this.config = { ...this.config, ...newConfig };
+
+    // 记录配置变更
+    this.api.logger.info("⚙️ 引擎配置已更新:");
+    if (oldConfig.compressInterval !== this.config.compressInterval) {
+      this.api.logger.info(`  压缩间隔: ${oldConfig.compressInterval} → ${this.config.compressInterval}`);
+    }
+    if (oldConfig.enableHealthCheck !== this.config.enableHealthCheck) {
+      this.api.logger.info(`  健康检查: ${oldConfig.enableHealthCheck} → ${this.config.enableHealthCheck}`);
+    }
+
+    // 如果健康检查状态变化，更新定时器
+    if (oldConfig.enableHealthCheck !== this.config.enableHealthCheck) {
+      if (this.config.enableHealthCheck && this.isRunningValue) {
+        this.startHealthCheck();
+      } else {
+        this.stopHealthCheck();
+      }
+    }
   }
 }
 

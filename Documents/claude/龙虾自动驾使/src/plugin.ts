@@ -13,7 +13,7 @@ import { loadConfig } from "./config.js";
 
 export default function register(api: OpenClawPluginApi) {
   const logger = api.logger;
-  const config = loadConfig();
+  const config = loadConfig(api.config);  // 从OpenClaw配置读取
   const engineService = new PerpetualEngineService(api, config);
 
   logger.info(`🦞 龙虾永动引擎配置加载: ` +
@@ -155,11 +155,131 @@ export default function register(api: OpenClawPluginApi) {
     },
   });
 
+  // 🆕 新增：/partner_orchestrate 命令 - 使用编排器执行任务
+  api.registerCommand({
+    name: "partner_orchestrate",
+    description: "使用指定编排器执行任务",
+    requireAuth: true,
+    handler: async (ctx) => {
+      const task = ctx.args?.trim();
+      if (!task) {
+        const orchestrators = await engineService.getAvailableOrchestrators();
+        return {
+          text: "🔧 编排器执行\n\n" +
+                "用法: /partner_orchestrate <任务描述> [编排器ID]\n\n" +
+                "自动选择示例（系统智能推荐）:\n" +
+                "  /partner_orchestrate 分析这个bug → 自动用 ralph\n" +
+                "  /partner_orchestrate 优化代码性能 → 自动用 alphaevolve\n" +
+                "  /partner_orchestrate 搜索相关资料 → 自动用 graph-rag\n\n" +
+                "手动指定示例:\n" +
+                "  /partner_orchestrate 分析这个bug ralph\n" +
+                "  /partner_orchestrate 设计算法 cbs\n\n" +
+                "可用编排器: " + orchestrators.slice(0, 10).join(', ') + "... (共56个)\n" +
+                "使用 /partner_orchestrators 查看完整列表"
+        };
+      }
+
+      // 智能解析：检查最后一个词是否是编排器ID
+      const words = task.split(/\s+/);
+      const allOrchestrators = await engineService.getAvailableOrchestrators();
+      const lastWord = words[words.length - 1];
+
+      let taskDesc: string;
+      let preferredOrchestrator: string | undefined;
+
+      if (words.length > 1 && allOrchestrators.includes(lastWord)) {
+        // 最后一个词是有效的编排器ID
+        taskDesc = words.slice(0, -1).join(' ');
+        preferredOrchestrator = lastWord;
+      } else {
+        // 没有指定编排器，使用整个输入作为任务
+        taskDesc = task;
+        preferredOrchestrator = undefined;
+      }
+
+      const result = await engineService.executeWithOrchestrator(taskDesc, preferredOrchestrator);
+      return { text: result.summary };
+    },
+  });
+
+  // 🆕 新增：/partner_orchestrators 命令 - 列出所有56个编排器
+  api.registerCommand({
+    name: "partner_orchestrators",
+    description: "列出所有56个可用的多代理编排器",
+    requireAuth: true,
+    handler: async () => {
+      const orchestrators = await engineService.getOrchestratorDetails();
+
+      // 按类别分组显示
+      const core = [
+        'adaptflow', 'aegean', 'alphaevolve', 'automl-agent', 'bayesian', 'cbs', 'croto',
+        'epoch', 'freemad', 'halo', 'hybrid', 'latentmas', 'lmars', 'malt', 'mamr'
+      ];
+      const collaboration = [
+        'mars', 'masfactory', 'mosaic', 'moya', 'multiturn', 'myantfarm', 'omas',
+        'orchestra', 'orchmas', 'puppeteer', 'rapo', 'symphony', 'tea'
+      ];
+      const reasoning = [
+        'ultrathink', 'adaptorch', 'ralph', 'deepseek-r1', 'chain-of-notebook',
+        'tree-of-execution', 'graph-rag'
+      ];
+      const model = [
+        'qwen-agentic', 'gpt-composer', 'claude-orchestra', 'llama-herd', 'mistral-fusion',
+        'gemini-protocol'
+      ];
+      const memory = [
+        'vector-orchestra', 'memory-mesh', 'knowledge-graph-flow'
+      ];
+      const advanced = [
+        'debate-protocol', 'consensus-mechanism', 'voting-system', 'ensemble-mix',
+        'streaming-chain', 'batch-process', 'pipeline-flow', 'parallel-grid',
+        'hierarchical-task', 'dynamic-switch', 'context-router', 'meta-orchestrator'
+      ];
+
+      const formatList = (ids: string[], details: typeof orchestrators) => {
+        return ids.map(id => {
+          const info = details.find(d => d.id === id);
+          return `  ${id}${info ? ' - ' + info.name : ''}`;
+        }).join('\n');
+      };
+
+      return {
+        text: "🔧 56个编排器\n\n" +
+              "【核心编排器】(16个)\n" + formatList(core, orchestrators) + "\n\n" +
+              "【协作编排器】(15个)\n" + formatList(collaboration, orchestrators) + "\n\n" +
+              "【推理编排器】(7个)\n" + formatList(reasoning, orchestrators) + "\n\n" +
+              "【模型专用】(6个)\n" + formatList(model, orchestrators) + "\n\n" +
+              "【记忆管理】(3个)\n" + formatList(memory, orchestrators) + "\n\n" +
+              "【高级编排】(9个)\n" + formatList(advanced, orchestrators) + "\n\n" +
+              "用法: /partner_orchestrate <任务> [编排器ID]\n" +
+              "示例: /partner_orchestrate 分析这个bug deepseek-r1"
+      };
+    },
+  });
+
   // 注册 gateway_start 钩子
   api.on("gateway_start", async (event, ctx) => {
     logger.info("🦞 Gateway 启动，永动引擎就绪");
+    // 从OpenClaw配置读取自动启动设置
+    const autoStart = api.config.auto_start_engine === true;
+    if (autoStart && !engineService.isRunning()) {
+      logger.info("🚀 配置了自动启动，引擎自动启动");
+      await engineService.start(ctx).catch(err =>
+        logger.error(`自动启动失败: ${err instanceof Error ? err.message : String(err)}`)
+      );
+    }
+  }, { priority: 100 });
+
+  // 注册 gateway_stop 钩子（新增）
+  api.on("gateway_stop", async (event, ctx) => {
+    logger.info("🦞 Gateway 停止，永动引擎清理中");
+    if (engineService.isRunning()) {
+      engineService.stopLoop();
+      logger.info("🛑 永动引擎已自动停止");
+    }
   }, { priority: 100 });
 
   logger.info("🦞 龙虾永动引擎插件已加载");
-  logger.info("📋 可用命令: /start_partner, /stop_partner, /partner_status, /partner_mission, /partner_analyze, /partner_compress");
+  logger.info("📋 可用命令: /start_partner, /stop_partner, /partner_status, /partner_mission, /partner_analyze, /partner_compress, /partner_orchestrate, /partner_orchestrators");
+  logger.info("📋 可用命令: /start_partner, /stop_partner, /partner_status, /partner_mission, /partner_analyze, /partner_compress, /partner_orchestrate, /partner_orchestrators");
 }
