@@ -124,19 +124,39 @@ export default function register(api: OpenClawPluginApi) {
     requireAuth: true,
     handler: async (ctx) => {
       const input = ctx.args?.trim() || "";
+
+      // v2.47: 无参数时显示当前任务目标
       if (!input) {
+        const { mission, exists } = await engineService.readMission();
+        const lines = mission.split('\n');
+        const coreGoal: string[] = [];
+        let inCoreGoal = false;
+
+        for (const line of lines) {
+          if (line.includes('## 核心目标') || line.includes('## Core Goal')) {
+            inCoreGoal = true;
+            continue;
+          }
+          if (inCoreGoal) {
+            if (line.startsWith('##')) break;
+            if (line.trim()) coreGoal.push(line);
+          }
+        }
+
         return {
           text: "📋 当前任务目标\n\n" +
-                "用法: /partner_mission <任务描述>\n\n" +
-                "示例:\n" +
-                "  /partner_mission 持续优化代码质量\n" +
-                "  /partner_mission 分析并修复所有bug"
+            (exists ? "(从 MISSION_PARTNER.md 读取)\n\n" : "(默认值 - 文件不存在)\n\n") +
+            coreGoal.slice(0, 10).join('\n') + // 最多显示10行
+            (coreGoal.length > 10 ? '\n... (更多内容请查看文件)' : '') +
+            "\n\n用法: /partner_mission <任务描述>"
         };
       }
-      // 这里应该写入 MISSION_PARTNER.md 文件
-      // 暂时返回确认信息
+
+      // v2.47: 写入新的任务目标
+      const result = await engineService.updateMission(input);
+
       return {
-        text: "✅ 任务目标已更新: " + input + "\n\n" +
+        text: result.message + "\n\n" +
               "引擎将在下一循环中使用新的任务目标"
       };
     },

@@ -1261,6 +1261,114 @@ export class PerpetualEngineService {
     return actions;
   }
 
+  /**
+   * 更新 MISSION 文件 (v2.47)
+   *
+   * 将新的任务目标写入 MISSION_PARTNER.md 文件。
+   * 如果文件不存在，会使用默认模板创建。
+   *
+   * @param missionText 新的任务目标描述
+   * @returns Promise<{ success: boolean; path: string; message: string }>
+   *
+   * @example
+   * ```ts
+   * const result = await engineService.updateMission("持续优化代码质量");
+   * // result.success === true 表示写入成功
+   * ```
+   */
+  async updateMission(missionText: string): Promise<{
+    success: boolean;
+    path: string;
+    message: string;
+  }> {
+    try {
+      const workspaceDir = process.cwd(); // 使用当前工作目录
+      const missionPath = path.join(workspaceDir, MissionFileNames.MISSION);
+
+      // 读取现有文件或使用默认模板
+      let existingContent = "";
+      try {
+        existingContent = await fs.readFile(missionPath, 'utf-8');
+      } catch {
+        // 文件不存在，使用默认模板
+        existingContent = this.getDefaultMission();
+      }
+
+      // 更新核心目标部分
+      const lines = existingContent.split('\n');
+      const updatedLines: string[] = [];
+      let inCoreGoal = false;
+      let coreGoalUpdated = false;
+
+      for (const line of lines) {
+        if (line.includes('## 核心目标') || line.includes('## Core Goal')) {
+          inCoreGoal = true;
+          updatedLines.push(line);
+          continue;
+        }
+        if (inCoreGoal && line.startsWith('##')) {
+          inCoreGoal = false;
+        }
+        if (inCoreGoal && !coreGoalUpdated) {
+          updatedLines.push(missionText);
+          updatedLines.push('');
+          coreGoalUpdated = true;
+          continue;
+        }
+        updatedLines.push(line);
+      }
+
+      // 如果没找到核心目标部分，添加到文件开头
+      if (!coreGoalUpdated) {
+        updatedLines.unshift('## 核心目标', missionText, '');
+      }
+
+      // 写入文件
+      await fs.writeFile(missionPath, updatedLines.join('\n'), 'utf-8');
+
+      return {
+        success: true,
+        path: missionPath,
+        message: `✅ 任务目标已更新: ${missionText}`
+      };
+    } catch (error) {
+      this.api.logger.error(`更新 MISSION 文件失败: ${error instanceof Error ? error.message : String(error)}`);
+      return {
+        success: false,
+        path: '',
+        message: `❌ 更新失败: ${error instanceof Error ? error.message : String(error)}`
+      };
+    }
+  }
+
+  /**
+   * 读取当前 MISSION 文件内容 (v2.47)
+   *
+   * @returns Promise<{ mission: string; exists: boolean; path: string }>
+   */
+  async readMission(): Promise<{
+    mission: string;
+    exists: boolean;
+    path: string;
+  }> {
+    try {
+      const workspaceDir = process.cwd();
+      const missionPath = path.join(workspaceDir, MissionFileNames.MISSION);
+      const content = await fs.readFile(missionPath, 'utf-8');
+      return {
+        mission: content,
+        exists: true,
+        path: missionPath
+      };
+    } catch {
+      return {
+        mission: this.getDefaultMission(),
+        exists: false,
+        path: path.join(process.cwd(), MissionFileNames.MISSION)
+      };
+    }
+  }
+
   // ========== 编排器集成 (v2.37) ==========
 
   /**
