@@ -1,7 +1,7 @@
 {
   "name": "lobster-perpetual-engine",
-  "version": "1.0.0",
-  "description": "OpenClaw 零延迟永动引擎插件",
+  "version": "2.47.0",
+  "description": "OpenClaw 零延迟永动引擎插件 - 集成优化与MISSION管理",
   "type": "module",
   "main": "dist/plugin.js",
   "openclaw": {
