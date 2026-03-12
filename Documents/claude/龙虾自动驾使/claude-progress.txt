@@ -100,14 +100,20 @@
 
 **剩余优化机会：**
 1. `runtime` 属性未使用 - 可用于访问更多 OpenClaw 特性
-2. `/partner_compress` 可调用实际的 `compressContext` 方法
-3. 其他命令也可以添加权限检查（`/partner_status` 等）
+2. 其他命令也可以添加权限检查（`/partner_status` 等）
 
 ### Round 33 完成 - /partner_mission 命令增强
 - ✅ 添加 `updateMission()` 方法到 PerpetualEngineService
 - ✅ 添加 `readMission()` 方法到 PerpetualEngineService
 - ✅ `/partner_mission` 无参数时显示当前任务目标
 - ✅ `/partner_mission` 有参数时写入 MISSION_PARTNER.md
+- ✅ TypeScript 编译: 0 错误
+- ✅ 测试通过率: 100% (8/8)
+
+### Round 34 完成 - /partner_compress 命令实现
+- ✅ 添加公开方法 `compressContextNow()` 到 PerpetualEngineService
+- ✅ `/partner_compress` 现在调用实际的压缩方法
+- ✅ 返回真实的压缩前后对比数据
 - ✅ TypeScript 编译: 0 错误
 - ✅ 测试通过率: 100% (8/8)
 

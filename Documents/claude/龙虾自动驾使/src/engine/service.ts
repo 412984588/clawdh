@@ -1810,6 +1810,35 @@ export class PerpetualEngineService {
    * 避免频繁的数组长度访问，缓存长度值用于比较。
    * 参考: https://dev.to/engrsakib/mastering-javascript-arrays-techniques-best-practices-and-advanced-uses-42mb
    */
+  /**
+   * 手动触发上下文压缩 (v2.47)
+   *
+   * 供命令行调用的公开方法。
+   *
+   * @returns {{ before: number; after: number; saved: number }} 压缩前后的字符数
+   */
+  compressContextNow(): {
+    before: number;
+    after: number;
+    saved: number;
+  } {
+    const beforeActions = this.context.actions.length;
+    const beforeErrors = this.context.errors.length;
+    const beforeSize = beforeActions + beforeErrors;
+
+    this.compressContext();
+
+    const afterActions = this.context.actions.length;
+    const afterErrors = this.context.errors.length;
+    const afterSize = afterActions + afterErrors;
+
+    return {
+      before: beforeSize,
+      after: afterSize,
+      saved: beforeSize - afterSize
+    };
+  }
+
   private compressContext(): void {
     const { actions, errors } = this.context;
     const { maxActions, maxErrors } = this.config;

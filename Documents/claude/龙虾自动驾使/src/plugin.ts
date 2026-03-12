@@ -186,14 +186,17 @@ export default function register(api: OpenClawPluginApi) {
     description: "手动触发上下文压缩",
     requireAuth: true,
     handler: async () => {
-      const beforeSize = engineService.getContextSize();
-      // 注意：compressContext 是私有方法，暂时模拟
-      const afterSize = Math.floor(beforeSize * 0.7);
+      // v2.47: 使用公开的 compressContextNow 方法
+      const result = engineService.compressContextNow();
+      const savedPercent = result.before > 0
+        ? Math.round((result.saved / result.before) * 100)
+        : 0;
+
       return {
         text: "📦 上下文已压缩\n\n" +
-              "压缩前: " + beforeSize + " 字符\n" +
-              "压缩后: " + afterSize + " 字符\n" +
-              "节省: ~30%"
+              "压缩前: " + result.before + " 条\n" +
+              "压缩后: " + result.after + " 条\n" +
+              "节省: " + result.saved + " 条 (~" + savedPercent + "%)"
       };
     },
   });
