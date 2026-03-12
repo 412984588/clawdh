@@ -42,10 +42,24 @@ openclaw restart gateway
 
 ### 在 Telegram/Discord 中
 
+**基础命令:**
 ```
-/start_partner   启动永动循环
-/stop_partner    停止永动循环
-/partner_status  查看引擎状态
+/start_partner        启动永动循环
+/stop_partner         停止永动循环
+/partner_status       查看引擎状态
+```
+
+**任务管理 (v2.47):**
+```
+/partner_mission      设置或查看任务目标
+/partner_analyze      触发代码质量分析
+/partner_compress     手动触发上下文压缩
+```
+
+**编排器 (v2.37):**
+```
+/partner_orchestrate  使用指定编排器执行任务
+/partner_orchestrators 列出所有56个可用编排器
 ```
 
 ### 状态输出示例
