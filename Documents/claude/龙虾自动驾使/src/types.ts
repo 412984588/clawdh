@@ -56,6 +56,7 @@ export interface PluginHookEvent {
 
 export type PluginHookName =
   | "gateway_start"
+  | "gateway_pre_stop"
   | "gateway_stop";
 
 export interface OpenClawPluginApi {

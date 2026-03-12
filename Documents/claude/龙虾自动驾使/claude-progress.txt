@@ -85,6 +85,24 @@
 
 结果: 未发现需要修复的问题，已识别优化机会 📋
 
+### Round 32 完成 - OpenClaw 集成优化实施
+- ✅ 添加 `isAuthorizedSender` 权限检查到 `/start_partner` 和 `/stop_partner`
+- ✅ 添加 `channelId` 到命令返回值（支持定向回复）
+- ✅ 在 `PluginHookName` 类型中添加 `gateway_pre_stop`
+- ✅ 实现 `gateway_pre_stop` 钩子处理器（优雅关闭准备）
+- ✅ TypeScript 编译: 0 错误
+- ✅ 测试通过率: 100% (8/8)
+
+**v2.47 变更：**
+- `/start_partner` 和 `/stop_partner` 现在验证发送者权限
+- 所有命令响应支持定向回复到原频道
+- `gateway_pre_stop` 钩子在停止前保存最终统计
+
+**剩余优化机会：**
+1. `runtime` 属性未使用 - 可用于访问更多 OpenClaw 特性
+2. `/partner_mission` 可实现写入 MISSION_PARTNER.md 文件
+3. `/partner_compress` 可调用实际的 `compressContext` 方法
+
 ### 版本历史
 - 最新: v2.46.0 (插件)
 - 编排器: v2.14-v2.40

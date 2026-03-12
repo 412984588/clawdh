@@ -40,13 +40,25 @@ export default function register(api: OpenClawPluginApi) {
     description: "启动零延迟永动循环引擎",
     requireAuth: true,
     handler: async (ctx) => {
-      logger.info("🚀 收到启动命令");
+      // v2.47: 权限检查 - 只允许授权用户启动引擎
+      if (!ctx.isAuthorizedSender) {
+        logger.warn(`🚫 未授权用户尝试启动引擎: ${ctx.senderId || 'unknown'}`);
+        return {
+          text: "❌ 权限不足：只有授权用户才能启动永动引擎",
+          channelId: ctx.channel // 回复到原频道
+        };
+      }
+
+      logger.info(`🚀 收到启动命令 (用户: ${ctx.senderId || 'unknown'}, 频道: ${ctx.channel})`);
       await engineService.startFromCommand(ctx);
+
+      // v2.47: 返回 channelId 用于定向回复
       return {
         text: "🦞 永动引擎已启动\n\n" +
               "状态: " + (engineService.isRunning() ? "运行中" : "启动中...") + "\n" +
               "循环次数: " + engineService.getLoopCount() + "\n\n" +
-              "使用 /stop_partner 停止引擎"
+              "使用 /stop_partner 停止引擎",
+        channelId: ctx.channel // 回复到原频道
       };
     },
   });
@@ -57,12 +69,23 @@ export default function register(api: OpenClawPluginApi) {
     description: "停止永动循环引擎",
     requireAuth: true,
     handler: async (ctx) => {
-      logger.info("🛑 收到停止命令");
+      // v2.47: 权限检查 - 只允许授权用户停止引擎
+      if (!ctx.isAuthorizedSender) {
+        logger.warn(`🚫 未授权用户尝试停止引擎: ${ctx.senderId || 'unknown'}`);
+        return {
+          text: "❌ 权限不足：只有授权用户才能停止永动引擎",
+          channelId: ctx.channel
+        };
+      }
+
+      logger.info(`🛑 收到停止命令 (用户: ${ctx.senderId || 'unknown'})`);
       engineService.stopLoop();
+
       return {
         text: "🛑 永动引擎已停止\n\n" +
               "总循环次数: " + engineService.getLoopCount() + "\n" +
-              "使用 /start_partner 重新启动"
+              "使用 /start_partner 重新启动",
+        channelId: ctx.channel
       };
     },
   });
@@ -270,7 +293,28 @@ export default function register(api: OpenClawPluginApi) {
     }
   }, { priority: 100 });
 
-  // 注册 gateway_stop 钩子（新增）
+  // 注册 gateway_pre_stop 钩子（v2.47）
+  // 在 gateway 停止前触发，用于优雅关闭准备
+  api.on("gateway_pre_stop", async (event, ctx) => {
+    logger.info("🦞 Gateway 即将停止，准备优雅关闭");
+
+    // v2.47: 保存最终状态到 stateDir
+    const loops = engineService.getLoopCount();
+    const avgTime = engineService.getAvgLoopTime();
+    const errors = engineService.getErrorStats();
+    const totalErrors = Object.values(errors).reduce((sum, count) => sum + count, 0);
+
+    logger.info(`📊 最终统计: 循环=${loops}, 平均耗时=${avgTime}ms, 错误=${totalErrors}`);
+
+    // 如果引擎正在运行，先停止它
+    if (engineService.isRunning()) {
+      logger.info("🛑 永动引擎运行中，将在 gateway_pre_stop 阶段停止");
+      engineService.stopLoop();
+      logger.info("✅ 永动引擎已优雅停止");
+    }
+  }, { priority: 100 });
+
+  // 注册 gateway_stop 钩子
   api.on("gateway_stop", async (event, ctx) => {
     logger.info("🦞 Gateway 停止，永动引擎清理中");
     if (engineService.isRunning()) {
