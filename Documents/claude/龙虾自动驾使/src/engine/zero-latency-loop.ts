@@ -214,6 +214,11 @@ export function createZeroLatencyLoop(
 export class MicrotaskBatcher {
   private tasks: Array<() => void> = [];
   private scheduled = false;
+  private errorCallback?: (error: unknown, task: () => void) => void;
+
+  constructor(options?: { errorCallback?: (error: unknown, task: () => void) => void }) {
+    this.errorCallback = options?.errorCallback;
+  }
 
   /**
    * 添加任务到批次
@@ -238,7 +243,11 @@ export class MicrotaskBatcher {
       try {
         task();
       } catch (error) {
-        console.error("Microtask error:", error);
+        if (this.errorCallback) {
+          this.errorCallback(error, task);
+        } else {
+          console.error("Microtask error:", error);
+        }
       }
     }
   }
@@ -254,8 +263,8 @@ export class MicrotaskBatcher {
 /**
  * 创建微任务批处理器
  */
-export function createMicrotaskBatcher(): MicrotaskBatcher {
-  return new MicrotaskBatcher();
+export function createMicrotaskBatcher(options?: { errorCallback?: (error: unknown, task: () => void) => void }): MicrotaskBatcher {
+  return new MicrotaskBatcher(options);
 }
 
 /**
