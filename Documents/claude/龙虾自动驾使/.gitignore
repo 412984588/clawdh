@@ -42,3 +42,7 @@ Thumbs.db
 *.temp
 task_plan.md
 notes.md
+
+# Runtime generated MISSION files
+MISSION_PARTNER.md
+BOUNDARIES_PARTNER.md
