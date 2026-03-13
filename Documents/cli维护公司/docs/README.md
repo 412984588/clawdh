@@ -1,6 +1,6 @@
 # Documentation Index
 
-**Owner**: Docs & Research Lead | **Last Updated**: 2026-03-13 17:45 EDT | **Last Review**: 2026-03-13 17:45 EDT
+**Owner**: Docs & Research Lead | **Last Updated**: 2026-03-13 21:45 EDT | **Last Review**: 2026-03-13 21:45 EDT
 
 ## Architecture Decision Records (ADRs)
 
@@ -33,12 +33,21 @@
 | [0013](runbooks/0013-openclaw-engine-runaway-loop.md) | OpenClaw Engine Runaway Loop Recovery | Runtime Reliability Engineer | 2026-03-13 |
 | [0014](runbooks/0014-local-paperclip-setup.md) | Local Paperclip Setup | Docs & Research Lead | 2026-03-13 |
 | [0015](runbooks/0015-reliability-service.md) | Reliability Service Operations | Runtime Reliability Engineer | 2026-03-13 |
+| [0016](runbooks/0016-adapter-resilience-testing.md) | Adapter Resilience Testing | Docs & Research Lead | 2026-03-13 |
+| [0017](runbooks/0017-performance-baselines.md) | Performance Baselines | Docs & Research Lead | 2026-03-13 |
+| [0018](runbooks/0018-backend-hardening-patterns.md) | Backend Hardening Patterns | Docs & Research Lead | 2026-03-13 |
+| [0019](runbooks/0019-error-recovery-resilience.md) | Error Recovery and Session Resilience | Docs & Research Lead | 2026-03-13 |
+| [0020](runbooks/0020-error-recovery-patterns.md) | Error Recovery Patterns | Runtime Reliability Engineer | 2026-03-13 |
+| [0021](runbooks/0021-claude-local-adapter-instructions.md) | Claude Local Adapter Instructions Injection | Runtime Reliability Engineer | 2026-03-13 |
+| [0022](runbooks/0022-provider-health-monitoring.md) | Provider Health Monitoring | Runtime Reliability Engineer | 2026-03-13 |
+| [0023](runbooks/0023-claude-local-cli-flag-bug.md) | claude_local Adapter CLI Flag Bug | Runtime Reliability Engineer | 2026-03-13 |
 
 ## API Reference
 
 | Document | Status | Last Updated |
 |----------|--------|--------------|
 | [MVP API Reference](api-reference.md) | Active | 2026-03-13 |
+| [API Integration Guide](api-integration-guide.md) | Active | 2026-03-13 |
 
 ## Architecture
 
@@ -92,6 +101,14 @@ cd frontend && npm run dev
 
 | Date | Document | Change |
 |------|----------|--------|
+| 2026-03-13 22:30 EDT | RB 0023 | Created claude_local Adapter CLI Flag Bug runbook (root cause: --append-system-prompt-file doesn't exist) |
+| 2026-03-13 21:45 EDT | RB 0021-0022 | Fixed duplicate numbering: 0021=Claude Local Adapter Instructions, 0022=Provider Health Monitoring |
+| 2026-03-13 21:35 EDT | Research | Documented Gemini CLI v0.34.0 preview (keybindings, parallel tools, A2A, voice mode) |
+| 2026-03-13 21:30 EDT | RB 0019-0021 | Fixed duplicate numbering: renamed 0019-provider-health-monitoring to 0021, added RB 0020 and RB 0021 to index |
+| 2026-03-13 16:53 EDT | CLI-36 | Completed: API Integration Guide with middleware docs, auth flow, curl examples |
+| 2026-03-13 16:53 EDT | API Guide | Created comprehensive API Integration Guide (middleware, endpoints, models, patterns) |
+| 2026-03-13 16:50 EDT | RB 0019 | Created Error Recovery and Session Resilience runbook |
+| 2026-03-13 16:34 EDT | RB 0016, 0017, 0018 | Added to documentation index |
 | 2026-03-13 18:20 EDT | RB 0015 | Created Reliability Service Operations runbook |
 | 2026-03-13 18:20 EDT | Backend | Implemented run cleanup, heartbeat, and auth drift detection service |
 | 2026-03-13 17:45 EDT | RB 0006 | Updated with Claude Code 2.1.75, Codex CLI 0.114.0, Gemini CLI 0.33.1 |
