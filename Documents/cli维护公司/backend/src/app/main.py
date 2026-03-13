@@ -70,6 +70,14 @@ from app.workspaces import (
     list_snapshots,
     resume_from_snapshot,
 )
+from app.session_resume import (
+    OrphanSessionDetector,
+    SessionResumeService,
+    detect_orphan_sessions,
+    get_recovery_logs,
+    release_stale_checkouts,
+    resume_session_from_checkpoint,
+)
 
 
 def create_app(seed_data: bool = True) -> FastAPI:
@@ -626,6 +634,114 @@ def create_app(seed_data: bool = True) -> FastAPI:
         if entry is None:
             raise HTTPException(status_code=404, detail="Entry not found")
         return entry.model_dump()
+
+    # ---- Session Resume and Crash Recovery Endpoints ----
+
+    @app.get("/api/reliability/orphans")
+    async def detect_orphans(
+        request: Request,
+        stale_timeout_seconds: int = Query(default=300, gt=0),
+        dead_timeout_seconds: int = Query(default=600, gt=0),
+    ):
+        """Detect orphaned sessions (task checked out but run stale/dead)."""
+        return [
+            o.model_dump()
+            for o in detect_orphan_sessions(
+                request.app.state.store._connection,
+                stale_timeout_seconds=stale_timeout_seconds,
+                dead_timeout_seconds=dead_timeout_seconds,
+            )
+        ]
+
+    @app.post("/api/reliability/resume/{run_id}")
+    async def resume_session(
+        run_id: str,
+        request: Request,
+    ):
+        """Resume a session from its latest checkpoint."""
+        body = await request.json() if request.headers.get("content-length") else {}
+        checkpoint_id = body.get("checkpoint_id")
+
+        result = resume_session_from_checkpoint(
+            request.app.state.store._connection,
+            run_id,
+            checkpoint_id=checkpoint_id,
+        )
+        return result.model_dump()
+
+    @app.post("/api/reliability/release-stale")
+    async def release_stale(
+        request: Request,
+    ):
+        """Release stale checkouts for orphaned sessions."""
+        body = await request.json() if request.headers.get("content-length") else {}
+        stale_timeout = body.get("stale_timeout_seconds", 300)
+        dead_timeout = body.get("dead_timeout_seconds", 600)
+        auto_release = body.get("auto_release", False)
+
+        result = release_stale_checkouts(
+            request.app.state.store._connection,
+            stale_timeout_seconds=stale_timeout,
+            dead_timeout_seconds=dead_timeout,
+            auto_release=auto_release,
+        )
+        return result.model_dump()
+
+    @app.get("/api/reliability/recovery-logs")
+    async def list_recovery_logs(
+        request: Request,
+        run_id: str | None = None,
+        limit: int = Query(default=50, gt=0, le=500),
+    ):
+        """Get recovery log entries for audit trail."""
+        return [
+            log.model_dump()
+            for log in get_recovery_logs(
+                request.app.state.store._connection,
+                run_id=run_id,
+                limit=limit,
+            )
+        ]
+
+    @app.post("/api/reliability/checkpoint/tool-call/pre/{run_id}")
+    async def create_pre_tool_checkpoint(
+        run_id: str,
+        request: Request,
+    ):
+        """Create a pre-tool-call checkpoint for session recovery."""
+        body = await request.json()
+        tool_name = body.get("tool_name", "unknown")
+        tool_args = body.get("tool_args", {})
+        current_state = body.get("current_state")
+
+        service = SessionResumeService(request.app.state.store._connection)
+        checkpoint = service.create_pre_tool_call_checkpoint(
+            run_id=run_id,
+            tool_name=tool_name,
+            tool_args=tool_args,
+            current_state=current_state,
+        )
+        return checkpoint.model_dump()
+
+    @app.post("/api/reliability/checkpoint/tool-call/post/{run_id}")
+    async def create_post_tool_checkpoint(
+        run_id: str,
+        request: Request,
+    ):
+        """Create a post-tool-call checkpoint for session recovery."""
+        body = await request.json()
+        tool_name = body.get("tool_name", "unknown")
+        result = body.get("result", {})
+        pre_checkpoint_id = body.get("pre_checkpoint_id", "")
+
+        service = SessionResumeService(request.app.state.store._connection)
+        checkpoint = service.create_post_tool_call_checkpoint(
+            run_id=run_id,
+            tool_name=tool_name,
+            result=result,
+            pre_checkpoint_id=pre_checkpoint_id,
+        )
+        return checkpoint.model_dump()
 
     return app
 
