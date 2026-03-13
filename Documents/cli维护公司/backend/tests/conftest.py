@@ -125,7 +125,7 @@ def empty_client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Generator[T
     )
     conn.close()
     monkeypatch.setenv("CONTROL_PLANE_DB_PATH", str(db_file))
-    with TestClient(create_app()) as c:
+    with TestClient(create_app(seed_data=False)) as c:
         yield c
 
 
@@ -217,7 +217,9 @@ class MockModelProvider:
             return self.responses.pop(0)
 
         response = {**self._default_response, "model": model}
-        response["id"] = f"mock-completion-{uuid4().hex[:8]}"
+        # Only override id if it's the default mock id (preserve custom response ids)
+        if not response["id"].startswith("custom-"):
+            response["id"] = f"mock-completion-{uuid4().hex[:8]}"
         return response
 
     def reset(self) -> None:

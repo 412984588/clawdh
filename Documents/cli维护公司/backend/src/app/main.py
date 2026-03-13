@@ -14,13 +14,15 @@ from app.overview import (
     OperationsOverview,
     RunCommentCreateRequest,
     RunCommentRecord,
+    RunLogResponse,
+    RunOverview,
+    RunUpdateRequest,
+    StatusHistoryEntry,
     TaskCheckoutRequest,
     TaskCommentCreateRequest,
     TaskCommentRecord,
     TaskOverview,
     TaskUpdateRequest,
-    RunOverview,
-    RunUpdateRequest,
 )
 from app.reliability import (
     AuthCheckRequest,
@@ -70,7 +72,7 @@ from app.workspaces import (
 )
 
 
-def create_app() -> FastAPI:
+def create_app(seed_data: bool = True) -> FastAPI:
     app = FastAPI(title="OpenClaw Company Bootstrap API")
 
     # Add rate limiting middleware (must be added first to wrap all requests)
@@ -83,7 +85,7 @@ def create_app() -> FastAPI:
         "CONTROL_PLANE_DB_PATH",
         str(Path(__file__).resolve().parents[2] / ".data" / "control-plane.sqlite3"),
     )
-    store = ControlPlaneStore(database_path)
+    store = ControlPlaneStore(database_path, seed_data=seed_data)
     app.state.store = store
 
     @app.get("/health")
@@ -205,6 +207,28 @@ def create_app() -> FastAPI:
             return request.app.state.store.create_run_comment(run_id, payload)
         except KeyError as error:
             raise HTTPException(status_code=404, detail="Run not found.") from error
+
+    @app.get("/api/runs/{run_id}/log")
+    async def get_run_log(
+        run_id: str,
+        request: Request,
+    ) -> RunLogResponse:
+        """Get structured log entries for a run's audit trail."""
+        try:
+            return request.app.state.store.get_run_log(run_id)
+        except KeyError as error:
+            raise HTTPException(status_code=404, detail="Run not found.") from error
+
+    @app.get("/api/tasks/{task_id}/status-history")
+    async def get_task_status_history(
+        task_id: str,
+        request: Request,
+    ) -> list[StatusHistoryEntry]:
+        """Get status transition history for a task."""
+        try:
+            return request.app.state.store.get_status_history(task_id)
+        except KeyError as error:
+            raise HTTPException(status_code=404, detail="Task not found.") from error
 
     # ---- Workspace snapshot and determinism endpoints ----
 

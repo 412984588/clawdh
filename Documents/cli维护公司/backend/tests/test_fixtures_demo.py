@@ -36,7 +36,12 @@ class TestClientFixtures:
         """Client fixture creates isolated database per test."""
         response = client.get("/health")
         assert response.status_code == 200
-        assert response.json() == {"status": "ok"}
+        body = response.json()
+        # HealthResponse includes status, timestamp, version, dependencies
+        assert "status" in body
+        assert body["status"] == "ok"
+        assert "dependencies" in body
+        assert len(body["dependencies"]) >= 2  # database + filesystem at minimum
 
     def test_client_has_seeded_data(self, client: TestClient) -> None:
         """Default client includes seed data from ControlPlaneStore."""
