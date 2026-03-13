@@ -43,7 +43,7 @@ export class RuntimeContextManager {
    */
   rememberRuntimeContext(ctx: OpenClawPluginServiceContext): OpenClawPluginServiceContext {
     this.runtimeContext = {
-      config: { ...ctx.config },
+      config: structuredClone(ctx.config),
       workspaceDir: ctx.workspaceDir,
       stateDir: ctx.stateDir,
       logger: ctx.logger,
