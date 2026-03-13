@@ -103,7 +103,9 @@ def empty_client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Generator[T
             trigger TEXT NOT NULL,
             issue TEXT NOT NULL,
             started_at TEXT NOT NULL,
-            updated_at TEXT NOT NULL DEFAULT ''
+            updated_at TEXT NOT NULL DEFAULT '',
+            ended_at TEXT,
+            outcome TEXT
         );
         CREATE TABLE IF NOT EXISTS task_comments (
             id TEXT PRIMARY KEY,
@@ -119,6 +121,27 @@ def empty_client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Generator[T
             author TEXT NOT NULL,
             body TEXT NOT NULL,
             created_at TEXT NOT NULL,
+            FOREIGN KEY(run_id) REFERENCES runs(id)
+        );
+        CREATE TABLE IF NOT EXISTS status_history (
+            id TEXT PRIMARY KEY,
+            task_id TEXT NOT NULL,
+            from_status TEXT,
+            to_status TEXT NOT NULL,
+            run_id TEXT,
+            timestamp TEXT NOT NULL,
+            FOREIGN KEY(task_id) REFERENCES tasks(id),
+            FOREIGN KEY(run_id) REFERENCES runs(id)
+        );
+        CREATE TABLE IF NOT EXISTS run_logs (
+            id TEXT PRIMARY KEY,
+            run_id TEXT NOT NULL,
+            timestamp TEXT NOT NULL,
+            action TEXT NOT NULL,
+            agent TEXT NOT NULL,
+            issue TEXT NOT NULL,
+            result TEXT NOT NULL,
+            metadata TEXT DEFAULT '{}',
             FOREIGN KEY(run_id) REFERENCES runs(id)
         );
         """
@@ -594,11 +617,15 @@ def insert_test_data(
     agents: list[dict[str, Any]] | None = None,
     tasks: list[dict[str, Any]] | None = None,
     runs: list[dict[str, Any]] | None = None,
+    status_history: list[dict[str, Any]] | None = None,
+    run_logs: list[dict[str, Any]] | None = None,
 ) -> None:
     """Insert test data directly into database for fast setup.
 
     Useful for tests that need specific data without going through the API.
     """
+    import json
+
     for agent in (agents or []):
         connection.execute(
             """
@@ -639,8 +666,8 @@ def insert_test_data(
     for run in (runs or []):
         connection.execute(
             """
-            INSERT INTO runs (id, agent, status, trigger, issue, started_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO runs (id, agent, status, trigger, issue, started_at, updated_at, ended_at, outcome)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 run["id"],
@@ -650,6 +677,42 @@ def insert_test_data(
                 run.get("issue", "CLI-0"),
                 run.get("startedAt", _current_timestamp()),
                 run.get("updatedAt", _current_timestamp()),
+                run.get("endedAt"),
+                run.get("outcome"),
+            ),
+        )
+
+    for entry in (status_history or []):
+        connection.execute(
+            """
+            INSERT INTO status_history (id, task_id, from_status, to_status, run_id, timestamp)
+            VALUES (?, ?, ?, ?, ?, ?)
+            """,
+            (
+                entry["id"],
+                entry["taskId"],
+                entry.get("fromStatus"),
+                entry["toStatus"],
+                entry.get("runId"),
+                entry.get("timestamp", _current_timestamp()),
+            ),
+        )
+
+    for log_entry in (run_logs or []):
+        connection.execute(
+            """
+            INSERT INTO run_logs (id, run_id, timestamp, action, agent, issue, result, metadata)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                log_entry["id"],
+                log_entry["runId"],
+                log_entry.get("timestamp", _current_timestamp()),
+                log_entry["action"],
+                log_entry.get("agent", "test-agent"),
+                log_entry.get("issue", "CLI-0"),
+                log_entry.get("result", "success"),
+                json.dumps(log_entry.get("metadata", {})),
             ),
         )
 

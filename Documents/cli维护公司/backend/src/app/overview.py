@@ -449,6 +449,7 @@ class ControlPlaneStore:
 
         review_queue = sum(1 for task in tasks if task.status in {"todo", "in_review"})
         blocked_work = sum(1 for task in tasks if task.status == "blocked")
+        stale_checkouts = self._count_stale_checkouts()
 
         # Import workspace health lazily to avoid circular imports
         try:
@@ -480,12 +481,44 @@ class ControlPlaneStore:
                     value=review_queue,
                     tone="attention",
                 ),
+                SummaryMetric(
+                    id="stale_checkouts",
+                    label="Stale Checkouts",
+                    value=stale_checkouts,
+                    tone="attention",
+                ),
             ],
             agents=self.list_agents(),
             tasks=tasks,
             runs=runs,
             workspaceHealth=workspace_health_dicts,
         )
+
+    def _count_stale_checkouts(self, stale_timeout_seconds: int = 300) -> int:
+        """Count runs that are stale (no heartbeat/update within timeout).
+
+        A stale checkout is a run that:
+        - Has status indicating activity (not completed/failed/killed)
+        - Has not been updated within stale_timeout_seconds
+        """
+        from datetime import UTC, datetime, timedelta
+
+        now = datetime.now(UTC)
+        threshold = (now - timedelta(seconds=stale_timeout_seconds)).isoformat().replace(
+            "+00:00", "Z"
+        )
+
+        row = self._connection.execute(
+            """
+            SELECT COUNT(*) as count
+            FROM runs
+            WHERE status NOT IN ('completed', 'failed', 'killed')
+            AND updated_at < ?
+            """,
+            (threshold,),
+        ).fetchone()
+
+        return row["count"] if row else 0
 
     def _initialize_schema(self) -> None:
         self._connection.executescript(

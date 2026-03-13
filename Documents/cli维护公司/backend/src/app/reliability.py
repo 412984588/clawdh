@@ -5,11 +5,14 @@ Implements:
 - Auto-release of stale checkouts
 - Run health status tracking
 - Auth drift detection for providers
+- Provider health check and connectivity verification
 """
 
 from __future__ import annotations
 
+import json
 import sqlite3
+import time
 from datetime import UTC, datetime, timedelta
 from enum import Enum
 from typing import Any
@@ -38,6 +41,57 @@ class AuthStatus(str, Enum):
     EXPIRED = "expired"
     INVALID = "invalid"
     UNKNOWN = "unknown"
+
+
+class ProviderHealthStatus(str, Enum):
+    """Health status for a model provider."""
+
+    HEALTHY = "healthy"  # Provider responding normally
+    DEGRADED = "degraded"  # Provider responding but with issues (high latency)
+    UNHEALTHY = "unhealthy"  # Provider not responding or errors
+    UNKNOWN = "unknown"  # No health data available
+
+
+class ProviderHealthCheck(BaseModel):
+    """Result of a provider health check."""
+
+    provider: str
+    status: ProviderHealthStatus
+    latency_ms: float | None = None
+    model: str | None = None
+    error: str | None = None
+    error_code: str | None = None
+    warning: str | None = None
+    checked_at: str
+
+
+class ProviderHealthReport(BaseModel):
+    """Comprehensive provider health report."""
+
+    total_providers: int
+    healthy_count: int
+    degraded_count: int
+    unhealthy_count: int
+    unknown_count: int
+    providers: list[ProviderHealthDetail]
+    recommendations: list[str]
+    generated_at: str
+
+
+class ProviderHealthDetail(BaseModel):
+    """Detailed health information for a provider."""
+
+    provider: str
+    status: ProviderHealthStatus
+    model: str | None = None
+    latency_p50: float | None = None
+    latency_p95: float | None = None
+    latency_p99: float | None = None
+    uptime_percent: float | None = None
+    last_check: str | None = None
+    error: str | None = None
+    error_code: str | None = None
+    warning: str | None = None
 
 
 class StaleRunInfo(BaseModel):
@@ -171,6 +225,21 @@ CREATE TABLE IF NOT EXISTS run_cleanup_log (
     performed_at TEXT NOT NULL,
     FOREIGN KEY(run_id) REFERENCES runs(id)
 );
+
+CREATE TABLE IF NOT EXISTS provider_health_checks (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    provider TEXT NOT NULL,
+    status TEXT NOT NULL,
+    latency_ms REAL,
+    error TEXT,
+    error_code TEXT,
+    warning TEXT,
+    model TEXT,
+    checked_at TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_provider_health_provider
+    ON provider_health_checks(provider, checked_at DESC);
 """
 
 
@@ -214,8 +283,6 @@ def record_heartbeat(
     Returns:
         HeartbeatResponse with health status
     """
-    import json
-
     _ensure_reliability_tables(conn)
 
     # Verify run exists
@@ -280,7 +347,7 @@ def get_last_heartbeat(
         SELECT run_id, recorded_at, status, files_touched, metadata
         FROM heartbeats
         WHERE run_id = ?
-        ORDER BY recorded_at DESC
+        ORDER BY recorded_at DESC, id DESC
         LIMIT 1
         """,
         (run_id,),
@@ -288,8 +355,6 @@ def get_last_heartbeat(
 
     if row is None:
         return None
-
-    import json
 
     return {
         "run_id": row["run_id"],
@@ -578,7 +643,7 @@ def check_provider_auth(
             SELECT status, expires_at, error, checked_at
             FROM auth_checks
             WHERE provider = ?
-            ORDER BY checked_at DESC
+            ORDER BY checked_at DESC, id DESC
             LIMIT 1
             """,
             (provider,),
@@ -666,7 +731,7 @@ def get_auth_history(
         SELECT provider, status, expires_at, error, checked_at
         FROM auth_checks
         WHERE provider = ?
-        ORDER BY checked_at DESC
+        ORDER BY checked_at DESC, id DESC
         LIMIT ?
         """,
         (provider, limit),
@@ -725,7 +790,7 @@ def detect_auth_drift(
             SELECT status, expires_at, checked_at
             FROM auth_checks
             WHERE provider = ?
-            ORDER BY checked_at DESC
+            ORDER BY checked_at DESC, id DESC
             LIMIT 1
             """,
             (provider,),
@@ -757,3 +822,411 @@ def detect_auth_drift(
             )
 
     return drifted_providers
+
+
+# ---------------------------------------------------------------------------
+# Provider Health Check and Drift Detection
+# ---------------------------------------------------------------------------
+
+
+def record_provider_health(
+    conn: sqlite3.Connection,
+    provider: str,
+    status: ProviderHealthStatus,
+    latency_ms: float | None = None,
+    model: str | None = None,
+    error: str | None = None,
+    error_code: str | None = None,
+    warning: str | None = None,
+) -> None:
+    """Record provider health check result.
+
+    Args:
+        conn: Database connection
+        provider: Provider name (e.g., "codex", "claude", "gemini")
+        status: Health status
+        latency_ms: Response latency in milliseconds
+        model: Model being checked
+        error: Error message if unhealthy
+        error_code: Error code for programmatic handling
+        warning: Warning message if degraded
+    """
+    _ensure_reliability_tables(conn)
+
+    checked_at = _current_timestamp()
+
+    conn.execute(
+        """
+        INSERT INTO provider_health_checks (
+            provider, status, latency_ms, error, error_code, warning, model, checked_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """,
+        (
+            provider,
+            status.value,
+            latency_ms,
+            error,
+            error_code,
+            warning,
+            model,
+            checked_at,
+        ),
+    )
+
+    conn.commit()
+
+
+def _calculate_percentile(values: list[float], percentile: float) -> float | None:
+    """Calculate percentile value from a list."""
+    if not values:
+        return None
+    sorted_values = sorted(values)
+    index = int(len(sorted_values) * percentile / 100)
+    return sorted_values[min(index, len(sorted_values) - 1)]
+
+
+def _get_provider_health_detail(
+    conn: sqlite3.Connection,
+    provider: str,
+) -> ProviderHealthDetail | None:
+    """Get detailed health information for a provider."""
+    # Get recent health checks (last 100 for statistics)
+    rows = conn.execute(
+        """
+        SELECT status, latency_ms, error, error_code, warning, model, checked_at
+        FROM provider_health_checks
+        WHERE provider = ?
+        ORDER BY checked_at DESC, id DESC
+        LIMIT 100
+        """,
+        (provider,),
+    ).fetchall()
+
+    if not rows:
+        return None
+
+    # Latest status
+    latest = rows[0]
+    status = ProviderHealthStatus(latest["status"])
+
+    # Calculate latency percentiles
+    latencies = [r["latency_ms"] for r in rows if r["latency_ms"] is not None]
+    latency_p50 = _calculate_percentile(latencies, 50)
+    latency_p95 = _calculate_percentile(latencies, 95)
+    latency_p99 = _calculate_percentile(latencies, 99)
+
+    # Calculate uptime percentage
+    healthy_count = sum(1 for r in rows if r["status"] == ProviderHealthStatus.HEALTHY.value)
+    uptime_percent = (healthy_count / len(rows)) * 100 if rows else None
+
+    return ProviderHealthDetail(
+        provider=provider,
+        status=status,
+        model=latest["model"],
+        latency_p50=latency_p50,
+        latency_p95=latency_p95,
+        latency_p99=latency_p99,
+        uptime_percent=round(uptime_percent, 1) if uptime_percent else None,
+        last_check=latest["checked_at"],
+        error=latest["error"],
+        error_code=latest["error_code"],
+        warning=latest["warning"],
+    )
+
+
+def get_provider_health_report(conn: sqlite3.Connection) -> ProviderHealthReport:
+    """Generate a comprehensive provider health report.
+
+    Args:
+        conn: Database connection
+
+    Returns:
+        ProviderHealthReport with statistics and recommendations
+    """
+    _ensure_reliability_tables(conn)
+
+    # Get distinct providers from both agents and health checks
+    providers_from_agents = conn.execute(
+        """
+        SELECT DISTINCT REPLACE(adapter, '-local', '') as provider
+        FROM agents
+        WHERE adapter LIKE '%-local'
+        """
+    ).fetchall()
+
+    providers_from_checks = conn.execute(
+        """
+        SELECT DISTINCT provider
+        FROM provider_health_checks
+        """
+    ).fetchall()
+
+    # Combine and deduplicate
+    all_providers = set()
+    for row in providers_from_agents:
+        all_providers.add(row["provider"])
+    for row in providers_from_checks:
+        all_providers.add(row["provider"])
+
+    # Get health details for each provider
+    provider_details: list[ProviderHealthDetail] = []
+    for provider in all_providers:
+        detail = _get_provider_health_detail(conn, provider)
+        if detail:
+            provider_details.append(detail)
+        else:
+            # No health check yet
+            provider_details.append(
+                ProviderHealthDetail(
+                    provider=provider,
+                    status=ProviderHealthStatus.UNKNOWN,
+                    last_check=None,
+                )
+            )
+
+    # Sort by status severity: unhealthy > degraded > unknown > healthy
+    severity_order = {
+        ProviderHealthStatus.UNHEALTHY: 0,
+        ProviderHealthStatus.DEGRADED: 1,
+        ProviderHealthStatus.UNKNOWN: 2,
+        ProviderHealthStatus.HEALTHY: 3,
+    }
+    provider_details.sort(key=lambda p: severity_order.get(p.status, 99))
+
+    # Count by status
+    healthy_count = sum(1 for p in provider_details if p.status == ProviderHealthStatus.HEALTHY)
+    degraded_count = sum(1 for p in provider_details if p.status == ProviderHealthStatus.DEGRADED)
+    unhealthy_count = sum(1 for p in provider_details if p.status == ProviderHealthStatus.UNHEALTHY)
+    unknown_count = sum(1 for p in provider_details if p.status == ProviderHealthStatus.UNKNOWN)
+
+    # Generate recommendations
+    recommendations: list[str] = []
+    for p in provider_details:
+        if p.status == ProviderHealthStatus.UNHEALTHY:
+            recommendations.append(
+                f"URGENT: {p.provider} is unhealthy - {p.error or 'not responding'}. "
+                f"Check API keys and network connectivity."
+            )
+        elif p.status == ProviderHealthStatus.DEGRADED:
+            recommendations.append(
+                f"WARNING: {p.provider} is degraded - {p.warning or 'high latency detected'}. "
+                f"Consider switching to alternative provider."
+            )
+        elif p.status == ProviderHealthStatus.UNKNOWN:
+            recommendations.append(
+                f"INFO: No health data for {p.provider}. Run health check to establish baseline."
+            )
+
+    return ProviderHealthReport(
+        total_providers=len(provider_details),
+        healthy_count=healthy_count,
+        degraded_count=degraded_count,
+        unhealthy_count=unhealthy_count,
+        unknown_count=unknown_count,
+        providers=provider_details,
+        recommendations=recommendations,
+        generated_at=_current_timestamp(),
+    )
+
+
+def detect_provider_drift(
+    conn: sqlite3.Connection,
+    drift_threshold_hours: int = 24,
+) -> list[dict[str, Any]]:
+    """Detect providers with health drift (stale, degraded, or unhealthy).
+
+    Args:
+        conn: Database connection
+        drift_threshold_hours: Hours since last check to consider drifted
+
+    Returns:
+        List of providers with drift issues
+    """
+    _ensure_reliability_tables(conn)
+
+    now = datetime.now(UTC)
+    threshold = now - timedelta(hours=drift_threshold_hours)
+    threshold_str = threshold.isoformat().replace("+00:00", "Z")
+
+    # Get all providers from agents
+    agents = conn.execute(
+        """
+        SELECT DISTINCT REPLACE(adapter, '-local', '') as provider
+        FROM agents
+        WHERE adapter LIKE '%-local'
+        """
+    ).fetchall()
+
+    drifted_providers: list[dict[str, Any]] = []
+
+    for row in agents:
+        provider = row["provider"]
+
+        # Get last health check (order by id DESC as tiebreaker for same timestamp)
+        last_check = conn.execute(
+            """
+            SELECT status, checked_at, error, warning
+            FROM provider_health_checks
+            WHERE provider = ?
+            ORDER BY checked_at DESC, id DESC
+            LIMIT 1
+            """,
+            (provider,),
+        ).fetchone()
+
+        if last_check is None:
+            drifted_providers.append(
+                {
+                    "provider": provider,
+                    "reason": "no_health_check",
+                    "severity": "warning",
+                    "last_check": None,
+                }
+            )
+        elif last_check["checked_at"] < threshold_str:
+            drifted_providers.append(
+                {
+                    "provider": provider,
+                    "reason": "stale_health_check",
+                    "severity": "warning",
+                    "last_check": last_check["checked_at"],
+                }
+            )
+        elif last_check["status"] == ProviderHealthStatus.UNHEALTHY.value:
+            drifted_providers.append(
+                {
+                    "provider": provider,
+                    "reason": "provider_unhealthy",
+                    "severity": "critical",
+                    "last_check": last_check["checked_at"],
+                    "error": last_check["error"],
+                }
+            )
+        elif last_check["status"] == ProviderHealthStatus.DEGRADED.value:
+            drifted_providers.append(
+                {
+                    "provider": provider,
+                    "reason": "provider_degraded",
+                    "severity": "warning",
+                    "last_check": last_check["checked_at"],
+                    "warning": last_check["warning"],
+                }
+            )
+
+    return drifted_providers
+
+
+def check_provider_connectivity(
+    conn: sqlite3.Connection,
+    providers: list[str] | None = None,
+    mock_mode: bool = False,
+    timeout_ms: int = 5000,
+) -> list[ProviderHealthCheck]:
+    """Check connectivity to model providers.
+
+    In production, this would make actual API calls to verify connectivity.
+    In mock mode, it simulates responses for testing.
+
+    Args:
+        conn: Database connection
+        providers: List of providers to check (empty = auto-detect from agents)
+        mock_mode: If True, simulate responses instead of real API calls
+        timeout_ms: Timeout for connectivity checks
+
+    Returns:
+        List of health check results
+    """
+    _ensure_reliability_tables(conn)
+
+    # Auto-detect providers from agents if not specified
+    if not providers:
+        agent_rows = conn.execute(
+            """
+            SELECT DISTINCT REPLACE(adapter, '-local', '') as provider, model
+            FROM agents
+            WHERE adapter LIKE '%-local'
+            """
+        ).fetchall()
+        providers = [row["provider"] for row in agent_rows]
+
+    results: list[ProviderHealthCheck] = []
+    checked_at = _current_timestamp()
+
+    for provider in providers:
+        if mock_mode:
+            # Simulate health check for testing
+            result = _mock_health_check(provider, checked_at)
+        else:
+            # Real health check - verify provider connectivity
+            result = _real_health_check(provider, checked_at, timeout_ms)
+
+        # Record result in database
+        record_provider_health(
+            conn,
+            result.provider,
+            result.status,
+            latency_ms=result.latency_ms,
+            model=result.model,
+            error=result.error,
+            error_code=result.error_code,
+            warning=result.warning,
+        )
+
+        results.append(result)
+
+    return results
+
+
+def _mock_health_check(provider: str, checked_at: str) -> ProviderHealthCheck:
+    """Generate mock health check result for testing."""
+    # Simulate different responses based on provider name
+    if "nonexistent" in provider.lower():
+        return ProviderHealthCheck(
+            provider=provider,
+            status=ProviderHealthStatus.UNHEALTHY,
+            error="Provider not found",
+            error_code="PROVIDER_NOT_FOUND",
+            checked_at=checked_at,
+        )
+
+    # Default: healthy with simulated latency
+    return ProviderHealthCheck(
+        provider=provider,
+        status=ProviderHealthStatus.HEALTHY,
+        latency_ms=100.0,
+        model=None,
+        checked_at=checked_at,
+    )
+
+
+def _real_health_check(provider: str, checked_at: str, timeout_ms: int) -> ProviderHealthCheck:
+    """Perform real health check against provider API.
+
+    This is a framework for real connectivity checks. In production,
+    this would make actual API calls to verify provider availability
+    using provider-specific endpoints.
+    """
+    start_time = time.monotonic()
+
+    try:
+        # For now, return a placeholder that indicates the check framework exists
+        # Real implementation would use httpx/urllib to hit the endpoints
+        latency_ms = (time.monotonic() - start_time) * 1000
+
+        return ProviderHealthCheck(
+            provider=provider,
+            status=ProviderHealthStatus.UNKNOWN,
+            latency_ms=latency_ms,
+            warning="Real health check not yet implemented - use mock_mode for testing",
+            checked_at=checked_at,
+        )
+    except Exception as e:
+        latency_ms = (time.monotonic() - start_time) * 1000
+        return ProviderHealthCheck(
+            provider=provider,
+            status=ProviderHealthStatus.UNHEALTHY,
+            latency_ms=latency_ms,
+            error=str(e),
+            error_code=type(e).__name__,
+            checked_at=checked_at,
+        )
