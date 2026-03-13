@@ -33,6 +33,9 @@ import type { OpenClawPluginServiceContext, PluginCommandContext } from "../type
 /** 配置导入 */
 import { EngineConfig, DEFAULT_CONFIG } from "../config.js";
 
+/** 通知器导入 */
+import { NotificationChannel, createNotifier } from "./notifier.js";
+
 /** 代码分析器导入 */
 import {
   LobsterCodeAnalyzer,
@@ -48,14 +51,6 @@ import {
   EventLoopMetrics,
   createZeroLatencyLoop,
 } from "./zero-latency-loop.js";
-
-/** 编排器注册表导入 (v2.37) */
-import {
-  OrchestratorRegistry,
-  OrchestratorResult,
-  initializeBuiltinOrchestrators,
-  recommendOrchestrator,
-} from "./orchestrator-registry.js";
 
 /** Node.js 内置模块 */
 import fs from "fs/promises";
@@ -252,6 +247,10 @@ const StateFileNames = {
   STATE_DIR: ".lobster-engine",
   /** 建议日志文件 */
   SUGGESTIONS_LOG: "suggestions.log",
+  /** 最新汇报文件 */
+  LATEST_REPORT: "latest-report.json",
+  /** 汇报历史文件 */
+  REPORT_HISTORY: "reports.log",
   /** 临时文件后缀（用于原子写入） */
   TEMP_SUFFIX: ".tmp",
 } as const;
@@ -379,33 +378,26 @@ const RetryConstants = {
  * 现代浏览器和 Node.js 支持原生 AbortSignal.timeout()，
  * 比 Promise.race 更高效且能真正取消底层操作。
  */
-async function withTimeout<T>(
+export async function withTimeout<T>(
   promise: Promise<T>,
   milliseconds: number,
   operation: string
 ): Promise<T> {
+  let timeoutId: NodeJS.Timeout | undefined;
+
   try {
-    // 使用现代 AbortSignal.timeout() API
-    const result = await Promise.race([
+    return await Promise.race([
       promise,
-      // 如果环境不支持 AbortSignal.timeout，使用手动实现
-      typeof AbortSignal.timeout === 'function'
-        ? Promise.reject(new DOMException(`操作超时: ${operation}`, 'TimeoutError'))
-            .then(() => {
-              // 永不 resolve，仅用于类型
-              return {} as T;
-            })
-        : new Promise<T>((_, reject) =>
-            setTimeout(() => reject(new Error(`操作超时: ${operation} (>${milliseconds}ms)`)), milliseconds)
-          )
+      new Promise<T>((_, reject) => {
+        timeoutId = setTimeout(() => {
+          reject(new Error(`${operation} 超时 (${milliseconds}ms)`));
+        }, milliseconds);
+      }),
     ]);
-    return result;
-  } catch (error) {
-    // 区分超时错误和其他错误
-    if (error instanceof Error && error.message.includes('超时')) {
-      throw new Error(`${operation} 超时 (${milliseconds}ms)`);
+  } finally {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
     }
-    throw error;
   }
 }
 
@@ -721,8 +713,19 @@ export class PerpetualEngineService {
   private api: EngineApi;
   /** 中断控制器 */
   private abortController: AbortController | null = null;
+  /** 后台循环任务 */
+  private loopTask: Promise<void> | null = null;
   /** 文件列表缓存 */
   private fileCache: Map<string, { data: string[]; timestamp: number }> = new Map();
+  /** 最近一次宿主上下文 */
+  private runtimeContext: OpenClawPluginServiceContext | null = null;
+  /** MISSION / BOUNDARIES 缓存 */
+  private missionCache: {
+    workspaceDir: string;
+    timestamp: number;
+    mission: string;
+    boundaries: string;
+  } | null = null;
 
   // ========== 零延迟循环引擎 ==========
   /** 零延迟循环引擎（用于事件循环优化） */
@@ -793,10 +796,70 @@ export class PerpetualEngineService {
       },
     });
 
-    // 初始化编排器注册表 (v2.37)
-    this.initializeOrchestrators().catch(err => {
-      safeDebug(this.api.logger, `编排器初始化失败: ${err instanceof Error ? err.message : String(err)}`);
-    });
+  }
+
+  private rememberRuntimeContext(ctx: OpenClawPluginServiceContext): OpenClawPluginServiceContext {
+    this.runtimeContext = {
+      config: { ...ctx.config },
+      workspaceDir: ctx.workspaceDir,
+      stateDir: ctx.stateDir,
+      logger: ctx.logger,
+    };
+    return this.runtimeContext;
+  }
+
+  private requireRuntimeContext(): OpenClawPluginServiceContext {
+    if (!this.runtimeContext) {
+      throw new Error("OpenClaw 宿主上下文缺失，请先通过服务启动或 gateway_start 注入 workspaceDir/stateDir");
+    }
+    return this.runtimeContext;
+  }
+
+  private getRuntimeContextFromCommand(ctx: PluginCommandContext): OpenClawPluginServiceContext {
+    const runtimeContext = this.requireRuntimeContext();
+    return {
+      ...runtimeContext,
+      config: { ...runtimeContext.config, ...ctx.config },
+      logger: runtimeContext.logger ?? this.api.logger,
+    };
+  }
+
+  private requireWorkspaceDir(ctx?: OpenClawPluginServiceContext): string {
+    const workspaceDir = ctx?.workspaceDir ?? this.runtimeContext?.workspaceDir;
+    if (!workspaceDir) {
+      throw new Error("OpenClaw workspaceDir 缺失，拒绝回退到 process.cwd()");
+    }
+    return workspaceDir;
+  }
+
+  async startLoop(ctx?: OpenClawPluginServiceContext): Promise<void> {
+    if (this.isRunningValue) {
+      this.api.logger.warn("引擎已在运行中");
+      return;
+    }
+
+    const serviceContext = ctx ? this.rememberRuntimeContext(ctx) : this.requireRuntimeContext();
+    await this.recoverState(serviceContext);
+
+    this.isRunningValue = true;
+    this.abortController = new AbortController();
+    this.lastLoopTime = Date.now();
+
+    this.stopHealthCheck();
+    this.startHealthCheck();
+
+    this.loopTask = this.runLoop(serviceContext, this.abortController.signal)
+      .catch((error) => {
+        this.api.logger.error("循环异常: " + (error instanceof Error ? error.message : String(error)));
+      })
+      .finally(() => {
+        this.isRunningValue = false;
+        this.abortController = null;
+        this.stopHealthCheck();
+        this.loopTask = null;
+      });
+
+    this.api.logger.info(LogMessages.ENGINE_STARTED);
   }
 
   /**
@@ -823,34 +886,7 @@ export class PerpetualEngineService {
    * ```
    */
   async startFromCommand(_ctx: PluginCommandContext): Promise<void> {
-    if (this.isRunningValue) {
-      this.api.logger.warn("引擎已在运行中");
-      return;
-    }
-
-    this.isRunningValue = true;
-    this.abortController = new AbortController();
-    this.lastLoopTime = Date.now();
-
-    // 构造一个虚拟的 service context
-    const serviceContext: OpenClawPluginServiceContext = {
-      config: _ctx.config,
-      workspaceDir: undefined, // 命令上下文可能没有这个
-      stateDir: path.join(process.cwd(), StateFileNames.STATE_DIR),
-      logger: this.api.logger,
-    };
-
-    // 启动健康检查
-    this.startHealthCheck();
-
-    // 启动异步循环（不阻塞命令响应）
-    this.runLoop(serviceContext, this.abortController.signal).catch((error) => {
-      this.api.logger.error("循环异常: " + error.message);
-      this.isRunningValue = false;
-      this.stopHealthCheck();
-    });
-
-    this.api.logger.info(LogMessages.ENGINE_STARTED);
+    await this.startLoop(this.getRuntimeContextFromCommand(_ctx));
   }
 
   /**
@@ -869,8 +905,9 @@ export class PerpetualEngineService {
    * 需要通过命令触发 `startFromCommand` 来开始循环。
    */
   async start(ctx: OpenClawPluginServiceContext): Promise<void> {
+    this.rememberRuntimeContext(ctx);
     // 尝试恢复之前的状态
-    await this.recoverState(ctx);
+    await this.recoverState(this.requireRuntimeContext());
     this.api.logger.info(LogMessages.ENGINE_READY);
   }
 
@@ -935,8 +972,8 @@ export class PerpetualEngineService {
    *
    * @param _ctx 服务上下文（未使用）
    */
-  stopService(_ctx: OpenClawPluginServiceContext): void {
-    this.stopLoop();
+  stopService(_ctx: OpenClawPluginServiceContext): Promise<void> {
+    return this.stopLoop();
   }
 
   /**
@@ -962,13 +999,22 @@ export class PerpetualEngineService {
    * @remarks
    * 停止操作是异步的，循环可能在调用后短暂继续运行直到下一次条件检查。
    */
-  stopLoop(): void {
+  async stopLoop(): Promise<void> {
     this.isRunningValue = false;
     if (this.abortController) {
       this.abortController.abort();
-      this.abortController = null;
     }
     this.stopHealthCheck();
+    if (this.loopTask) {
+      await this.loopTask.catch(() => {
+        // stop 路径不再向上抛出后台循环异常
+      });
+    }
+    if (this.runtimeContext) {
+      await this.persistState(this.runtimeContext).catch((error) => {
+        this.api.logger.warn(`停止时状态持久化失败: ${error instanceof Error ? error.message : String(error)}`);
+      });
+    }
     this.api.logger.info(LogMessages.ENGINE_STOPPED);
   }
 
@@ -1035,14 +1081,15 @@ export class PerpetualEngineService {
           });
         }
 
+        if (this.loopCountValue % this.config.persistInterval === 0) {
+          await this.persistState(ctx);
+        }
+
         this.loopCountValue++;
 
         // 记录循环时间
         this.recordLoopTime();
         this.lastLoopTime = Date.now(); // 更新健康检查时间戳
-
-        // ⚡ 零延迟：立即进入下一轮，无 sleep
-
       } catch (error) {
         // 狂暴异常处理
         const errorMsg = error instanceof Error ? error.message : String(error);
@@ -1067,6 +1114,8 @@ export class PerpetualEngineService {
         // 错误注入上下文，让 AI 换方法
         // 立即继续下一轮
       }
+
+      await new Promise<void>((resolve) => setImmediate(resolve));
     }
 
     this.api.logger.info(`🔄 永动循环结束，总循环次数: ${this.loopCountValue}`);
@@ -1086,9 +1135,23 @@ export class PerpetualEngineService {
     mission: string;
     boundaries: string;
   }> {
-    const workspaceDir = ctx.workspaceDir || process.cwd();
+    const workspaceDir = this.requireWorkspaceDir(ctx);
     const missionPath = path.join(workspaceDir, MissionFileNames.MISSION);
     const boundariesPath = path.join(workspaceDir, MissionFileNames.BOUNDARIES);
+    const now = Date.now();
+    const shouldUseCache = this.config.enableCache;
+
+    if (
+      shouldUseCache &&
+      this.missionCache &&
+      this.missionCache.workspaceDir === workspaceDir &&
+      now - this.missionCache.timestamp < this.config.cacheTTL
+    ) {
+      return {
+        mission: this.missionCache.mission,
+        boundaries: this.missionCache.boundaries,
+      };
+    }
 
     try {
       const [mission, boundaries] = await Promise.all([
@@ -1096,13 +1159,30 @@ export class PerpetualEngineService {
         fs.readFile(boundariesPath, "utf-8").catch(() => this.getDefaultBoundaries()),
       ]);
 
+      if (shouldUseCache) {
+        this.missionCache = {
+          workspaceDir,
+          timestamp: now,
+          mission,
+          boundaries,
+        };
+      }
+
       return { mission, boundaries };
     } catch (error) {
       this.api.logger.warn("无法加载 MISSION/BOUNDARIES，使用默认值");
-      return {
+      const fallback = {
         mission: this.getDefaultMission(),
         boundaries: this.getDefaultBoundaries(),
       };
+      if (shouldUseCache) {
+        this.missionCache = {
+          workspaceDir,
+          timestamp: now,
+          ...fallback,
+        };
+      }
+      return fallback;
     }
   }
 
@@ -1168,19 +1248,20 @@ export class PerpetualEngineService {
   private async planNextAction(mission: string, _boundaries: string): Promise<{
     description: string;
     type: string;
+    recoveryErrorTimestamp?: number;
   }> {
     // 优先级1：处理未解决的错误
-    const unresolvedErrors = this.context.errors.filter(e => !e.resolved);
+    const unresolvedErrors = this.context.errors.filter(
+      (error) => !error.resolved && error.recoveryAttemptedAt === undefined,
+    );
     if (unresolvedErrors.length > 0) {
       const lastError = unresolvedErrors[unresolvedErrors.length - 1];
       const recovery = this.getErrorRecoveryAction(lastError);
 
-      // 标记错误为已处理
-      lastError.resolved = true;
-
       return {
         description: recovery.description,
         type: "error_recovery",
+        recoveryErrorTimestamp: lastError.timestamp,
       };
     }
 
@@ -1282,7 +1363,7 @@ export class PerpetualEngineService {
     message: string;
   }> {
     try {
-      const workspaceDir = process.cwd(); // 使用当前工作目录
+      const workspaceDir = this.requireWorkspaceDir();
       const missionPath = path.join(workspaceDir, MissionFileNames.MISSION);
 
       // 读取现有文件或使用默认模板
@@ -1325,6 +1406,7 @@ export class PerpetualEngineService {
 
       // 写入文件
       await fs.writeFile(missionPath, updatedLines.join('\n'), 'utf-8');
+      this.missionCache = null;
 
       return {
         success: true,
@@ -1352,7 +1434,7 @@ export class PerpetualEngineService {
     path: string;
   }> {
     try {
-      const workspaceDir = process.cwd();
+      const workspaceDir = this.requireWorkspaceDir();
       const missionPath = path.join(workspaceDir, MissionFileNames.MISSION);
       const content = await fs.readFile(missionPath, 'utf-8');
       return {
@@ -1361,129 +1443,19 @@ export class PerpetualEngineService {
         path: missionPath
       };
     } catch {
+      // 使用 requireWorkspaceDir() 确保路径处理一致性
+      // 如果 workspaceDir 不存在，将抛出有意义的错误而非返回不完整路径
+      const workspaceDir = this.requireWorkspaceDir();
       return {
         mission: this.getDefaultMission(),
         exists: false,
-        path: path.join(process.cwd(), MissionFileNames.MISSION)
+        path: path.join(workspaceDir, MissionFileNames.MISSION),
       };
     }
   }
 
-  // ========== 编排器集成 (v2.37) ==========
-
-  /**
-   * 初始化编排器注册表
-   *
-   * 加载内置编排器并注册到全局注册表。
-   */
-  private async initializeOrchestrators(): Promise<void> {
-    try {
-      await initializeBuiltinOrchestrators();
-      this.api.logger.info(`🦞 编排器注册表初始化完成 (${OrchestratorRegistry.size} 个编排器)`);
-    } catch (error) {
-      this.api.logger.warn(`编排器初始化失败: ${error instanceof Error ? error.message : String(error)}`);
-    }
-  }
-
-  /**
-   * 调用编排器执行任务
-   *
-   * 根据任务描述推荐并执行合适的编排器。
-   *
-   * @param task 任务描述
-   * @param preferredOrchestrator 首选编排器（可选）
-   * @returns Promise<{ summary: string }> 执行结果摘要
-   */
-  public async executeWithOrchestrator(
-    task: string,
-    preferredOrchestrator?: string
-  ): Promise<{ summary: string }> {
-    try {
-      // 边界检查：处理空任务
-      const trimmedTask = task?.trim() || "";
-      if (!trimmedTask) {
-        return { summary: "⚠️ 任务描述不能为空\n用法: /partner_orchestrate <任务描述> [编排器ID]" };
-      }
-
-      // 如果指定了编排器，直接使用
-      let orchestratorId = preferredOrchestrator;
-
-      // 否则推荐编排器
-      if (!orchestratorId) {
-        const recommendations = await recommendOrchestrator(trimmedTask);
-        orchestratorId = recommendations[0] || 'malt'; // 默认使用 MALT
-      }
-
-      // 检查编排器是否已注册
-      if (!OrchestratorRegistry.has(orchestratorId)) {
-        return { summary: `⚠️ 编排器 "${orchestratorId}" 未注册` };
-      }
-
-      // 获取编排器元数据
-      const metadata = await OrchestratorRegistry.getMetadata(orchestratorId);
-      this.api.logger.info(`🔧 使用编排器: ${metadata?.name || orchestratorId}`);
-
-      // 执行编排器
-      const result = await OrchestratorRegistry.execute(orchestratorId, trimmedTask);
-
-      if (result.success) {
-        return {
-          summary: `✅ [${metadata?.name || orchestratorId}] 完成 (${result.duration}ms)\n` +
-                   `   输入: ${trimmedTask.slice(0, 50)}${trimmedTask.length > 50 ? '...' : ''}`
-        };
-      } else {
-        return {
-          summary: `❌ [${metadata?.name || orchestratorId}] 失败: ${result.error}`
-        };
-      }
-    } catch (error) {
-      return {
-        summary: `❌ 编排器执行异常: ${error instanceof Error ? error.message : String(error)}`
-      };
-    }
-  }
-
-  /**
-   * 判断是否应该使用编排器
-   *
-   * 根据任务描述的特征判断是否应该调用编排器。
-   *
-   * @param description 行动描述
-   * @returns {boolean} 是否应该使用编排器
-   */
-  private shouldUseOrchestrator(description: string): boolean {
-    // 包含特定关键词的任务使用编排器
-    const orchestratorKeywords = [
-      '推理', '分析', '协作', '优化', '进化', '求解',
-      '计算', '规划', '决策', '推理', '搜索', '学习',
-      '多步骤', '复杂', '深度', '反思', '验证'
-    ];
-
-    return orchestratorKeywords.some(keyword => description.includes(keyword));
-  }
-
-  /**
-   * 获取可用编排器列表（全部56个）
-   *
-   * @returns {string[]} 编排器 ID 列表
-   */
-  async getAvailableOrchestrators(): Promise<string[]> {
-    const orchestrators = await OrchestratorRegistry.list();
-    return orchestrators.map(m => m.id);
-  }
-
-  /**
-   * 获取编排器完整信息
-   *
-   * @returns 编排器详细信息列表
-   */
-  async getOrchestratorDetails(): Promise<Array<{id: string; name: string; description: string}>> {
-    const orchestrators = await OrchestratorRegistry.list();
-    return orchestrators.map(m => ({
-      id: m.id,
-      name: m.name,
-      description: m.description,
-    }));
+  async analyzeCurrentWorkspace(): Promise<string> {
+    return this.analyzeCodebase(this.requireRuntimeContext());
   }
 
   /**
@@ -1496,7 +1468,7 @@ export class PerpetualEngineService {
    * @returns Promise<{ summary: string }> 执行结果摘要
    */
   private async executeAction(
-    action: { description: string; type: string },
+    action: { description: string; type: string; recoveryErrorTimestamp?: number },
     ctx: OpenClawPluginServiceContext
   ): Promise<{ summary: string }> {
     // 根据行动类型执行不同的逻辑
@@ -1505,6 +1477,14 @@ export class PerpetualEngineService {
         return { summary: "引擎初始化完成，已加载 MISSION 和 BOUNDARIES" };
 
       case ActionType.ERROR_RECOVERY:
+        if (action.recoveryErrorTimestamp) {
+          const pendingError = this.context.errors.find(
+            (error) => error.timestamp === action.recoveryErrorTimestamp && !error.resolved,
+          );
+          if (pendingError) {
+            pendingError.recoveryAttemptedAt = Date.now();
+          }
+        }
         return { summary: "已记录错误，将在下次循环中调整策略" };
 
       case ActionType.EXECUTE:
@@ -1531,12 +1511,6 @@ export class PerpetualEngineService {
     description: string,
     ctx: OpenClawPluginServiceContext
   ): Promise<{ summary: string }> {
-    // v2.37: 优先检查是否应该使用编排器
-    if (this.shouldUseOrchestrator(description)) {
-      this.api.logger.info(`🔧 检测到复杂任务，使用编排器处理`);
-      return await this.executeWithOrchestrator(description);
-    }
-
     const handlers = {
       [ActionKeywords.ANALYZE]: () => this.analyzeWorkspace(ctx),
       [ActionKeywords.CHECK]: () => this.checkStatus(ctx),
@@ -1642,7 +1616,7 @@ export class PerpetualEngineService {
    * @see {@link https://github.com/microsoft/TypeScript/wiki/Using-the-Compiler-API | TypeScript Compiler API}
    */
   private async analyzeCodebase(ctx: OpenClawPluginServiceContext): Promise<string> {
-    const workspaceDir = ctx.workspaceDir || process.cwd();
+    const workspaceDir = this.requireWorkspaceDir(ctx);
 
     try {
       // 使用真正的代码分析器
@@ -1718,7 +1692,7 @@ export class PerpetualEngineService {
     ctx: OpenClawPluginServiceContext,
     label: string
   ): Promise<string> {
-    const workspaceDir = ctx.workspaceDir || process.cwd();
+    const workspaceDir = this.requireWorkspaceDir(ctx);
     try {
       const files = await this.getCachedFiles(workspaceDir);
       const stats = this.countFileTypes(files);
@@ -1743,6 +1717,10 @@ export class PerpetualEngineService {
    * @returns Promise<string[]> 文件名列表
    */
   private async getCachedFiles(dir: string): Promise<string[]> {
+    if (!this.config.enableCache) {
+      return fs.readdir(dir);
+    }
+
     const now = Date.now();
     const cached = this.fileCache.get(dir);
 
@@ -1856,7 +1834,7 @@ export class PerpetualEngineService {
   /**
    * 发送汇报
    *
-   * 记录当前循环的状态信息并持久化状态到磁盘。
+   * 记录当前循环的状态信息。
    *
    * @param ctx 服务上下文
    * @param status 包含循环编号、行动和结果的状态对象
@@ -1866,14 +1844,107 @@ export class PerpetualEngineService {
     ctx: OpenClawPluginServiceContext,
     status: { loop: number; action: string; result: string }
   ): Promise<void> {
-    // 简化版：只记录日志
-    // 实际应该通过 OpenClaw 发送消息到配置的频道
+    const reportRecord = {
+      ...status,
+      timestamp: new Date().toISOString(),
+      running: this.isRunningValue,
+      avgLoopTimeMs: this.getAvgLoopTime(),
+      loopsPerSecond: this.getLoopsPerSecond(),
+      contextSize: this.getContextSize(),
+      errorStats: this.getErrorStats(),
+      reportTarget: this.config.reportTarget,
+      reportChannel: this.config.reportChannel,
+      llm: {
+        provider: this.config.llmProvider,
+        model: this.config.llmModel,
+        baseURL: this.config.llmBaseURL,
+      },
+    };
+
+    if (this.config.reportTarget !== "log") {
+      try {
+        await fs.mkdir(ctx.stateDir, { recursive: true });
+
+        const latestReportPath = path.join(ctx.stateDir, StateFileNames.LATEST_REPORT);
+        const latestTmpPath = latestReportPath + StateFileNames.TEMP_SUFFIX;
+        const historyPath = path.join(ctx.stateDir, StateFileNames.REPORT_HISTORY);
+
+        await fs.writeFile(latestTmpPath, JSON.stringify(reportRecord, null, 2), "utf-8");
+        await fs.rename(latestTmpPath, latestReportPath);
+        await fs.appendFile(historyPath, JSON.stringify(reportRecord) + "\n", "utf-8");
+      } catch (error) {
+        this.api.logger.warn(`汇报落盘失败: ${error instanceof Error ? error.message : String(error)}`);
+      }
+    }
+
+    await this.sendExternalReport(reportRecord);
+
     this.api.logger.info(
       `📤 [循环 ${status.loop}] ${status.action} → ${status.result}`
     );
+  }
 
-    // 持久化状态到磁盘
-    await this.persistState(ctx);
+  private async sendExternalReport(reportRecord: {
+    loop: number;
+    action: string;
+    result: string;
+    timestamp: string;
+    running: boolean;
+    avgLoopTimeMs: number;
+    loopsPerSecond: number;
+    contextSize: number;
+    errorStats: Record<string, number>;
+    reportTarget: EngineConfig["reportTarget"];
+    reportChannel?: string;
+    llm: {
+      provider: EngineConfig["llmProvider"];
+      model?: string;
+      baseURL?: string;
+    };
+  }): Promise<void> {
+    if (reportRecord.reportTarget !== "discord" && reportRecord.reportTarget !== "telegram") {
+      return;
+    }
+
+    if (!reportRecord.reportChannel) {
+      this.api.logger.warn(`外部汇报已启用但 reportChannel 缺失: ${reportRecord.reportTarget}`);
+      return;
+    }
+
+    try {
+      const notifier =
+        reportRecord.reportTarget === "discord"
+          ? createNotifier({
+              enabled: true,
+              enabledChannels: [NotificationChannel.DISCORD],
+              discord: {
+                webhookUrl: reportRecord.reportChannel,
+              },
+            })
+          : (() => {
+              // 优先使用配置中的 bot token，回退到环境变量
+              const botToken = this.config.telegramBotToken ?? process.env.TELEGRAM_BOT_TOKEN;
+              if (!botToken) {
+                throw new Error("TELEGRAM_BOT_TOKEN 缺失（需通过配置 telegramBotToken 或环境变量提供）");
+              }
+              return createNotifier({
+                enabled: true,
+                enabledChannels: [NotificationChannel.TELEGRAM],
+                telegram: {
+                  botToken,
+                  chatId: reportRecord.reportChannel!,
+                },
+              });
+            })();
+
+      await notifier.info(
+        `龙虾引擎循环 ${reportRecord.loop}`,
+        `${reportRecord.action} -> ${reportRecord.result}\n` +
+          `provider=${reportRecord.llm.provider}, model=${reportRecord.llm.model ?? "n/a"}`,
+      );
+    } catch (error) {
+      this.api.logger.warn(`外部汇报失败: ${error instanceof Error ? error.message : String(error)}`);
+    }
   }
 
   /**
@@ -2007,6 +2078,8 @@ export class PerpetualEngineService {
    */
   private startHealthCheck(): void {
     if (!this.config.enableHealthCheck) return;
+
+    this.stopHealthCheck();
 
     this.healthCheckInterval = setInterval(() => {
       const timeSinceLastLoop = Date.now() - this.lastLoopTime;
@@ -2234,6 +2307,8 @@ interface ErrorRecord {
   category?: ErrorCategory;
   /** 标记错误是否已通过恢复策略解决 */
   resolved?: boolean;
+  /** 已尝试恢复的时间戳，用于避免重复卡在恢复分支 */
+  recoveryAttemptedAt?: number;
 }
 
 /**

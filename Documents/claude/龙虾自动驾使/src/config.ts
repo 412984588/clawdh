@@ -16,11 +16,176 @@ export class ConfigValidationError extends Error {
   }
 }
 
+const NUMERIC_FIELDS = [
+  "compressInterval",
+  "persistInterval",
+  "reportInterval",
+  "cacheTTL",
+  "stallThreshold",
+  "healthCheckInterval",
+  "maxActions",
+  "maxErrors",
+] as const;
+
+type NumericField = (typeof NUMERIC_FIELDS)[number];
+
+export const REPORT_TARGETS = ["state", "log", "telegram", "discord"] as const;
+export type ReportTarget = (typeof REPORT_TARGETS)[number];
+
+export const LLM_PROVIDERS = ["openclaw", "openai", "anthropic", "ollama", "vllm", "custom"] as const;
+export type EngineLLMProvider = (typeof LLM_PROVIDERS)[number];
+
+function hasOwn(config: Record<string, unknown>, field: string): boolean {
+  return Object.prototype.hasOwnProperty.call(config, field);
+}
+
+function isFiniteNumber(value: unknown): value is number {
+  return typeof value === "number" && Number.isFinite(value);
+}
+
+function parseFiniteNumber(
+  value: unknown,
+): number | undefined {
+  if (isFiniteNumber(value)) {
+    return value;
+  }
+
+  if (typeof value === "string" && value.trim() !== "") {
+    const parsed = Number(value.trim());
+    if (Number.isFinite(parsed)) {
+      return parsed;
+    }
+  }
+
+  return undefined;
+}
+
+function parseBooleanValue(value: unknown): boolean | undefined {
+  if (typeof value === "boolean") {
+    return value;
+  }
+
+  if (typeof value === "string") {
+    const normalized = value.trim().toLowerCase();
+    if (normalized === "true") return true;
+    if (normalized === "false") return false;
+  }
+
+  return undefined;
+}
+
+function readBoolean(
+  config: Record<string, unknown>,
+  field: string,
+  envKey: string,
+  defaultValue: boolean,
+): boolean {
+  if (hasOwn(config, field)) {
+    const configured = parseBooleanValue(config[field]);
+    if (configured === undefined) {
+      throw new ConfigValidationError(field, config[field], `${field} 必须是布尔值，当前: ${String(config[field])}`);
+    }
+    return configured;
+  }
+
+  const fromEnv = parseBooleanValue(process.env[envKey]);
+  if (fromEnv !== undefined) {
+    return fromEnv;
+  }
+
+  return defaultValue;
+}
+
+function readNumber(
+  config: Record<string, unknown>,
+  field: NumericField,
+  envKey: string,
+  defaultValue: number,
+): number {
+  if (hasOwn(config, field)) {
+    const configured = parseFiniteNumber(config[field]);
+    if (configured === undefined) {
+      throw new ConfigValidationError(field, config[field], `${field} 必须是有限数字，当前: ${String(config[field])}`);
+    }
+    return configured;
+  }
+
+  const fromEnv = parseFiniteNumber(process.env[envKey]);
+  if (fromEnv !== undefined) {
+    return fromEnv;
+  }
+
+  return defaultValue;
+}
+
+function parseOptionalString(value: unknown): string | undefined {
+  if (value === undefined || value === null) {
+    return undefined;
+  }
+
+  if (typeof value !== "string") {
+    return undefined;
+  }
+
+  const trimmed = value.trim();
+  return trimmed === "" ? undefined : trimmed;
+}
+
+function readOptionalString(
+  config: Record<string, unknown>,
+  field: string,
+  envKey: string,
+): string | undefined {
+  if (hasOwn(config, field)) {
+    const configured = parseOptionalString(config[field]);
+    if (config[field] != null && configured === undefined) {
+      throw new ConfigValidationError(field, config[field], `${field} 必须是非空字符串，当前: ${String(config[field])}`);
+    }
+    return configured;
+  }
+
+  return parseOptionalString(process.env[envKey]);
+}
+
+function readEnumValue<T extends string>(
+  config: Record<string, unknown>,
+  field: string,
+  envKey: string,
+  allowedValues: readonly T[],
+  defaultValue: T,
+): T {
+  if (hasOwn(config, field)) {
+    const configured = parseOptionalString(config[field]);
+    if (!configured || !allowedValues.includes(configured as T)) {
+      throw new ConfigValidationError(
+        field,
+        config[field],
+        `${field} 必须是 ${allowedValues.join(", ")} 之一，当前: ${String(config[field])}`,
+      );
+    }
+    return configured as T;
+  }
+
+  const fromEnv = parseOptionalString(process.env[envKey]);
+  if (fromEnv && allowedValues.includes(fromEnv as T)) {
+    return fromEnv as T;
+  }
+
+  return defaultValue;
+}
+
 /**
  * 验证配置值范围
  */
 export function validateConfig(config: EngineConfig): void {
   const errors: string[] = [];
+
+  for (const field of NUMERIC_FIELDS) {
+    const value = config[field];
+    if (!isFiniteNumber(value)) {
+      errors.push(`${field} 必须是有限数字，当前: ${String(value)}`);
+    }
+  }
 
   // 验证循环间隔
   if (config.compressInterval < 1 || config.compressInterval > 100) {
@@ -76,6 +241,16 @@ export interface EngineConfig {
   readonly enableHealthCheck: boolean;  // 启用健康检查
   readonly enableMetrics: boolean;      // 启用性能指标
   readonly enableCache: boolean;        // 启用文件缓存
+
+  // 汇报配置
+  readonly reportTarget: ReportTarget;
+  readonly reportChannel?: string;
+  readonly telegramBotToken?: string;  // Telegram bot token（可选，优先级高于环境变量）
+
+  // LLM 配置
+  readonly llmProvider: EngineLLMProvider;
+  readonly llmModel?: string;
+  readonly llmBaseURL?: string;
 }
 
 /**
@@ -93,6 +268,12 @@ export const DEFAULT_CONFIG: EngineConfig = {
   enableHealthCheck: true,
   enableMetrics: true,
   enableCache: true,
+  reportTarget: "state",
+  reportChannel: undefined,
+  telegramBotToken: undefined,
+  llmProvider: "openclaw",
+  llmModel: undefined,
+  llmBaseURL: undefined,
 };
 
 /**
@@ -102,31 +283,30 @@ export function loadConfig(openclawConfig?: Record<string, unknown>): EngineConf
   const config = openclawConfig || {};
   const loadedConfig: EngineConfig = {
     ...DEFAULT_CONFIG,
-    // 优先使用OpenClaw配置，其次环境变量，最后默认值
-    compressInterval: (config.compressInterval as number) ?? parseInt(process.env.LOBSTER_COMPRESS_INTERVAL || '') ?? DEFAULT_CONFIG.compressInterval,
-    persistInterval: (config.persistInterval as number) ?? parseInt(process.env.LOBSTER_PERSIST_INTERVAL || '') ?? DEFAULT_CONFIG.persistInterval,
-    reportInterval: (config.reportInterval as number) ?? parseInt(process.env.LOBSTER_REPORT_INTERVAL || '') ?? DEFAULT_CONFIG.reportInterval,
-    cacheTTL: (config.cacheTTL as number) ?? parseInt(process.env.LOBSTER_CACHE_TTL || '') ?? DEFAULT_CONFIG.cacheTTL,
-    stallThreshold: (config.stallThreshold as number) ?? parseInt(process.env.LOBSTER_STALL_THRESHOLD || '') ?? DEFAULT_CONFIG.stallThreshold,
-    healthCheckInterval: (config.healthCheckInterval as number) ?? parseInt(process.env.LOBSTER_HEALTH_CHECK_INTERVAL || '') ?? DEFAULT_CONFIG.healthCheckInterval,
-    maxActions: (config.maxActions as number) ?? parseInt(process.env.LOBSTER_MAX_ACTIONS || '') ?? DEFAULT_CONFIG.maxActions,
-    maxErrors: (config.maxErrors as number) ?? parseInt(process.env.LOBSTER_MAX_ERRORS || '') ?? DEFAULT_CONFIG.maxErrors,
-    enableHealthCheck: (config.enableHealthCheck as boolean) ?? process.env.LOBSTER_HEALTH_CHECK !== 'false',
-    enableMetrics: (config.enableMetrics as boolean) ?? process.env.LOBSTER_METRICS !== 'false',
-    enableCache: (config.enableCache as boolean) ?? process.env.LOBSTER_CACHE !== 'false',
+    compressInterval: readNumber(config, "compressInterval", "LOBSTER_COMPRESS_INTERVAL", DEFAULT_CONFIG.compressInterval),
+    persistInterval: readNumber(config, "persistInterval", "LOBSTER_PERSIST_INTERVAL", DEFAULT_CONFIG.persistInterval),
+    reportInterval: readNumber(config, "reportInterval", "LOBSTER_REPORT_INTERVAL", DEFAULT_CONFIG.reportInterval),
+    cacheTTL: readNumber(config, "cacheTTL", "LOBSTER_CACHE_TTL", DEFAULT_CONFIG.cacheTTL),
+    stallThreshold: readNumber(config, "stallThreshold", "LOBSTER_STALL_THRESHOLD", DEFAULT_CONFIG.stallThreshold),
+    healthCheckInterval: readNumber(
+      config,
+      "healthCheckInterval",
+      "LOBSTER_HEALTH_CHECK_INTERVAL",
+      DEFAULT_CONFIG.healthCheckInterval,
+    ),
+    maxActions: readNumber(config, "maxActions", "LOBSTER_MAX_ACTIONS", DEFAULT_CONFIG.maxActions),
+    maxErrors: readNumber(config, "maxErrors", "LOBSTER_MAX_ERRORS", DEFAULT_CONFIG.maxErrors),
+    enableHealthCheck: readBoolean(config, "enableHealthCheck", "LOBSTER_HEALTH_CHECK", DEFAULT_CONFIG.enableHealthCheck),
+    enableMetrics: readBoolean(config, "enableMetrics", "LOBSTER_METRICS", DEFAULT_CONFIG.enableMetrics),
+    enableCache: readBoolean(config, "enableCache", "LOBSTER_CACHE", DEFAULT_CONFIG.enableCache),
+    reportTarget: readEnumValue(config, "reportTarget", "LOBSTER_REPORT_TARGET", REPORT_TARGETS, DEFAULT_CONFIG.reportTarget),
+    reportChannel: readOptionalString(config, "reportChannel", "LOBSTER_REPORT_CHANNEL"),
+    telegramBotToken: readOptionalString(config, "telegramBotToken", "TELEGRAM_BOT_TOKEN"),
+    llmProvider: readEnumValue(config, "llmProvider", "LLM_PROVIDER", LLM_PROVIDERS, DEFAULT_CONFIG.llmProvider),
+    llmModel: readOptionalString(config, "llmModel", "LLM_MODEL"),
+    llmBaseURL: readOptionalString(config, "llmBaseURL", "LLM_BASE_URL"),
   };
 
-  // 验证配置值范围
-  try {
-    validateConfig(loadedConfig);
-  } catch (error) {
-    if (error instanceof ConfigValidationError) {
-      console.warn(`⚠️ 配置验证失败，使用默认值: ${error.message}`);
-      // 返回安全的默认配置
-      return { ...DEFAULT_CONFIG };
-    }
-    throw error;
-  }
-
+  validateConfig(loadedConfig);
   return loadedConfig;
 }
