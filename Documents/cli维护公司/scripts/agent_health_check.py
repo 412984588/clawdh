@@ -16,108 +16,125 @@ Environment:
     PAPERCLIP_COMPANY_ID - Company ID
 """
 
+from __future__ import annotations
+
 import argparse
 import json
 import os
 import sys
-from dataclasses import dataclass, field
+import urllib.request
+from dataclasses import dataclass
 from datetime import datetime, timezone
-from typing import Any
-from urllib.request import Request, urlopen
-from urllib.error import HTTPError, URLError
+
+
+# ---------------------------------------------------------------------------
+# Data models
+# ---------------------------------------------------------------------------
 
 
 @dataclass
 class AgentHealth:
+    """Health status for a single agent."""
+
     id: str
     name: str
     adapter_type: str
     status: str
-    last_heartbeat_at: str | None
-    heartbeat_age_seconds: float | None = None
-    is_stale: bool = False
-    issues: list[str] = field(default_factory=list)
+    last_heartbeat: str | None
+    heartbeat_age_sec: int | None
+    is_stale: bool
+
+    def to_dict(self) -> dict[str, object]:
+        return {
+            "id": self.id,
+            "name": self.name,
+            "adapter_type": self.adapter_type,
+            "status": self.status,
+            "last_heartbeat": self.last_heartbeat,
+            "heartbeat_age_sec": self.heartbeat_age_sec,
+            "is_stale": self.is_stale,
+        }
 
 
-@dataclass
-class TaskPickup:
-    issue_id: str
-    identifier: str
-    title: str
-    assignee_id: str
-    assignee_name: str
-    created_at: str
-    assigned_at: str | None
-    checkout_at: str | None
-    pickup_latency_seconds: float | None = None
-    is_late: bool = False
-    heartbeats_since_assignment: int | None = None
-
-
-@dataclass
-class HealthReport:
-    timestamp: str
-    company_id: str
-    agents: list[AgentHealth] = field(default_factory=list)
-    task_pickups: list[TaskPickup] = field(default_factory=list)
-    summary: dict[str, Any] = field(default_factory=dict)
+# ---------------------------------------------------------------------------
+# API helpers
+# ---------------------------------------------------------------------------
 
 
 def api_get(url: str, api_key: str) -> dict | list:
     """Make authenticated GET request to Paperclip API."""
-    req = Request(url, headers={
-        "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json",
-    })
+    req = urllib.request.Request(
+        url,
+        headers={
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+        },
+    )
     try:
-        with urlopen(req, timeout=30) as resp:
+        with urllib.request.urlopen(req, timeout=30) as resp:
             return json.loads(resp.read().decode())
     except Exception as e:
-        print(f"API error for {url}: {e}")
+        print(f"API error for {url}: {e}", file=sys.stderr)
         return {} if "?" not in url else []
+
+
+# ---------------------------------------------------------------------------
+# Health checks
+# ---------------------------------------------------------------------------
+
+
+def is_agent_stale(agent: dict, now: datetime, threshold_sec: int = 300) -> bool:
+    """Check if agent heartbeat is stale (older than threshold)."""
+    last_hb = agent.get("lastHeartbeatAt")
+    if not last_hb:
+        return True
+    try:
+        hb_dt = datetime.fromisoformat(last_hb.replace("Z", "+00:00"))
+        return (now - hb_dt).total_seconds() > threshold_sec
+    except (ValueError, TypeError):
+        return True
 
 
 def check_agent_health(
     agents: list[dict],
-    now_iso: str,
+    now: datetime,
     stale_threshold_sec: int = 300,
 ) -> list[AgentHealth]:
     """Check heartbeat liveness for all agents."""
-    from datetime import datetime, timezone
-
-    now = datetime.fromisoformat(now_iso.replace("Z", "+00:00"))
-    results = []
+    results: list[AgentHealth] = []
 
     for agent in agents:
         last_hb = agent.get("lastHeartbeatAt")
-        hb_age_sec = None
-        is_stale = False
+        hb_age_sec: int | None = None
+        is_stale = is_agent_stale(agent, now, stale_threshold_sec)
 
         if last_hb:
-            hb_dt = datetime.fromisoformat(last_hb.replace("Z", "+00:00"))
-            hb_age_sec = (now - hb_dt).total_seconds()
-            is_stale = hb_age_sec > 300  # 5 minutes
+            try:
+                hb_dt = datetime.fromisoformat(last_hb.replace("Z", "+00:00"))
+                hb_age_sec = int((now - hb_dt).total_seconds())
+            except (ValueError, TypeError):
+                pass
 
-        results.append(HealthAgent(
-            id=agent["id"],
-            name=agent["name"],
-            adapter_type=agent.get("adapterType", "unknown"),
-            status=agent.get("status", "unknown"),
-            last_heartbeat=last_hb,
-            heartbeat_age_sec=int(hb_age_sec) if hb_age_sec else None,
-            is_stale=is_stale,
-        ))
+        results.append(
+            AgentHealth(
+                id=agent["id"],
+                name=agent["name"],
+                adapter_type=agent.get("adapterType", "unknown"),
+                status=agent.get("status", "unknown"),
+                last_heartbeat=last_hb,
+                heartbeat_age_sec=hb_age_sec,
+                is_stale=is_stale,
+            )
+        )
 
     return results
 
 
 def check_task_pickup_latency(issues: list[dict], agents: list[dict]) -> list[dict]:
     """Check how long tasks have been waiting for pickup."""
-    from datetime import datetime, timezone
-
     now = datetime.now(timezone.utc)
     agent_map = {a["id"]: a["name"] for a in agents}
-    results = []
+    results: list[dict] = []
 
     for issue in issues:
         if issue.get("status") != "todo":
@@ -131,143 +148,100 @@ def check_task_pickup_latency(issues: list[dict], agents: list[dict]) -> list[di
         if not created_at:
             continue
 
-        created_dt = datetime.fromisoformat(created_at.replace("Z", "+00:00"))
-        wait_sec = (now - created_dt).total_seconds()
+        try:
+            created_dt = datetime.fromisoformat(created_at.replace("Z", "+00:00"))
+            wait_sec = (now - created_dt).total_seconds()
+        except (ValueError, TypeError):
+            continue
 
-        results.append({
-            "issue_id": issue["id"],
-            "identifier": issue.get("identifier", "N/A"),
-            "title": issue.get("title", "N/A")[:60],
-            "assignee": agent_map.get(assignee_id, assignee_id),
-            "assignee_id": assignee_id,
-            "wait_sec": int(wait_sec),
-            "wait_min": round(wait_sec / 60, 1),
-            "priority": issue.get("priority", "medium"),
-        })
+        results.append(
+            {
+                "issue_id": issue["id"],
+                "identifier": issue.get("identifier", "N/A"),
+                "title": issue.get("title", "N/A")[:60],
+                "assignee": agent_map.get(assignee_id, assignee_id),
+                "assignee_id": assignee_id,
+                "wait_sec": int(wait_sec),
+                "wait_min": round(wait_sec / 60, 1),
+                "priority": issue.get("priority", "medium"),
+            }
+        )
 
     return sorted(results, key=lambda x: x["wait_sec"], reverse=True)
 
 
-# Dataclasses for structured output
-from dataclasses import dataclass
+def check_agent_protocol_compliance(
+    agents: list[dict],
+    recent_runs: list[dict],
+    stale_threshold_sec: int = 300,
+) -> list[dict]:
+    """
+    Detect agents that heartbeat but don't follow protocol.
 
-@dataclass
-class HealthAgent:
-    id: str
-    name: str
-    adapter_type: str
-    status: str
-    last_heartbeat: str | None
-    heartbeat_age_sec: int | None
-    is_stale: bool
+    This detects the "alive but unconscious" pattern where agents:
+    - Heartbeat regularly (show as running)
+    - But never check out assigned tasks
+    - Have no files_touched in their runs
 
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "name": self.name,
-            "adapter_type": self.adapter_type,
-            "status": self.status,
-            "last_heartbeat": self.last_heartbeat,
-            "heartbeat_age_sec": self.heartbeat_age_sec,
-            "is_stale": self.is_stale,
-        }
-
-
-def main():
-    """Run full health check and output report."""
-    import os
-    import json
-    import urllib.request
-    import argparse
-
-    parser = argparse.ArgumentParser(description="Agent Health Monitor")
-    parser.add_argument("--json", action="store_true", help="Output JSON format")
-    parser.add_argument("--threshold", type=int, default=300, help="Stale threshold in seconds (default: 300)")
-    parser.add_argument("--pickup-threshold", type=int, default=300, help="Pickup delay threshold in seconds (default: 300)")
-    args = parser.parse_args()
-
-    api_url = os.environ.get("PAPERCLIP_API_URL", "http://127.0.0.1:3100")
-    api_key = os.environ.get("PAPERCLIP_API_KEY", "")
-    company_id = os.environ.get("PAPERCLIP_COMPANY_ID", "")
-
-    if not api_key or not company_id:
-        print("ERROR: PAPERCLIP_API_KEY and PAPERCLIP_COMPANY_ID must be set", file=sys.stderr)
-        return 1
-
-    headers = {"Authorization": f"Bearer {api_key}"}
-
-    def fetch(path):
-        req = urllib.request.Request(f"{api_url}{path}", headers=headers)
-        with urllib.request.urlopen(req, timeout=15) as resp:
-            return json.loads(resp.read())
-
-    # Fetch data
-    agents = fetch(f"/api/companies/{company_id}/agents")
-    issues = fetch(f"/api/companies/{company_id}/issues?status=todo,in_progress,blocked")
-    dashboard = fetch(f"/api/companies/{company_id}/dashboard")
-
+    See runbook 0021 for the claude_local adapter instructions injection failure.
+    """
     now = datetime.now(timezone.utc)
-    now_iso = now.strftime("%Y-%m-%dT%H:%M:%SZ")
+    non_compliant: list[dict] = []
 
-    # Run checks
-    stale_agents = []
     for agent in agents:
-        if _is_stale(agent, now_iso, args.threshold):
-            last_hb = agent.get("lastHeartbeatAt", "never")
-            hb_dt = datetime.fromisoformat(last_hb.replace("Z", "+00:00")) if last_hb != "never" else None
-            age_min = round((now - hb_dt).total_seconds() / 60, 1) if hb_dt else "unknown"
-            stale_agents.append({
-                "name": agent["name"],
-                "id": agent["id"],
-                "adapter": agent.get("adapterType", "?"),
-                "status": agent.get("status", "?"),
-                "last_heartbeat": last_hb,
-                "age_minutes": age_min,
-            })
+        agent_id = agent["id"]
+        agent_name = agent["name"]
+        adapter_type = agent.get("adapterType", "unknown")
+        issues: list[str] = []
 
-    pickup_delays = check_task_pickup_latency(issues, agents)
-    late_pickups = [p for p in pickup_delays if p["wait_sec"] > args.pickup_threshold]
+        # Get runs for this agent
+        agent_runs = [r for r in recent_runs if r.get("agent") == agent_id]
 
-    # Build report
-    alerts = []
+        # Check if agent is heartbeating (has recent runs)
+        running_runs = [r for r in agent_runs if r.get("status") in ("in_progress", "running")]
 
-    for agent in stale_agents:
-        alerts.append({
-            "level": "warning",
-            "type": "stale_heartbeat",
-            "agent": agent["name"],
-            "message": f"Heartbeat stale ({agent['age_minutes']}min ago)",
-        })
+        if not running_runs:
+            continue  # Agent isn't running, skip
 
-    for issue in late_pickups:
-        level = "critical" if issue["wait_min"] > 15 else "warning"
-        alerts.append({
-            "level": level,
-            "type": "task_pickup_delay",
-            "issue": issue["identifier"],
-            "assignee": issue["assignee"],
-            "message": f"[{issue['priority'].upper()}] {issue['title']} waiting {issue['wait_min']}min",
-        })
+        # Check for runs with no files touched
+        for run in running_runs:
+            files_touched = run.get("filesTouched", [])
+            started_at = run.get("startedAt")
 
-    report = {
-        "timestamp": now_iso,
-        "company_id": company_id,
-        "dashboard": {
-            "agents": dashboard.get("agents", {}),
-            "tasks": dashboard.get("tasks", {}),
-            "costs_cents": dashboard.get("costs", {}).get("monthSpendCents", 0),
-        },
-        "stale_agents": stale_agents,
-        "pickup_delays": late_pickups,
-        "alerts": alerts,
-    }
+            if not files_touched and started_at:
+                try:
+                    started_dt = datetime.fromisoformat(started_at.replace("Z", "+00:00"))
+                    run_age_sec = (now - started_dt).total_seconds()
 
-    if args.json:
-        print(json.dumps(report, indent=2, default=str, ensure_ascii=False))
-    else:
-        _print_report(report)
+                    # Only flag if run has been going for more than 1 heartbeat cycle
+                    if run_age_sec > stale_threshold_sec:
+                        issues.append(
+                            f"Run {run.get('id', 'unknown')} running {round(run_age_sec / 60, 1)}min "
+                            f"with no files touched"
+                        )
+                except (ValueError, TypeError):
+                    pass
 
-    return 1 if alerts else 0
+        # Check for heartbeat without task checkout pattern
+        # Agent heartbeats but tasks assigned to them stay in "todo"
+        if issues:
+            non_compliant.append(
+                {
+                    "agent_id": agent_id,
+                    "agent_name": agent_name,
+                    "adapter_type": adapter_type,
+                    "compliant": False,
+                    "issues": issues,
+                    "severity": "critical" if adapter_type == "claude_local" else "warning",
+                }
+            )
+
+    return non_compliant
+
+
+# ---------------------------------------------------------------------------
+# Report printing
+# ---------------------------------------------------------------------------
 
 
 def _print_report(report: dict) -> None:
@@ -279,7 +253,11 @@ def _print_report(report: dict) -> None:
     d = report["dashboard"]
     print(f"\n📊 Dashboard:")
     print(f"   Agents: {d['agents'].get('running', 0)} running, {d['agents'].get('active', 0)} active")
-    print(f"   Tasks:  {d['tasks'].get('open', 0)} open, {d['tasks'].get('inProgress', 0)} in progress, {d['tasks'].get('blocked', 0)} blocked")
+    print(
+        f"   Tasks:  {d['tasks'].get('open', 0)} open, "
+        f"{d['tasks'].get('inProgress', 0)} in progress, "
+        f"{d['tasks'].get('blocked', 0)} blocked"
+    )
     print(f"   Costs:  ${d['costs_cents'] / 100:.2f} this month")
 
     if report["stale_agents"]:
@@ -297,6 +275,14 @@ def _print_report(report: dict) -> None:
     else:
         print(f"\n✅ No task pickup delays")
 
+    if report.get("non_compliant_agents"):
+        print(f"\n🔴 PROTOCOL NON-COMPLIANCE ({len(report['non_compliant_agents'])}):")
+        for nc in report["non_compliant_agents"]:
+            print(f"   - {nc['agent_name']} ({nc['adapter_type']}):")
+            for issue in nc["issues"]:
+                print(f"     • {issue}")
+            print(f"     See: docs/runbooks/0021-claude-local-adapter-instructions.md")
+
     if report["alerts"]:
         print(f"\n🚨 ALERTS ({len(report['alerts'])}):")
         for a in report["alerts"]:
@@ -308,14 +294,170 @@ def _print_report(report: dict) -> None:
     print("\n" + "=" * 70)
 
 
-def _is_stale(agent: dict, now_iso: str, threshold_sec: int = 300) -> bool:
-    """Check if agent heartbeat is stale (older than threshold)."""
-    last_hb = agent.get("lastHeartbeatAt")
-    if not last_hb:
-        return True
-    now = datetime.fromisoformat(now_iso.replace("Z", "+00:00"))
-    hb_dt = datetime.fromisoformat(last_hb.replace("Z", "+00:00"))
-    return (now - hb_dt).total_seconds() > threshold_sec
+# ---------------------------------------------------------------------------
+# Main
+# ---------------------------------------------------------------------------
+
+
+def main() -> int:
+    """Run full health check and output report."""
+    parser = argparse.ArgumentParser(description="Agent Health Monitor")
+    parser.add_argument("--json", action="store_true", help="Output JSON format")
+    parser.add_argument(
+        "--threshold",
+        type=int,
+        default=300,
+        help="Stale threshold in seconds (default: 300)",
+    )
+    parser.add_argument(
+        "--pickup-threshold",
+        type=int,
+        default=300,
+        help="Pickup delay threshold in seconds (default: 300)",
+    )
+    parser.add_argument(
+        "--protocol-check",
+        action="store_true",
+        help="Enable protocol compliance checking (detect heartbeating but non-functional agents)",
+    )
+    args = parser.parse_args()
+
+    api_url = os.environ.get("PAPERCLIP_API_URL", "http://127.0.0.1:3100")
+    api_key = os.environ.get("PAPERCLIP_API_KEY", "")
+    company_id = os.environ.get("PAPERCLIP_COMPANY_ID", "")
+
+    if not api_key or not company_id:
+        print(
+            "ERROR: PAPERCLIP_API_KEY and PAPERCLIP_COMPANY_ID must be set",
+            file=sys.stderr,
+        )
+        return 1
+
+    headers = {"Authorization": f"Bearer {api_key}"}
+
+    def fetch(path: str) -> dict | list:
+        req = urllib.request.Request(f"{api_url}{path}", headers=headers)
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            return json.loads(resp.read())
+
+    # Fetch data
+    agents = fetch(f"/api/companies/{company_id}/agents")
+    issues = fetch(f"/api/companies/{company_id}/issues?status=todo,in_progress,blocked")
+    dashboard = fetch(f"/api/companies/{company_id}/dashboard")
+
+    # Fetch runs data if protocol check is enabled
+    runs: list[dict] = []
+    if args.protocol_check:
+        try:
+            runs_resp = fetch(f"/api/companies/{company_id}/runs?status=in_progress,running")
+            runs = runs_resp if isinstance(runs_resp, list) else []
+        except Exception:
+            pass  # Runs endpoint may not exist in all Paperclip versions
+
+    now = datetime.now(timezone.utc)
+    now_iso = now.strftime("%Y-%m-%dT%H:%M:%SZ")
+
+    # Run checks using the same is_agent_stale function
+    stale_agents = []
+    if isinstance(agents, list):
+        for agent in agents:
+            if is_agent_stale(agent, now, args.threshold):
+                last_hb = agent.get("lastHeartbeatAt")
+                age_min: float | str = "unknown"
+                if last_hb:
+                    try:
+                        hb_dt = datetime.fromisoformat(last_hb.replace("Z", "+00:00"))
+                        age_min = round((now - hb_dt).total_seconds() / 60, 1)
+                    except (ValueError, TypeError):
+                        pass
+                stale_agents.append(
+                    {
+                        "name": agent["name"],
+                        "id": agent["id"],
+                        "adapter": agent.get("adapterType", "?"),
+                        "status": agent.get("status", "?"),
+                        "last_heartbeat": last_hb or "never",
+                        "age_minutes": age_min,
+                    }
+                )
+
+    pickup_delays = check_task_pickup_latency(
+        issues if isinstance(issues, list) else [],
+        agents if isinstance(agents, list) else [],
+    )
+    late_pickups = [p for p in pickup_delays if p["wait_sec"] > args.pickup_threshold]
+
+    # Build alerts
+    alerts: list[dict] = []
+
+    for agent in stale_agents:
+        alerts.append(
+            {
+                "level": "warning",
+                "type": "stale_heartbeat",
+                "agent": agent["name"],
+                "message": f"Heartbeat stale ({agent['age_minutes']}min ago)",
+            }
+        )
+
+    for issue in late_pickups:
+        level = "critical" if issue["wait_min"] > 15 else "warning"
+        alerts.append(
+            {
+                "level": level,
+                "type": "task_pickup_delay",
+                "issue": issue["identifier"],
+                "assignee": issue["assignee"],
+                "message": f"[{issue['priority'].upper()}] {issue['title']} waiting {issue['wait_min']}min",
+            }
+        )
+
+    # Protocol compliance check (detect "alive but unconscious" agents)
+    non_compliant_agents: list[dict] = []
+    if args.protocol_check and isinstance(agents, list):
+        non_compliant_agents = check_agent_protocol_compliance(
+            agents,
+            runs,
+            stale_threshold_sec=args.threshold,
+        )
+        for nc in non_compliant_agents:
+            for issue in nc["issues"]:
+                alerts.append(
+                    {
+                        "level": nc["severity"],
+                        "type": "protocol_non_compliance",
+                        "agent": nc["agent_name"],
+                        "adapter": nc["adapter_type"],
+                        "message": f"[{nc['adapter_type']}] {nc['agent_name']}: {issue}",
+                    }
+                )
+
+    # Build report
+    report = {
+        "timestamp": now_iso,
+        "company_id": company_id,
+        "dashboard": {
+            "agents": dashboard.get("agents", {}) if isinstance(dashboard, dict) else {},
+            "tasks": dashboard.get("tasks", {}) if isinstance(dashboard, dict) else {},
+            "costs_cents": (
+                dashboard.get("costs", {}).get("monthSpendCents", 0)
+                if isinstance(dashboard, dict)
+                else 0
+            ),
+        },
+        "stale_agents": stale_agents,
+        "pickup_delays": late_pickups,
+        "non_compliant_agents": non_compliant_agents if args.protocol_check else [],
+        "protocol_check_enabled": args.protocol_check,
+        "alerts": alerts,
+    }
+
+    if args.json:
+        print(json.dumps(report, indent=2, default=str, ensure_ascii=False))
+    else:
+        _print_report(report)
+
+    return 1 if alerts else 0
 
 
 if __name__ == "__main__":

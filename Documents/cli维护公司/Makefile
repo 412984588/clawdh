@@ -41,3 +41,9 @@ health-check:
 
 health-check-json:
 	python3 scripts/agent_health_check.py --json
+
+health-check-protocol:
+	python3 scripts/agent_health_check.py --protocol-check
+
+health-check-full:
+	python3 scripts/agent_health_check.py --protocol-check --json
