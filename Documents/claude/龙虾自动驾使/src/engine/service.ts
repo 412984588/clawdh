@@ -1579,11 +1579,18 @@ export class PerpetualEngineService {
     return ResponseMessages.SUGGESTION_LOGGED(suggestion);
   }
 
+  /** 最大日志文件大小（50MB） */
+  private readonly MAX_LOG_SIZE_BYTES = 50 * 1024 * 1024;
+
+  /** 日志轮转时保留的行数 */
+  private readonly MAX_LOG_LINES = 10000;
+
   /**
    * 异步写入建议日志
    *
    * 将建议追加写入到日志文件，不阻塞主循环。
    * 写入失败时静默处理，不影响主流程。
+   * 日志超过阈值时自动轮转（防失控增长）。
    *
    * @param ctx 服务上下文
    * @param suggestion 建议内容
@@ -1594,6 +1601,21 @@ export class PerpetualEngineService {
       const logPath = path.join(ctx.stateDir, StateFileNames.SUGGESTIONS_LOG);
       const timestamp = new Date().toISOString();
       await fs.mkdir(ctx.stateDir, { recursive: true });
+
+      // 日志轮转: 检查文件大小，超过阈值则截断
+      try {
+        const stats = await fs.stat(logPath);
+        if (stats.size > this.MAX_LOG_SIZE_BYTES) {
+          safeDebug(this.api.logger, `🗜️ 建议日志超过 ${this.MAX_LOG_SIZE_BYTES / 1024 / 1024}MB，执行轮转`);
+          const content = await fs.readFile(logPath, 'utf-8');
+          const lines = content.split('\n').filter(Boolean);
+          const keepLines = lines.slice(-this.MAX_LOG_LINES);
+          await fs.writeFile(logPath, keepLines.join('\n') + '\n', 'utf-8');
+        }
+      } catch {
+        // 文件不存在或无法访问，继续写入
+      }
+
       await fs.appendFile(logPath, `[${timestamp}] ${suggestion}\n`);
     } catch {
       // 静默失败，不影响主循环
