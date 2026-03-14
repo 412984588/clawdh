@@ -1,0 +1,36 @@
+[project]
+name = "cli-maintenance-backend"
+version = "0.1.0"
+description = "Backend scaffold for the company bootstrap workspace."
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.135.1",
+    "uvicorn>=0.41.0",
+    "python-jose[cryptography]>=3.3.0",
+    "psutil>=7.2.2",
+]
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28.1",
+    "pytest>=9.0.2",
+    "pytest-asyncio>=0.24.0",
+    "ruff>=0.15.6",
+    "ty>=0.0.22",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ty.environment]
+python-version = "3.11"
+
+[tool.ty.rules]
+possibly-unresolved-reference = "error"
