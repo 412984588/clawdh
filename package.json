@@ -27,7 +27,13 @@
     "bootstrap": "pnpm install && pnpm build",
     "release:gate": "bash scripts/release-gate.sh",
     "prepack": "pnpm secret-scan",
-    "prepublishOnly": "pnpm secret-scan"
+    "prepublishOnly": "pnpm secret-scan",
+    "loadtest": "bash tests/load/run.sh",
+    "loadtest:health": "bash tests/load/run.sh health",
+    "loadtest:sessions": "bash tests/load/run.sh sessions",
+    "loadtest:smoke": "bash tests/load/run.sh smoke",
+    "loadtest:stress": "bash tests/load/run.sh stress",
+    "loadtest:full": "DURATION=full bash tests/load/run.sh all"
   },
   "keywords": [
     "voice",

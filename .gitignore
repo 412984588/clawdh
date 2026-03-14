@@ -90,3 +90,8 @@ worktrees/
 
 # Serena
 .serena/
+
+# Python
+*.pyc
+__pycache__/
+backend/.data/

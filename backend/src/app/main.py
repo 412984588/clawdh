@@ -78,6 +78,18 @@ from app.session_resume import (
     release_stale_checkouts,
     resume_session_from_checkpoint,
 )
+from app.socratic_hints import (
+    HintKnowledgeBase,
+    HintRequest,
+    HintResponse,
+    add_knowledge_entry,
+    generate_hints,
+    get_hint_effectiveness_report,
+    get_hint_history,
+    init_hint_tables,
+    record_hint_feedback,
+    resolve_error,
+)
 
 
 def create_app(seed_data: bool = True) -> FastAPI:
@@ -742,6 +754,101 @@ def create_app(seed_data: bool = True) -> FastAPI:
             pre_checkpoint_id=pre_checkpoint_id,
         )
         return checkpoint.model_dump()
+
+    # ---- Socratic Hints Endpoints ----
+
+    @app.post("/api/hints/generate")
+    async def generate_socratic_hint(
+        payload: HintRequest,
+        request: Request,
+    ) -> HintResponse:
+        """Generate progressive hints for an error. Triggered after 3+ retries."""
+        # Initialize hint tables if needed
+        init_hint_tables(request.app.state.store._connection)
+
+        return generate_hints(
+            request.app.state.store._connection,
+            payload,
+        )
+
+    @app.post("/api/hints/{hint_id}/feedback")
+    async def submit_hint_feedback(
+        hint_id: str,
+        request: Request,
+    ):
+        """Record feedback on a hint's effectiveness."""
+        body = await request.json()
+        was_helpful = body.get("was_helpful", True)
+        resolved_issue = body.get("resolved_issue")
+
+        record_hint_feedback(
+            request.app.state.store._connection,
+            hint_id,
+            was_helpful,
+            resolved_issue,
+        )
+
+        return {"status": "recorded", "hint_id": hint_id}
+
+    @app.get("/api/hints/history")
+    async def list_hint_history(
+        request: Request,
+        agent_id: str | None = None,
+        run_id: str | None = None,
+        limit: int = Query(default=50, gt=0, le=500),
+    ):
+        """Get hint history for analysis."""
+        return [
+            h.model_dump()
+            for h in get_hint_history(
+                request.app.state.store._connection,
+                agent_id=agent_id,
+                run_id=run_id,
+                limit=limit,
+            )
+        ]
+
+    @app.get("/api/hints/effectiveness")
+    async def hint_effectiveness_report(request: Request):
+        """Get hint effectiveness analytics."""
+        return get_hint_effectiveness_report(request.app.state.store._connection)
+
+    @app.post("/api/hints/resolve")
+    async def mark_error_resolved(
+        request: Request,
+    ):
+        """Mark an error as resolved."""
+        body = await request.json()
+        agent_id = body.get("agent_id")
+        run_id = body.get("run_id")
+        error_type = body.get("error_type")
+
+        if not all([agent_id, run_id, error_type]):
+            raise HTTPException(
+                status_code=400, detail="agent_id, run_id, and error_type are required"
+            )
+
+        resolve_error(
+            request.app.state.store._connection,
+            agent_id,
+            run_id,
+            error_type,
+        )
+
+        return {"status": "resolved"}
+
+    @app.post("/api/hints/knowledge", status_code=status.HTTP_201_CREATED)
+    async def add_hint_knowledge(
+        payload: HintKnowledgeBase,
+        request: Request,
+    ):
+        """Add a new knowledge base entry for hints."""
+        add_knowledge_entry(
+            request.app.state.store._connection,
+            payload,
+        )
+
+        return {"status": "created", "entry_id": payload.entry_id}
 
     return app
 
