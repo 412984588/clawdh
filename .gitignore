@@ -16,6 +16,10 @@ dist/
 *.db
 *.db-shm
 *.db-wal
+*.db-journal
+*.sqlite
+*.sqlite-journal
+*.sqlite-wal
 data/
 
 # Secrets
@@ -26,9 +30,13 @@ secrets/
 
 # Logs
 logs/
+logs
 *.log
 npm-debug.log*
 pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dev-debug.log
 
 # OS
 .DS_Store
@@ -40,6 +48,11 @@ Thumbs.db
 *.swp
 *.swo
 *~
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
 # Testing
 coverage/
@@ -51,3 +64,29 @@ openclaw-state.json
 
 # Claude Code
 .claude-plugin/
+.claude/settings.local.json
+
+# Claude Flow generated files
+.mcp.json
+claude-flow.config.json
+.swarm/
+.hive-mind/
+.claude-flow/
+memory/
+coordination/
+memory/claude-flow-data.json
+memory/sessions/*
+!memory/sessions/README.md
+memory/agents/*
+!memory/agents/README.md
+coordination/memory_bank/*
+coordination/subtasks/*
+coordination/orchestration/*
+claude-flow
+hive-mind-prompt-*.txt
+
+# Worktrees
+worktrees/
+
+# Serena
+.serena/

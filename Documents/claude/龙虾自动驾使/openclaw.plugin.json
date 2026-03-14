@@ -1,0 +1,20 @@
+{
+  "id": "lobster-perpetual-engine",
+  "name": "龙虾永动引擎",
+  "description": "零延迟永动循环引擎 - 24/7/365 自治运行",
+  "version": "1.0.0",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "enabled": {
+        "type": "boolean",
+        "description": "是否启用永动引擎"
+      },
+      "compressInterval": {
+        "type": "number",
+        "description": "上下文压缩间隔（循环次数）"
+      }
+    }
+  }
+}

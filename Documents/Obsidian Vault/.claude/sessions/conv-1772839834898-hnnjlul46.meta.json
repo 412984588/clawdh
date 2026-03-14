@@ -1,0 +1,19 @@
+{
+  "id": "conv-1772839834898-hnnjlul46",
+  "title": "检查 Obsidian 技能安装情况",
+  "titleGenerationStatus": "success",
+  "createdAt": 1772839834899,
+  "updatedAt": 1772840127452,
+  "lastResponseAt": 1772840127452,
+  "sessionId": "545d63de-05b7-4764-8980-7f497f251f80",
+  "sdkSessionId": "545d63de-05b7-4764-8980-7f497f251f80",
+  "usage": {
+    "model": "opus",
+    "inputTokens": 0,
+    "cacheCreationInputTokens": 0,
+    "cacheReadInputTokens": 0,
+    "contextWindow": 200000,
+    "contextTokens": 0,
+    "percentage": 0
+  }
+}

@@ -1,0 +1,261 @@
+{
+  "main": {
+    "id": "e0e48b6e129f4362",
+    "type": "split",
+    "children": [
+      {
+        "id": "92f61caa473ad729",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "bc3a8ba3130ff54a",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "test_put_file.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "test_put_file"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "d0dcac5a5afd5e37",
+    "type": "split",
+    "children": [
+      {
+        "id": "aecd99667d721fd0",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "d6fe96ce7a43586b",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "文件列表"
+            }
+          },
+          {
+            "id": "49dcbc82e4a6f5df",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "搜索"
+            }
+          },
+          {
+            "id": "4c45996fb844a0fc",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "书签"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "871466b43faefdfc",
+    "type": "split",
+    "children": [
+      {
+        "id": "11958d578509b0c1",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "b057d284e7f07ac9",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "未命名 1.canvas",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "未命名 1 的反向链接列表"
+            }
+          },
+          {
+            "id": "8c8a9c2b7fe25cf3",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "欢迎.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "欢迎 的出链列表"
+            }
+          },
+          {
+            "id": "b156c4c063a0d93b",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "标签"
+            }
+          },
+          {
+            "id": "dab9aa74d635e302",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "未命名 1.canvas",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "未命名 1 的大纲"
+            }
+          },
+          {
+            "id": "8aba69d0144c96b0",
+            "type": "leaf",
+            "state": {
+              "type": "smart-connections-view",
+              "state": {},
+              "icon": "lucide-ghost",
+              "title": "smart-connections-view"
+            }
+          },
+          {
+            "id": "22a76f10f0f76ef9",
+            "type": "leaf",
+            "state": {
+              "type": "copilot-chat-view",
+              "state": {},
+              "icon": "lucide-ghost",
+              "title": "copilot-chat-view"
+            }
+          },
+          {
+            "id": "60fe1878fa255082",
+            "type": "leaf",
+            "state": {
+              "type": "smart-lookup-view",
+              "state": {},
+              "icon": "smart-lookup",
+              "title": "Lookup"
+            }
+          },
+          {
+            "id": "9bf8af0bbd88fa82",
+            "type": "leaf",
+            "state": {
+              "type": "claudian-view",
+              "state": {},
+              "icon": "bot",
+              "title": "Claudian"
+            }
+          }
+        ],
+        "currentTab": 7
+      }
+    ],
+    "direction": "horizontal",
+    "width": 554.5
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "markdown-importer:打开 Markdown 格式转换器": false,
+      "bases:新建数据库": false,
+      "switcher:打开快速切换": false,
+      "graph:查看关系图谱": false,
+      "canvas:新建白板": false,
+      "daily-notes:打开/创建今天的日记": false,
+      "templates:插入模板": false,
+      "command-palette:打开命令面板": false,
+      "smart-connections:Smart Connections: Open connections view": false,
+      "smart-connections:Smart Lookup: Open lookup view": false,
+      "smart-connections:Smart Connections: Open random connection": false,
+      "copilot:Open Copilot Chat": false,
+      "claudian:Open Claudian": false
+    }
+  },
+  "active": "bc3a8ba3130ff54a",
+  "lastOpenFiles": [
+    "重复内容分析报告.md",
+    "🎯 Obsidian Vault 优化总报告.md",
+    "知识图谱.md",
+    "文件夹结构优化方案.md",
+    "未命名 2.canvas",
+    "未命名 3.canvas",
+    "未命名 1.canvas",
+    "未命名.canvas",
+    "产品管理/Reddit评论神器 有人月入79342美元.md",
+    "产品管理/eSIM是什么，有什么用途，国内可以用来合法访问外网是真的吗，国际旅行用哪些eSIM合适？.md",
+    "产品管理/Claude Code伴侣：可视化管理新体验.md",
+    "产品管理/chatbox+硅基流动=完美体验满血 DeepSeek.md",
+    "产品管理/受够微信 PC 版限制？SuperWeChatPC 强势来袭，体验飙升.md",
+    "产品管理/深圳跨境大厂，运营高手分享的十大跨境AI工具！10分钟产出爆单素材！.md",
+    "产品管理/纽约人！你换ID了吗？搭飞机有它就行 全州已有20万人注册这款电子身份证.md",
+    "产品管理/搞懂Meta再营销，你的广告转化率至少翻一倍.md",
+    "产品管理/从0到1！手把手教你搞定亚马逊卖家资质审核.md",
+    "产品管理/3个做无货源跨境电商的平台，替代阿里速卖通AliExpress，支持一件代发.md",
+    "test_put_file.md",
+    "知识库导入报告.md",
+    "微信文章处理报告.md",
+    "万字剖析多Agent系统-智能海报项目拆解.md",
+    "技术教程/5.5K开发者都在偷偷用的Claude Code神器，一键安装100+预制模板，让AI编程效率翻3倍.md",
+    "AI技术/n8n邪修指南：Agent终极大BOSS，被官方隐藏的战略核武.md",
+    "工具推荐/n8n 进阶：你与自动化高手的差距，不在工具，而在思考顺序.md",
+    "工具推荐/斩获7.8K星 !!! 再见百度 , 搜1小时不如1分钟 , 效率暴涨500% , 1000+格式互转 yyds ! 绝了.md",
+    "工具推荐/13.2k Stars！这个开源神器让你的聊天软件瞬间智能化：QQ微信秒变 AI 助手.md",
+    "工具推荐/这个国产开源 Agent 神器绝了，让 AI 自己用 Python。.md",
+    "工具推荐/斩获15.2k星星的GitHub 汉化开源插件项目：github-chinese.md",
+    "技术教程/suna 堪称开源版manus,本地安装部署.md",
+    "创业投资",
+    "行业分析",
+    "产品管理",
+    "技术教程",
+    "工具推荐",
+    "AI技术",
+    "copilot/copilot-custom-prompts",
+    "copilot",
+    "未命名.base",
+    "未命名"
+  ]
+}

@@ -1,0 +1,15 @@
+[Unit]
+Description=OpenClaw 自主服务监控代理
+Documentation=https://docs.openclaw.ai/cli/gateway
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/Users/zhimingdeng/Documents/通用
+ExecStart=/usr/bin/python3 scripts/openclaw_monitor.py
+Restart=no
+StandardOutput=append:/Users/zhimingdeng/Documents/通用/logs/openclaw-monitor.log
+StandardError=append:/Users/zhimingdeng/Documents/通用/logs/openclaw-monitor.err
+
+[Install]
+WantedBy=multi-user.target

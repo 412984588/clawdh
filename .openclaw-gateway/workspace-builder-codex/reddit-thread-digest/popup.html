@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      width: 400px;
+      padding: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #1a1a1b;
+      color: #d7dadc;
+    }
+    .header { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+    .header h1 { font-size: 15px; font-weight: 600; }
+    .header .logo { font-size: 20px; }
+    .btn {
+      width: 100%; padding: 11px; border: none; border-radius: 8px;
+      cursor: pointer; font-weight: 600; font-size: 14px;
+      transition: background 0.2s;
+    }
+    .btn-primary { background: #ff4500; color: white; }
+    .btn-primary:hover { background: #ff5722; }
+    .btn-primary:disabled { background: #555; cursor: not-allowed; }
+    .btn-secondary { background: #343536; color: #d7dadc; font-size: 12px; padding: 8px; }
+    .btn-secondary:hover { background: #4a4a4b; }
+    #result { margin-top: 14px; font-size: 13px; line-height: 1.7; max-height: 420px; overflow-y: auto; }
+    .summary { background: #272729; padding: 12px; border-radius: 8px; border-left: 3px solid #ff4500; }
+    .error { color: #ff6b6b; background: #2d1f1f; padding: 12px; border-radius: 8px; font-size: 13px; }
+    .loading { text-align: center; padding: 20px; color: #818384; }
+    .status { font-size: 11px; color: #818384; text-align: center; margin-top: 6px; }
+    .export-row { display: flex; gap: 8px; margin-top: 10px; }
+    .export-row .btn { flex: 1; }
+    .setup { margin-bottom: 14px; }
+    .setup label { display: block; font-size: 12px; color: #818384; margin-bottom: 6px; }
+    .setup input {
+      width: 100%; padding: 9px; border: 1px solid #343536; border-radius: 6px;
+      background: #272729; color: #d7dadc; font-size: 13px; margin-bottom: 8px;
+    }
+    .setup .hint { font-size: 11px; color: #818384; margin-top: 4px; }
+    .settings { margin-bottom: 10px; }
+    .settings label { display: block; font-size: 12px; color: #b5b7ba; margin-bottom: 6px; }
+    .settings input {
+      width: 100%; padding: 8px;
+      border: 1px solid #343536; border-radius: 6px;
+      background: #272729; color: #d7dadc; font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <span class="logo">📝</span>
+    <h1>Reddit Thread Digest</h1>
+  </div>
+
+  <div id="setup" class="setup" style="display:none;">
+    <label>输入你的 API Key（right.codes 或 OpenAI 兼容）</label>
+    <input type="password" id="apiKey" placeholder="sk-..." />
+    <button class="btn btn-primary" id="saveKey">保存</button>
+    <div class="hint">Key 仅存储在本地，不会上传</div>
+  </div>
+
+  <div id="settings" class="settings" style="display:none;">
+    <label for="maxComments">评论样本数（5 - 50，建议 15）</label>
+    <input type="number" id="maxComments" min="5" max="50" step="1" value="15" />
+  </div>
+
+  <button class="btn btn-primary" id="summarize" style="display:none;">🚀 生成 AI 摘要</button>
+  <div class="status" id="status"></div>
+  <div id="result"></div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+{
+  "name": "lobster-perpetual-engine",
+  "version": "2.47.0",
+  "description": "OpenClaw 零延迟永动引擎插件 - 集成优化与MISSION管理",
+  "type": "module",
+  "main": "dist/plugin.js",
+  "openclaw": {
+    "id": "lobster-perpetual-engine",
+    "entry": "dist/plugin.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist",
+    "test": "node dist/test.js",
+    "pretest": "npm run build",
+    "perf": "node dist/perf-test.js",
+    "preperf": "npm run build"
+  },
+  "keywords": ["openclaw", "plugin", "perpetual", "engine"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@openclaw/plugin-types": "latest",
+    "typescript": "^5.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0"
+  }
+}
