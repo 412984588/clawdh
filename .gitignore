@@ -98,3 +98,6 @@ worktrees/
 *.pyc
 __pycache__/
 backend/.data/
+
+# Agent progress logs (local state)
+claude-progress.txt
