@@ -33,14 +33,14 @@ export default function register(api: OpenClawPluginApi) {
   const HEALTH_THRESHOLD_MB = 500;  // 健康检查内存阈值（魔法数字常量化）
 
   // v2.48: 权限检查辅助函数 - 消除重复逻辑
-  function checkAuth(ctx: { isAuthorizedSender: boolean; senderId?: string }, action: string): { authorized: boolean; response?: { text: string; channelId: string } } {
+  function checkAuth(ctx: { isAuthorizedSender: boolean; senderId?: string; channel?: string }, action: string): { authorized: boolean; response?: { text: string; channelId: string } } {
     if (!ctx.isAuthorizedSender) {
       logger.warn(`🚫 未授权用户尝试${action}: ${ctx.senderId || 'unknown'}`);
       return {
         authorized: false,
         response: {
           text: `❌ 权限不足：只有授权用户才能${action}`,
-          channelId: (ctx as any).channel || ''
+          channelId: ctx.channel || ''
         }
       };
     }

@@ -66,6 +66,19 @@ const DEFAULT_MAINTENANCE_ACTIONS = [
   "更新运行状态",
 ] as const;
 
+/** 最大连续错误数 - 超过后触发电路熔断 */
+export const MAX_CONSECUTIVE_ERRORS = 10;
+/** 基础退避时间（毫秒） */
+export const BASE_BACKOFF_MS = 1000;
+/** 最大退避时间（毫秒） */
+export const MAX_BACKOFF_MS = 60000;
+/** 最小循环间隔（毫秒） - 防止失控循环 */
+export const MIN_LOOP_INTERVAL_MS = 1000;
+/** 最大日志文件大小（MB） */
+export const MAX_LOG_SIZE_MB = 50;
+/** 健康检查卡死阈值（秒） */
+export const MAX_STALL_SECONDS = 300;
+
 /**
  * 错误分类枚举
  */
@@ -169,23 +182,6 @@ export class LoopEngineManager {
   /** 连续错误计数器 */
   private consecutiveErrors = 0;
 
-  /** 最大连续错误数（超过则自动停止） */
-  private readonly MAX_CONSECUTIVE_ERRORS = 10;
-
-  /** 基础退避时间（毫秒） */
-  private readonly BASE_BACKOFF_MS = 1000;
-
-  /** 最大退避时间（毫秒） */
-  private readonly MAX_BACKOFF_MS = 60000;
-
-  /** 最小循环间隔（毫秒） - 防止失控循环 */
-  private readonly MIN_LOOP_INTERVAL_MS = 1000;
-
-  /** 最大日志文件大小（MB） */
-  private readonly MAX_LOG_SIZE_MB = 50;
-
-  /** 健康检查卡死阈值（秒） */
-  private readonly MAX_STALL_SECONDS = 300;
 
   constructor(
     private readonly api: { logger: EngineLogger },
@@ -400,7 +396,7 @@ export class LoopEngineManager {
         });
 
         // 电路熔断: 连续错误超过阈值则自动停止
-        if (this.consecutiveErrors >= this.MAX_CONSECUTIVE_ERRORS) {
+        if (this.consecutiveErrors >= MAX_CONSECUTIVE_ERRORS) {
           this.api.logger.error(
             `🛑 连续 ${this.consecutiveErrors} 次错误，引擎自动停止以防止失控循环`
           );
@@ -411,8 +407,8 @@ export class LoopEngineManager {
 
         // 指数退避
         const backoff = Math.min(
-          this.BASE_BACKOFF_MS * Math.pow(2, this.consecutiveErrors - 1),
-          this.MAX_BACKOFF_MS
+          BASE_BACKOFF_MS * Math.pow(2, this.consecutiveErrors - 1),
+          MAX_BACKOFF_MS
         );
         this.api.logger.info(`⏳ 退避 ${backoff}ms 后重试...`);
         await new Promise((resolve) => setTimeout(resolve, backoff));
@@ -426,7 +422,7 @@ export class LoopEngineManager {
 
       // 强制最小循环间隔，防止失控循环
       const loopElapsed = Date.now() - this.state.loopStartTime;
-      const remaining = this.MIN_LOOP_INTERVAL_MS - loopElapsed;
+      const remaining = MIN_LOOP_INTERVAL_MS - loopElapsed;
       if (remaining > 0) {
         await new Promise((resolve) => setTimeout(resolve, remaining));
       }
@@ -509,9 +505,9 @@ export class LoopEngineManager {
         );
 
         // 主动健康检查: 卡死超过阈值则自动停止
-        if (stallSeconds >= this.MAX_STALL_SECONDS) {
+        if (stallSeconds >= MAX_STALL_SECONDS) {
           this.api.logger.error(
-            `🛑 引擎卡死超过 ${this.MAX_STALL_SECONDS} 秒，自动停止`
+            `🛑 引擎卡死超过 ${MAX_STALL_SECONDS} 秒，自动停止`
           );
           await this.stopLoop(contextForStop);
         }
