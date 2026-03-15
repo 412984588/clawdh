@@ -39,37 +39,16 @@ import { NotificationChannel, createNotifier } from "./notifier.js";
 /** 代码分析器导入 */
 import {
   LobsterCodeAnalyzer,
-  quickAnalyze,
-  CodeQualityReport,
   IssueSeverity,
-  CodeIssueType,
 } from "./code-analyzer.js";
 
-/** 零延迟循环引擎导入 */
-import {
-  ZeroLatencyLoopEngine,
-  EventLoopMetrics,
-  createZeroLatencyLoop,
-} from "./zero-latency-loop.js";
+/** 运行时模块导入 */
+import type { EngineLogger } from "./runtime/runtime-context.js";
+import { RuntimeContextManager } from "./runtime/runtime-context.js";
 
 /** Node.js 内置模块 */
 import fs from "fs/promises";
 import path from "path";
-
-/**
- * 简化的日志接口
- * @internal
- */
-interface EngineLogger {
-  /** 记录信息日志 */
-  info: (message: string) => void;
-  /** 记录警告日志 */
-  warn: (message: string) => void;
-  /** 记录错误日志 */
-  error: (message: string) => void;
-  /** 记录调试日志（可选） */
-  debug?: (message: string) => void;
-}
 
 /**
  * 简化的 API 接口
@@ -315,37 +294,6 @@ const FormatConstants = {
   TIMEZONE: 'UTC',
 } as const;
 
-/**
- * 超时配置常量
- *
- * 定义异步操作的超时时间。
- *
- * @internal
- */
-const TimeoutConstants = {
-  /** 文件读取超时（5秒） */
-  FILE_READ_MS: 5000,
-  /** 文件写入超时（10秒） */
-  FILE_WRITE_MS: 10000,
-  /** 目录操作超时（3秒） */
-  DIR_OP_MS: 3000,
-} as const;
-
-/**
- * 重试配置常量
- *
- * 定义失败重试的参数。
- *
- * @internal
- */
-const RetryConstants = {
-  /** 最大重试次数 */
-  MAX_ATTEMPTS: 3,
-  /** 初始退避时间（毫秒） */
-  INITIAL_BACKOFF_MS: 100,
-  /** 退避倍数 */
-  BACKOFF_MULTIPLIER: 2,
-} as const;
 
 // ========== 辅助工具函数 ==========
 
@@ -401,125 +349,6 @@ export async function withTimeout<T>(
   }
 }
 
-/**
- * 指数退避重试函数
- *
- * 当操作失败时，使用指数退避策略进行重试。
- * 每次重试的等待时间是前一次的倍数。
- *
- * @template T 函数返回值类型
- * @param fn 要重试的异步函数
- * @param maxAttempts 最大尝试次数（包括首次）
- * @param initialBackoffMs 初始退避时间
- * @param multiplier 退避倍数
- * @returns Promise<T> 函数结果
- * @throws {AggregateError} 所有尝试都失败时
- *
- * @example
- * ```ts
- * const data = await retryWithBackoff(
- *   () => fetch('https://api.example.com'),
- *   3,
- *   100,
- *   2
- * );
- * ```
- *
- * @see {@link https://en.wikipedia.org/wiki/Exponential_backoff | Exponential backoff - Wikipedia}
- * @see {@link https://cloud.google.com/architecture/retries-with-exponential-backoff | Retries with exponential backoff - Google Cloud}
- */
-async function retryWithBackoff<T>(
-  fn: () => Promise<T>,
-  maxAttempts: number = RetryConstants.MAX_ATTEMPTS,
-  initialBackoffMs: number = RetryConstants.INITIAL_BACKOFF_MS,
-  multiplier: number = RetryConstants.BACKOFF_MULTIPLIER
-): Promise<T> {
-  const errors: Error[] = [];
-  let backoffMs = initialBackoffMs;
-
-  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-    try {
-      return await fn();
-    } catch (error) {
-      errors.push(error instanceof Error ? error : new Error(String(error)));
-
-      if (attempt < maxAttempts) {
-        // 🔥 2025 增强：添加 Jitter 防止雷群效应
-        // 随机范围：±25% 的退避时间
-        const jitter = backoffMs * 0.25 * (Math.random() * 2 - 1);
-        const actualBackoff = backoffMs + jitter;
-
-        // 等待带抖动的后退时间
-        await new Promise(resolve => setTimeout(resolve, actualBackoff));
-        backoffMs *= multiplier;
-      }
-    }
-  }
-
-  // 所有尝试都失败，抛出聚合错误
-  throw new AggregateError(
-    errors,
-    `操作失败，已重试 ${maxAttempts} 次`
-  );
-}
-
-
-/**
- * 安全的资源清理器
- *
- * 确保清理操作即使失败也不影响主流程。
- * 记录清理错误但不会抛出异常。
- *
- * @param cleanup 清理函数
- * @param logger 日志记录器
- * @param resourceName 资源名称（用于日志）
- *
- * @internal
- *
- * @remarks
- * 用于防止清理代码中的错误影响正常的错误处理流程。
- * 遵循"错误处理不应引入新错误"原则。
- */
-function safeCleanup(
-  cleanup: () => void | Promise<void>,
-  logger: EngineLogger,
-  resourceName: string
-): void {
-  try {
-    const result = cleanup();
-    if (result instanceof Promise) {
-      result.catch(error => {
-        logger.warn(`清理 ${resourceName} 失败: ${error instanceof Error ? error.message : String(error)}`);
-      });
-    }
-  } catch (error) {
-    logger.warn(`清理 ${resourceName} 失败: ${error instanceof Error ? error.message : String(error)}`);
-  }
-}
-
-/**
- * 类型守卫：检查是否为 AbortError
- *
- * @param error 要检查的错误
- * @returns {boolean} 是否为 AbortError
- *
- * @internal
- */
-function isAbortError(error: unknown): error is DOMException & { name: 'AbortError' } {
-  return error instanceof DOMException && error.name === 'AbortError';
-}
-
-/**
- * 类型守卫：检查是否为 AggregateError
- *
- * @param error 要检查的错误
- * @returns {boolean} 是否为 AggregateError
- *
- * @internal
- */
-function isAggregateError(error: unknown): error is AggregateError {
-  return error instanceof AggregateError;
-}
 
 /**
  * 优化建议列表
@@ -591,8 +420,8 @@ export class PerpetualEngineService {
   private loopTask: Promise<void> | null = null;
   /** 文件列表缓存 */
   private fileCache: Map<string, { data: string[]; timestamp: number }> = new Map();
-  /** 最近一次宿主上下文 */
-  private runtimeContext: OpenClawPluginServiceContext | null = null;
+  /** 运行时上下文管理器 */
+  private readonly contextManager: RuntimeContextManager;
   /** MISSION / BOUNDARIES 缓存 */
   private missionCache: {
     workspaceDir: string;
@@ -600,10 +429,6 @@ export class PerpetualEngineService {
     mission: string;
     boundaries: string;
   } | null = null;
-
-  // ========== 零延迟循环引擎 ==========
-  /** 零延迟循环引擎（用于事件循环优化） */
-  private zeroLatencyEngine: ZeroLatencyLoopEngine;
 
   // ========== 配置 ==========
   /** 引擎配置 */
@@ -656,55 +481,9 @@ export class PerpetualEngineService {
   constructor(api: EngineApi, config?: Partial<EngineConfig>) {
     this.api = api;
     this.config = { ...DEFAULT_CONFIG, ...config };
-    // 初始化零延迟循环引擎，启用事件循环监控
-    this.zeroLatencyEngine = createZeroLatencyLoop({
-      yieldAfterEachLoop: true, // 让出控制权，避免阻塞事件循环
-      lagThreshold: 50, // 50ms 延迟阈值
-      onMetricsUpdate: (metrics) => {
-        // 定期记录事件循环指标
-        safeDebug(
-          this.api.logger,
-          `📊 事件循环指标: 平均延迟=${metrics.avgLag.toFixed(2)}ms, ` +
-          `最大延迟=${metrics.maxLag}ms, 高延迟次数=${metrics.highLagCount}`
-        );
-      },
-    });
-
+    this.contextManager = new RuntimeContextManager(api);
   }
 
-  private rememberRuntimeContext(ctx: OpenClawPluginServiceContext): OpenClawPluginServiceContext {
-    this.runtimeContext = {
-      config: { ...ctx.config },
-      workspaceDir: ctx.workspaceDir,
-      stateDir: ctx.stateDir,
-      logger: ctx.logger,
-    };
-    return this.runtimeContext;
-  }
-
-  private requireRuntimeContext(): OpenClawPluginServiceContext {
-    if (!this.runtimeContext) {
-      throw new Error("OpenClaw 宿主上下文缺失，请先通过服务启动或 gateway_start 注入 workspaceDir/stateDir");
-    }
-    return this.runtimeContext;
-  }
-
-  private getRuntimeContextFromCommand(ctx: PluginCommandContext): OpenClawPluginServiceContext {
-    const runtimeContext = this.requireRuntimeContext();
-    return {
-      ...runtimeContext,
-      config: { ...runtimeContext.config, ...ctx.config },
-      logger: runtimeContext.logger ?? this.api.logger,
-    };
-  }
-
-  private requireWorkspaceDir(ctx?: OpenClawPluginServiceContext): string {
-    const workspaceDir = ctx?.workspaceDir ?? this.runtimeContext?.workspaceDir;
-    if (!workspaceDir) {
-      throw new Error("OpenClaw workspaceDir 缺失，拒绝回退到 process.cwd()");
-    }
-    return workspaceDir;
-  }
 
   async startLoop(ctx?: OpenClawPluginServiceContext): Promise<void> {
     if (this.isRunningValue) {
@@ -712,7 +491,7 @@ export class PerpetualEngineService {
       return;
     }
 
-    const serviceContext = ctx ? this.rememberRuntimeContext(ctx) : this.requireRuntimeContext();
+    const serviceContext = ctx ? this.contextManager.rememberRuntimeContext(ctx) : this.contextManager.requireRuntimeContext();
     await this.recoverState(serviceContext);
 
     this.isRunningValue = true;
@@ -760,7 +539,7 @@ export class PerpetualEngineService {
    * ```
    */
   async startFromCommand(_ctx: PluginCommandContext): Promise<void> {
-    await this.startLoop(this.getRuntimeContextFromCommand(_ctx));
+    await this.startLoop(this.contextManager.getRuntimeContextFromCommand(_ctx));
   }
 
   /**
@@ -779,9 +558,9 @@ export class PerpetualEngineService {
    * 需要通过命令触发 `startFromCommand` 来开始循环。
    */
   async start(ctx: OpenClawPluginServiceContext): Promise<void> {
-    this.rememberRuntimeContext(ctx);
+    this.contextManager.rememberRuntimeContext(ctx);
     // 尝试恢复之前的状态
-    await this.recoverState(this.requireRuntimeContext());
+    await this.recoverState(this.contextManager.requireRuntimeContext());
     this.api.logger.info(LogMessages.ENGINE_READY);
   }
 
@@ -884,8 +663,9 @@ export class PerpetualEngineService {
         // stop 路径不再向上抛出后台循环异常
       });
     }
-    if (this.runtimeContext) {
-      await this.persistState(this.runtimeContext).catch((error) => {
+    const runtimeContext = this.contextManager.getRuntimeContext();
+    if (runtimeContext) {
+      await this.persistState(runtimeContext).catch((error) => {
         this.api.logger.warn(`停止时状态持久化失败: ${error instanceof Error ? error.message : String(error)}`);
       });
     }
@@ -1009,7 +789,7 @@ export class PerpetualEngineService {
     mission: string;
     boundaries: string;
   }> {
-    const workspaceDir = this.requireWorkspaceDir(ctx);
+    const workspaceDir = this.contextManager.requireWorkspaceDir(ctx);
     const missionPath = path.join(workspaceDir, MissionFileNames.MISSION);
     const boundariesPath = path.join(workspaceDir, MissionFileNames.BOUNDARIES);
     const now = Date.now();
@@ -1237,7 +1017,7 @@ export class PerpetualEngineService {
     message: string;
   }> {
     try {
-      const workspaceDir = this.requireWorkspaceDir();
+      const workspaceDir = this.contextManager.requireWorkspaceDir();
       const missionPath = path.join(workspaceDir, MissionFileNames.MISSION);
 
       // 读取现有文件或使用默认模板
@@ -1308,7 +1088,7 @@ export class PerpetualEngineService {
     path: string;
   }> {
     try {
-      const workspaceDir = this.requireWorkspaceDir();
+      const workspaceDir = this.contextManager.requireWorkspaceDir();
       const missionPath = path.join(workspaceDir, MissionFileNames.MISSION);
       const content = await fs.readFile(missionPath, 'utf-8');
       return {
@@ -1319,7 +1099,7 @@ export class PerpetualEngineService {
     } catch {
       // 使用 requireWorkspaceDir() 确保路径处理一致性
       // 如果 workspaceDir 不存在，将抛出有意义的错误而非返回不完整路径
-      const workspaceDir = this.requireWorkspaceDir();
+      const workspaceDir = this.contextManager.requireWorkspaceDir();
       return {
         mission: this.getDefaultMission(),
         exists: false,
@@ -1329,7 +1109,7 @@ export class PerpetualEngineService {
   }
 
   async analyzeCurrentWorkspace(): Promise<string> {
-    return this.analyzeCodebase(this.requireRuntimeContext());
+    return this.analyzeCodebase(this.contextManager.requireRuntimeContext());
   }
 
   /**
@@ -1512,7 +1292,7 @@ export class PerpetualEngineService {
    * @see {@link https://github.com/microsoft/TypeScript/wiki/Using-the-Compiler-API | TypeScript Compiler API}
    */
   private async analyzeCodebase(ctx: OpenClawPluginServiceContext): Promise<string> {
-    const workspaceDir = this.requireWorkspaceDir(ctx);
+    const workspaceDir = this.contextManager.requireWorkspaceDir(ctx);
 
     try {
       // 使用真正的代码分析器
@@ -1588,7 +1368,7 @@ export class PerpetualEngineService {
     ctx: OpenClawPluginServiceContext,
     label: string
   ): Promise<string> {
-    const workspaceDir = this.requireWorkspaceDir(ctx);
+    const workspaceDir = this.contextManager.requireWorkspaceDir(ctx);
     try {
       const files = await this.getCachedFiles(workspaceDir);
       const stats = this.countFileTypes(files);
