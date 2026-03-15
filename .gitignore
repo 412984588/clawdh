@@ -54,6 +54,9 @@ Thumbs.db
 *.sln
 *.sw?
 
+# Agent local configs (Paperclip)
+agents/
+
 # Testing
 coverage/
 .nyc_output/
