@@ -46,3 +46,13 @@ notes.md
 # Runtime generated MISSION files
 MISSION_PARTNER.md
 BOUNDARIES_PARTNER.md
+
+# Dev-only artifacts
+claude-progress.txt
+audit-report.md
+*.backup
+dev/
+
+# Untracked source files (dev/test scripts not part of public API)
+src/test.ts
+src/perf-test.ts

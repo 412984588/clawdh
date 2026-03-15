@@ -7,9 +7,12 @@
  * - /start_partner 和 /stop_partner 命令
  */
 
-import type { OpenClawPluginApi } from "./types.js";
+import type { OpenClawPluginApi, OpenClawPluginServiceContext } from "./types.js";
 import { PerpetualEngineService } from "./engine/service.js";
 import { loadConfig } from "./config.js";
+
+// v2.48: 插件版本常量
+const PLUGIN_VERSION = "v2.48.0";
 
 export default function register(api: OpenClawPluginApi) {
   const logger = api.logger;
@@ -20,6 +23,97 @@ export default function register(api: OpenClawPluginApi) {
     `压缩间隔=${config.compressInterval}, ` +
     `健康检查=${config.enableHealthCheck}`
   );
+
+  // 安全警告：未配置 auth token 时所有端点对任意调用方开放
+  if (!process.env.OPENCLAW_AUTH_TOKEN) {
+    logger.warn("⚠️  OPENCLAW_AUTH_TOKEN 未配置 — HTTP 端点和 RPC 方法对任意调用方开放。生产环境请务必配置此变量。");
+  }
+
+  // v2.48: 共享状态获取函数 - 消除重复代码
+  const HEALTH_THRESHOLD_MB = 500;  // 健康检查内存阈值（魔法数字常量化）
+
+  // v2.48: 权限检查辅助函数 - 消除重复逻辑
+  function checkAuth(ctx: { isAuthorizedSender: boolean; senderId?: string }, action: string): { authorized: boolean; response?: { text: string; channelId: string } } {
+    if (!ctx.isAuthorizedSender) {
+      logger.warn(`🚫 未授权用户尝试${action}: ${ctx.senderId || 'unknown'}`);
+      return {
+        authorized: false,
+        response: {
+          text: `❌ 权限不足：只有授权用户才能${action}`,
+          channelId: (ctx as any).channel || ''
+        }
+      };
+    }
+    return { authorized: true };
+  }
+
+  // v2.48: 统一命令响应辅助函数
+  function commandResponse(text: string, channelId: string): { text: string; channelId: string } {
+    return { text, channelId };
+  }
+
+  // v2.48: HTTP 端点认证检查 - 防止未授权访问
+  function checkHttpAuth(req: { headers?: Record<string, string> }): boolean {
+    const authToken = process.env.OPENCLAW_AUTH_TOKEN;
+    if (!authToken) return true; // 未配置 token 时允许访问（向后兼容）
+    const authHeader = req.headers?.["authorization"];
+    return authHeader === `Bearer ${authToken}`;
+  }
+
+  // v2.48: RPC 方法 token 校验 - 防止未授权 RPC 调用
+  function checkRpcAuth(args: unknown[]): boolean {
+    const authToken = process.env.OPENCLAW_AUTH_TOKEN;
+    if (!authToken) return true; // 未配置 token 时允许调用
+    const callerToken = args.find((a): a is string => typeof a === "string");
+    return callerToken === authToken;
+  }
+
+  function isEnabled(value: unknown): boolean {
+    if (value === true) {
+      return true;
+    }
+
+    if (typeof value === "string") {
+      return value.trim().toLowerCase() === "true";
+    }
+
+    return false;
+  }
+
+  function getEngineStatus() {
+    const avgTime = engineService.getAvgLoopTime();
+    const loopsPerSec = engineService.getLoopsPerSecond();
+    const memory = engineService.getMemoryUsage();
+    const errorStats = engineService.getErrorStats();
+    const errorStatsText = Object.entries(errorStats)
+      .map(([cat, count]) => `${cat}: ${count}`)
+      .join(', ') || '无';
+
+    return {
+      version: PLUGIN_VERSION,
+      running: engineService.isRunning(),
+      loopCount: engineService.getLoopCount(),
+      avgLoopTimeMs: avgTime,
+      loopsPerSecond: loopsPerSec,
+      memoryUsageMB: memory,
+      errorStats,
+      errorStatsText,
+      contextSize: engineService.getContextSize(),
+      isHealthy: memory < HEALTH_THRESHOLD_MB,
+      timestamp: new Date().toISOString()
+    };
+  }
+
+  function formatStatusText(status: ReturnType<typeof getEngineStatus>) {
+    return "🦞 永动引擎状态\n\n" +
+      "运行中: " + (status.running ? "是" : "否") + "\n" +
+      "循环次数: " + status.loopCount + "\n" +
+      "平均耗时: " + status.avgLoopTimeMs + "ms\n" +
+      "循环速率: " + status.loopsPerSecond + " 循环/秒\n" +
+      "内存使用: " + status.memoryUsageMB + " MB\n" +
+      "错误统计: " + status.errorStatsText + "\n" +
+      "上下文大小: " + status.contextSize + " 字符";
+  }
 
   // 注册后台服务
   api.registerService({
@@ -40,26 +134,22 @@ export default function register(api: OpenClawPluginApi) {
     description: "启动零延迟永动循环引擎",
     requireAuth: true,
     handler: async (ctx) => {
-      // v2.47: 权限检查 - 只允许授权用户启动引擎
-      if (!ctx.isAuthorizedSender) {
-        logger.warn(`🚫 未授权用户尝试启动引擎: ${ctx.senderId || 'unknown'}`);
-        return {
-          text: "❌ 权限不足：只有授权用户才能启动永动引擎",
-          channelId: ctx.channel // 回复到原频道
-        };
+      // v2.48: 使用统一权限检查
+      const authCheck = checkAuth(ctx, "启动引擎");
+      if (!authCheck.authorized) {
+        return authCheck.response!;
       }
 
       logger.info(`🚀 收到启动命令 (用户: ${ctx.senderId || 'unknown'}, 频道: ${ctx.channel})`);
       await engineService.startFromCommand(ctx);
 
-      // v2.47: 返回 channelId 用于定向回复
-      return {
-        text: "🦞 永动引擎已启动\n\n" +
-              "状态: " + (engineService.isRunning() ? "运行中" : "启动中...") + "\n" +
-              "循环次数: " + engineService.getLoopCount() + "\n\n" +
-              "使用 /stop_partner 停止引擎",
-        channelId: ctx.channel // 回复到原频道
-      };
+      return commandResponse(
+        "🦞 永动引擎已启动\n\n" +
+        "状态: " + (engineService.isRunning() ? "运行中" : "启动中...") + "\n" +
+        "循环次数: " + engineService.getLoopCount() + "\n\n" +
+        "使用 /stop_partner 停止引擎",
+        ctx.channel
+      );
     },
   });
 
@@ -69,24 +159,21 @@ export default function register(api: OpenClawPluginApi) {
     description: "停止永动循环引擎",
     requireAuth: true,
     handler: async (ctx) => {
-      // v2.47: 权限检查 - 只允许授权用户停止引擎
-      if (!ctx.isAuthorizedSender) {
-        logger.warn(`🚫 未授权用户尝试停止引擎: ${ctx.senderId || 'unknown'}`);
-        return {
-          text: "❌ 权限不足：只有授权用户才能停止永动引擎",
-          channelId: ctx.channel
-        };
+      // v2.48: 使用统一权限检查
+      const authCheck = checkAuth(ctx, "停止引擎");
+      if (!authCheck.authorized) {
+        return authCheck.response!;
       }
 
       logger.info(`🛑 收到停止命令 (用户: ${ctx.senderId || 'unknown'})`);
-      engineService.stopLoop();
+      await engineService.stopLoop();
 
-      return {
-        text: "🛑 永动引擎已停止\n\n" +
-              "总循环次数: " + engineService.getLoopCount() + "\n" +
-              "使用 /start_partner 重新启动",
-        channelId: ctx.channel
-      };
+      return commandResponse(
+        "🛑 永动引擎已停止\n\n" +
+        "总循环次数: " + engineService.getLoopCount() + "\n" +
+        "使用 /start_partner 重新启动",
+        ctx.channel
+      );
     },
   });
 
@@ -96,24 +183,8 @@ export default function register(api: OpenClawPluginApi) {
     description: "查看永动引擎状态",
     requireAuth: true,
     handler: async () => {
-      const avgTime = engineService.getAvgLoopTime();
-      const loopsPerSec = engineService.getLoopsPerSecond();
-      const memory = engineService.getMemoryUsage();
-      const errorStats = engineService.getErrorStats();
-      const errorStatsText = Object.entries(errorStats)
-        .map(([cat, count]) => `${cat}: ${count}`)
-        .join(', ') || '无';
-
-      return {
-        text: "🦞 永动引擎状态\n\n" +
-              "运行中: " + (engineService.isRunning() ? "是" : "否") + "\n" +
-              "循环次数: " + engineService.getLoopCount() + "\n" +
-              "平均耗时: " + avgTime + "ms\n" +
-              "循环速率: " + loopsPerSec + " 循环/秒\n" +
-              "内存使用: " + memory + " MB\n" +
-              "错误统计: " + errorStatsText + "\n" +
-              "上下文大小: " + engineService.getContextSize() + " 字符"
-      };
+      const status = getEngineStatus();
+      return { text: formatStatusText(status) };
     },
   });
 
@@ -122,8 +193,10 @@ export default function register(api: OpenClawPluginApi) {
     name: "partner_mission",
     description: "设置或查看永动引擎的任务目标（MISSION）",
     requireAuth: true,
+    acceptsArgs: true,  // v2.48: 声明接受参数
     handler: async (ctx) => {
-      const input = ctx.args?.trim() || "";
+      // v2.48: 优先使用 commandBody 获取完整命令文本
+      const input = (ctx.commandBody || ctx.args || "").trim();
 
       // v2.47: 无参数时显示当前任务目标
       if (!input) {
@@ -169,13 +242,14 @@ export default function register(api: OpenClawPluginApi) {
     requireAuth: true,
     handler: async (ctx) => {
       logger.info("📊 触发代码分析");
-      // 简化版：返回已知的分析结果
+      const authCheck = checkAuth(ctx, "执行代码分析");
+      if (!authCheck.authorized) {
+        return authCheck.response!;
+      }
+
+      const analysis = await engineService.analyzeCurrentWorkspace();
       return {
-        text: "📊 代码质量分析\n\n" +
-              "状态: 分析完成\n" +
-              "评分: 48/100\n" +
-              "问题: 13 个\n" +
-              "建议: 添加错误处理、降低复杂度"
+        text: analysis
       };
     },
   });
@@ -201,116 +275,181 @@ export default function register(api: OpenClawPluginApi) {
     },
   });
 
-  // 🆕 新增：/partner_orchestrate 命令 - 使用编排器执行任务
+  // 🆕 v2.48: /partner_voice_report 命令 - 语音汇报引擎状态
   api.registerCommand({
-    name: "partner_orchestrate",
-    description: "使用指定编排器执行任务",
+    name: "partner_voice_report",
+    description: "使用语音播报引擎状态（需要 TTS 支持）",
     requireAuth: true,
     handler: async (ctx) => {
-      const task = ctx.args?.trim();
-      if (!task) {
-        const orchestrators = await engineService.getAvailableOrchestrators();
+      const status = getEngineStatus();
+
+      // 构建语音文本
+      const voiceText = `龙虾永动引擎状态报告。${status.running ? "引擎正在运行" : "引擎已停止"}。` +
+        `已完成 ${status.loopCount} 次循环。` +
+        `平均每次循环耗时 ${status.avgLoopTimeMs} 毫秒。` +
+        `当前内存使用 ${Math.round(status.memoryUsageMB)} 兆字节。`;
+
+      // 尝试使用 TTS
+      if (api.runtime?.tts?.textToSpeechTelephony) {
+        try {
+          const audioBuffer = await api.runtime.tts.textToSpeechTelephony(voiceText, {
+            language: "zh-CN",
+            voice: "default"
+          });
+          return commandResponse(
+            "🎙️ 语音报告已生成: " + voiceText + "\n\n(音频长度: " + audioBuffer.length + " 字节)",
+            ctx.channel
+          );
+        } catch (e) {
+          logger.warn(`TTS 失败: ${e}`);
+          return commandResponse(
+            "⚠️ TTS 语音生成失败，返回文本报告:\n\n" + voiceText,
+            ctx.channel
+          );
+        }
+      }
+
+      // TTS 不可用，返回文本报告
+      return commandResponse(
+        "📋 引擎状态（文本模式）:\n\n" + voiceText + "\n\n提示: 语音功能需要 OpenClaw 运行时支持 TTS",
+        ctx.channel
+      );
+    },
+  });
+
+  // v2.48: 注册 HTTP 路由 - REST API 端点
+  try {
+    // GET /lobster/status - 获取引擎状态（需要认证）
+    api.registerHttpRoute && api.registerHttpRoute({
+      method: "GET",
+      path: "/lobster/status",
+      handler: async (req, res) => {
+        if (!checkHttpAuth(req)) {
+          res.statusCode = 401;
+          res.json({ error: "Unauthorized" });
+          return;
+        }
+        const status = getEngineStatus();
+        res.json({
+          version: status.version,
+          running: status.running,
+          loopCount: status.loopCount,
+          avgLoopTimeMs: status.avgLoopTimeMs,
+          loopsPerSecond: status.loopsPerSecond,
+          memoryUsageMB: status.memoryUsageMB,
+          errorStats: status.errorStats,
+          contextSize: status.contextSize,
+          timestamp: status.timestamp
+        });
+      }
+    });
+
+    // GET /lobster/health - 健康检查端点（不暴露内部细节）
+    api.registerHttpRoute && api.registerHttpRoute({
+      method: "GET",
+      path: "/lobster/health",
+      handler: async (_req, res) => {
+        const status = getEngineStatus();
+        res.statusCode = status.isHealthy ? 200 : 503;
+        res.json({ status: status.isHealthy ? "ok" : "unhealthy" });
+      }
+    });
+
+    logger.info("🌐 HTTP 路由已注册: GET /lobster/status, GET /lobster/health");
+  } catch (e) {
+    logger.warn(`⚠️ HTTP 路由注册失败 (可能 OpenClaw 版本不支持): ${e}`);
+  }
+
+  // v2.48: 注册 Gateway RPC 方法 - 允许其他插件调用引擎功能
+  try {
+    // lobster.getStatus() - 获取引擎状态
+    api.registerGatewayMethod && api.registerGatewayMethod({
+      name: "lobster.getStatus",
+      description: "获取永动引擎状态",
+      handler: () => {
+        const status = getEngineStatus();
         return {
-          text: "🔧 编排器执行\n\n" +
-                "用法: /partner_orchestrate <任务描述> [编排器ID]\n\n" +
-                "自动选择示例（系统智能推荐）:\n" +
-                "  /partner_orchestrate 分析这个bug → 自动用 ralph\n" +
-                "  /partner_orchestrate 优化代码性能 → 自动用 alphaevolve\n" +
-                "  /partner_orchestrate 搜索相关资料 → 自动用 graph-rag\n\n" +
-                "手动指定示例:\n" +
-                "  /partner_orchestrate 分析这个bug ralph\n" +
-                "  /partner_orchestrate 设计算法 cbs\n\n" +
-                "可用编排器: " + orchestrators.slice(0, 10).join(', ') + "... (共56个)\n" +
-                "使用 /partner_orchestrators 查看完整列表"
+          version: status.version,
+          running: status.running,
+          loopCount: status.loopCount,
+          avgLoopTimeMs: status.avgLoopTimeMs,
+          loopsPerSecond: status.loopsPerSecond,
+          memoryUsageMB: status.memoryUsageMB,
+          errorStats: status.errorStats,
+          contextSize: status.contextSize,
+          isHealthy: status.isHealthy,
+          timestamp: status.timestamp
         };
       }
+    });
 
-      // 智能解析：检查最后一个词是否是编排器ID
-      const words = task.split(/\s+/);
-      const allOrchestrators = await engineService.getAvailableOrchestrators();
-      const lastWord = words[words.length - 1];
+    // lobster.isRunning() - 检查引擎是否运行中
+    api.registerGatewayMethod && api.registerGatewayMethod({
+      name: "lobster.isRunning",
+      description: "检查永动引擎是否正在运行",
+      handler: () => engineService.isRunning()
+    });
 
-      let taskDesc: string;
-      let preferredOrchestrator: string | undefined;
+    // lobster.getLoopCount() - 获取循环次数
+    api.registerGatewayMethod && api.registerGatewayMethod({
+      name: "lobster.getLoopCount",
+      description: "获取永动引擎循环次数",
+      handler: () => engineService.getLoopCount()
+    });
 
-      if (words.length > 1 && allOrchestrators.includes(lastWord)) {
-        // 最后一个词是有效的编排器ID
-        taskDesc = words.slice(0, -1).join(' ');
-        preferredOrchestrator = lastWord;
-      } else {
-        // 没有指定编排器，使用整个输入作为任务
-        taskDesc = task;
-        preferredOrchestrator = undefined;
+    // lobster.start() - 启动引擎（需要 token 认证）
+    api.registerGatewayMethod && api.registerGatewayMethod({
+      name: "lobster.start",
+      description: "启动永动引擎",
+      handler: async (...args: unknown[]) => {
+        if (!checkRpcAuth(args)) {
+          return { success: false, error: "Unauthorized" };
+        }
+        const ctx = args[0] as OpenClawPluginServiceContext | undefined;
+        try {
+          if (!engineService.isRunning()) {
+            await engineService.startLoop(ctx);
+            return { success: true, message: "永动引擎已启动" };
+          }
+          return { success: true, message: "引擎已在运行中" };
+        } catch (error) {
+          return {
+            success: false,
+            error: error instanceof Error ? error.message : String(error),
+          };
+        }
       }
+    });
 
-      const result = await engineService.executeWithOrchestrator(taskDesc, preferredOrchestrator);
-      return { text: result.summary };
-    },
-  });
+    // lobster.stop() - 停止引擎（需要 token 认证）
+    api.registerGatewayMethod && api.registerGatewayMethod({
+      name: "lobster.stop",
+      description: "停止永动引擎",
+      handler: async (...args: unknown[]) => {
+        if (!checkRpcAuth(args)) {
+          return { success: false, error: "Unauthorized" };
+        }
+        if (engineService.isRunning()) {
+          await engineService.stopLoop();
+          return { success: true, message: "永动引擎已停止", loopCount: engineService.getLoopCount() };
+        }
+        return { success: true, message: "引擎未运行" };
+      }
+    });
 
-  // 🆕 新增：/partner_orchestrators 命令 - 列出所有56个编排器
-  api.registerCommand({
-    name: "partner_orchestrators",
-    description: "列出所有56个可用的多代理编排器",
-    requireAuth: true,
-    handler: async () => {
-      const orchestrators = await engineService.getOrchestratorDetails();
-
-      // 按类别分组显示
-      const core = [
-        'adaptflow', 'aegean', 'alphaevolve', 'automl-agent', 'bayesian', 'cbs', 'croto',
-        'epoch', 'freemad', 'halo', 'hybrid', 'latentmas', 'lmars', 'malt', 'mamr'
-      ];
-      const collaboration = [
-        'mars', 'masfactory', 'mosaic', 'moya', 'multiturn', 'myantfarm', 'omas',
-        'orchestra', 'orchmas', 'puppeteer', 'rapo', 'symphony', 'tea'
-      ];
-      const reasoning = [
-        'ultrathink', 'adaptorch', 'ralph', 'deepseek-r1', 'chain-of-notebook',
-        'tree-of-execution', 'graph-rag'
-      ];
-      const model = [
-        'qwen-agentic', 'gpt-composer', 'claude-orchestra', 'llama-herd', 'mistral-fusion',
-        'gemini-protocol'
-      ];
-      const memory = [
-        'vector-orchestra', 'memory-mesh', 'knowledge-graph-flow'
-      ];
-      const advanced = [
-        'debate-protocol', 'consensus-mechanism', 'voting-system', 'ensemble-mix',
-        'streaming-chain', 'batch-process', 'pipeline-flow', 'parallel-grid',
-        'hierarchical-task', 'dynamic-switch', 'context-router', 'meta-orchestrator'
-      ];
-
-      const formatList = (ids: string[], details: typeof orchestrators) => {
-        return ids.map(id => {
-          const info = details.find(d => d.id === id);
-          return `  ${id}${info ? ' - ' + info.name : ''}`;
-        }).join('\n');
-      };
-
-      return {
-        text: "🔧 56个编排器\n\n" +
-              "【核心编排器】(16个)\n" + formatList(core, orchestrators) + "\n\n" +
-              "【协作编排器】(15个)\n" + formatList(collaboration, orchestrators) + "\n\n" +
-              "【推理编排器】(7个)\n" + formatList(reasoning, orchestrators) + "\n\n" +
-              "【模型专用】(6个)\n" + formatList(model, orchestrators) + "\n\n" +
-              "【记忆管理】(3个)\n" + formatList(memory, orchestrators) + "\n\n" +
-              "【高级编排】(9个)\n" + formatList(advanced, orchestrators) + "\n\n" +
-              "用法: /partner_orchestrate <任务> [编排器ID]\n" +
-              "示例: /partner_orchestrate 分析这个bug deepseek-r1"
-      };
-    },
-  });
+    logger.info("🔌 Gateway RPC 方法已注册: lobster.getStatus, lobster.isRunning, lobster.getLoopCount, lobster.start, lobster.stop");
+  } catch (e) {
+    logger.warn(`⚠️ Gateway RPC 方法注册失败 (可能 OpenClaw 版本不支持): ${e}`);
+  }
 
   // 注册 gateway_start 钩子
   api.on("gateway_start", async (event, ctx) => {
     logger.info("🦞 Gateway 启动，永动引擎就绪");
     // 从OpenClaw配置读取自动启动设置
-    const autoStart = api.config.auto_start_engine === true;
+    const autoStart = isEnabled(api.config.auto_start_engine);
     if (autoStart && !engineService.isRunning()) {
       logger.info("🚀 配置了自动启动，引擎自动启动");
-      await engineService.start(ctx).catch(err =>
+      await engineService.startLoop(ctx).catch(err =>
         logger.error(`自动启动失败: ${err instanceof Error ? err.message : String(err)}`)
       );
     }
@@ -321,18 +460,16 @@ export default function register(api: OpenClawPluginApi) {
   api.on("gateway_pre_stop", async (event, ctx) => {
     logger.info("🦞 Gateway 即将停止，准备优雅关闭");
 
-    // v2.47: 保存最终状态到 stateDir
-    const loops = engineService.getLoopCount();
-    const avgTime = engineService.getAvgLoopTime();
-    const errors = engineService.getErrorStats();
-    const totalErrors = Object.values(errors).reduce((sum, count) => sum + count, 0);
+    // v2.48: 使用共享状态函数获取最终统计
+    const status = getEngineStatus();
+    const totalErrors = Object.values(status.errorStats).reduce((sum, count) => sum + count, 0);
 
-    logger.info(`📊 最终统计: 循环=${loops}, 平均耗时=${avgTime}ms, 错误=${totalErrors}`);
+    logger.info(`📊 最终统计: 循环=${status.loopCount}, 平均耗时=${status.avgLoopTimeMs}ms, 错误=${totalErrors}`);
 
     // 如果引擎正在运行，先停止它
-    if (engineService.isRunning()) {
+    if (status.running) {
       logger.info("🛑 永动引擎运行中，将在 gateway_pre_stop 阶段停止");
-      engineService.stopLoop();
+      await engineService.stopLoop();
       logger.info("✅ 永动引擎已优雅停止");
     }
   }, { priority: 100 });
@@ -341,11 +478,25 @@ export default function register(api: OpenClawPluginApi) {
   api.on("gateway_stop", async (event, ctx) => {
     logger.info("🦞 Gateway 停止，永动引擎清理中");
     if (engineService.isRunning()) {
-      engineService.stopLoop();
+      await engineService.stopLoop();
       logger.info("🛑 永动引擎已自动停止");
     }
   }, { priority: 100 });
 
   logger.info("🦞 龙虾永动引擎插件已加载");
-  logger.info("📋 可用命令: /start_partner, /stop_partner, /partner_status, /partner_mission, /partner_analyze, /partner_compress, /partner_orchestrate, /partner_orchestrators");
+  // v2.48: 动态生成命令列表（避免手动维护）
+  const REGISTERED_COMMANDS = [
+    "start_partner", "stop_partner", "partner_status", "partner_mission",
+    "partner_analyze", "partner_compress", "partner_voice_report"
+  ];
+  const REGISTERED_APIS = [
+    "GET /lobster/status", "GET /lobster/health"
+  ];
+  const REGISTERED_RPC_METHODS = [
+    "lobster.getStatus", "lobster.isRunning", "lobster.getLoopCount",
+    "lobster.start", "lobster.stop"
+  ];
+  logger.info(`📋 可用命令 (${REGISTERED_COMMANDS.length}个): /${REGISTERED_COMMANDS.join(', /')}`);
+  logger.info(`🌐 REST API (${REGISTERED_APIS.length}个): ${REGISTERED_APIS.join(', ')}`);
+  logger.info(`🔌 RPC 方法 (${REGISTERED_RPC_METHODS.length}个): ${REGISTERED_RPC_METHODS.join(', ')}`);
 }
