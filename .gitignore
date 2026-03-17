@@ -101,3 +101,6 @@ backend/.data/
 
 # Agent progress logs (local state)
 claude-progress.txt
+
+# Agent workspace directories
+.openclaw-gateway/
