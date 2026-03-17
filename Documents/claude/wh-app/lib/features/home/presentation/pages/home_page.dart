@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:wh_app/core/providers/mock_data_providers.dart';
+import 'package:wh_app/core/providers/api_providers.dart';
+import 'package:wh_app/core/models/org.dart';
 import 'package:wh_app/core/constants/app_constants.dart';
 import 'package:wh_app/features/home/presentation/widgets/org_info_card.dart';
 import 'package:wh_app/features/home/presentation/widgets/event_list_item.dart';
@@ -13,9 +14,9 @@ class HomePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final org = ref.watch(mockOrgProvider);
-    final eventsAsync = ref.watch(mockEventsProvider);
-    final announcementsAsync = ref.watch(mockAnnouncementsProvider);
+    final orgAsync = ref.watch(orgProvider);
+    final eventsAsync = ref.watch(eventsProvider);
+    final announcementsAsync = ref.watch(announcementsProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -24,9 +25,10 @@ class HomePage extends ConsumerWidget {
       ),
       body: RefreshIndicator(
         onRefresh: () async {
-          // 刷新数据
-          ref.invalidate(mockEventsProvider);
-          ref.invalidate(mockAnnouncementsProvider);
+          // 刷新所有數據
+          ref.invalidate(orgProvider);
+          ref.invalidate(eventsProvider);
+          ref.invalidate(announcementsProvider);
         },
         child: ListView(
           padding: const EdgeInsets.symmetric(
@@ -34,7 +36,7 @@ class HomePage extends ConsumerWidget {
             vertical: AppConstants.spacingSmall,
           ),
           children: [
-            OrgInfoCard(org: org),
+            _buildOrgSection(context, orgAsync),
             const SizedBox(height: AppConstants.spacingLarge),
             _buildHeader(context, '最新活動', () => context.go('/events')),
             _buildEventsSection(context, eventsAsync, ref),
@@ -48,9 +50,30 @@ class HomePage extends ConsumerWidget {
     );
   }
 
+  Widget _buildOrgSection(BuildContext context, AsyncValue<Org> orgAsync) {
+    return orgAsync.when(
+      loading: () => const Card(
+        child: Padding(
+          padding: EdgeInsets.all(AppConstants.spacingLarge),
+          child: Center(child: CircularProgressIndicator()),
+        ),
+      ),
+      error: (err, stack) => OrgInfoCard(
+        org: Org(
+          id: '1',
+          name: '紐約唐人街同鄉總會',
+          logo: '',
+          description: '成立於1980年，旨在聯絡鄉情，服務鄉親，促進僑社安定繁榮。',
+          memberCount: 500,
+        ),
+      ),
+      data: (org) => OrgInfoCard(org: org),
+    );
+  }
+
   Widget _buildEventsSection(
     BuildContext context,
-    AsyncValue eventsAsync,
+    AsyncValue<List<dynamic>> eventsAsync,
     WidgetRef ref,
   ) {
     return eventsAsync.when(
@@ -61,8 +84,8 @@ class HomePage extends ConsumerWidget {
       error: (err, stack) => SizedBox(
         height: 200,
         child: ErrorStateWidget(
-          message: '加載活動失敗',
-          onRetry: () => ref.invalidate(mockEventsProvider),
+          message: getErrorMessage(err),
+          onRetry: () => ref.invalidate(eventsProvider),
         ),
       ),
       data: (events) {
@@ -89,7 +112,7 @@ class HomePage extends ConsumerWidget {
 
   Widget _buildAnnouncementsSection(
     BuildContext context,
-    AsyncValue announcementsAsync,
+    AsyncValue<List<dynamic>> announcementsAsync,
     WidgetRef ref,
   ) {
     return announcementsAsync.when(
@@ -100,8 +123,8 @@ class HomePage extends ConsumerWidget {
       error: (err, stack) => SizedBox(
         height: 150,
         child: ErrorStateWidget(
-          message: '加載公告失敗',
-          onRetry: () => ref.invalidate(mockAnnouncementsProvider),
+          message: getErrorMessage(err),
+          onRetry: () => ref.invalidate(announcementsProvider),
         ),
       ),
       data: (announcements) {
