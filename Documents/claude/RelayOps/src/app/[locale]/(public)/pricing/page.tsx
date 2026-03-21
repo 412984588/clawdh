@@ -35,53 +35,57 @@ type Tier = {
   features: Array<{ label: string; included: boolean }>
 }
 
+// NOTE: Prices are indicative and subject to owner confirmation before launch
 const tiers: Tier[] = [
   {
     name: 'Starter',
-    price: 'Starting at $X/mo',
-    billing: 'Fixed monthly placeholder pricing',
+    price: '$499/mo',
+    billing: '5 tickets/month, $99 per additional ticket',
     summary: 'For small teams that need a clean starting point and predictable delivery.',
     ctaLabel: 'Start Starter Plan',
     icon: CircleDollarSign,
     featured: false,
     features: [
       { label: 'Core cleanup workflows', included: true },
-      { label: 'Standard turnaround windows', included: true },
+      { label: 'Standard turnaround (48h)', included: true },
       { label: 'Basic reporting visibility', included: true },
+      { label: 'Email support', included: true },
       { label: 'Dedicated success lead', included: false },
       { label: 'Custom enterprise controls', included: false },
     ],
   },
   {
     name: 'Professional',
-    price: 'Starting at $X/mo',
-    billing: 'Usage-based placeholder pricing',
+    price: '$1,499/mo',
+    billing: '20 tickets/month, $75 per additional ticket',
     summary: 'For growing operators that want full workflow coverage with scalable capacity.',
     ctaLabel: 'Choose Professional',
     icon: Sparkles,
     featured: true,
     features: [
-      { label: 'Core cleanup workflows', included: true },
-      { label: 'Standard turnaround windows', included: true },
-      { label: 'Advanced reporting visibility', included: true },
+      { label: 'Everything in Starter', included: true },
+      { label: 'Priority turnaround (36h)', included: true },
+      { label: 'Advanced analytics dashboard', included: true },
       { label: 'Priority queueing', included: true },
+      { label: 'Slack integration', included: true },
       { label: 'Dedicated success lead', included: false },
     ],
   },
   {
     name: 'Enterprise',
-    price: 'Custom quote',
-    billing: 'Custom commercial structure',
+    price: 'Contact Sales',
+    billing: 'Unlimited tickets + custom SLA',
     summary: 'For large accounts that need tailored support, governance, and commercial terms.',
     ctaLabel: 'Contact Enterprise Sales',
     icon: Building2,
     featured: false,
     features: [
-      { label: 'Core cleanup workflows', included: true },
-      { label: 'Priority queueing', included: true },
-      { label: 'Dedicated success lead', included: true },
-      { label: 'Custom enterprise controls', included: true },
-      { label: 'Negotiated support model', included: true },
+      { label: 'Everything in Professional', included: true },
+      { label: 'Unlimited tickets', included: true },
+      { label: 'Custom SLA (24h or faster)', included: true },
+      { label: 'Dedicated success manager', included: true },
+      { label: 'Custom integrations', included: true },
+      { label: 'Quarterly business reviews', included: true },
     ],
   },
 ]
@@ -175,10 +179,10 @@ export default function PricingPage() {
             <Badge className="rounded-full border border-blue-500/20 bg-white/10 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-200 hover:bg-white/10">
               Pricing Strategy
             </Badge>
-            <h1 className="mt-8 text-5xl font-black tracking-[-0.08em] text-balance md:text-7xl lg:leading-[0.96]">
+            <h1 className="mt-6 max-w-[11ch] text-[2.85rem] font-black leading-[0.93] tracking-[-0.07em] sm:mt-8 sm:max-w-4xl sm:text-5xl md:text-7xl lg:leading-[0.96]">
               Placeholder pricing built to explain positioning before final commercial terms.
             </h1>
-            <p className="mt-6 max-w-3xl text-lg leading-8 text-zinc-300 md:text-xl">
+            <p className="mt-5 max-w-3xl text-base leading-7 text-zinc-300 sm:mt-6 sm:text-lg sm:leading-8 md:text-xl">
               RelayOps is positioned as a structured operating model, not generic task labor. The
               page shows how the offer scales from a small team entry point to enterprise support.
             </p>
@@ -192,7 +196,7 @@ export default function PricingPage() {
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-700">
               Pricing tiers
             </p>
-            <h2 className="mt-5 text-4xl font-black tracking-[-0.06em] text-zinc-950 text-balance md:text-5xl">
+            <h2 className="mt-5 text-3xl font-black tracking-[-0.06em] text-zinc-950 text-balance sm:text-4xl md:text-5xl">
               Three ways to package the RelayOps operating model
             </h2>
           </div>
@@ -281,7 +285,7 @@ export default function PricingPage() {
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-700">
               Frequently Asked Questions
             </p>
-            <h2 className="mt-5 text-4xl font-black tracking-[-0.06em] text-zinc-950 text-balance md:text-5xl">
+            <h2 className="mt-5 text-3xl font-black tracking-[-0.06em] text-zinc-950 text-balance sm:text-4xl md:text-5xl">
               Frequently Asked Questions
             </h2>
           </div>
@@ -317,12 +321,47 @@ export default function PricingPage() {
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-700">
               Competitive positioning
             </p>
-            <h2 className="mt-5 text-4xl font-black tracking-[-0.06em] text-zinc-950 text-balance md:text-5xl">
+            <h2 className="mt-5 text-3xl font-black tracking-[-0.06em] text-zinc-950 text-balance sm:text-4xl md:text-5xl">
               How RelayOps stacks up against the alternatives
             </h2>
           </div>
 
-          <div className="mt-14 overflow-hidden rounded-[2rem] border border-zinc-200 bg-white shadow-[0_24px_70px_-42px_rgba(15,23,42,0.18)]">
+          <div className="mt-14 space-y-4 md:hidden">
+            {comparisonRows.map((row) => (
+              <Card
+                key={row.dimension}
+                className="rounded-[1.75rem] border-zinc-200 bg-white shadow-[0_18px_50px_-34px_rgba(15,23,42,0.14)]"
+              >
+                <CardHeader className="px-5 pb-4 pt-5">
+                  <CardTitle className="text-xl font-black tracking-[-0.04em] text-zinc-950">
+                    {row.dimension}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4 px-5 pb-5 pt-0">
+                  <div className="rounded-2xl border border-blue-100 bg-blue-50/60 p-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.24em] text-blue-700">
+                      RelayOps
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-zinc-700">{row.relayops}</p>
+                  </div>
+                  <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.24em] text-zinc-500">
+                      Self-built team
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-zinc-700">{row.selfBuilt}</p>
+                  </div>
+                  <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.24em] text-zinc-500">
+                      Traditional outsourcing
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-zinc-700">{row.outsourcing}</p>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <div className="mt-14 hidden overflow-hidden rounded-[2rem] border border-zinc-200 bg-white shadow-[0_24px_70px_-42px_rgba(15,23,42,0.18)] md:block">
             <Table>
               <TableHeader>
                 <TableRow className="bg-zinc-50">
@@ -349,11 +388,11 @@ export default function PricingPage() {
 
       <section className="pb-20 md:pb-28">
         <div className="container">
-          <div className="rounded-[2rem] border border-zinc-200 bg-zinc-950 px-8 py-10 text-white shadow-[0_30px_90px_-48px_rgba(15,23,42,0.82)] md:px-12">
+          <div className="rounded-[2rem] border border-zinc-200 bg-zinc-950 px-6 py-8 text-white shadow-[0_30px_90px_-48px_rgba(15,23,42,0.82)] sm:px-8 sm:py-10 md:px-12">
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-300">
               Ready to price the real version?
             </p>
-            <h2 className="mt-5 max-w-3xl text-4xl font-black tracking-[-0.06em] text-balance md:text-5xl">
+            <h2 className="mt-5 max-w-3xl text-3xl font-black tracking-[-0.06em] text-balance sm:text-4xl md:text-5xl">
               Use the placeholder model to frame value, then move the buyer into a real access conversation.
             </h2>
             <p className="mt-5 max-w-2xl text-base leading-7 text-zinc-300">

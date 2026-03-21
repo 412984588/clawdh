@@ -39,11 +39,11 @@ describe('PricingPage', () => {
       screen.getByRole('heading', { name: /how relayops stacks up against the alternatives/i }),
     ).toBeInTheDocument()
     expect(screen.getByRole('table')).toBeInTheDocument()
-    expect(screen.getByText(/self-built team/i)).toBeInTheDocument()
-    expect(screen.getByText(/traditional outsourcing/i)).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /request access/i })).toHaveAttribute(
+    expect(screen.getAllByText(/self-built team/i).length).toBeGreaterThan(0)
+    expect(screen.getAllByText(/traditional outsourcing/i).length).toBeGreaterThan(0)
+    expect(screen.getAllByRole('link', { name: /request access/i })[0]).toHaveAttribute(
       'href',
-      '/request-access',
+      '/request-access'
     )
   })
 })
