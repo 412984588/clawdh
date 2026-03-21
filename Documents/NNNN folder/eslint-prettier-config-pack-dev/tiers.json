@@ -1,0 +1,38 @@
+{
+  "product": "ESLint + Prettier Config Pack",
+  "version": "1.0.0",
+  "tiers": [
+    {
+      "id": "starter",
+      "name": "Starter",
+      "price_usd": 19,
+      "template_count": 4,
+      "templates": [
+        "01-react-typescript",
+        "02-nextjs",
+        "03-nodejs-api",
+        "04-typescript-strict"
+      ],
+      "zip_name": "eslint-prettier-config-pack-starter-v1.0.0.zip"
+    },
+    {
+      "id": "pro",
+      "name": "Pro",
+      "price_usd": 39,
+      "template_count": 10,
+      "templates": [
+        "01-react-typescript",
+        "02-nextjs",
+        "03-nodejs-api",
+        "04-typescript-strict",
+        "05-vue",
+        "06-svelte",
+        "07-monorepo",
+        "08-library",
+        "09-vitest",
+        "10-legacy-js"
+      ],
+      "zip_name": "eslint-prettier-config-pack-pro-v1.0.0.zip"
+    }
+  ]
+}
