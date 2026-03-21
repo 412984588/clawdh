@@ -42,34 +42,25 @@ export default async function AdminTicketsPage({ searchParams }: AdminTicketsPag
 
   return (
     <div className="dashboard-page">
-      <section className="overflow-hidden rounded-[32px] border border-slate-200/80 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.16),transparent_34%),linear-gradient(180deg,rgba(248,250,252,0.98),rgba(255,255,255,0.94))] px-6 py-6 shadow-[0_34px_90px_-60px_rgba(15,23,42,0.45)] sm:px-8">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <span className="inline-flex rounded-full border border-white/70 bg-white/80 px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-slate-600 shadow-sm">
-              Ticket Queue
-            </span>
-            <h1 className="mt-4 text-3xl font-semibold tracking-tight text-slate-950">
-              All Tickets
-            </h1>
-            <p className="mt-2 text-sm text-slate-600">
-              {result.total} {result.total === 1 ? 'ticket' : 'tickets'}
-              {statusFilter ? ` filtered by "${statusFilter}"` : ' across all statuses'}
-            </p>
-          </div>
-
-          <div className="rounded-full border border-white/70 bg-white/80 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-600 shadow-sm">
+      <div className="flex items-start justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold">All Tickets</h1>
+          <p className="text-muted-foreground mt-0.5 text-sm">
             {result.total} {result.total === 1 ? 'ticket' : 'tickets'}
-          </div>
+            {statusFilter ? ` · filtered by "${statusFilter}"` : ''}
+          </p>
         </div>
-      </section>
+      </div>
 
       <TicketStatusFilter currentStatus={statusFilter} />
 
-      <TicketListTable
-        tickets={result.data}
-        basePath="/admin/tickets"
-        emptyMessage="No tickets match the current filter."
-      />
+      <div className="mt-4">
+        <TicketListTable
+          tickets={result.data}
+          basePath="/admin/tickets"
+          emptyMessage="No tickets match the current filter."
+        />
+      </div>
 
       <PaginationNav
         page={result.page}

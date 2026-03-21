@@ -37,7 +37,7 @@ describe('LandingPage', () => {
   it('renders hero trust signals with a Request Access CTA', () => {
     render(<LandingPage />)
 
-    expect(screen.getByText(/810\+ tests/i)).toBeInTheDocument()
+    expect(screen.getByText(/635 tests/i)).toBeInTheDocument()
     expect(screen.getByText(/SOC2-ready/i)).toBeInTheDocument()
     expect(screen.getAllByRole('link', { name: /request access/i }).length).toBeGreaterThan(0)
   })

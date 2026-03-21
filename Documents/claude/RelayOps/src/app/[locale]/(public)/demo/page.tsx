@@ -187,13 +187,13 @@ const roleIcons = {
 
 function MockDashboardPreview({ step }: { step: DemoStep }) {
   return (
-    <div className="rounded-[1.5rem] border border-zinc-200 bg-white p-4 shadow-[0_24px_70px_-42px_rgba(15,23,42,0.24)] sm:rounded-[1.75rem] sm:p-5">
+    <div className="rounded-[1.75rem] border border-zinc-200 bg-white p-4 shadow-[0_24px_70px_-42px_rgba(15,23,42,0.24)]">
       <div className="flex items-center justify-between gap-4 border-b border-zinc-200 pb-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.28em] text-zinc-500">
             {step.preview.eyebrow}
           </p>
-          <p className="mt-2 text-base font-bold tracking-[-0.03em] text-zinc-950 sm:text-lg">
+          <p className="mt-2 text-lg font-bold tracking-[-0.03em] text-zinc-950">
             {step.preview.title}
           </p>
           <p className="mt-1 text-sm text-zinc-600">{step.preview.subtitle}</p>
@@ -206,7 +206,7 @@ function MockDashboardPreview({ step }: { step: DemoStep }) {
         </div>
       </div>
 
-      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-4 grid gap-3 md:grid-cols-3">
         {step.preview.stats.map((stat) => (
           <div key={stat.label} className="rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-4">
             <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-zinc-500">
@@ -227,7 +227,7 @@ function MockDashboardPreview({ step }: { step: DemoStep }) {
               {panel.label}
             </p>
             <div className="mt-3 h-2 w-full rounded-full bg-zinc-200">
-              <div className="h-full w-2/3 rounded-full bg-gradient-to-r from-blue-600 to-cyan-300" />
+              <div className="h-full w-2/3 rounded-full bg-gradient-to-r from-blue-500 to-amber-400" />
             </div>
             <p className="mt-3 text-sm leading-6 text-zinc-700">{panel.value}</p>
           </div>
@@ -240,25 +240,25 @@ function MockDashboardPreview({ step }: { step: DemoStep }) {
 export default function DemoPage() {
   return (
     <div className="bg-white">
-      <section className="relative overflow-hidden bg-zinc-950 py-16 text-white sm:py-20 md:py-28">
+      <section className="relative overflow-hidden bg-zinc-950 py-20 text-white md:py-28">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.24),transparent_30%),radial-gradient(circle_at_80%_20%,rgba(245,158,11,0.16),transparent_28%)]" />
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:120px_120px] opacity-20" />
 
         <div className="container relative">
           <div className="max-w-4xl">
-            <Badge className="rounded-full border border-blue-500/20 bg-white/10 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-blue-200 hover:bg-white/10 sm:px-4 sm:text-[11px] sm:tracking-[0.28em]">
+            <Badge className="rounded-full border border-blue-500/20 bg-white/10 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-200 hover:bg-white/10">
               Interactive Product Demo
             </Badge>
-            <h1 className="mt-6 max-w-[11ch] text-[2.8rem] font-black leading-[0.93] tracking-[-0.08em] text-balance sm:mt-8 sm:max-w-4xl sm:text-5xl md:text-7xl lg:leading-[0.96]">
+            <h1 className="mt-8 text-5xl font-black tracking-[-0.08em] text-balance md:text-7xl lg:leading-[0.96]">
               Show the RelayOps workflow without opening the real dashboard.
             </h1>
-            <p className="mt-5 max-w-3xl text-base leading-7 text-zinc-300 sm:mt-6 sm:text-lg sm:leading-8 md:text-xl">
+            <p className="mt-6 max-w-3xl text-lg leading-8 text-zinc-300 md:text-xl">
               Walk prospects through the exact sequence from intake to approval using a lightweight,
               public-facing demo built from styled interface placeholders.
             </p>
           </div>
 
-          <div className="mt-10 grid gap-3 sm:mt-12 sm:gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="mt-12 grid gap-4 md:grid-cols-4">
             {demoSteps.map((step, index) => {
               const Icon = step.icon
 
@@ -275,12 +275,10 @@ export default function DemoPage() {
                       Step {index + 1}
                     </span>
                   </div>
-                  <p className="mt-4 text-base font-bold tracking-[-0.03em] text-white sm:mt-5 sm:text-lg">
+                  <p className="mt-5 text-lg font-bold tracking-[-0.03em] text-white">
                     {step.title}
                   </p>
-                  <p className="mt-2 text-[15px] leading-6 text-zinc-300 sm:text-sm">
-                    {step.summary}
-                  </p>
+                  <p className="mt-2 text-sm leading-6 text-zinc-300">{step.summary}</p>
                 </div>
               )
             })}
@@ -288,15 +286,15 @@ export default function DemoPage() {
         </div>
       </section>
 
-      <section className="py-14 sm:py-16 md:py-24">
+      <section className="py-16 md:py-24">
         <div className="container">
           <Tabs defaultValue={demoSteps[0].value} className="space-y-8">
-            <TabsList className="grid h-auto grid-cols-1 gap-2 rounded-[1.5rem] bg-zinc-100 p-2 sm:grid-cols-2 lg:grid-cols-4">
+            <TabsList className="grid h-auto grid-cols-1 gap-2 rounded-[1.5rem] bg-zinc-100 p-2 md:grid-cols-4">
               {demoSteps.map((step) => (
                 <TabsTrigger
                   key={step.value}
                   value={step.value}
-                  className="min-h-[56px] rounded-[1.1rem] px-4 py-3 text-left data-[state=active]:shadow-[0_18px_48px_-34px_rgba(15,23,42,0.24)] sm:min-h-[64px] sm:py-4"
+                  className="min-h-[64px] rounded-[1.1rem] px-4 py-4 text-left data-[state=active]:shadow-[0_18px_48px_-34px_rgba(15,23,42,0.24)]"
                 >
                   <span className="flex flex-col gap-1">
                     <span className="text-[11px] font-semibold uppercase tracking-[0.24em] text-zinc-500">
@@ -315,7 +313,7 @@ export default function DemoPage() {
                 <TabsContent key={step.value} value={step.value}>
                   <Card className="overflow-hidden rounded-[2rem] border-zinc-200 shadow-[0_24px_70px_-42px_rgba(15,23,42,0.18)]">
                     <div className="grid gap-0 lg:grid-cols-[0.88fr_1.12fr]">
-                      <div className={`bg-gradient-to-br ${step.accent} p-6 sm:p-8 md:p-10`}>
+                      <div className={`bg-gradient-to-br ${step.accent} p-8 md:p-10`}>
                         <div className="flex items-center gap-3">
                           <Badge
                             className={`rounded-full border px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em] ${roleStyles[step.role]}`}
@@ -325,19 +323,15 @@ export default function DemoPage() {
                           </Badge>
                         </div>
 
-                        <div className="mt-6 space-y-3 sm:mt-8 sm:space-y-4">
-                          <h2 className="text-2xl font-black tracking-[-0.05em] text-zinc-950 sm:text-3xl md:text-4xl">
+                        <div className="mt-8 space-y-4">
+                          <h2 className="text-3xl font-black tracking-[-0.05em] text-zinc-950 md:text-4xl">
                             {step.detailTitle}
                           </h2>
-                          <p className="text-[15px] leading-7 text-zinc-700 sm:text-base">
-                            {step.detailBody}
-                          </p>
-                          <p className="text-base font-semibold text-zinc-900 sm:text-lg">
-                            {step.outcome}
-                          </p>
+                          <p className="text-base leading-7 text-zinc-700">{step.detailBody}</p>
+                          <p className="text-lg font-semibold text-zinc-900">{step.outcome}</p>
                         </div>
 
-                        <div className="mt-6 rounded-[1.5rem] border border-zinc-200 bg-white/80 p-4 sm:mt-8 sm:p-5">
+                        <div className="mt-8 rounded-[1.5rem] border border-zinc-200 bg-white/80 p-5">
                           <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-zinc-500">
                             What happens in this step
                           </p>
@@ -352,12 +346,12 @@ export default function DemoPage() {
                         </div>
                       </div>
 
-                      <CardContent className="p-6 sm:p-8 md:p-10">
+                      <CardContent className="p-8 md:p-10">
                         <CardHeader className="p-0">
-                          <CardTitle className="text-lg font-bold tracking-[-0.04em] text-zinc-950 sm:text-xl">
+                          <CardTitle className="text-xl font-bold tracking-[-0.04em] text-zinc-950">
                             Mock dashboard preview
                           </CardTitle>
-                          <CardDescription className="text-[15px] leading-7 text-zinc-600 sm:text-base">
+                          <CardDescription className="text-base leading-7 text-zinc-600">
                             A CSS-only interface placeholder that mirrors the information a buyer
                             needs to understand at this stage of the workflow.
                           </CardDescription>
@@ -376,16 +370,16 @@ export default function DemoPage() {
         </div>
       </section>
 
-      <section className="pb-16 sm:pb-20 md:pb-28">
+      <section className="pb-20 md:pb-28">
         <div className="container">
-          <div className="rounded-[2rem] border border-zinc-200 bg-zinc-950 px-6 py-8 text-white shadow-[0_30px_90px_-48px_rgba(15,23,42,0.82)] sm:px-8 sm:py-10 md:px-12">
+          <div className="rounded-[2rem] border border-zinc-200 bg-zinc-950 px-8 py-10 text-white shadow-[0_30px_90px_-48px_rgba(15,23,42,0.82)] md:px-12">
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-300">
               Turn the walkthrough into pipeline
             </p>
-            <h2 className="mt-5 max-w-3xl text-3xl font-black tracking-[-0.06em] text-balance sm:text-4xl md:text-5xl">
+            <h2 className="mt-5 max-w-3xl text-4xl font-black tracking-[-0.06em] text-balance md:text-5xl">
               Use the demo to explain the workflow, then open the partner application.
             </h2>
-            <p className="mt-5 max-w-2xl text-[15px] leading-7 text-zinc-300 sm:text-base">
+            <p className="mt-5 max-w-2xl text-base leading-7 text-zinc-300">
               The public demo gives prospects enough operational clarity to understand the model
               before they ever touch the live product.
             </p>
@@ -393,7 +387,7 @@ export default function DemoPage() {
               <Button
                 asChild
                 size="lg"
-                className="w-full rounded-full border border-blue-500/30 bg-blue-600 px-7 text-white shadow-[0_24px_50px_-24px_rgba(59,130,246,0.6)] transition-all duration-300 hover:-translate-y-1 hover:bg-blue-500 sm:w-auto"
+                className="rounded-full border border-blue-500/30 bg-blue-600 px-7 text-white shadow-[0_24px_50px_-24px_rgba(59,130,246,0.6)] transition-all duration-300 hover:-translate-y-1 hover:bg-blue-500"
               >
                 <Link href="/request-access">
                   Request Access

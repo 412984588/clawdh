@@ -23,9 +23,7 @@ export default async function PartnerTicketsPage({ searchParams }: PartnerTicket
   if (!sessionUser.organization_id) {
     return (
       <div className="dashboard-page-narrow">
-        <div className="rounded-[28px] border border-dashed border-slate-300 bg-white/80 px-6 py-12 text-center text-sm text-slate-500">
-          Your account is not linked to an organization yet.
-        </div>
+        <p className="text-muted-foreground">Your account is not linked to an organization yet.</p>
       </div>
     )
   }
@@ -46,33 +44,20 @@ export default async function PartnerTicketsPage({ searchParams }: PartnerTicket
 
   return (
     <div className="dashboard-page">
-      <section className="overflow-hidden rounded-[32px] border border-slate-200/80 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.16),transparent_34%),linear-gradient(180deg,rgba(248,250,252,0.98),rgba(255,255,255,0.94))] px-6 py-6 shadow-[0_34px_90px_-60px_rgba(15,23,42,0.45)] sm:px-8">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <span className="inline-flex rounded-full border border-white/70 bg-white/80 px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-slate-600 shadow-sm">
-              Job Queue
-            </span>
-            <h1 className="mt-4 text-3xl font-semibold tracking-tight text-slate-950">
-              My Jobs
-            </h1>
-            <p className="mt-2 text-sm text-slate-600">
-              {result.total} {result.total === 1 ? 'ticket' : 'tickets'} total
-            </p>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <div className="rounded-full border border-white/70 bg-white/80 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-600 shadow-sm">
-              {result.page}/{Math.max(result.totalPages, 1)} pages
-            </div>
-            <Button asChild className="rounded-full shadow-sm">
-              <Link href="/partner/tickets/new">
-                <Plus className="w-4 h-4 mr-2" />
-                New Job
-              </Link>
-            </Button>
-          </div>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold">My Jobs</h1>
+          <p className="text-muted-foreground mt-0.5 text-sm">
+            {result.total} {result.total === 1 ? 'ticket' : 'tickets'} total
+          </p>
         </div>
-      </section>
+        <Button asChild>
+          <Link href="/partner/tickets/new">
+            <Plus className="w-4 h-4 mr-2" />
+            New Job
+          </Link>
+        </Button>
+      </div>
 
       <TicketListTable
         tickets={result.data}

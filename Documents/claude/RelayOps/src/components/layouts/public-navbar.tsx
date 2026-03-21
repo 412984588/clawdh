@@ -42,20 +42,17 @@ export function PublicNavbar() {
             : 'border-zinc-200/40 bg-white/72 backdrop-blur-sm'
         }`}
       >
-        <nav
-          aria-label="Primary"
-          className="container flex h-16 items-center justify-between gap-3 sm:h-20 sm:gap-6"
-        >
+        <nav aria-label="Primary" className="container flex h-20 items-center justify-between gap-6">
           <Link
             href="/"
-            className="group flex min-w-0 items-center gap-2 rounded-full border border-zinc-200/70 bg-white/80 px-2.5 py-1.5 shadow-[0_16px_40px_-28px_rgba(59,130,246,0.28)] transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-[0_24px_44px_-24px_rgba(59,130,246,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 sm:gap-3 sm:px-3 sm:py-2"
+            className="group flex items-center gap-3 rounded-full border border-zinc-200/70 bg-white/80 px-3 py-2 shadow-[0_16px_40px_-28px_rgba(59,130,246,0.28)] transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-[0_24px_44px_-24px_rgba(59,130,246,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
           >
-            <span className="relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-2xl bg-blue-600 shadow-[0_14px_30px_-18px_rgba(59,130,246,0.6)] sm:h-11 sm:w-11">
-              <svg width="18" height="18" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+            <span className="relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-2xl bg-blue-600 shadow-[0_14px_30px_-18px_rgba(59,130,246,0.6)]">
+              <svg width="20" height="20" viewBox="0 0 14 14" fill="none" aria-hidden="true">
                 <path d="M2 4h4v4H2V4zm6 2h4v4H8V6z" fill="white" />
               </svg>
             </span>
-            <span className="truncate text-sm font-black tracking-[-0.04em] text-zinc-950 transition-colors group-hover:text-blue-600 sm:text-lg">
+            <span className="text-lg font-black tracking-[-0.04em] text-zinc-950 transition-colors group-hover:text-blue-600">
               RelayOps
             </span>
           </Link>
@@ -73,20 +70,20 @@ export function PublicNavbar() {
             ))}
           </div>
 
-          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+          <div className="flex items-center gap-2">
             <LocaleSwitcher />
             <Button
               asChild
               variant="ghost"
               size="sm"
-              className="hidden min-h-[44px] rounded-full px-4 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-950 sm:inline-flex"
+              className="min-h-[44px] rounded-full px-4 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-950"
             >
               <Link href="/login">{t('login')}</Link>
             </Button>
             <Button
               asChild
               size="sm"
-              className="min-h-[42px] rounded-full border border-blue-600/40 bg-blue-600 px-3 text-xs text-white shadow-sm shadow-[0_18px_38px_-20px_rgba(37,99,235,0.55)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-blue-700 hover:shadow-[0_0_0_1px_rgba(37,99,235,0.18),0_22px_44px_-18px_rgba(37,99,235,0.72)] sm:min-h-[44px] sm:px-5 sm:text-sm"
+              className="min-h-[44px] rounded-full border border-blue-600/40 bg-blue-600 px-5 text-white shadow-sm shadow-[0_18px_38px_-20px_rgba(37,99,235,0.55)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-blue-700 hover:shadow-[0_0_0_1px_rgba(37,99,235,0.18),0_22px_44px_-18px_rgba(37,99,235,0.72)]"
             >
               <Link href="/request-access">
                 {t('requestAccess')}

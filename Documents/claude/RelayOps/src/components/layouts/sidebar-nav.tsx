@@ -68,9 +68,7 @@ export function SidebarNav({ role, collapsed = false }: SidebarNavProps) {
   const navItems = NAV_BY_ROLE[role] ?? []
 
   return (
-    <nav
-      className={cn('flex flex-1 flex-col gap-1.5 py-5', collapsed ? 'px-2.5' : 'px-3.5')}
-    >
+    <nav className={cn('flex flex-1 flex-col gap-0.5 py-4', collapsed ? 'px-2' : 'px-3')}>
       {navItems.map((item) => {
         const Icon = item.icon
         const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
@@ -79,33 +77,16 @@ export function SidebarNav({ role, collapsed = false }: SidebarNavProps) {
             key={item.href}
             href={item.href}
             aria-label={item.label}
-            aria-current={isActive ? 'page' : undefined}
             title={collapsed ? item.label : undefined}
             className={cn(
-              'group relative flex min-h-11 items-center overflow-hidden rounded-2xl py-2.5 text-sm font-medium transition-all duration-200',
-              collapsed ? 'justify-center px-0' : 'gap-3 px-3.5',
+              'flex items-center rounded-md py-2 text-sm font-medium transition-colors',
+              collapsed ? 'justify-center px-0' : 'gap-3 px-3',
               isActive
-                ? 'bg-white/[0.08] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_18px_30px_-26px_rgba(59,130,246,0.95)] ring-1 ring-white/10'
-                : 'text-zinc-400 hover:bg-white/5 hover:text-zinc-100'
+                ? 'bg-blue-500/20 text-white shadow-[inset_0_0_0_1px_rgba(96,165,250,0.22)]'
+                : 'text-zinc-400 hover:text-zinc-100 hover:bg-white/5'
             )}
           >
-            {isActive && (
-              <span
-                aria-hidden="true"
-                className="absolute inset-y-2 left-0 w-1 rounded-r-full bg-blue-400"
-              />
-            )}
-
-            <span
-              className={cn(
-                'relative flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border transition-colors',
-                isActive
-                  ? 'border-white/10 bg-blue-500/20 text-blue-100'
-                  : 'border-white/5 bg-white/[0.03] text-zinc-400 group-hover:border-white/10 group-hover:bg-white/[0.07] group-hover:text-zinc-100'
-              )}
-            >
-              <Icon className="h-4 w-4 shrink-0" />
-            </span>
+            <Icon className="h-4 w-4 shrink-0" />
             <AnimatePresence initial={false}>
               {!collapsed && (
                 <m.span

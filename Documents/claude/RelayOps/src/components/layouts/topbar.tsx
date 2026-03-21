@@ -46,36 +46,32 @@ export function Topbar({ email, role }: TopbarProps) {
   }
 
   return (
-    <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center justify-between border-b border-slate-200/80 bg-white/80 px-4 shadow-[0_16px_42px_-36px_rgba(15,23,42,0.5)] backdrop-blur-xl sm:px-6">
+    <header className="h-14 border-b border-zinc-200 bg-white/95 backdrop-blur-sm flex items-center justify-between px-6 shrink-0 sticky top-0 z-10">
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:rounded-md focus:bg-zinc-950 focus:px-4 focus:py-2 focus:text-white"
       >
         跳至主要内容
       </a>
-      <div className="inline-flex items-center gap-2 rounded-full border border-blue-200/80 bg-blue-50/90 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-blue-700 shadow-sm">
-        <span className="h-2 w-2 rounded-full bg-blue-500" aria-hidden="true" />
+      <span className="text-xs font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-full px-3 py-1">
         {roleLabel[role] ?? role}
-      </div>
+      </span>
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
             variant="ghost"
-            className="h-10 w-10 rounded-full border border-slate-200/80 bg-white/90 p-0 shadow-sm hover:bg-slate-50 hover:shadow-md"
+            className="h-8 w-8 rounded-full p-0"
             aria-label={`${roleLabel[role] ?? role} account menu`}
           >
-            <Avatar className="h-10 w-10">
-              <AvatarFallback className="bg-blue-100 text-xs font-semibold text-blue-700 ring-1 ring-blue-200/70">
+            <Avatar className="h-8 w-8">
+              <AvatarFallback className="bg-blue-100 text-blue-700 text-xs">
                 {initials}
               </AvatarFallback>
             </Avatar>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent
-          align="end"
-          className="w-60 rounded-2xl border border-slate-200/80 bg-white/95 p-1.5 shadow-[0_24px_60px_-32px_rgba(15,23,42,0.38)]"
-        >
+        <DropdownMenuContent align="end" className="w-56">
           <div className="px-2 py-1.5">
             <p className="text-sm font-medium truncate">{email}</p>
             <p className="text-xs text-muted-foreground">{roleLabel[role] ?? role}</p>
