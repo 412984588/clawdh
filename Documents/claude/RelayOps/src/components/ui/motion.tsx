@@ -54,9 +54,9 @@ export function PageTransition({ children }: { children: ReactNode }) {
     <AnimatePresence mode="wait">
       <m.div
         key={pathname}
-        initial={reduced ? false : { opacity: 0, y: 8 }}
+        initial={reduced ? false : { opacity: 1, y: 8 }}
         animate={reduced ? undefined : { opacity: 1, y: 0 }}
-        exit={reduced ? undefined : { opacity: 0, y: -8 }}
+        exit={reduced ? undefined : { opacity: 1, y: -8 }}
         transition={{ duration: MOTION_DURATIONS.fast, ease: MOTION_EASE }}
         className="flex-1 flex flex-col"
       >
@@ -106,12 +106,14 @@ export function FadeIn({
 }: HTMLMotionProps<'div'>) {
   const reduced = useReducedMotionPreference()
 
+  // 渐进增强：SSR/无JS 时默认可见（opacity:1），客户端 hydrate 后才做动画
+  // 用 translateY 微移代替 opacity 0→1，避免白屏风险
   return (
     <m.div
       data-motion="fade-in"
       data-reduced-motion={reduced ? 'true' : 'false'}
-      initial={reduced ? false : { opacity: 0 }}
-      whileInView={reduced ? undefined : { opacity: 1 }}
+      initial={reduced ? false : { opacity: 1, y: 12 }}
+      whileInView={reduced ? undefined : { opacity: 1, y: 0 }}
       viewport={viewport}
       transition={
         reduced
@@ -119,7 +121,7 @@ export function FadeIn({
           : { duration: MOTION_DURATIONS.fast, ease: MOTION_EASE, ...transition }
       }
       className={cn(MOTION_REDUCE_CLASS, className)}
-      style={mergeMotionStyle(style as CSSProperties | undefined, reduced, 'opacity')}
+      style={style as CSSProperties | undefined}
       {...props}
     />
   )
@@ -134,11 +136,12 @@ export function SlideUp({
 }: HTMLMotionProps<'div'>) {
   const reduced = useReducedMotionPreference()
 
+  // 渐进增强：初始 opacity:1 避免白屏，只做 translateY 动画
   return (
     <m.div
       data-motion="slide-up"
       data-reduced-motion={reduced ? 'true' : 'false'}
-      initial={reduced ? false : { opacity: 0, y: 24 }}
+      initial={reduced ? false : { opacity: 1, y: 24 }}
       whileInView={reduced ? undefined : { opacity: 1, y: 0 }}
       viewport={viewport}
       transition={
@@ -147,7 +150,7 @@ export function SlideUp({
           : { duration: MOTION_DURATIONS.slow, ease: MOTION_EASE, ...transition }
       }
       className={cn(MOTION_REDUCE_CLASS, className)}
-      style={mergeMotionStyle(style as CSSProperties | undefined, reduced, 'transform, opacity')}
+      style={style as CSSProperties | undefined}
       {...props}
     />
   )
@@ -169,7 +172,7 @@ export function StaggerList(props: StaggerListProps) {
     variants: reduced
       ? undefined
       : {
-          hidden: { opacity: 0 },
+          hidden: { opacity: 1 },
           show: {
             opacity: 1,
             transition: {
@@ -234,7 +237,7 @@ export function StaggerItem(props: StaggerItemProps) {
     variants: reduced
       ? undefined
       : {
-          hidden: { opacity: 0, y: 24 },
+          hidden: { opacity: 1, y: 24 },
           show: {
             opacity: 1,
             y: 0,
