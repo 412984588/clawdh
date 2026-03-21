@@ -6,7 +6,8 @@ export function calculateDueAt(paidAt: Date, slaHoursBusiness: number): Date {
 }
 
 // 检查工单是否已超时
-export function isOverdue(dueAt: Date | null | undefined): boolean {
+export function isOverdue(dueAt: Date | string | null | undefined): boolean {
   if (!dueAt) return false
-  return new Date() > new Date(dueAt)
+  const due = typeof dueAt === 'string' ? new Date(dueAt) : dueAt
+  return Date.now() > due.getTime()
 }

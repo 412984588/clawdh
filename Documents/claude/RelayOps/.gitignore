@@ -49,3 +49,7 @@ load-tests/reports/*.html
 /backups/
 *.sql.gz
 *.dump
+
+# temporary files
+.tmp/
+*.tmp

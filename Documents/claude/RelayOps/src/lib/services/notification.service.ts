@@ -14,7 +14,7 @@ export async function notifyTicketEvent(
   try {
     await dispatchNotification(supabase, ticketId, eventType, payload)
   } catch (err) {
-    logger.error('Failed to send notification', { context: 'notification', err })
+    logger.error('Failed to send notification', { context: 'notification', error: err, ticketId, eventType })
   }
 }
 
