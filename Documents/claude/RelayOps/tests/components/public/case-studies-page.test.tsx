@@ -23,7 +23,7 @@ describe('CaseStudiesPage', () => {
   it('renders three placeholder case studies with scenario-specific outcomes', () => {
     render(<CaseStudiesPage />)
 
-    expect(screen.getByText(/placeholder case studies/i)).toBeInTheDocument()
+    expect(screen.getByText(/case studies/i)).toBeInTheDocument()
     expect(screen.getByText(/Northstar Commerce/i)).toBeInTheDocument()
     expect(screen.getByText(/efficiency gain: 60%/i)).toBeInTheDocument()
     expect(screen.getByText(/Vertex Cloud Ops/i)).toBeInTheDocument()

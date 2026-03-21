@@ -30,48 +30,47 @@ const nextSteps = [
 export default function RequestAccessPage() {
   return (
     <MotionProvider>
-      <div className="relative min-h-screen overflow-hidden bg-[#0B1220]">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.24),transparent_30%),radial-gradient(circle_at_78%_18%,rgba(20,184,166,0.14),transparent_24%)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:120px_120px] opacity-20" />
+      <div className="relative min-h-screen overflow-hidden bg-slate-900 font-sans">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(59,130,246,0.12)_0%,transparent_60%)] pointer-events-none" />
 
-        <div className="container relative py-16 md:py-24">
-          <div className="grid gap-12 lg:grid-cols-[0.92fr_1.08fr] lg:items-start">
-            <div className="space-y-8 text-white">
+        <div className="container relative py-20 md:py-32">
+          <div className="grid gap-16 lg:grid-cols-[1fr_1.1fr] lg:items-start max-w-7xl mx-auto">
+            <div className="space-y-12 text-white">
               <FadeIn>
-                <p className="font-mono text-sm font-semibold uppercase tracking-[0.28em] text-blue-300">
+                <p className="font-mono text-[10px] font-medium uppercase tracking-widest text-blue-300">
                   Partner Program
                 </p>
-                <h1 className="font-display mt-5 text-5xl font-bold tracking-[-0.08em] text-balance md:text-7xl lg:leading-[0.94]">
-                  Apply for Partner Access
+                <h1 className="font-display mt-6 text-[3.5rem] font-bold tracking-tighter text-balance md:text-6xl lg:leading-[1.05]">
+                  Apply for Access.
                 </h1>
-                <p className="mt-6 max-w-xl text-lg leading-8 text-zinc-300">
+                <p className="mt-8 max-w-xl text-lg font-normal leading-relaxed text-slate-400">
                   Join agencies using RelayOps to deliver white-label CRM cleanup to their
                   clients. We review all applications within 2 business days.
                 </p>
               </FadeIn>
 
               <StaggerList className="grid gap-4 sm:grid-cols-3">
-                <StaggerItem className="rounded-[1.75rem] border border-white/10 bg-white/10 px-5 py-5 backdrop-blur-sm">
-                  <p className="font-mono text-xs uppercase tracking-[0.24em] text-zinc-500">Review</p>
-                  <p className="font-display mt-2 text-4xl font-bold tracking-[-0.06em] text-white">2 days</p>
+                <StaggerItem className="rounded-[24px] border border-slate-800 bg-slate-800/50 p-6 backdrop-blur-sm">
+                  <p className="font-mono text-[10px] font-medium uppercase tracking-widest text-slate-400">Review</p>
+                  <p className="font-display mt-3 text-3xl font-bold tracking-tighter text-white">2 days</p>
                 </StaggerItem>
-                <StaggerItem className="rounded-[1.75rem] border border-white/10 bg-white/10 px-5 py-5 backdrop-blur-sm">
-                  <p className="font-mono text-xs uppercase tracking-[0.24em] text-zinc-500">Scoping</p>
-                  <p className="font-display mt-2 text-4xl font-bold tracking-[-0.06em] text-white">4 hours</p>
+                <StaggerItem className="rounded-[24px] border border-slate-800 bg-slate-800/50 p-6 backdrop-blur-sm">
+                  <p className="font-mono text-[10px] font-medium uppercase tracking-widest text-slate-400">Scoping</p>
+                  <p className="font-display mt-3 text-3xl font-bold tracking-tighter text-white">4 hrs</p>
                 </StaggerItem>
-                <StaggerItem className="rounded-[1.75rem] border border-white/10 bg-white/10 px-5 py-5 backdrop-blur-sm">
-                  <p className="font-mono text-xs uppercase tracking-[0.24em] text-zinc-500">Pricing</p>
-                  <p className="font-display mt-2 text-4xl font-bold tracking-[-0.06em] text-white">Flat</p>
+                <StaggerItem className="rounded-[24px] border border-slate-800 bg-slate-800/50 p-6 backdrop-blur-sm">
+                  <p className="font-mono text-[10px] font-medium uppercase tracking-widest text-slate-400">Pricing</p>
+                  <p className="font-display mt-3 text-3xl font-bold tracking-tighter text-white">Flat</p>
                 </StaggerItem>
               </StaggerList>
 
               <FadeIn transition={{ delay: 0.2 }}>
-                <div className="rounded-[2rem] border border-white/10 bg-white/10 p-7 shadow-[0_24px_60px_-40px_rgba(11,18,32,0.82)] backdrop-blur-xl">
-                  <div className="space-y-4">
+                <div className="rounded-[32px] border border-slate-800 bg-slate-800/30 p-8 md:p-10 shadow-[0_24px_80px_-12px_rgb(0,0,0,0.5)] backdrop-blur-xl">
+                  <div className="space-y-5">
                     {PARTNER_BENEFITS.map((benefit) => (
-                      <div key={benefit} className="flex items-start gap-3 text-zinc-200">
-                        <CheckCircle className="mt-1 h-5 w-5 shrink-0 text-teal-400" />
-                        <span className="text-base leading-7">{benefit}</span>
+                      <div key={benefit} className="flex items-start gap-4">
+                        <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-blue-500" />
+                        <span className="text-[15px] font-normal leading-relaxed text-slate-300">{benefit}</span>
                       </div>
                     ))}
                   </div>
@@ -79,17 +78,17 @@ export default function RequestAccessPage() {
               </FadeIn>
 
               <FadeIn transition={{ delay: 0.3 }}>
-                <div className="rounded-[2rem] border border-blue-500/15 bg-gradient-to-br from-blue-600/14 via-white/5 to-white/5 p-7 shadow-[0_24px_60px_-40px_rgba(59,130,246,0.35)]">
-                  <p className="font-mono text-xs font-semibold uppercase tracking-[0.28em] text-blue-300">
+                <div className="rounded-[32px] border border-blue-500/20 bg-blue-500/5 p-8 md:p-10">
+                  <p className="font-mono text-[10px] font-medium uppercase tracking-widest text-blue-300">
                     What happens next?
                   </p>
-                  <ol className="mt-5 space-y-4 text-base leading-7 text-zinc-200">
+                  <ol className="mt-6 space-y-5 text-[15px] font-normal leading-relaxed text-slate-300">
                     {nextSteps.map((step, index) => (
-                      <li key={step} className="flex items-start gap-3">
-                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/10 text-sm font-semibold text-white">
+                      <li key={step} className="flex items-start gap-4">
+                        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-600/20 text-[11px] font-bold text-blue-400">
                           {index + 1}
                         </span>
-                        <span>{step}</span>
+                        <span className="mt-0.5">{step}</span>
                       </li>
                     ))}
                   </ol>
@@ -97,14 +96,14 @@ export default function RequestAccessPage() {
               </FadeIn>
             </div>
 
-            <SlideUp transition={{ delay: 0.15 }}>
-              <div className="rounded-[2rem] border border-white/10 bg-white p-6 shadow-[0_40px_90px_-45px_rgba(11,18,32,0.6)] md:p-8">
-                <div className="mb-6 rounded-[1.5rem] border border-zinc-100 bg-zinc-50 px-5 py-5">
-                  <p className="font-mono text-xs font-semibold uppercase tracking-[0.28em] text-blue-700">
-                    Partner Application
+            <SlideUp transition={{ delay: 0.15 }} className="lg:pl-8">
+              <div className="rounded-[40px] border border-slate-200/60 bg-white p-8 md:p-12 shadow-[0_32px_64px_-16px_rgb(0,0,0,0.4)]">
+                <div className="mb-10">
+                  <p className="font-mono text-[10px] font-medium uppercase tracking-widest text-slate-400 mb-3">
+                    Application Form
                   </p>
-                  <h2 className="font-display mt-3 text-2xl font-bold tracking-[-0.04em] text-zinc-950">
-                    Partner Application
+                  <h2 className="font-display text-3xl font-bold tracking-tight text-slate-900">
+                    Tell us about your agency
                   </h2>
                 </div>
                 <PartnerApplicationForm />

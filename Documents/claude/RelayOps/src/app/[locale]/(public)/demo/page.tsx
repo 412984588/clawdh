@@ -55,7 +55,7 @@ const demoSteps: DemoStep[] = [
     summary:
       'A partner captures the brief, data source, acceptance criteria, and expected delivery in a single structured intake.',
     outcome: 'The request becomes a scoping-ready job instead of an email thread.',
-    accent: 'from-blue-500/14 via-teal-400/8 to-transparent',
+    accent: 'from-blue-500/10 via-blue-400/5 to-transparent',
     detailTitle: 'Structured intake replaces messy back-and-forth',
     detailBody:
       'The partner flow turns an unclear cleanup request into a scoped ticket with context, files, and approval criteria already attached.',
@@ -88,7 +88,7 @@ const demoSteps: DemoStep[] = [
     summary:
       'Ops reviews the brief, locks scope, applies pricing, and moves the job into a predictable delivery lane.',
     outcome: 'Pricing, SLA, and scope are explicit before execution starts.',
-    accent: 'from-slate-400/18 via-blue-400/8 to-transparent',
+    accent: 'from-slate-400/10 via-slate-300/5 to-transparent',
     detailTitle: 'The admin view converts requests into executable work',
     detailBody:
       'Admins validate fit, identify the right pricing tier, and turn the intake into a delivery package with commercial clarity.',
@@ -121,7 +121,7 @@ const demoSteps: DemoStep[] = [
     summary:
       'The assigned operator works from a clear brief, processes the dataset, and records output against the agreed acceptance criteria.',
     outcome: 'Execution happens against the same spec the partner approved.',
-    accent: 'from-teal-500/16 via-blue-400/8 to-transparent',
+    accent: 'from-teal-500/10 via-teal-400/5 to-transparent',
     detailTitle: 'Execution is guided by a fixed delivery contract',
     detailBody:
       'Workers see what to clean, how to structure the output, and what proof is needed before the job can move to review.',
@@ -154,7 +154,7 @@ const demoSteps: DemoStep[] = [
     summary:
       'The partner reviews the delivered package, validates the outcome, and closes the job or requests a revision with context.',
     outcome: 'Acceptance is auditable and tied to the original delivery criteria.',
-    accent: 'from-slate-300/18 via-teal-400/8 to-transparent',
+    accent: 'from-blue-100/50 via-white to-transparent',
     detailTitle: 'Delivery review closes the loop with visible proof',
     detailBody:
       'The final handoff makes it easy to compare the delivered output against the approved scope and decide whether to accept or revise.',
@@ -182,9 +182,9 @@ const demoSteps: DemoStep[] = [
 ]
 
 const roleStyles = {
-  Partner: 'border-blue-200 bg-blue-50 text-blue-700',
-  Admin: 'border-slate-300 bg-slate-100 text-slate-700',
-  Worker: 'border-teal-200 bg-teal-50 text-teal-700',
+  Partner: 'border-blue-200/60 bg-blue-50/50 text-blue-700',
+  Admin: 'border-slate-200/60 bg-slate-50 text-slate-700',
+  Worker: 'border-teal-200/60 bg-teal-50/50 text-teal-700',
 } as const
 
 const roleIcons = {
@@ -195,49 +195,49 @@ const roleIcons = {
 
 function MockDashboardPreview({ step }: { step: DemoStep }) {
   return (
-    <div className="rounded-[1.75rem] border border-zinc-200 bg-white p-4 shadow-[0_24px_70px_-42px_rgba(15,23,42,0.24)]">
-      <div className="flex items-center justify-between gap-4 border-b border-zinc-200 pb-4">
+    <div className="rounded-[24px] border border-slate-200/60 bg-white p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+      <div className="flex items-center justify-between gap-4 border-b border-slate-100 pb-5">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-zinc-500">
+          <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-slate-400">
             {step.preview.eyebrow}
           </p>
-          <p className="mt-2 text-lg font-bold tracking-[-0.03em] text-zinc-950">
+          <p className="mt-2 text-lg font-bold tracking-tight text-slate-900">
             {step.preview.title}
           </p>
-          <p className="mt-1 text-sm text-zinc-600">{step.preview.subtitle}</p>
+          <p className="mt-1 text-[13px] text-slate-500">{step.preview.subtitle}</p>
         </div>
-        <div className="hidden rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-right md:block">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-zinc-500">
+        <div className="hidden rounded-[16px] border border-slate-200/60 bg-slate-50 px-4 py-3 text-right md:block">
+          <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-slate-400">
             Flow Stage
           </p>
-          <p className="mt-2 text-sm font-semibold text-zinc-950">{step.title}</p>
+          <p className="mt-2 text-[13px] font-semibold text-slate-900">{step.title}</p>
         </div>
       </div>
 
-      <div className="mt-4 grid gap-3 md:grid-cols-3">
+      <div className="mt-5 grid gap-3 md:grid-cols-3">
         {step.preview.stats.map((stat) => (
-          <div key={stat.label} className="rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-4">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-zinc-500">
+          <div key={stat.label} className="rounded-[16px] border border-slate-200/60 bg-slate-50 px-5 py-4">
+            <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-slate-400">
               {stat.label}
             </p>
-            <p className="mt-2 text-sm font-bold text-zinc-950">{stat.value}</p>
+            <p className="mt-2 text-[15px] font-bold tracking-tight text-slate-900">{stat.value}</p>
           </div>
         ))}
       </div>
 
-      <div className="mt-4 space-y-3">
+      <div className="mt-5 space-y-3">
         {step.preview.panels.map((panel) => (
           <div
             key={panel.label}
-            className="rounded-2xl border border-zinc-200 bg-gradient-to-r from-zinc-50 to-white px-4 py-4"
+            className="rounded-[16px] border border-slate-200/60 bg-gradient-to-r from-slate-50 to-white px-5 py-4"
           >
-            <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-zinc-500">
+            <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-slate-400">
               {panel.label}
             </p>
-            <div className="mt-3 h-2 w-full rounded-full bg-zinc-200">
-              <div className="h-full w-2/3 rounded-full bg-gradient-to-r from-blue-500 to-teal-400" />
+            <div className="mt-3 h-1.5 w-full rounded-full bg-slate-200/60">
+              <div className="h-full w-2/3 rounded-full bg-blue-600" />
             </div>
-            <p className="mt-3 text-sm leading-6 text-zinc-700">{panel.value}</p>
+            <p className="mt-3 text-[13px] leading-relaxed text-slate-600">{panel.value}</p>
           </div>
         ))}
       </div>
@@ -248,26 +248,25 @@ function MockDashboardPreview({ step }: { step: DemoStep }) {
 export default function DemoPage() {
   return (
     <MotionProvider>
-      <div className="bg-[#f8fafc]">
-        <section className="relative overflow-hidden border-b border-slate-200 bg-[#f8fafc] py-20 md:py-28">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.14),transparent_30%),radial-gradient(circle_at_80%_20%,rgba(20,184,166,0.1),transparent_24%)]" />
-          <div className="absolute inset-0 bg-[linear-gradient(rgba(148,163,184,0.11)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.11)_1px,transparent_1px)] bg-[size:120px_120px] opacity-25" />
+      <div className="bg-[#FAFAFA] font-sans text-slate-900">
+        <section className="relative overflow-hidden pt-28 pb-20 md:pt-40 md:pb-28">
+          <div className="absolute top-0 left-1/2 w-full -translate-x-1/2 h-[500px] bg-[radial-gradient(ellipse_at_top,rgba(59,130,246,0.06)_0%,transparent_70%)] pointer-events-none" />
 
-          <div className="container relative">
-            <FadeIn className="max-w-4xl">
-              <Badge className="rounded-full border border-blue-200 bg-white px-4 py-2 font-mono text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-700 hover:bg-white">
+          <div className="container relative max-w-4xl text-center">
+            <FadeIn>
+              <Badge className="rounded-full border border-slate-200/60 bg-white px-4 py-2 font-mono text-[10px] font-medium uppercase tracking-widest text-slate-600 shadow-sm">
                 Interactive Product Demo
               </Badge>
-              <h1 className="font-display mt-8 text-5xl font-bold tracking-[-0.08em] text-balance text-slate-950 md:text-7xl lg:leading-[0.94]">
-                Show the RelayOps workflow without opening the real dashboard.
+              <h1 className="font-display mt-10 text-[3.5rem] font-bold tracking-tighter text-balance text-slate-900 md:text-7xl lg:leading-[1]">
+                See the workflow. <br className="hidden md:block"/> No login required.
               </h1>
-              <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-600 md:text-xl">
+              <p className="mt-8 max-w-3xl mx-auto text-lg font-normal leading-relaxed text-slate-500 md:text-xl">
                 Walk prospects through the exact sequence from intake to approval using a lightweight,
                 public-facing demo built from styled interface placeholders.
               </p>
             </FadeIn>
 
-            <StaggerList className="mt-12 grid gap-4 md:grid-cols-4">
+            <StaggerList className="mt-20 grid gap-4 md:grid-cols-4 text-left">
               {demoSteps.map((step, index) => {
                 const Icon = step.icon
 
@@ -275,21 +274,22 @@ export default function DemoPage() {
                   <StaggerItem
                     key={step.value}
                     className={cn(
-                      `rounded-[1.75rem] border border-slate-200 bg-gradient-to-br ${step.accent} px-5 py-5 shadow-[0_22px_60px_-40px_rgba(15,23,42,0.18)] transition-all duration-300 hover:-translate-y-1`
+                      `rounded-[24px] border border-slate-200/60 bg-white px-6 py-6 shadow-[0_4px_20px_rgb(0,0,0,0.02)] transition-shadow hover:shadow-[0_12px_40px_rgb(0,0,0,0.06)]`,
+                      index % 2 !== 0 ? "md:translate-y-4" : ""
                     )}
                   >
                     <div className="flex items-center justify-between gap-3">
-                      <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#0B1220] text-white shadow-[0_16px_34px_-20px_rgba(11,18,32,0.72)]">
-                        <Icon className="h-5 w-5" />
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-50 text-slate-900 border border-slate-100">
+                        <Icon className="h-4 w-4" />
                       </div>
-                      <span className="text-[11px] font-semibold uppercase tracking-[0.28em] text-slate-500">
+                      <span className="font-mono text-[10px] font-semibold uppercase tracking-widest text-slate-400">
                         Step {index + 1}
                       </span>
                     </div>
-                    <p className="font-display mt-5 text-lg font-bold tracking-[-0.03em] text-slate-950">
+                    <p className="font-display mt-6 text-[17px] font-bold tracking-tight text-slate-900">
                       {step.title}
                     </p>
-                    <p className="mt-2 text-sm leading-6 text-slate-600">{step.summary}</p>
+                    <p className="mt-3 text-[13px] leading-relaxed text-slate-500">{step.summary}</p>
                   </StaggerItem>
                 )
               })}
@@ -297,22 +297,22 @@ export default function DemoPage() {
           </div>
         </section>
 
-        <section className="py-16 md:py-24">
-          <div className="container">
-            <Tabs defaultValue={demoSteps[0].value} className="space-y-8">
+        <section className="py-24 md:py-32">
+          <div className="container max-w-6xl">
+            <Tabs defaultValue={demoSteps[0].value} className="space-y-12">
               <FadeIn>
-                <TabsList className="grid h-auto grid-cols-1 gap-2 rounded-[1.5rem] bg-[#E8EEF7] p-2 md:grid-cols-4">
+                <TabsList className="grid h-auto grid-cols-1 gap-3 rounded-[24px] bg-white p-3 border border-slate-200/60 shadow-sm md:grid-cols-4">
                   {demoSteps.map((step) => (
                     <TabsTrigger
                       key={step.value}
                       value={step.value}
-                      className="min-h-[64px] rounded-[1.1rem] border border-transparent px-4 py-4 text-left data-[state=active]:border-slate-200 data-[state=active]:bg-white data-[state=active]:shadow-[0_18px_48px_-34px_rgba(15,23,42,0.18)] transition-all duration-300"
+                      className="min-h-[64px] rounded-[16px] border border-transparent px-5 py-4 text-left data-[state=active]:border-slate-200/60 data-[state=active]:bg-slate-50 data-[state=active]:shadow-[0_2px_8px_rgb(0,0,0,0.04)] transition-all duration-300"
                     >
-                      <span className="flex flex-col gap-1">
-                        <span className="text-[11px] font-semibold uppercase tracking-[0.24em] text-zinc-500">
+                      <span className="flex flex-col gap-1.5">
+                        <span className="font-mono text-[10px] font-semibold uppercase tracking-widest text-slate-500">
                           {step.role}
                         </span>
-                        <span className="text-sm font-semibold text-zinc-950">{step.title}</span>
+                        <span className="text-[13px] font-bold tracking-tight text-slate-900">{step.title}</span>
                       </span>
                     </TabsTrigger>
                   ))}
@@ -324,13 +324,13 @@ export default function DemoPage() {
 
                 return (
                   <TabsContent key={step.value} value={step.value} className="focus-visible:outline-none">
-                    <SlideUp className="overflow-hidden rounded-[2rem] border border-zinc-200 bg-white shadow-[0_24px_70px_-42px_rgba(15,23,42,0.18)]">
-                      <div className="grid gap-0 lg:grid-cols-[0.88fr_1.12fr]">
-                        <div className={`bg-gradient-to-br ${step.accent} p-8 md:p-10`}>
+                    <SlideUp className="overflow-hidden rounded-[32px] border border-slate-200/60 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+                      <div className="grid gap-0 lg:grid-cols-[1fr_1.2fr]">
+                        <div className={`bg-gradient-to-br ${step.accent} p-10 md:p-14`}>
                           <div className="flex items-center gap-3">
                             <Badge
                               className={cn(
-                                `rounded-full border px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em]`,
+                                `rounded-full border px-3 py-1 font-mono text-[10px] font-semibold uppercase tracking-widest shadow-sm`,
                                 roleStyles[step.role]
                               )}
                             >
@@ -339,22 +339,22 @@ export default function DemoPage() {
                             </Badge>
                           </div>
 
-                          <div className="mt-8 space-y-4">
-                            <h2 className="font-display text-3xl font-bold tracking-[-0.05em] text-zinc-950 md:text-4xl">
+                          <div className="mt-10 space-y-5">
+                            <h2 className="font-display text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">
                               {step.detailTitle}
                             </h2>
-                            <p className="text-base leading-7 text-zinc-700">{step.detailBody}</p>
-                            <p className="text-lg font-semibold text-zinc-900">{step.outcome}</p>
+                            <p className="text-[15px] font-normal leading-relaxed text-slate-600">{step.detailBody}</p>
+                            <p className="text-[15px] font-semibold text-slate-900">{step.outcome}</p>
                           </div>
 
-                          <div className="mt-8 rounded-[1.5rem] border border-zinc-200 bg-white/80 p-5">
-                            <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-zinc-500">
+                          <div className="mt-10 rounded-[24px] border border-slate-200/60 bg-white/60 p-6 backdrop-blur-sm">
+                            <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-slate-500">
                               What happens in this step
                             </p>
-                            <ul className="mt-4 space-y-3">
+                            <ul className="mt-5 space-y-4">
                               {step.bullets.map((bullet) => (
-                                <li key={bullet} className="flex gap-3 text-sm leading-6 text-zinc-700">
-                                  <FileStack className="mt-0.5 h-4 w-4 flex-none text-zinc-500" />
+                                <li key={bullet} className="flex gap-3 text-[14px] leading-relaxed text-slate-700">
+                                  <FileStack className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
                                   <span>{bullet}</span>
                                 </li>
                               ))}
@@ -362,18 +362,18 @@ export default function DemoPage() {
                           </div>
                         </div>
 
-                        <CardContent className="p-8 md:p-10">
-                          <CardHeader className="p-0">
-                            <CardTitle className="text-xl font-bold tracking-[-0.04em] text-zinc-950">
+                        <CardContent className="p-10 md:p-14 border-l border-slate-100 bg-white">
+                          <CardHeader className="p-0 mb-10">
+                            <CardTitle className="text-[17px] font-bold tracking-tight text-slate-900">
                               Mock dashboard preview
                             </CardTitle>
-                            <CardDescription className="text-base leading-7 text-zinc-600">
+                            <CardDescription className="mt-3 text-[15px] font-normal leading-relaxed text-slate-500">
                               A CSS-only interface placeholder that mirrors the information a buyer
                               needs to understand at this stage of the workflow.
                             </CardDescription>
                           </CardHeader>
 
-                          <div className="mt-8">
+                          <div>
                             <MockDashboardPreview step={step} />
                           </div>
                         </CardContent>
@@ -386,28 +386,28 @@ export default function DemoPage() {
           </div>
         </section>
 
-        <section className="pb-20 md:pb-28">
-          <div className="container">
-            <FadeIn className="rounded-[2rem] border border-[#0B1220] bg-[#0B1220] px-8 py-10 text-white shadow-[0_30px_90px_-48px_rgba(11,18,32,0.82)] md:px-12">
-              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-300">
+        <section className="pb-24 md:pb-32">
+          <div className="container max-w-5xl">
+            <FadeIn className="rounded-[32px] bg-slate-900 px-10 py-16 text-center text-white shadow-[0_32px_64px_-16px_rgb(0,0,0,0.2)] md:px-16 md:py-24">
+              <p className="font-mono text-[10px] font-medium uppercase tracking-widest text-slate-400 mb-6">
                 Turn the walkthrough into pipeline
               </p>
-              <h2 className="font-display mt-5 text-4xl font-bold tracking-[-0.06em] text-balance md:text-5xl">
-                Use the demo to explain the workflow, then open the partner application.
+              <h2 className="font-display max-w-3xl mx-auto text-4xl font-bold tracking-tight text-balance md:text-5xl">
+                Use the demo to explain the workflow, then open the application.
               </h2>
-              <p className="mt-5 max-w-2xl text-base leading-7 text-zinc-300">
+              <p className="mt-8 max-w-2xl mx-auto text-lg font-normal leading-relaxed text-slate-400">
                 The public demo gives prospects enough operational clarity to understand the model
                 before they ever touch the live product.
               </p>
-              <div className="mt-8">
+              <div className="mt-12">
                 <Button
                   asChild
                   size="lg"
-                  className="rounded-full border border-blue-500/30 bg-blue-600 px-7 text-white shadow-[0_24px_50px_-24px_rgba(59,130,246,0.6)] transition-all duration-300 hover:-translate-y-1 hover:bg-blue-700"
+                  className="h-14 rounded-full bg-blue-600 px-10 text-[15px] font-medium text-white shadow-[0_8px_16px_rgb(59,130,246,0.2)] transition-transform hover:-translate-y-0.5 hover:bg-blue-700"
                 >
                   <Link href="/request-access">
                     Request Access
-                    <ArrowRight className="h-4 w-4" />
+                    <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
               </div>

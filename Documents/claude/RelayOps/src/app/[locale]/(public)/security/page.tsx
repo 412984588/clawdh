@@ -122,21 +122,20 @@ const SECTIONS = [
 export default function SecurityPage() {
   return (
     <MotionProvider>
-      <div className="flex flex-col bg-[#f8fafc]">
+      <div className="flex flex-col bg-[#FAFAFA] font-sans text-slate-900">
         {/* Hero */}
-        <section className="relative overflow-hidden border-b border-slate-200 bg-[#0B1220] py-20 text-white md:py-28">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.22),transparent_28%),radial-gradient(circle_at_82%_18%,rgba(20,184,166,0.12),transparent_24%)]" />
-          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:120px_120px] opacity-20" />
+        <section className="relative overflow-hidden pt-28 pb-20 md:pt-40 md:pb-32 bg-slate-900 text-white">
+          <div className="absolute top-0 left-1/2 w-full -translate-x-1/2 h-[500px] bg-[radial-gradient(ellipse_at_top,rgba(59,130,246,0.12)_0%,transparent_70%)] pointer-events-none" />
           
           <div className="container relative mx-auto px-4 max-w-4xl text-center">
             <FadeIn>
-              <Badge className="rounded-full border border-blue-500/20 bg-white/10 px-4 py-2 font-mono text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-200 hover:bg-white/10">
+              <Badge className="rounded-full border border-blue-500/30 bg-blue-500/10 px-4 py-2 font-mono text-[10px] font-medium uppercase tracking-widest text-blue-200">
                 Security & Privacy
               </Badge>
-              <h1 className="font-display mt-8 text-5xl font-bold tracking-[-0.08em] text-balance text-white md:text-7xl lg:leading-[0.94]">
-                Your Client Data is Handled Seriously
+              <h1 className="font-display mt-8 text-[3.5rem] font-bold tracking-tighter text-balance md:text-7xl lg:leading-[1.05]">
+                Handled with Care.
               </h1>
-              <p className="mx-auto mt-6 max-w-3xl text-lg leading-8 text-zinc-300 md:text-xl">
+              <p className="mx-auto mt-8 max-w-2xl text-lg font-normal leading-relaxed text-slate-400 md:text-xl">
                 Encrypted storage, fixed retention schedules, AI processing that never trains on
                 your data, and automatic deletion on schedule.
               </p>
@@ -145,31 +144,31 @@ export default function SecurityPage() {
         </section>
 
         {/* Sections */}
-        <section className="bg-white py-20 md:py-28">
+        <section className="bg-white py-24 md:py-32">
           <div className="container mx-auto px-4 max-w-5xl">
-            <StaggerList className="space-y-20">
+            <StaggerList className="space-y-24">
               {SECTIONS.map((section) => {
                 const Icon = section.icon
                 return (
-                  <StaggerItem key={section.title} className="space-y-8">
-                    <div className="flex items-center gap-4">
-                      <div className="h-12 w-12 rounded-2xl bg-blue-50 flex items-center justify-center shrink-0 shadow-sm ring-1 ring-blue-100">
+                  <StaggerItem key={section.title} className="space-y-10">
+                    <div className="flex items-center gap-4 border-b border-slate-100 pb-6">
+                      <div className="h-14 w-14 rounded-2xl bg-slate-50 flex items-center justify-center shrink-0 border border-slate-100">
                         <Icon className="h-6 w-6 text-blue-600" />
                       </div>
-                      <h2 className="font-display text-3xl font-bold tracking-[-0.04em] text-slate-950">
+                      <h2 className="font-display text-3xl font-bold tracking-tight text-slate-900">
                         {section.title}
                       </h2>
                     </div>
-                    <div className="grid sm:grid-cols-2 gap-6">
+                    <div className="grid sm:grid-cols-2 gap-8">
                       {section.items.map((item) => (
                         <div
                           key={item.heading}
-                          className="bg-white rounded-[1.75rem] border border-slate-200 p-6 space-y-3 shadow-[0_18px_45px_-32px_rgba(15,23,42,0.12)] transition-all duration-300 hover:-translate-y-1 hover:border-blue-200"
+                          className="bg-[#FAFAFA] rounded-[24px] border border-slate-200/60 p-8 transition-shadow hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)]"
                         >
-                          <h3 className="text-base font-bold tracking-tight text-slate-950">
+                          <h3 className="text-[17px] font-bold tracking-tight text-slate-900">
                             {item.heading}
                           </h3>
-                          <p className="text-sm text-slate-600 leading-relaxed">{item.body}</p>
+                          <p className="mt-4 text-[15px] text-slate-600 leading-relaxed font-normal">{item.body}</p>
                         </div>
                       ))}
                     </div>
@@ -181,24 +180,29 @@ export default function SecurityPage() {
         </section>
 
         {/* Retention quick-reference */}
-        <section className="bg-[#E8EEF7] border-y border-slate-200 py-20">
-          <div className="container mx-auto px-4 max-w-3xl">
+        <section className="bg-white border-y border-slate-100 py-24 md:py-32">
+          <div className="container mx-auto px-4 max-w-4xl">
             <FadeIn>
-              <h2 className="font-display text-3xl font-bold tracking-[-0.04em] text-slate-950 mb-10 text-center">
-                Retention Schedule Quick Reference
-              </h2>
-              <div className="overflow-hidden rounded-[2rem] border border-slate-200 shadow-[0_24px_70px_-42px_rgba(15,23,42,0.18)] bg-white">
+              <div className="mb-16 text-center">
+                <p className="font-mono text-[10px] font-medium uppercase tracking-widest text-slate-400 mb-4">
+                  Reference
+                </p>
+                <h2 className="font-display text-4xl font-bold tracking-tight text-slate-900">
+                  Retention Schedule
+                </h2>
+              </div>
+              <div className="overflow-hidden rounded-[32px] border border-slate-200/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-white">
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm border-collapse">
                     <thead>
-                      <tr className="bg-slate-50 border-b border-slate-200">
-                        <th className="text-left px-6 py-4 font-mono text-[11px] uppercase tracking-[0.22em] text-slate-500">
+                      <tr className="bg-slate-50 border-b border-slate-200/60">
+                        <th className="text-left px-8 py-6 font-mono text-[10px] font-medium uppercase tracking-widest text-slate-400">
                           Job state
                         </th>
-                        <th className="text-left px-6 py-4 font-mono text-[11px] uppercase tracking-[0.22em] text-slate-500">
+                        <th className="text-left px-8 py-6 font-mono text-[10px] font-medium uppercase tracking-widest text-slate-400">
                           Retention
                         </th>
-                        <th className="text-left px-6 py-4 font-mono text-[11px] uppercase tracking-[0.22em] text-slate-500">
+                        <th className="text-left px-8 py-6 font-mono text-[10px] font-medium uppercase tracking-widest text-slate-400">
                           Notes
                         </th>
                       </tr>
@@ -211,9 +215,9 @@ export default function SecurityPage() {
                         ['Disputed', '90 days', 'From dispute resolution'],
                       ].map(([state, retention, notes]) => (
                         <tr key={state} className="bg-white transition-colors hover:bg-slate-50/50">
-                          <td className="px-6 py-4 font-bold text-slate-950">{state}</td>
-                          <td className="px-6 py-4 text-blue-600 font-bold">{retention}</td>
-                          <td className="px-6 py-4 text-slate-500">{notes}</td>
+                          <td className="px-8 py-6 text-[15px] font-bold text-slate-900">{state}</td>
+                          <td className="px-8 py-6 text-[15px] text-blue-600 font-bold">{retention}</td>
+                          <td className="px-8 py-6 text-[14px] text-slate-500">{notes}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -225,20 +229,20 @@ export default function SecurityPage() {
         </section>
 
         {/* DPA CTA */}
-        <section className="bg-white py-20 md:py-28">
+        <section className="bg-white py-24 md:py-32">
           <div className="container mx-auto px-4 max-w-4xl">
             <SlideUp>
-              <div className="rounded-[2.25rem] border border-slate-200 bg-[#0B1220] p-8 md:p-12 text-center shadow-[0_30px_80px_-48px_rgba(11,18,32,0.72)]">
-                <div className="h-14 w-14 rounded-2xl bg-white/5 flex items-center justify-center mx-auto mb-8 border border-white/10 shadow-inner">
-                  <Server className="h-7 w-7 text-blue-400" />
+              <div className="rounded-[32px] bg-slate-900 p-12 text-center text-white shadow-[0_32px_64px_-16px_rgb(0,0,0,0.2)] md:p-20">
+                <div className="h-16 w-16 rounded-2xl bg-white/5 flex items-center justify-center mx-auto mb-10 border border-white/10 shadow-inner">
+                  <Server className="h-8 w-8 text-blue-400" />
                 </div>
-                <h2 className="font-display text-3xl font-bold tracking-[-0.04em] text-white mb-6">Need a DPA?</h2>
-                <p className="text-zinc-300 text-lg leading-8 max-w-2xl mx-auto mb-10">
+                <h2 className="font-display text-4xl font-bold tracking-tight mb-8">Need a DPA?</h2>
+                <p className="text-slate-400 text-[17px] font-normal leading-relaxed max-w-2xl mx-auto mb-12">
                   If you have an enterprise client that requires a Data Processing Agreement before
                   you can share data with a sub-processor, we can provide one. Request it through
                   your partner portal or contact us directly.
                 </p>
-                <Button asChild size="lg" className="rounded-full bg-blue-600 px-8 hover:bg-blue-700 shadow-[0_20px_45px_-20px_rgba(59,130,246,0.52)]">
+                <Button asChild size="lg" className="h-14 rounded-full bg-blue-600 px-10 text-[15px] font-medium text-white shadow-[0_8px_16px_rgb(59,130,246,0.2)] transition-transform hover:-translate-y-0.5 hover:bg-blue-700">
                   <Link href="/request-access">
                     Apply for Partner Access
                     <ArrowRight className="ml-2 h-4 w-4" />

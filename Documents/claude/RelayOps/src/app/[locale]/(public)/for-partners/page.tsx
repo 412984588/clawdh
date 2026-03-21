@@ -32,54 +32,36 @@ const BENEFITS = [
     title: '2-Day SLA',
     description:
       'Standard jobs turn in 2 business days from payment. Predictable turnaround means you can promise clients a delivery date and keep it.',
-    accent: 'border-t-blue-500',
-    iconBg: 'bg-blue-500/10',
-    iconColor: 'text-blue-600',
   },
   {
     icon: Tag,
     title: 'Resell at Any Margin',
     description:
       'Our pricing is your floor. Charge clients $500–$1,000 for a $149 pilot job, or $2,000–$5,000 for a $499 standard job. You own the relationship and the margin.',
-    accent: 'border-t-slate-400',
-    iconBg: 'bg-slate-400/10',
-    iconColor: 'text-slate-600',
   },
   {
     icon: Shield,
-    title: 'ISO-Grade Data Handling',
+    title: 'ISO-Grade Handling',
     description:
-      'Your data is never used to train AI models. Files are stored encrypted with signed URLs and deleted automatically on a fixed retention schedule. A DPA is available on request for enterprise clients.',
-    accent: 'border-t-teal-500',
-    iconBg: 'bg-teal-500/10',
-    iconColor: 'text-teal-600',
+      'Your data is never used to train AI models. Files are stored encrypted with signed URLs and deleted automatically on a fixed retention schedule.',
   },
   {
     icon: Users,
-    title: 'Dedicated Partner Portal',
+    title: 'Dedicated Portal',
     description:
       'Submit briefs, track job status, download deliverables, and manage your account — all in one place. No email threads, no spreadsheet tracking.',
-    accent: 'border-t-blue-400',
-    iconBg: 'bg-blue-400/10',
-    iconColor: 'text-blue-500',
   },
   {
     icon: TrendingUp,
     title: 'Scale Without Headcount',
     description:
       'Add data prep capacity without hiring. Submit 1 job or 20 jobs a month — the same process, the same SLA, no staffing overhead on your end.',
-    accent: 'border-t-slate-500',
-    iconBg: 'bg-slate-500/10',
-    iconColor: 'text-slate-600',
   },
   {
     icon: FileCheck,
     title: 'Fixed Scope, Fixed Price',
     description:
       'Every job is scoped before invoicing. You see exactly what will be delivered and what it costs before you pay. No scope creep, no surprise overages.',
-    accent: 'border-t-teal-500',
-    iconBg: 'bg-teal-500/10',
-    iconColor: 'text-teal-600',
   },
 ]
 
@@ -172,39 +154,38 @@ const GOOD_FIT = [
 export default function ForPartnersPage() {
   return (
     <MotionProvider>
-      <div className="flex flex-col bg-[#f8fafc]">
-        <section className="relative overflow-hidden bg-[#0B1220] py-20 text-white md:py-28">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.24),transparent_30%),radial-gradient(circle_at_82%_18%,rgba(20,184,166,0.14),transparent_24%)]" />
-          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:120px_120px] opacity-20" />
+      <div className="flex flex-col bg-[#FAFAFA] font-sans text-slate-900">
+        <section className="relative overflow-hidden pt-28 pb-20 md:pt-40 md:pb-32 bg-slate-900 text-white">
+          <div className="absolute top-0 left-1/2 w-full -translate-x-1/2 h-[500px] bg-[radial-gradient(ellipse_at_top,rgba(59,130,246,0.12)_0%,transparent_70%)] pointer-events-none" />
 
-          <div className="container relative">
-            <div className="grid items-center gap-12 lg:grid-cols-[1.08fr_0.92fr]">
+          <div className="container relative max-w-7xl">
+            <div className="grid items-center gap-16 lg:grid-cols-[1.1fr_0.9fr]">
               <FadeIn>
-                <Badge className="rounded-full border border-blue-500/20 bg-white/10 px-4 py-2 font-mono text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-200 hover:bg-white/10">
+                <Badge className="rounded-full border border-blue-500/30 bg-blue-500/10 px-4 py-2 font-mono text-[10px] font-medium uppercase tracking-widest text-blue-200">
                   Partner Program
                 </Badge>
-                <h1 className="font-display mt-8 text-5xl font-bold tracking-[-0.08em] text-balance text-white md:text-7xl lg:leading-[0.94]">
-                  White-Label CRM Cleanup for RevOps Agencies
+                <h1 className="font-display mt-8 text-[3.5rem] font-bold tracking-tighter text-balance md:text-7xl lg:leading-[1.05]">
+                  White-Label CRM Cleanup.
                 </h1>
-                <p className="mt-6 max-w-2xl text-lg leading-8 text-zinc-300 md:text-xl">
+                <p className="mt-8 max-w-2xl text-lg font-normal leading-relaxed text-slate-400 md:text-xl">
                   Offer 2-day CRM import prep to your clients without hiring operators. RelayOps
                   handles the cleaning. You handle the relationship.
                 </p>
-                <div className="mt-8 flex flex-col gap-4 sm:flex-row">
+                <div className="mt-10 flex flex-col gap-4 sm:flex-row">
                   <Button
                     asChild
                     size="lg"
-                    className="rounded-full border border-blue-500/30 bg-blue-600 px-7 text-white shadow-[0_24px_50px_-24px_rgba(59,130,246,0.52)] transition-all duration-300 hover:-translate-y-1 hover:bg-blue-500"
+                    className="h-14 rounded-full bg-blue-600 px-8 text-[15px] font-medium text-white shadow-[0_8px_16px_rgb(59,130,246,0.2)] transition-transform hover:-translate-y-0.5 hover:bg-blue-700"
                   >
                     <Link href="/request-access">
                       Apply for Partner Access
-                      <ArrowRight className="h-4 w-4" />
+                      <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
                   </Button>
                   <Button
                     asChild
-                    size="lg"
-                    className="rounded-full border border-white/15 bg-white/5 px-7 text-white shadow-[0_18px_40px_-24px_rgba(24,24,27,0.8)] transition-all duration-300 hover:-translate-y-1 hover:border-white/25 hover:bg-white/10 hover:shadow-[0_28px_44px_-22px_rgba(24,24,27,0.95)]"
+                    variant="outline"
+                    className="h-14 rounded-full border-slate-700 bg-slate-800 px-8 text-[15px] font-medium text-white transition-transform hover:-translate-y-0.5 hover:bg-slate-700"
                   >
                     <Link href="/how-it-works">See How It Works</Link>
                   </Button>
@@ -212,38 +193,38 @@ export default function ForPartnersPage() {
               </FadeIn>
 
               <SlideUp transition={{ delay: 0.15 }}>
-                <div className="rounded-[2rem] border border-white/10 bg-white/10 p-8 shadow-[0_40px_90px_-45px_rgba(59,130,246,0.35)] backdrop-blur-xl">
+                <div className="rounded-[32px] border border-slate-800 bg-slate-800/50 p-10 shadow-[0_24px_80px_-12px_rgb(0,0,0,0.5)] backdrop-blur-xl">
                   <div className="grid gap-4 sm:grid-cols-2">
                     {[
                       '2-Day SLA',
                       'Resell at Any Margin',
-                      'Dedicated Partner Portal',
-                      'Fixed Scope, Fixed Price',
+                      'Dedicated Portal',
+                      'Fixed Price',
                     ].map((item) => (
                       <div
                         key={item}
-                        className="rounded-3xl border border-white/10 bg-[#0B1220]/55 px-5 py-5 text-sm font-medium text-zinc-200"
+                        className="rounded-[20px] bg-slate-900/80 px-6 py-5 text-[14px] font-medium text-slate-300 border border-slate-800"
                       >
                         {item}
                       </div>
                     ))}
                   </div>
-                  <div className="mt-5 rounded-[1.75rem] border border-white/10 bg-gradient-to-br from-white/10 to-white/5 p-6">
-                    <p className="text-xs font-semibold uppercase tracking-[0.24em] text-blue-300">
-                      Transparent pricing tiers
+                  <div className="mt-6 rounded-[24px] border border-blue-500/20 bg-blue-500/5 p-8">
+                    <p className="font-mono text-[10px] font-medium uppercase tracking-widest text-blue-300 mb-6">
+                      Pricing Overview
                     </p>
-                    <div className="mt-4 grid gap-4 sm:grid-cols-3">
+                    <div className="grid gap-6 sm:grid-cols-3">
                       <div>
-                        <p className="text-xs uppercase tracking-[0.24em] text-zinc-500">Pilot</p>
-                        <p className="mt-2 text-3xl font-black tracking-[-0.05em] text-white">$149</p>
+                        <p className="font-mono text-[10px] uppercase tracking-widest text-slate-500">Pilot</p>
+                        <p className="mt-2 font-display text-3xl font-bold tracking-tighter text-white">$149</p>
                       </div>
                       <div>
-                        <p className="text-xs uppercase tracking-[0.24em] text-zinc-500">Standard</p>
-                        <p className="mt-2 text-3xl font-black tracking-[-0.05em] text-white">$499</p>
+                        <p className="font-mono text-[10px] uppercase tracking-widest text-slate-500">Standard</p>
+                        <p className="mt-2 font-display text-3xl font-bold tracking-tighter text-white">$499</p>
                       </div>
                       <div>
-                        <p className="text-xs uppercase tracking-[0.24em] text-zinc-500">Custom</p>
-                        <p className="mt-2 text-3xl font-black tracking-[-0.05em] text-white">Quoted</p>
+                        <p className="font-mono text-[10px] uppercase tracking-widest text-slate-500">Custom</p>
+                        <p className="mt-2 font-display text-3xl font-bold tracking-tighter text-white">Quoted</p>
                       </div>
                     </div>
                   </div>
@@ -253,31 +234,30 @@ export default function ForPartnersPage() {
           </div>
         </section>
 
-        <section className="bg-white py-20 md:py-28">
-          <div className="container">
-            <FadeIn className="mx-auto max-w-2xl text-center">
-              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-700">
-                What you get as a partner
-              </p>
-              <h2 className="font-display mt-5 text-4xl font-bold tracking-[-0.06em] text-balance text-zinc-950 md:text-5xl">
+        <section className="bg-white py-24 md:py-32">
+          <div className="container max-w-7xl">
+            <FadeIn className="mx-auto max-w-3xl text-center mb-20">
+              <h2 className="font-display text-4xl font-bold tracking-tight text-slate-900 md:text-5xl">
                 What you get as a partner
               </h2>
             </FadeIn>
-            <StaggerList className="mt-14 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-              {BENEFITS.map((item) => {
+            
+            <StaggerList className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+              {BENEFITS.map((item, index) => {
                 const Icon = item.icon
                 return (
                   <StaggerItem
                     key={item.title}
                     className={cn(
-                      `rounded-[2rem] border border-zinc-200 border-t-4 ${item.accent} bg-white px-6 py-7 text-zinc-950 shadow-[0_24px_60px_-42px_rgba(15,23,42,0.16)] transition-all duration-300 ease-out hover:-translate-y-1 hover:border-blue-200 hover:shadow-[0_30px_70px_-36px_rgba(59,130,246,0.18)]`
+                      "rounded-[24px] border border-slate-200/60 bg-[#FAFAFA] p-8 transition-colors hover:bg-slate-50",
+                      index === 0 ? "xl:col-span-2" : ""
                     )}
                   >
-                    <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${item.iconBg}`}>
-                      <Icon className={`h-5 w-5 ${item.iconColor}`} />
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white text-slate-900 shadow-[0_2px_8px_rgb(0,0,0,0.04)]">
+                      <Icon className="h-5 w-5" />
                     </div>
-                    <h3 className="font-display mt-6 text-2xl font-bold tracking-[-0.04em]">{item.title}</h3>
-                    <p className="mt-3 text-base leading-7 text-zinc-600">{item.description}</p>
+                    <h3 className="font-display mt-8 text-2xl font-bold tracking-tight text-slate-900">{item.title}</h3>
+                    <p className="mt-4 text-[15px] font-normal leading-relaxed text-slate-500">{item.description}</p>
                   </StaggerItem>
                 )
               })}
@@ -285,69 +265,70 @@ export default function ForPartnersPage() {
           </div>
         </section>
 
-        <section className="relative overflow-hidden bg-[#0B1220] py-20 text-white md:py-28">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.22),transparent_38%),radial-gradient(circle_at_82%_18%,rgba(20,184,166,0.12),transparent_24%)]" />
-          <div className="container relative">
-            <FadeIn className="mx-auto max-w-2xl text-center">
-              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-300">
+        <section className="py-24 md:py-32 border-y border-slate-100">
+          <div className="container max-w-7xl">
+            <FadeIn className="mx-auto max-w-3xl text-center mb-20">
+              <p className="font-mono text-[10px] font-medium uppercase tracking-widest text-blue-600 mb-4">
                 Pricing
               </p>
-              <h2 className="font-display mt-5 text-4xl font-bold tracking-[-0.06em] text-balance text-white md:text-5xl">
+              <h2 className="font-display text-4xl font-bold tracking-tight text-slate-900 md:text-5xl">
                 Transparent pricing tiers
               </h2>
-              <p className="mt-5 text-lg leading-8 text-zinc-300">
+              <p className="mt-6 text-lg font-normal leading-relaxed text-slate-500">
                 These are your costs. Charge your clients whatever makes sense for your business.
               </p>
             </FadeIn>
 
-            <StaggerList className="mt-14 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-              {PRICING.map((plan) => (
+            <StaggerList className="grid gap-6 md:grid-cols-2 xl:grid-cols-4 lg:items-end">
+              {PRICING.map((plan, index) => (
                 <StaggerItem
                   key={plan.tier}
                   className={cn(
-                    "rounded-[2rem] border p-6 transition-all duration-300 ease-out hover:-translate-y-1",
+                    "flex flex-col h-full rounded-[32px] border p-8 transition-all duration-300",
                     plan.highlight
-                      ? 'border-blue-500/40 bg-gradient-to-b from-blue-500/16 via-[#101827] to-[#0B1220] shadow-[0_30px_90px_-44px_rgba(59,130,246,0.5)] hover:shadow-[0_36px_110px_-38px_rgba(59,130,246,0.6)]'
-                      : 'border-white/10 bg-white/5 shadow-[0_24px_60px_-40px_rgba(15,23,42,0.82)] hover:bg-white/10 hover:shadow-[0_28px_70px_-34px_rgba(59,130,246,0.22)]'
+                      ? 'border-slate-900 bg-slate-900 text-white shadow-[0_24px_80px_-12px_rgb(0,0,0,0.2)]'
+                      : 'border-slate-200/60 bg-white hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)]',
+                    plan.highlight ? "lg:pb-12" : "lg:pb-8"
                   )}
                 >
-                  {plan.highlight ? (
-                    <Badge className="rounded-full border border-blue-500/20 bg-blue-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-blue-200 hover:bg-blue-500/10">
-                      Most common
-                    </Badge>
-                  ) : null}
-                  <div className="mt-4">
-                    <div className="text-xs font-semibold uppercase tracking-[0.28em] text-zinc-400">
+                  <div className="flex-1">
+                    {plan.highlight ? (
+                      <Badge className="mb-6 rounded-full bg-blue-600 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white border-none">
+                        Most common
+                      </Badge>
+                    ) : null}
+                    <div className="font-mono text-[10px] font-medium uppercase tracking-widest text-slate-400">
                       {plan.tier}
                     </div>
-                    <div className="mt-3 flex items-end gap-2">
+                    <div className="mt-4 flex items-end gap-2">
                       {plan.unit ? (
-                        <span className="text-xs uppercase tracking-[0.22em] text-zinc-500">
+                        <span className="mb-2 text-[11px] font-bold uppercase tracking-widest text-slate-500">
                           {plan.unit}
                         </span>
                       ) : null}
-                      <span className="text-5xl font-black tracking-[-0.06em] text-white">
+                      <span className={cn("font-display text-[2.5rem] font-bold tracking-tighter leading-none", plan.highlight ? "text-white" : "text-slate-900")}>
                         {plan.price}
                       </span>
                     </div>
+                    <ul className="mt-10 space-y-4">
+                      {plan.features.map((feature) => (
+                        <li key={feature} className={cn("flex items-start gap-3 text-[14px] font-medium leading-relaxed", plan.highlight ? "text-slate-300" : "text-slate-600")}>
+                          <span className={cn("mt-2 h-1.5 w-1.5 shrink-0 rounded-full", plan.highlight ? "bg-blue-500" : "bg-slate-300")} />
+                          <span>{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                  <ul className="mt-6 space-y-3">
-                    {plan.features.map((feature) => (
-                      <li key={feature} className="flex items-start gap-3 text-sm leading-6 text-zinc-300">
-                        <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-teal-400" />
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
                   <Button
                     asChild
-                    size="lg"
+                    size={plan.highlight ? "lg" : "default"}
                     className={cn(
-                      "mt-8 w-full rounded-full transition-all duration-300",
+                      "mt-10 w-full rounded-full transition-transform hover:-translate-y-0.5",
                       plan.highlight
-                        ? 'border border-blue-500/30 bg-blue-600 text-white shadow-[0_24px_50px_-24px_rgba(59,130,246,0.52)] hover:bg-blue-700'
-                        : 'border border-white/10 bg-white/5 text-white hover:bg-white/10'
+                        ? 'h-14 bg-white text-slate-900 shadow-[0_8px_16px_rgb(255,255,255,0.1)] hover:bg-slate-50'
+                        : 'h-12 border-slate-200/80 bg-white text-slate-900 shadow-[0_2px_8px_rgb(0,0,0,0.04)] hover:bg-slate-50'
                     )}
+                    variant={plan.highlight ? "default" : "outline"}
                   >
                     <Link href={plan.href}>{plan.cta}</Link>
                   </Button>
@@ -357,61 +338,56 @@ export default function ForPartnersPage() {
           </div>
         </section>
 
-        <section className="bg-white py-20 md:py-28">
-          <div className="container">
-            <FadeIn className="mx-auto max-w-2xl text-center">
-              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-700">
-                Good fit
-              </p>
-              <h2 className="font-display mt-5 text-4xl font-bold tracking-[-0.06em] text-zinc-950 text-balance md:text-5xl">
-                Who makes a great partner
+        <section className="bg-white py-24 md:py-32">
+          <div className="container max-w-5xl">
+            <FadeIn className="mx-auto max-w-2xl text-center mb-20">
+              <h2 className="font-display text-4xl font-bold tracking-tight text-slate-900 md:text-5xl">
+                Who makes a great partner?
               </h2>
-              <p className="mt-5 text-lg leading-8 text-zinc-600">
+              <p className="mt-6 text-lg font-normal leading-relaxed text-slate-500">
                 RelayOps is designed for agencies that handle CRM data regularly and want
                 reliable fulfillment without adding headcount.
               </p>
             </FadeIn>
-            <StaggerList className="mt-14 grid gap-5 md:grid-cols-2">
+            <StaggerList className="grid gap-6 md:grid-cols-2">
               {GOOD_FIT.map((item) => (
                 <StaggerItem
                   key={item.type}
-                  className="rounded-[2rem] border border-zinc-200 bg-white p-7 shadow-[0_18px_50px_-34px_rgba(15,23,42,0.18)] transition-all duration-300 ease-out hover:-translate-y-1 hover:border-blue-200 hover:shadow-[0_30px_70px_-36px_rgba(59,130,246,0.18)]"
+                  className="rounded-[24px] border border-slate-200/60 bg-[#FAFAFA] p-8 transition-colors hover:bg-slate-50"
                 >
-                  <p className="text-xs font-semibold uppercase tracking-[0.24em] text-blue-700">
+                  <h3 className="font-display text-xl font-bold tracking-tight text-slate-900">
                     {item.type}
-                  </p>
-                  <p className="mt-4 text-base leading-7 text-zinc-600">{item.description}</p>
+                  </h3>
+                  <p className="mt-4 text-[15px] font-normal leading-relaxed text-slate-600">{item.description}</p>
                 </StaggerItem>
               ))}
             </StaggerList>
           </div>
         </section>
 
-        <section className="relative overflow-hidden bg-[#0B1220] py-20 text-white md:py-24">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.22),transparent_36%),radial-gradient(circle_at_82%_18%,rgba(20,184,166,0.12),transparent_24%)]" />
-          <div className="container relative text-center">
-            <FadeIn className="mx-auto max-w-3xl">
-              <h2 className="font-display text-4xl font-bold tracking-[-0.06em] text-balance md:text-5xl">
+        <section className="pb-24 md:pb-32">
+          <div className="container max-w-5xl">
+            <FadeIn className="rounded-[32px] bg-slate-900 px-10 py-16 text-center text-white shadow-[0_32px_64px_-16px_rgb(0,0,0,0.2)] md:px-16 md:py-24">
+              <h2 className="font-display max-w-3xl mx-auto text-4xl font-bold tracking-tight text-balance md:text-5xl">
                 Apply for Partner Access
               </h2>
-              <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-zinc-300">
+              <p className="mx-auto mt-6 max-w-2xl text-[17px] font-normal leading-relaxed text-slate-400">
                 White-label CRM data cleanup fulfillment for RevOps agencies. Apply for partner access.
               </p>
-              <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
+              <div className="mt-10 flex flex-col justify-center gap-4 sm:flex-row">
                 <Button
                   asChild
                   size="lg"
-                  className="rounded-full border border-blue-500/30 bg-blue-600 px-7 text-white shadow-[0_24px_50px_-24px_rgba(59,130,246,0.52)] transition-all duration-300 hover:-translate-y-1 hover:bg-blue-500"
+                  className="h-14 rounded-full bg-blue-600 px-8 text-[15px] font-medium text-white shadow-[0_8px_16px_rgb(59,130,246,0.2)] transition-transform hover:-translate-y-0.5 hover:bg-blue-700"
                 >
                   <Link href="/request-access">
                     Apply for Partner Access
-                    <ArrowRight className="h-4 w-4" />
                   </Link>
                 </Button>
                 <Button
                   asChild
-                  size="lg"
-                  className="rounded-full border border-white/15 bg-white/5 px-7 text-white transition-all duration-300 hover:-translate-y-1 hover:border-white/25 hover:bg-white/10"
+                  variant="outline"
+                  className="h-14 rounded-full border-slate-700 bg-slate-800 px-8 text-[15px] font-medium text-white transition-transform hover:-translate-y-0.5 hover:bg-slate-700"
                 >
                   <Link href="/pilot-sample">Start with a Pilot</Link>
                 </Button>

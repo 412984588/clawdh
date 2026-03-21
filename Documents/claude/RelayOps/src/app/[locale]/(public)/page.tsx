@@ -134,106 +134,81 @@ const proofMetrics = [
   { value: 98, suffix: '%', label: 'Partner Satisfaction' },
 ]
 
-const proofChecks = [
-  'Scope locked before production starts',
-  'QA review before the handoff lands in your portal',
-  'Secure data handling built for agency delivery teams',
-]
-
 export default function LandingPage() {
   return (
     <MotionProvider>
-      <div className="flex flex-col bg-[#f8fafc] text-slate-950">
-        <section className="relative overflow-hidden border-b border-slate-200 bg-[#f8fafc]">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.14),transparent_32%),radial-gradient(circle_at_82%_14%,rgba(20,184,166,0.12),transparent_22%)]" />
-          <div className="absolute inset-0 bg-[linear-gradient(rgba(148,163,184,0.11)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.11)_1px,transparent_1px)] bg-[size:120px_120px] opacity-30" />
-
-          <div className="container relative py-20 md:py-28 lg:py-32">
-            <div className="grid items-center gap-12 lg:grid-cols-[1.02fr_0.98fr]">
+      <div className="flex flex-col bg-[#FAFAFA] text-slate-900 font-sans">
+        
+        {/* HERO SECTION */}
+        <section className="relative overflow-hidden pt-28 pb-32 md:pt-40 md:pb-48">
+          <div className="absolute top-0 left-1/2 w-full -translate-x-1/2 h-[500px] bg-[radial-gradient(ellipse_at_top,rgba(59,130,246,0.08)_0%,transparent_70%)] pointer-events-none" />
+          
+          <div className="container relative max-w-7xl">
+            <div className="grid items-center gap-16 lg:grid-cols-[1.1fr_0.9fr]">
               <FadeIn>
-                <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-white px-4 py-2 shadow-[0_18px_40px_-30px_rgba(15,23,42,0.18)]">
-                  <span className="h-2 w-2 rounded-full bg-teal-500" />
-                  <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.24em] text-blue-700">
-                    Operational confidence for RevOps agencies
+                <div className="inline-flex items-center gap-2 rounded-full border border-slate-200/50 bg-white/50 px-3 py-1.5 shadow-[0_2px_8px_rgb(0,0,0,0.04)] backdrop-blur-md">
+                  <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />
+                  <span className="font-mono text-[10px] font-medium uppercase tracking-widest text-slate-600">
+                    Operational confidence for RevOps
                   </span>
                 </div>
 
-                <h1 className="font-display mt-8 max-w-5xl text-5xl font-bold tracking-[-0.08em] text-balance text-slate-950 md:text-7xl lg:text-[5.3rem] lg:leading-[0.92]">
+                <h1 className="font-display mt-8 max-w-5xl text-[3.5rem] font-bold tracking-tighter text-balance text-slate-900 leading-[1.05] md:text-7xl lg:text-[5.5rem]">
                   Build a{' '}
-                  <span className="text-blue-600">48-hour delivery promise</span> on a system your
-                  clients never see.
+                  <span className="text-blue-600">48-hour delivery</span> promise.
                 </h1>
 
-                <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600 md:text-xl">
+                <p className="mt-8 max-w-2xl text-lg font-normal leading-relaxed text-slate-500 md:text-xl">
                   RelayOps gives agencies a white-label production floor for CRM cleanup, QA, and
-                  delivery handoff. You keep the relationship and the commercial upside. We keep the
-                  work scoped, reviewed, and moving.
+                  delivery handoff. You keep the relationship. We keep the work moving.
                 </p>
 
-                <div className="mt-8 flex flex-col gap-4 sm:flex-row">
+                <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row">
                   <Button
                     asChild
                     size="lg"
-                    className="rounded-full border border-blue-600/30 bg-blue-600 px-7 text-white shadow-[0_22px_44px_-22px_rgba(59,130,246,0.55)] transition-all duration-300 hover:-translate-y-1 hover:bg-blue-700 hover:shadow-[0_28px_52px_-20px_rgba(37,99,235,0.62)]"
+                    className="h-12 w-full rounded-full bg-blue-600 px-8 text-[15px] font-medium text-white shadow-[0_8px_16px_rgb(59,130,246,0.2)] transition-all hover:-translate-y-0.5 hover:bg-blue-700 sm:w-auto"
                   >
                     <Link href="/request-access">
                       Request Access
-                      <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                      <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
                   </Button>
                   <Button
                     asChild
-                    size="lg"
                     variant="outline"
-                    className="rounded-full border-slate-300 bg-white px-7 text-slate-900 shadow-[0_18px_42px_-28px_rgba(15,23,42,0.18)] transition-all duration-300 hover:-translate-y-1 hover:border-slate-400 hover:bg-slate-50"
+                    className="h-11 w-full rounded-full border-slate-200/80 bg-white px-6 text-[15px] font-medium text-slate-600 shadow-[0_2px_8px_rgb(0,0,0,0.04)] transition-all hover:bg-slate-50 sm:w-auto"
                   >
                     <Link href="/how-it-works">
-                      See the workflow
-                      <ArrowRight className="h-4 w-4 opacity-70" aria-hidden="true" />
+                      Explore the workflow
                     </Link>
                   </Button>
                 </div>
 
-                <div className="mt-8 flex flex-wrap gap-3 text-sm text-slate-600">
+                <div className="mt-12 flex flex-wrap gap-x-6 gap-y-3 text-sm text-slate-400">
                   {trustSignals.map((item) => (
-                    <div
-                      key={item}
-                      className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 shadow-[0_14px_30px_-24px_rgba(15,23,42,0.16)]"
-                    >
-                      <CheckCircle className="h-4 w-4 text-teal-600" />
-                      <span>{item}</span>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="mt-10 grid gap-4 sm:grid-cols-3">
-                  {proofChecks.map((item) => (
-                    <div
-                      key={item}
-                      className="rounded-[1.6rem] border border-slate-200 bg-white px-5 py-5 text-sm leading-6 text-slate-600 shadow-[0_20px_40px_-30px_rgba(15,23,42,0.14)]"
-                    >
-                      {item}
+                    <div key={item} className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-slate-300" />
+                      <span className="font-medium">{item}</span>
                     </div>
                   ))}
                 </div>
               </FadeIn>
 
-              <SlideUp transition={{ delay: 0.15 }}>
-                <div className="relative overflow-hidden rounded-[2rem] border border-[#0B1220] bg-[#0B1220] p-8 text-white shadow-[0_36px_90px_-52px_rgba(11,18,32,0.82)]">
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.16),transparent_42%),radial-gradient(circle_at_85%_15%,rgba(20,184,166,0.14),transparent_26%)]" />
-                  <div className="relative space-y-6">
-                    <div className="flex items-start justify-between gap-4">
+              <SlideUp transition={{ delay: 0.15 }} className="relative z-10">
+                <div className="relative rounded-[24px] border border-slate-200/50 bg-white p-2 shadow-[0_24px_80px_-12px_rgb(0,0,0,0.08)]">
+                  <div className="rounded-[20px] bg-slate-50 p-6 md:p-8">
+                    <div className="flex items-start justify-between gap-4 mb-8">
                       <div>
-                        <p className="font-mono text-xs font-semibold uppercase tracking-[0.28em] text-blue-200">
+                        <p className="font-mono text-[10px] font-medium uppercase tracking-widest text-slate-400">
                           Live delivery board
                         </p>
-                        <p className="mt-3 max-w-md text-sm leading-6 text-slate-300">
-                          The commercial promise your account team sells is the operating system we
-                          optimize for.
+                        <p className="mt-2 text-sm font-medium text-slate-900">
+                          Real-time SLA tracking
                         </p>
                       </div>
-                      <div className="rounded-full border border-teal-400/20 bg-teal-400/10 px-3 py-1 text-xs font-semibold text-teal-200">
-                        2-day SLA path
+                      <div className="rounded-full bg-blue-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-blue-700">
+                        Active
                       </div>
                     </div>
 
@@ -241,12 +216,12 @@ export default function LandingPage() {
                       {deliveryBoardStats.map((item) => (
                         <div
                           key={item.label}
-                          className="rounded-[1.5rem] border border-white/10 bg-white/5 p-5"
+                          className="rounded-2xl border border-slate-200/60 bg-white p-5 shadow-sm"
                         >
-                          <p className="font-mono text-[11px] uppercase tracking-[0.24em] text-slate-500">
+                          <p className="font-mono text-[10px] uppercase tracking-widest text-slate-400">
                             {item.label}
                           </p>
-                          <p className="mt-3 font-display text-4xl font-bold tracking-[-0.05em] text-white">
+                          <p className="mt-3 font-display text-4xl font-bold tracking-tight text-slate-900">
                             <Counter
                               end={item.value}
                               prefix={item.prefix}
@@ -254,33 +229,31 @@ export default function LandingPage() {
                               decimals={item.decimals}
                             />
                           </p>
-                          <p className="mt-2 text-sm leading-6 text-slate-400">{item.detail}</p>
+                          <p className="mt-2 text-xs font-medium text-slate-500">{item.detail}</p>
                         </div>
                       ))}
                     </div>
 
-                    <div className="rounded-[1.75rem] border border-white/10 bg-white/5 p-5">
-                      <p className="font-mono text-[11px] uppercase tracking-[0.24em] text-slate-500">
+                    <div className="mt-4 rounded-2xl border border-slate-200/60 bg-white p-5 shadow-sm">
+                      <p className="font-mono text-[10px] uppercase tracking-widest text-slate-400 mb-4">
                         Delivery sequence
                       </p>
-                      <div className="mt-4 space-y-3">
+                      <div className="space-y-3">
                         {deliveryBoardRows.map((row) => (
                           <div
                             key={row.stage}
-                            className="grid gap-3 rounded-[1.25rem] border border-white/10 bg-[#101a2d] px-4 py-4 md:grid-cols-[0.72fr_1.08fr_auto]"
+                            className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50/50 p-3"
                           >
-                            <div>
-                              <p className="font-display text-lg font-semibold tracking-[-0.03em] text-white">
-                                {row.stage}
-                              </p>
-                              <p className="font-mono mt-1 text-[11px] uppercase tracking-[0.22em] text-slate-500">
-                                {row.owner}
-                              </p>
+                            <div className="flex items-center gap-3">
+                              <div className="h-2 w-2 rounded-full bg-blue-500" />
+                              <div>
+                                <p className="text-sm font-semibold text-slate-900">{row.stage}</p>
+                                <p className="text-[11px] font-medium text-slate-500">{row.note}</p>
+                              </div>
                             </div>
-                            <p className="text-sm leading-6 text-slate-300">{row.note}</p>
-                            <div className="inline-flex h-fit items-center rounded-full bg-blue-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-blue-200">
+                            <span className="font-mono text-[10px] uppercase tracking-widest text-slate-400">
                               {row.status}
-                            </div>
+                            </span>
                           </div>
                         ))}
                       </div>
@@ -298,44 +271,39 @@ export default function LandingPage() {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(buildOrganizationJsonLd()) }}
         />
 
-        <section className="bg-white py-20 md:py-28">
-          <div className="container">
-            <FadeIn className="max-w-2xl">
-              <p className="font-mono text-xs font-semibold uppercase tracking-[0.28em] text-blue-700">
-                Customer value
-              </p>
-              <h2 className="font-display mt-5 text-4xl font-bold tracking-[-0.06em] text-slate-950 text-balance md:text-5xl">
+        {/* VALUE PROPS SECTION - Asymmetric Grid */}
+        <section className="bg-white py-32 border-y border-slate-100">
+          <div className="container max-w-7xl">
+            <FadeIn className="max-w-2xl mb-20">
+              <h2 className="font-display text-4xl font-bold tracking-tight text-slate-900 md:text-5xl">
                 Built for agencies selling certainty, not cleanup hours.
               </h2>
-              <p className="mt-5 max-w-xl text-lg leading-8 text-slate-600">
-                RelayOps should feel like an operating partner with commercial discipline, not a
-                generic back-office vendor. Each module on the homepage reinforces that promise.
+              <p className="mt-6 text-lg font-normal leading-relaxed text-slate-500">
+                RelayOps feels like an operating partner with commercial discipline, not a
+                generic back-office vendor.
               </p>
             </FadeIn>
 
-            <StaggerList className="mt-14 grid gap-5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <StaggerList className="grid gap-6 md:grid-cols-3">
               {valueProps.map((item, index) => {
                 const Icon = item.icon
                 return (
                   <StaggerItem
                     key={item.title}
                     className={cn(
-                      'rounded-[1.9rem] border border-slate-200 bg-white p-6 shadow-[0_18px_50px_-34px_rgba(15,23,42,0.18)] transition-all duration-300 ease-out hover:-translate-y-1 hover:border-blue-200 hover:shadow-[0_24px_60px_-30px_rgba(59,130,246,0.16)]',
-                      item.highlight && 'lg:col-span-2 xl:col-span-1'
+                      'group rounded-[24px] bg-[#FAFAFA] p-8 transition-colors hover:bg-slate-50',
+                      item.highlight ? 'md:col-span-2' : 'md:col-span-1'
                     )}
                   >
-                    <div className="flex items-center justify-between gap-4">
-                      <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500">
-                        Signal {index + 1}
-                      </span>
-                      <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] border border-slate-200 bg-slate-50 text-blue-600">
-                        <Icon className="h-5 w-5" />
-                      </div>
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white shadow-[0_2px_8px_rgb(0,0,0,0.04)] text-blue-600">
+                      <Icon className="h-5 w-5" />
                     </div>
-                    <h3 className="font-display mt-6 text-2xl font-semibold tracking-[-0.04em] text-slate-950">
+                    <h3 className="font-display mt-8 text-2xl font-bold tracking-tight text-slate-900">
                       {item.title}
                     </h3>
-                    <p className="mt-4 text-base leading-7 text-slate-600">{item.description}</p>
+                    <p className="mt-4 text-base font-normal leading-relaxed text-slate-500">
+                      {item.description}
+                    </p>
                   </StaggerItem>
                 )
               })}
@@ -343,58 +311,56 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section className="relative overflow-hidden bg-[#E8EEF7] py-20 md:py-28">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.12),transparent_32%)]" />
-          <div className="container relative">
-            <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
+        {/* WORKFLOW SECTION - Tight / Asymmetric */}
+        <section className="py-32">
+          <div className="container max-w-7xl">
+            <div className="grid gap-16 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
               <FadeIn>
-                <p className="font-mono text-xs font-semibold uppercase tracking-[0.28em] text-blue-700">
-                  Workflow
-                </p>
-                <h2 className="font-display mt-5 text-4xl font-bold tracking-[-0.06em] text-slate-950 text-balance md:text-5xl">
-                  Partner to delivery, with a clean handoff at every stage.
-                </h2>
-                <p className="mt-5 max-w-xl text-lg leading-8 text-slate-600">
-                  The workflow has to read in one scan. Buyers should understand where ambiguity gets
-                  removed and where quality gets enforced.
-                </p>
-
-                <div className="mt-8 rounded-[1.85rem] border border-slate-200 bg-[#0B1220] px-6 py-6 text-white shadow-[0_28px_70px_-44px_rgba(11,18,32,0.7)]">
-                  <p className="font-mono text-[11px] uppercase tracking-[0.24em] text-teal-200">
-                    Commercial effect
+                <div className="sticky top-32">
+                  <p className="font-mono text-[10px] font-medium uppercase tracking-widest text-blue-600">
+                    Clean Handoff
                   </p>
-                  <p className="mt-4 text-base leading-7 text-slate-300">
-                    Scope lock protects margin. Worker QA protects delivery quality. White-label
-                    handoff protects the agency relationship.
+                  <h2 className="font-display mt-4 text-4xl font-bold tracking-tight text-slate-900 md:text-5xl">
+                    Partner to delivery.
+                  </h2>
+                  <p className="mt-6 text-lg font-normal leading-relaxed text-slate-500">
+                    Buyers should understand exactly where ambiguity gets
+                    removed and where quality gets enforced.
                   </p>
+                  
+                  <div className="mt-10 max-w-sm rounded-[20px] bg-slate-900 p-8 text-white shadow-[0_20px_40px_-10px_rgb(0,0,0,0.1)]">
+                    <p className="font-mono text-[10px] font-medium uppercase tracking-widest text-slate-400">
+                      Commercial effect
+                    </p>
+                    <p className="mt-4 text-[15px] font-normal leading-relaxed text-slate-300">
+                      Scope lock protects margin. Worker QA protects delivery quality. White-label
+                      handoff protects the agency relationship.
+                    </p>
+                  </div>
                 </div>
               </FadeIn>
 
-              <StaggerList className="grid gap-5 md:grid-cols-2">
+              <StaggerList className="flex flex-col gap-4">
                 {workflowSteps.map((item) => {
-                  const Icon = item.icon
                   return (
                     <StaggerItem
                       key={item.title}
                       className={cn(
-                        "relative rounded-[1.9rem] border border-slate-200 bg-white p-6 shadow-[0_18px_50px_-34px_rgba(15,23,42,0.16)] transition-all duration-300 ease-out hover:-translate-y-1 hover:border-blue-200 hover:shadow-[0_24px_60px_-30px_rgba(59,130,246,0.16)]",
-                        item.highlight && "md:col-span-2 lg:col-span-1 xl:col-span-1"
+                        "flex flex-col sm:flex-row sm:items-start gap-6 rounded-[24px] border border-slate-200/50 bg-white p-8 transition-shadow hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)]",
+                        item.highlight ? "ring-1 ring-blue-500/20 shadow-sm" : ""
                       )}
                     >
-                      <div className="flex items-start justify-between gap-4">
-                        <div>
-                          <span className="font-mono text-sm font-semibold uppercase tracking-[0.22em] text-blue-700">
-                            {item.step}
-                          </span>
-                          <h3 className="font-display mt-4 text-2xl font-semibold tracking-[-0.04em] text-slate-950">
-                            {item.title}
-                          </h3>
-                        </div>
-                        <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] bg-blue-50 text-blue-600 ring-1 ring-blue-100">
-                          <Icon className="h-5 w-5" />
-                        </div>
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-slate-50 text-slate-900">
+                        <span className="font-mono text-[11px] font-bold">{item.step}</span>
                       </div>
-                      <p className="mt-4 text-base leading-7 text-slate-600">{item.description}</p>
+                      <div>
+                        <h3 className="font-display text-xl font-bold tracking-tight text-slate-900">
+                          {item.title}
+                        </h3>
+                        <p className="mt-3 text-[15px] font-normal leading-relaxed text-slate-500">
+                          {item.description}
+                        </p>
+                      </div>
                     </StaggerItem>
                   )
                 })}
@@ -403,105 +369,92 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section className="bg-white py-20 md:py-28">
-          <div className="container">
-            <div className="grid gap-10 lg:grid-cols-[0.88fr_1.12fr]">
-              <FadeIn>
-                <p className="font-mono text-xs font-semibold uppercase tracking-[0.28em] text-blue-700">
-                  Social proof
-                </p>
-                <h2 className="font-display mt-5 text-4xl font-bold tracking-[-0.06em] text-slate-950 text-balance md:text-5xl">
-                  Proof that feels commercial, not aspirational.
-                </h2>
-                <p className="mt-5 max-w-xl text-lg leading-8 text-slate-600">
-                  Buyers need to believe RelayOps makes delivery safer than keeping cleanup work
-                  in-house. The proof stack answers that in metrics and in voice.
-                </p>
+        {/* SOCIAL PROOF SECTION */}
+        <section className="bg-white py-32 border-t border-slate-100">
+          <div className="container max-w-7xl text-center">
+            <FadeIn className="mx-auto max-w-3xl">
+              <h2 className="font-display text-4xl font-bold tracking-tight text-slate-900 md:text-5xl">
+                Proof that feels commercial.
+              </h2>
+              <p className="mt-6 text-lg font-normal leading-relaxed text-slate-500">
+                Buyers need to believe RelayOps makes delivery safer than keeping cleanup work
+                in-house. 
+              </p>
+            </FadeIn>
 
-                <div className="mt-10 grid gap-4 sm:grid-cols-3">
-                  {proofMetrics.map((item) => (
-                    <div
-                      key={item.label}
-                      className="rounded-[1.6rem] border border-slate-200 bg-[#f8fafc] px-5 py-5 shadow-[0_18px_45px_-32px_rgba(15,23,42,0.14)]"
-                    >
-                      <p className="font-display text-4xl font-bold tracking-[-0.06em] text-slate-950">
-                        <Counter
-                          end={item.value}
-                          suffix={item.suffix}
-                        />
-                      </p>
-                      <p className="mt-2 text-sm text-slate-500">{item.label}</p>
-                    </div>
-                  ))}
+            <div className="mt-20 grid gap-8 md:grid-cols-3">
+              <FadeIn>
+                <div className="flex flex-col items-center justify-center space-y-4">
+                  <p className="font-display text-6xl font-bold tracking-tighter text-slate-900">
+                    <Counter end={1240} suffix="+" />
+                  </p>
+                  <p className="font-mono text-[11px] font-medium uppercase tracking-widest text-slate-400">Tickets Processed</p>
                 </div>
               </FadeIn>
+              <FadeIn transition={{ delay: 0.1 }}>
+                <div className="flex flex-col items-center justify-center space-y-4">
+                  <p className="font-display text-6xl font-bold tracking-tighter text-blue-600">
+                    <Counter end={46} suffix="h" />
+                  </p>
+                  <p className="font-mono text-[11px] font-medium uppercase tracking-widest text-slate-400">Average Delivery</p>
+                </div>
+              </FadeIn>
+              <FadeIn transition={{ delay: 0.2 }}>
+                <div className="flex flex-col items-center justify-center space-y-4">
+                  <p className="font-display text-6xl font-bold tracking-tighter text-slate-900">
+                    <Counter end={98} suffix="%" />
+                  </p>
+                  <p className="font-mono text-[11px] font-medium uppercase tracking-widest text-slate-400">Partner Satisfaction</p>
+                </div>
+              </FadeIn>
+            </div>
 
-              <SlideUp transition={{ delay: 0.15 }}>
-                <div className="rounded-[2rem] border border-[#0B1220] bg-[#0B1220] p-8 text-white shadow-[0_30px_80px_-48px_rgba(11,18,32,0.88)]">
-                  <div className="flex items-center justify-between gap-4">
-                    <div>
-                      <p className="font-mono text-xs font-semibold uppercase tracking-[0.28em] text-blue-200">
-                        What partners say
-                      </p>
-                      <p className="mt-2 text-sm text-slate-400">
-                        Placeholder proof block ready for real testimonials.
-                      </p>
-                    </div>
-                    <div className="rounded-full border border-blue-400/20 bg-blue-400/10 px-3 py-1 text-xs font-semibold text-blue-100">
-                      Testimonial slot
-                    </div>
-                  </div>
-
-                  <blockquote className="font-display mt-8 text-2xl font-semibold leading-10 tracking-[-0.03em] text-white">
-                    “RelayOps lets us promise fast CRM delivery without pulling senior operators into
-                    another week of spreadsheet cleanup.”
-                  </blockquote>
-
-                  <div className="mt-8 rounded-[1.5rem] border border-white/10 bg-white/5 px-5 py-5 text-sm leading-6 text-slate-300">
-                    Placeholder testimonial for launch. Swap in named partner proof when approved, but
-                    the module structure, hierarchy, and metrics block are ready now.
+            <SlideUp transition={{ delay: 0.3 }} className="mx-auto mt-24 max-w-4xl">
+              <div className="rounded-[32px] bg-[#FAFAFA] p-10 md:p-16 text-left">
+                <blockquote className="font-display text-3xl font-bold leading-tight tracking-tight text-slate-900 md:text-4xl">
+                  “RelayOps lets us promise fast CRM delivery without pulling senior operators into
+                  another week of spreadsheet cleanup.”
+                </blockquote>
+                <div className="mt-10 flex items-center gap-4">
+                  <div className="h-12 w-12 rounded-full bg-slate-200" />
+                  <div>
+                    <p className="text-[15px] font-semibold text-slate-900">Partner Name</p>
+                    <p className="text-[13px] text-slate-500">RevOps Agency Director</p>
                   </div>
                 </div>
-              </SlideUp>
-            </div>
+              </div>
+            </SlideUp>
           </div>
         </section>
 
-        <section className="bg-[#0B1220] py-20 text-white md:py-28">
-          <div className="container">
-            <FadeIn className="rounded-[2.25rem] border border-white/10 bg-[linear-gradient(135deg,rgba(59,130,246,0.16),rgba(20,184,166,0.08))] px-8 py-10 shadow-[0_30px_80px_-48px_rgba(11,18,32,0.72)] md:px-12 md:py-14">
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-2">
-                <Users className="h-3.5 w-3.5 text-teal-300" />
-                <span className="font-mono text-xs font-semibold uppercase tracking-[0.24em] text-blue-100">
-                  Request access in under 2 minutes
-                </span>
-              </div>
-              <h2 className="font-display mt-6 max-w-4xl text-4xl font-bold tracking-[-0.06em] text-balance md:text-5xl">
-                Give your agency a delivery engine that sells certainty instead of cleanup hours.
+        {/* CTA SECTION */}
+        <section className="py-32">
+          <div className="container max-w-5xl">
+            <FadeIn className="rounded-[32px] bg-slate-900 p-12 text-center text-white shadow-[0_32px_64px_-16px_rgb(0,0,0,0.2)] md:p-20">
+              <h2 className="font-display text-4xl font-bold tracking-tight md:text-5xl">
+                Sell certainty, not hours.
               </h2>
-              <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-300">
+              <p className="mx-auto mt-6 max-w-2xl text-[17px] font-normal leading-relaxed text-slate-400">
                 The next step should be obvious: open the application, confirm fit, and start quoting
                 work with more confidence.
               </p>
-              <div className="mt-8 flex flex-col gap-4 sm:flex-row">
+              <div className="mt-10 flex flex-col justify-center gap-4 sm:flex-row">
                 <Button
                   asChild
                   size="lg"
-                  className="rounded-full border border-blue-500/30 bg-blue-600 px-7 text-white shadow-[0_18px_38px_-20px_rgba(59,130,246,0.52)] transition-all duration-300 hover:-translate-y-1 hover:bg-blue-700"
+                  className="h-14 rounded-full bg-blue-600 px-8 text-[15px] font-medium text-white shadow-[0_8px_16px_rgb(59,130,246,0.2)] hover:bg-blue-700 hover:-translate-y-0.5 transition-transform"
                 >
                   <Link href="/request-access">
                     Request Access
-                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                    <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
                 <Button
                   asChild
-                  size="lg"
                   variant="outline"
-                  className="rounded-full border-white/20 bg-transparent px-7 text-white transition-all duration-300 hover:-translate-y-1 hover:border-white/35 hover:bg-white/10"
+                  className="h-14 rounded-full border-slate-700 bg-slate-800 px-8 text-[15px] font-medium text-white hover:bg-slate-700 hover:-translate-y-0.5 transition-transform"
                 >
                   <Link href="/pilot-sample">
-                    <Lock className="mr-2 h-4 w-4" aria-hidden="true" />
                     Preview a pilot deliverable
                   </Link>
                 </Button>

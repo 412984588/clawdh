@@ -36,7 +36,7 @@ describe('PricingPage', () => {
 
     expect(screen.getByRole('heading', { name: /frequently asked questions/i })).toBeInTheDocument()
     expect(
-      screen.getByRole('heading', { name: /how relayops stacks up against the alternatives/i }),
+      screen.getByRole('heading', { name: /how relayops stacks up/i }),
     ).toBeInTheDocument()
     expect(screen.getByRole('table')).toBeInTheDocument()
     expect(screen.getAllByText(/self-built team/i).length).toBeGreaterThan(0)

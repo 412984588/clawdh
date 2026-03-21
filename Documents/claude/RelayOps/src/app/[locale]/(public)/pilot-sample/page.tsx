@@ -34,50 +34,49 @@ const PILOT_LIMITATIONS = [
 export default function PilotSamplePage() {
   return (
     <MotionProvider>
-      <div className="flex flex-col bg-[#f8fafc]">
-        <section className="relative overflow-hidden bg-[#0B1220] py-20 text-white md:py-28">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.24),transparent_28%),radial-gradient(circle_at_82%_18%,rgba(20,184,166,0.14),transparent_24%)]" />
-          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:120px_120px] opacity-20" />
-          <div className="container relative">
-            <div className="grid items-center gap-12 lg:grid-cols-[1.08fr_0.92fr]">
+      <div className="flex flex-col bg-[#FAFAFA] font-sans text-slate-900">
+        <section className="relative overflow-hidden bg-slate-900 pt-28 pb-20 md:pt-40 md:pb-32 text-white">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(59,130,246,0.12)_0%,transparent_70%)] pointer-events-none" />
+          <div className="container relative max-w-7xl">
+            <div className="grid items-center gap-16 lg:grid-cols-[1.1fr_0.9fr]">
               <FadeIn>
-                <Badge className="rounded-full border border-blue-500/20 bg-white/10 px-4 py-2 font-mono text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-200 hover:bg-white/10">
+                <Badge className="rounded-full border border-blue-500/30 bg-blue-500/10 px-4 py-2 font-mono text-[10px] font-medium uppercase tracking-widest text-blue-200">
                   Paid Pilot
                 </Badge>
-                <h1 className="font-display mt-8 text-5xl font-bold tracking-[-0.08em] text-balance text-white md:text-7xl lg:leading-[0.94]">
-                  Get a Taste Before Committing
+                <h1 className="font-display mt-8 text-[3.5rem] font-bold tracking-tighter text-balance md:text-7xl lg:leading-[1.05]">
+                  Get a Taste Before Committing.
                 </h1>
-                <p className="mt-6 max-w-2xl text-lg leading-8 text-zinc-300 md:text-xl">
+                <p className="mt-8 max-w-2xl text-lg font-normal leading-relaxed text-slate-400 md:text-xl">
                   $149 flat fee. Submit a real dataset (up to 500 rows), see how we clean it,
                   evaluate the output format — before you commit to production jobs.
                 </p>
               </FadeIn>
 
               <SlideUp transition={{ delay: 0.15 }}>
-                <div className="rounded-[2rem] border border-white/10 bg-white/10 p-8 shadow-[0_40px_90px_-45px_rgba(59,130,246,0.35)] backdrop-blur-xl">
-                  <div className="rounded-[1.75rem] border border-blue-500/20 bg-gradient-to-br from-blue-600/16 via-[#101827] to-[#0B1220] p-6 shadow-[0_24px_60px_-36px_rgba(59,130,246,0.45)]">
-                    <p className="font-mono text-xs font-semibold uppercase tracking-[0.28em] text-blue-300">
+                <div className="rounded-[32px] border border-slate-800 bg-slate-800/50 p-10 shadow-[0_24px_80px_-12px_rgb(0,0,0,0.5)] backdrop-blur-xl">
+                  <div className="rounded-[24px] border border-blue-500/20 bg-blue-500/5 p-8">
+                    <p className="font-mono text-[10px] font-medium uppercase tracking-widest text-blue-300">
                       Pilot Fee
                     </p>
-                    <div className="mt-3 flex items-end gap-3">
-                      <span className="font-display text-6xl font-bold tracking-[-0.08em] text-white">$149</span>
-                      <span className="pb-2 text-sm uppercase tracking-[0.24em] text-zinc-400">
+                    <div className="mt-4 flex items-end gap-3">
+                      <span className="font-display text-[4rem] leading-none font-bold tracking-tighter text-white">$149</span>
+                      <span className="mb-2 text-[11px] font-bold uppercase tracking-widest text-slate-500">
                         flat fee
                       </span>
                     </div>
-                    <div className="mt-5 grid gap-3 sm:grid-cols-3">
+                    <div className="mt-8 grid gap-4 sm:grid-cols-3">
                       {['2 business days', '1 dataset', '500 rows'].map((item) => (
                         <div
                           key={item}
-                          className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-zinc-200"
+                          className="rounded-[16px] border border-slate-700 bg-slate-800/50 px-5 py-4 text-[13px] font-medium text-slate-300"
                         >
                           {item}
                         </div>
                       ))}
                     </div>
                   </div>
-                  <div className="mt-5 rounded-[1.75rem] border border-white/10 bg-[#0B1220]/55 p-6 text-center">
-                    <p className="text-sm leading-7 text-zinc-300">
+                  <div className="mt-6 rounded-[24px] border border-slate-800 bg-slate-900/80 p-6 text-center">
+                    <p className="text-[14px] leading-relaxed text-slate-400">
                       See our output format before committing to production work.
                     </p>
                   </div>
@@ -87,23 +86,23 @@ export default function PilotSamplePage() {
           </div>
         </section>
 
-        <section className="bg-white py-20 md:py-28">
-          <div className="container">
-            <div className="grid gap-6 lg:grid-cols-2">
+        <section className="bg-white py-24 md:py-32">
+          <div className="container max-w-6xl">
+            <div className="grid gap-8 lg:grid-cols-2">
               <FadeIn>
-                <div className="h-full rounded-[2rem] border border-zinc-200 border-t-4 border-t-teal-500 bg-white p-8 shadow-[0_18px_50px_-34px_rgba(15,23,42,0.18)] transition-all duration-300 hover:-translate-y-1 hover:border-teal-200 hover:shadow-[0_30px_70px_-36px_rgba(20,184,166,0.18)]">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-teal-50">
-                      <CheckCircle2 className="h-5 w-5 text-teal-600" />
+                <div className="h-full rounded-[32px] border border-slate-200/60 bg-white p-10 shadow-[0_4px_20px_rgb(0,0,0,0.02)] transition-shadow hover:shadow-[0_12px_40px_rgb(0,0,0,0.06)]">
+                  <div className="flex items-center gap-4">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-50 text-slate-900 border border-slate-100">
+                      <CheckCircle2 className="h-5 w-5 text-blue-600" />
                     </div>
-                    <h2 className="font-display text-2xl font-bold tracking-[-0.04em] text-zinc-950">
+                    <h2 className="font-display text-2xl font-bold tracking-tight text-slate-900">
                       What&apos;s included
                     </h2>
                   </div>
-                  <ul className="mt-6 space-y-4">
+                  <ul className="mt-8 space-y-5">
                     {PILOT_INCLUDES.map((item) => (
-                      <li key={item} className="flex items-start gap-3 text-base leading-7 text-zinc-600">
-                        <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-teal-500" />
+                      <li key={item} className="flex items-start gap-4 text-[15px] leading-relaxed text-slate-600">
+                        <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-500" />
                         <span>{item}</span>
                       </li>
                     ))}
@@ -112,17 +111,17 @@ export default function PilotSamplePage() {
               </FadeIn>
 
               <FadeIn transition={{ delay: 0.1 }}>
-                <div className="h-full rounded-[2rem] border border-zinc-200 border-t-4 border-t-blue-500 bg-[#0B1220] p-8 text-white shadow-[0_18px_50px_-34px_rgba(15,23,42,0.4)] transition-all duration-300 hover:-translate-y-1 hover:border-blue-400 hover:shadow-[0_30px_70px_-36px_rgba(59,130,246,0.25)]">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-500/10">
-                      <AlertCircle className="h-5 w-5 text-blue-300" />
+                <div className="h-full rounded-[32px] border border-slate-200/60 bg-slate-50 p-10 shadow-[0_4px_20px_rgb(0,0,0,0.02)] transition-shadow hover:shadow-[0_12px_40px_rgb(0,0,0,0.06)]">
+                  <div className="flex items-center gap-4">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white text-slate-900 border border-slate-200/60 shadow-sm">
+                      <AlertCircle className="h-5 w-5 text-slate-600" />
                     </div>
-                    <h2 className="font-display text-2xl font-bold tracking-[-0.04em]">Pilot limitations</h2>
+                    <h2 className="font-display text-2xl font-bold tracking-tight text-slate-900">Pilot limitations</h2>
                   </div>
-                  <ul className="mt-6 space-y-4">
+                  <ul className="mt-8 space-y-5">
                     {PILOT_LIMITATIONS.map((item) => (
-                      <li key={item} className="flex items-start gap-3 text-base leading-7 text-zinc-300">
-                        <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-blue-400" />
+                      <li key={item} className="flex items-start gap-4 text-[15px] leading-relaxed text-slate-600">
+                        <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-400" />
                         <span>{item}</span>
                       </li>
                     ))}
@@ -132,14 +131,16 @@ export default function PilotSamplePage() {
             </div>
 
             <FadeIn transition={{ delay: 0.2 }}>
-              <div className="mt-8 rounded-[2rem] border border-blue-200 bg-[#E8EEF7] px-6 py-6 shadow-[0_18px_50px_-36px_rgba(59,130,246,0.14)] transition-all duration-700 ease-out">
-                <div className="flex gap-4">
-                  <Info className="mt-1 h-5 w-5 shrink-0 text-blue-700" />
+              <div className="mt-12 rounded-[32px] border border-blue-100 bg-blue-50 p-10">
+                <div className="flex gap-5 flex-col md:flex-row md:items-start">
+                  <div className="flex h-12 w-12 items-center justify-center shrink-0 rounded-xl bg-white shadow-sm border border-blue-100">
+                    <Info className="h-5 w-5 text-blue-600" />
+                  </div>
                   <div>
-                    <p className="text-sm font-semibold text-zinc-950">
+                    <p className="text-[17px] font-bold tracking-tight text-slate-900">
                       What does &quot;watermarked output&quot; mean?
                     </p>
-                    <p className="mt-2 text-sm leading-7 text-zinc-600">
+                    <p className="mt-3 text-[15px] font-normal leading-relaxed text-slate-600">
                       The pilot deliverable has a &quot;RelayOps Preview — Not for Client Delivery&quot;
                       column added. This lets you evaluate the quality and format of the work without
                       us doing unbilled production output. Once you become a full partner, all
@@ -152,56 +153,57 @@ export default function PilotSamplePage() {
           </div>
         </section>
 
-        <section className="relative overflow-hidden bg-[#0B1220] py-20 text-white md:py-28">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.22),transparent_36%)]" />
-          <div className="container relative">
-            <div className="grid gap-6 lg:grid-cols-2">
+        <section className="py-24 md:py-32 border-y border-slate-100">
+          <div className="container max-w-6xl">
+            <div className="grid gap-8 lg:grid-cols-2">
               <FadeIn>
-                <div className="rounded-[2rem] border border-white/10 bg-white/5 p-8 shadow-[0_24px_60px_-40px_rgba(15,23,42,0.82)] transition-all duration-300 ease-out hover:-translate-y-1 hover:bg-white/10 hover:shadow-[0_28px_70px_-34px_rgba(59,130,246,0.3)]">
-                  <p className="font-mono text-xs font-semibold uppercase tracking-[0.28em] text-blue-300">
+                <div className="flex flex-col h-full rounded-[32px] border border-slate-200/60 bg-white p-10 shadow-[0_4px_20px_rgb(0,0,0,0.02)]">
+                  <p className="font-mono text-[10px] font-medium uppercase tracking-widest text-slate-400">
                     Already a partner?
                   </p>
-                  <h3 className="font-display mt-5 text-3xl font-bold tracking-[-0.05em] text-white">
+                  <h3 className="font-display mt-6 text-3xl font-bold tracking-tight text-slate-900">
                     Submit your pilot brief from your portal
                   </h3>
-                  <p className="mt-4 text-base leading-7 text-zinc-300">
+                  <p className="mt-4 text-[15px] font-normal leading-relaxed text-slate-500">
                     Log in to your partner portal, create a new ticket, and select the Pilot tier
                     when scoping. The flat $149 invoice will be generated automatically after admin
                     review.
                   </p>
-                  <Button
-                    asChild
-                    size="lg"
-                    className="mt-8 w-full rounded-full bg-blue-600 px-7 text-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:bg-blue-700 hover:shadow-md"
-                  >
-                    <Link href="/login">
-                      Sign in to your portal
-                      <ArrowRight className="h-4 w-4" />
-                    </Link>
-                  </Button>
+                  <div className="mt-12 pt-8 border-t border-slate-100 mt-auto">
+                    <Button
+                      asChild
+                      size="lg"
+                      className="w-full h-14 rounded-full bg-blue-600 text-[15px] font-medium text-white shadow-[0_8px_16px_rgb(59,130,246,0.2)] transition-transform hover:-translate-y-0.5 hover:bg-blue-700"
+                    >
+                      <Link href="/login">
+                        Sign in to your portal
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </Link>
+                    </Button>
+                  </div>
                 </div>
               </FadeIn>
 
               <FadeIn transition={{ delay: 0.1 }}>
-                <div className="rounded-[2rem] border border-white/10 bg-white p-8 text-zinc-950 shadow-[0_24px_60px_-40px_rgba(15,23,42,0.35)] transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-[0_28px_70px_-34px_rgba(59,130,246,0.24)]">
-                  <p className="font-mono text-xs font-semibold uppercase tracking-[0.28em] text-blue-700">
+                <div className="flex flex-col h-full rounded-[32px] border border-slate-200/60 bg-slate-50 p-10 shadow-[0_4px_20px_rgb(0,0,0,0.02)]">
+                  <p className="font-mono text-[10px] font-medium uppercase tracking-widest text-blue-600">
                     Not a partner yet?
                   </p>
-                  <h3 className="font-display mt-5 text-3xl font-bold tracking-[-0.05em]">
+                  <h3 className="font-display mt-6 text-3xl font-bold tracking-tight text-slate-900">
                     Express interest in a pilot
                   </h3>
-                  <p className="mt-4 text-base leading-7 text-zinc-600">
+                  <p className="mt-4 text-[15px] font-normal leading-relaxed text-slate-600">
                     Leave your email and we&apos;ll reach out once you&apos;re approved. The fastest path
                     is to apply for partner access — it takes 2 minutes and we review within 2
                     business days.
                   </p>
-                  <div className="mt-6">
+                  <div className="mt-10">
                     <PilotInterestForm />
                   </div>
-                  <div className="mt-6 border-t border-zinc-100 pt-4">
-                    <p className="text-sm text-zinc-500">
+                  <div className="mt-10 pt-6 border-t border-slate-200/60 mt-auto">
+                    <p className="text-[13px] text-slate-500">
                       Or{' '}
-                      <Link href="/request-access" className="font-semibold text-blue-700 hover:text-blue-800 underline decoration-blue-200 underline-offset-4">
+                      <Link href="/request-access" className="font-semibold text-blue-600 hover:text-blue-700 underline decoration-blue-200 underline-offset-4">
                         apply for full partner access
                       </Link>{' '}
                       to get started right away.
@@ -213,28 +215,28 @@ export default function PilotSamplePage() {
           </div>
         </section>
 
-        <section className="bg-white py-20 md:py-28">
-          <div className="container">
-            <FadeIn className="mx-auto max-w-2xl text-center">
-              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-700">
-                Pilot vs. Standard job
+        <section className="bg-white py-24 md:py-32">
+          <div className="container max-w-4xl">
+            <FadeIn className="text-center mb-16">
+              <p className="font-mono text-[10px] font-medium uppercase tracking-widest text-slate-400 mb-4">
+                Comparison
               </p>
-              <h2 className="font-display mt-5 text-4xl font-bold tracking-[-0.06em] text-balance text-zinc-950 md:text-5xl">
+              <h2 className="font-display text-4xl font-bold tracking-tight text-slate-900 md:text-5xl">
                 Pilot vs. Standard job
               </h2>
             </FadeIn>
-            <SlideUp className="mt-12 overflow-hidden rounded-[2rem] border border-zinc-200 shadow-[0_18px_50px_-34px_rgba(15,23,42,0.18)] transition-all duration-700 ease-out">
-              <table className="w-full border-collapse text-sm">
+            <SlideUp className="overflow-hidden rounded-[32px] border border-slate-200/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+              <table className="w-full border-collapse">
                 <thead>
-                  <tr className="bg-[#0B1220] text-white">
-                    <th className="px-6 py-5 text-left font-semibold tracking-[0.22em] text-zinc-400"></th>
-                    <th className="bg-[#E8EEF7] px-6 py-5 text-center font-semibold text-[#0B1220]">
+                  <tr className="bg-slate-50">
+                    <th className="px-8 py-6 text-left font-mono text-[10px] font-medium uppercase tracking-widest text-slate-400"></th>
+                    <th className="px-8 py-6 text-center font-mono text-[10px] font-bold uppercase tracking-widest text-slate-900 bg-white">
                       Pilot
                     </th>
-                    <th className="px-6 py-5 text-center font-semibold">Standard</th>
+                    <th className="px-8 py-6 text-center font-mono text-[10px] font-medium uppercase tracking-widest text-slate-400">Standard</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-zinc-100 bg-white">
+                <tbody className="divide-y divide-slate-100 bg-white">
                   {[
                     ['Price', '$149 flat', 'From $399'],
                     ['Row limit', '500', '5,000'],
@@ -244,12 +246,12 @@ export default function PilotSamplePage() {
                     ['Client-deliverable', 'No', 'Yes'],
                     ['Per-org limit', '1', 'Unlimited'],
                   ].map(([feature, pilot, standard]) => (
-                    <tr key={feature} className="transition-colors hover:bg-zinc-50/60">
-                      <td className="px-6 py-4 font-medium text-zinc-600">{feature}</td>
-                      <td className="bg-[#E8EEF7]/40 px-6 py-4 text-center font-semibold text-zinc-950">
+                    <tr key={feature} className="transition-colors hover:bg-slate-50/50">
+                      <td className="px-8 py-5 text-[14px] font-medium text-slate-600">{feature}</td>
+                      <td className="px-8 py-5 text-center text-[15px] font-bold text-slate-900 bg-slate-50/30">
                         {pilot}
                       </td>
-                      <td className="px-6 py-4 text-center text-zinc-600">{standard}</td>
+                      <td className="px-8 py-5 text-center text-[14px] text-slate-500">{standard}</td>
                     </tr>
                   ))}
                 </tbody>

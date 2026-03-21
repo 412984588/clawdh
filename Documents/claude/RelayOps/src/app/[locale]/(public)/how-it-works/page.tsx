@@ -31,9 +31,9 @@ const STEPS = [
     description:
       "Fill out a structured ticket in your partner portal. Tell us what you have (file counts, row counts, source system), what's broken (duplicates, bad formatting, failed import errors), and what done looks like (target system, acceptance criteria).",
     deliverable: 'Scoping review starts within 4 business hours.',
-    accent: 'border-t-blue-500',
-    iconBg: 'bg-blue-500/10',
-    iconColor: 'text-blue-600',
+    accent: 'bg-white',
+    iconBg: 'bg-slate-50',
+    iconColor: 'text-slate-900',
   },
   {
     icon: Search,
@@ -43,9 +43,9 @@ const STEPS = [
     description:
       "A RelayOps admin reviews your brief, categorizes the work (cleanup, normalization, or diagnosis), and assigns a pricing tier. Standard jobs are quoted at a flat rate. Complex jobs are quoted individually. You'll see the scope and price before any work starts.",
     deliverable: 'You receive a fixed-price invoice via Stripe.',
-    accent: 'border-t-slate-400',
-    iconBg: 'bg-slate-400/10',
-    iconColor: 'text-slate-600',
+    accent: 'bg-white',
+    iconBg: 'bg-slate-50',
+    iconColor: 'text-slate-900',
   },
   {
     icon: CreditCard,
@@ -55,9 +55,9 @@ const STEPS = [
     description:
       'Pay the invoice through your partner portal. Once payment is confirmed, the job enters the queue. No payment, no start — this protects both parties and keeps the pipeline predictable.',
     deliverable: 'Job status moves to Queued.',
-    accent: 'border-t-blue-400',
-    iconBg: 'bg-blue-400/10',
-    iconColor: 'text-blue-500',
+    accent: 'bg-white',
+    iconBg: 'bg-slate-50',
+    iconColor: 'text-slate-900',
   },
   {
     icon: Wrench,
@@ -68,9 +68,9 @@ const STEPS = [
       'Your dataset is processed through our AI-assisted workflow, working strictly within the scoped acceptance criteria — no undocumented changes, no touching out-of-scope columns. Your data is never used to train AI models. All processing happens in our secure environment with encrypted file storage.',
     deliverable:
       'Completed deliverable uploaded with a delivery summary for review.',
-    accent: 'border-t-teal-500',
-    iconBg: 'bg-teal-500/10',
-    iconColor: 'text-teal-600',
+    accent: 'bg-blue-50/50',
+    iconBg: 'bg-blue-600',
+    iconColor: 'text-white',
     highlight: true,
   },
   {
@@ -81,9 +81,9 @@ const STEPS = [
     description:
       "Download the deliverable and check it against the acceptance criteria. If it meets the brief: approve and the job closes. If something's off: request one revision with specific notes. If there's a genuine shortfall: open a dispute for admin review.",
     deliverable: 'Approved deliverable ready to deliver to your client.',
-    accent: 'border-t-slate-500',
-    iconBg: 'bg-slate-500/10',
-    iconColor: 'text-slate-600',
+    accent: 'bg-white',
+    iconBg: 'bg-slate-50',
+    iconColor: 'text-slate-900',
   },
 ]
 
@@ -94,8 +94,8 @@ const DELIVERABLE_TYPES = [
     rows: 'Up to 500 rows',
     files: '1 file',
     turnaround: '2 business days',
-    revisions: 'None (preview output)',
-    notes: 'One per organization. Watermarked output — for evaluating our format before committing.',
+    revisions: 'None',
+    notes: 'One per organization. Watermarked output.',
   },
   {
     tier: 'Standard',
@@ -113,7 +113,7 @@ const DELIVERABLE_TYPES = [
     files: 'Up to 10 files',
     turnaround: '3–4 business days',
     revisions: '1 included',
-    notes: 'Multi-object migrations, complex deduplication logic, or multiple source systems. Advanced multi-system work (15,000+ rows) from $1,499.',
+    notes: 'Multi-object migrations or multiple sources.',
   },
   {
     tier: 'Custom',
@@ -122,7 +122,7 @@ const DELIVERABLE_TYPES = [
     files: 'Unlimited',
     turnaround: 'Agreed in scope',
     revisions: 'Agreed in scope',
-    notes: 'Ongoing engagements, bulk volume, or unusual complexity. Projects from $2,500; monthly retainers from $3,000.',
+    notes: 'Ongoing engagements or bulk volume.',
   },
 ]
 
@@ -152,73 +152,78 @@ const FAQS = [
 export default function HowItWorksPage() {
   return (
     <MotionProvider>
-      <div className="flex flex-col bg-[#f8fafc]">
-        <section className="relative overflow-hidden bg-[#0B1220] py-20 text-white md:py-28">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.24),transparent_28%),radial-gradient(circle_at_82%_20%,rgba(20,184,166,0.14),transparent_24%)]" />
-          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:120px_120px] opacity-20" />
-          <div className="container relative">
-            <div className="mx-auto max-w-4xl text-center">
-              <FadeIn>
-                <Badge className="rounded-full border border-blue-500/20 bg-white/10 px-4 py-2 font-mono text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-200 hover:bg-white/10">
-                  Process
-                </Badge>
-                <h1 className="font-display mt-8 text-5xl font-bold tracking-[-0.08em] text-balance text-white md:text-7xl lg:leading-[0.94]">
-                  From Brief to Clean Data in 5 Steps
-                </h1>
-                <p className="mx-auto mt-6 max-w-3xl text-lg leading-8 text-zinc-300 md:text-xl">
-                  Every job follows the same structured process — scoped before it starts, reviewed
-                  before it closes.
-                </p>
-              </FadeIn>
-            </div>
+      <div className="flex flex-col bg-[#FAFAFA] text-slate-900 font-sans">
+        
+        {/* HERO */}
+        <section className="relative overflow-hidden pt-28 pb-20 md:pt-40 md:pb-28">
+          <div className="absolute top-0 left-1/2 w-full -translate-x-1/2 h-[500px] bg-[radial-gradient(ellipse_at_top,rgba(59,130,246,0.06)_0%,transparent_70%)] pointer-events-none" />
+          <div className="container relative max-w-4xl text-center">
+            <FadeIn>
+              <Badge className="rounded-full border border-slate-200/60 bg-white px-4 py-2 font-mono text-[10px] font-medium uppercase tracking-widest text-slate-600 shadow-sm">
+                Process
+              </Badge>
+              <h1 className="font-display mt-10 text-[3.5rem] font-bold tracking-tighter text-balance text-slate-900 md:text-7xl lg:leading-[1]">
+                From Brief to Clean Data <br/> in 5 Steps.
+              </h1>
+              <p className="mx-auto mt-8 max-w-2xl text-lg font-normal leading-relaxed text-slate-500 md:text-xl">
+                Every job follows the same structured process — scoped before it starts, reviewed
+                before it closes.
+              </p>
+            </FadeIn>
           </div>
         </section>
 
-        <section className="bg-white py-20 md:py-28">
-          <div className="container">
-            <div className="grid gap-6 xl:grid-cols-[0.7fr_1fr]">
+        {/* TIMELINE */}
+        <section className="py-24 md:py-32 bg-white border-y border-slate-100">
+          <div className="container max-w-6xl">
+            <div className="grid gap-16 xl:grid-cols-[0.8fr_1.2fr]">
               <FadeIn>
-                <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-700">
-                  Timeline
-                </p>
-                <h2 className="font-display mt-5 max-w-lg text-4xl font-bold tracking-[-0.06em] text-zinc-950 text-balance md:text-5xl">
-                  The five-step process from brief to clean, import-ready CRM data.
-                </h2>
+                <div className="sticky top-32">
+                  <h2 className="font-display text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">
+                    The Delivery Flow
+                  </h2>
+                  <p className="mt-6 text-[17px] font-normal leading-relaxed text-slate-500">
+                    A fixed workflow designed to remove ambiguity. You know exactly what happens at each stage, and more importantly, when it's done.
+                  </p>
+                </div>
               </FadeIn>
 
-              <StaggerList className="space-y-5">
+              <StaggerList className="space-y-6">
                 {STEPS.map((item) => {
                   const Icon = item.icon
                   return (
-                    <StaggerItem
-                      key={item.step}
-                    >
+                    <StaggerItem key={item.step}>
                       <div className={cn(
-                        `rounded-[2rem] border border-zinc-200 border-t-4 ${item.accent} bg-white p-6 shadow-[0_18px_50px_-34px_rgba(15,23,42,0.18)] transition-all duration-300 hover:-translate-y-1 hover:border-blue-200 hover:shadow-[0_30px_70px_-36px_rgba(59,130,246,0.18)]`,
-                        item.highlight && "ring-2 ring-teal-500/20"
+                        `group relative overflow-hidden rounded-[32px] border border-slate-200/60 p-8 shadow-[0_4px_20px_rgb(0,0,0,0.02)] transition-shadow hover:shadow-[0_12px_40px_rgb(0,0,0,0.06)] md:p-10`,
+                        item.accent,
+                        item.highlight ? "ring-1 ring-blue-500/20" : ""
                       )}>
-                        <div className="flex flex-col gap-5 sm:flex-row">
-                          <div className="flex items-center gap-4">
-                            <div className={`flex h-14 w-14 items-center justify-center rounded-2xl ${item.iconBg}`}>
-                              <Icon className={`h-6 w-6 ${item.iconColor}`} />
-                            </div>
-                            <div className="min-w-[100px]">
-                              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-blue-700">
-                                {item.step}
-                              </p>
-                              <p className="mt-1 text-xs text-zinc-400">{item.duration}</p>
+                        <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
+                          <div className="flex items-center gap-4 sm:w-[140px] sm:shrink-0">
+                            <div className={cn("flex h-12 w-12 items-center justify-center rounded-xl", item.iconBg)}>
+                              <Icon className={cn("h-5 w-5", item.iconColor)} />
                             </div>
                           </div>
+                          
                           <div className="flex-1">
-                            <h3 className="font-display text-2xl font-bold tracking-[-0.04em] text-zinc-950">
+                            <div className="flex items-center gap-3 mb-2">
+                              <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-blue-600">
+                                {item.step}
+                              </span>
+                              <span className="text-[11px] font-medium text-slate-400">· {item.duration}</span>
+                            </div>
+                            <h3 className="font-display text-2xl font-bold tracking-tight text-slate-900">
                               {item.title}
                             </h3>
-                            <p className="mt-3 text-base leading-7 text-zinc-600">
+                            <p className="mt-4 text-[15px] font-normal leading-relaxed text-slate-600">
                               {item.description}
                             </p>
-                            <div className="mt-4 flex items-start gap-2 rounded-2xl border border-zinc-100 bg-zinc-50 px-4 py-3">
-                              <ChevronDown className="mt-0.5 h-4 w-4 shrink-0 -rotate-90 text-teal-500" />
-                              <p className="text-sm font-medium text-zinc-700">{item.deliverable}</p>
+                            
+                            <div className="mt-8 flex items-start gap-3 rounded-2xl bg-slate-100/50 p-5">
+                              <ChevronDown className="h-4 w-4 shrink-0 -rotate-90 text-slate-400 mt-0.5" />
+                              <p className="text-[13px] font-semibold text-slate-700">
+                                Output: {item.deliverable}
+                              </p>
                             </div>
                           </div>
                         </div>
@@ -231,109 +236,105 @@ export default function HowItWorksPage() {
           </div>
         </section>
 
-        <section className="relative overflow-hidden bg-[#0B1220] py-20 text-white md:py-28">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.22),transparent_38%),radial-gradient(circle_at_82%_18%,rgba(20,184,166,0.12),transparent_24%)]" />
-          <div className="container relative">
-            <FadeIn className="mx-auto max-w-2xl text-center">
-              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-300">
-                Pricing Tiers
-              </p>
-              <h2 className="font-display mt-5 text-4xl font-bold tracking-[-0.06em] text-white text-balance md:text-5xl">
+        {/* PRICING TIERS OVERVIEW */}
+        <section className="py-24 md:py-32">
+          <div className="container max-w-7xl">
+            <FadeIn className="mb-16">
+              <h2 className="font-display text-3xl font-bold tracking-tight text-slate-900 md:text-4xl text-center">
                 Job Categorization
               </h2>
-              <p className="mt-5 text-lg leading-8 text-zinc-300">
-                All prices are per job. Volume agreements available for partners with predictable monthly flow.
-              </p>
             </FadeIn>
 
-            <StaggerList className="mt-14 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+            <StaggerList className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
               {DELIVERABLE_TYPES.map((tier, index) => (
                 <StaggerItem
                   key={tier.tier}
                   className={cn(
-                    "rounded-[2rem] border p-6 transition-all duration-300 ease-out hover:-translate-y-1",
-                    index === 1
-                      ? 'border-blue-500/40 bg-gradient-to-b from-blue-500/16 via-[#101827] to-[#0B1220] shadow-[0_30px_90px_-44px_rgba(59,130,246,0.5)] hover:shadow-[0_36px_110px_-38px_rgba(59,130,246,0.6)]'
-                      : 'border-white/10 bg-white/5 shadow-[0_24px_60px_-40px_rgba(15,23,42,0.82)] hover:bg-white/10 hover:shadow-[0_28px_70px_-34px_rgba(59,130,246,0.22)]'
+                    "flex flex-col rounded-[24px] border border-slate-200/60 bg-white p-8 shadow-[0_4px_20px_rgb(0,0,0,0.02)] transition-shadow hover:shadow-[0_12px_40px_rgb(0,0,0,0.06)]",
+                    index === 1 ? "ring-1 ring-blue-500/20 shadow-sm" : ""
                   )}
                 >
-                  <p className="text-xs font-semibold uppercase tracking-[0.28em] text-zinc-400">
+                  <p className="font-mono text-[10px] font-medium uppercase tracking-widest text-slate-400">
                     {tier.tier}
                   </p>
-                  <p className="mt-4 text-4xl font-black tracking-[-0.06em] text-white">
+                  <p className="mt-4 font-display text-3xl font-bold tracking-tighter text-slate-900">
                     {tier.price}
                   </p>
-                  <div className="mt-5 space-y-3 text-sm leading-6 text-zinc-300">
-                    <p className="flex items-center gap-2">
-                      <span className="h-1 w-1 rounded-full bg-blue-400" />
+                  
+                  <div className="mt-8 space-y-4 text-[13px] font-medium text-slate-600 flex-1">
+                    <p className="flex items-center gap-3">
+                      <span className="h-1.5 w-1.5 rounded-full bg-slate-300" />
                       {tier.rows}
                     </p>
-                    <p className="flex items-center gap-2">
-                      <span className="h-1 w-1 rounded-full bg-blue-400" />
+                    <p className="flex items-center gap-3">
+                      <span className="h-1.5 w-1.5 rounded-full bg-slate-300" />
                       {tier.files}
                     </p>
-                    <p className="flex items-center gap-2">
-                      <span className="h-1 w-1 rounded-full bg-blue-400" />
+                    <p className="flex items-center gap-3">
+                      <span className="h-1.5 w-1.5 rounded-full bg-slate-300" />
                       {tier.turnaround}
                     </p>
-                    <p className="flex items-center gap-2">
-                      <span className="h-1 w-1 rounded-full bg-blue-400" />
+                    <p className="flex items-center gap-3">
+                      <span className="h-1.5 w-1.5 rounded-full bg-slate-300" />
                       {tier.revisions}
                     </p>
                   </div>
-                  <p className="mt-5 text-sm leading-6 text-zinc-400">{tier.notes}</p>
+                  
+                  <div className="mt-8 pt-6 border-t border-slate-100">
+                    <p className="text-[12px] leading-relaxed text-slate-500">{tier.notes}</p>
+                  </div>
                 </StaggerItem>
               ))}
             </StaggerList>
           </div>
         </section>
 
-        <section className="bg-white py-20 md:py-28">
-          <div className="container">
-            <FadeIn className="mx-auto max-w-2xl text-center">
-              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-700">
-                Frequently Asked Questions
-              </p>
-              <h2 className="font-display mt-5 text-4xl font-bold tracking-[-0.06em] text-zinc-950 text-balance md:text-5xl">
+        {/* FAQS */}
+        <section className="bg-white py-24 md:py-32 border-t border-slate-100">
+          <div className="container max-w-3xl">
+            <FadeIn>
+              <h2 className="font-display text-3xl font-bold tracking-tight text-slate-900 md:text-4xl mb-16 text-center">
                 Frequently Asked Questions
               </h2>
             </FadeIn>
-            <StaggerList className="mx-auto mt-14 max-w-4xl space-y-5">
+            <StaggerList className="space-y-6">
               {FAQS.map((item) => (
                 <StaggerItem
                   key={item.q}
-                  className="rounded-[2rem] border border-zinc-200 bg-white p-7 shadow-[0_18px_50px_-34px_rgba(15,23,42,0.18)] transition-all duration-300 ease-out hover:-translate-y-1 hover:border-blue-200 hover:shadow-[0_30px_70px_-36px_rgba(59,130,246,0.18)]"
+                  className="rounded-[24px] border border-slate-200/60 bg-white p-8 shadow-[0_4px_20px_rgb(0,0,0,0.02)] transition-shadow hover:shadow-[0_12px_40px_rgb(0,0,0,0.06)]"
                 >
-                  <h3 className="text-xl font-bold tracking-[-0.03em] text-zinc-950">{item.q}</h3>
-                  <p className="mt-4 text-base leading-7 text-zinc-600">{item.a}</p>
+                  <h3 className="text-[17px] font-bold tracking-tight text-slate-900">{item.q}</h3>
+                  <p className="mt-4 text-[15px] font-normal leading-relaxed text-slate-500">{item.a}</p>
                 </StaggerItem>
               ))}
             </StaggerList>
           </div>
         </section>
 
-        <section className="relative overflow-hidden bg-[#0B1220] py-20 text-white md:py-24">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.22),transparent_36%),radial-gradient(circle_at_82%_18%,rgba(20,184,166,0.12),transparent_24%)]" />
-          <div className="container relative text-center">
-            <FadeIn className="mx-auto max-w-3xl">
-              <h2 className="font-display text-4xl font-bold tracking-[-0.06em] text-balance md:text-5xl">
+        {/* CTA */}
+        <section className="py-24 md:py-32">
+          <div className="container max-w-5xl">
+            <FadeIn className="rounded-[32px] bg-slate-900 px-10 py-16 text-center text-white shadow-[0_32px_64px_-16px_rgb(0,0,0,0.2)] md:px-16 md:py-24">
+              <h2 className="font-display text-4xl font-bold tracking-tight md:text-5xl">
                 Ready to get started?
               </h2>
-              <p className="mx-auto mt-5 max-w-md text-lg leading-8 text-zinc-300">
+              <p className="mx-auto mt-6 max-w-2xl text-[17px] font-normal leading-relaxed text-slate-400">
                 Apply for partner access and have your portal set up within 2 business days.
               </p>
-              <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
+              <div className="mt-10 flex flex-col justify-center gap-4 sm:flex-row">
                 <Button
                   asChild
                   size="lg"
-                  className="rounded-full border border-blue-500/30 bg-blue-600 px-7 text-white shadow-[0_24px_50px_-24px_rgba(59,130,246,0.52)] transition-all duration-300 hover:-translate-y-1 hover:bg-blue-500"
+                  className="h-14 rounded-full bg-blue-600 px-8 text-[15px] font-medium text-white shadow-[0_8px_16px_rgb(59,130,246,0.2)] transition-transform hover:-translate-y-0.5 hover:bg-blue-700"
                 >
-                  <Link href="/request-access">Apply for partner access</Link>
+                  <Link href="/request-access">
+                    Apply for partner access
+                  </Link>
                 </Button>
                 <Button
                   asChild
-                  size="lg"
-                  className="rounded-full border border-white/15 bg-white/5 px-7 text-white transition-all duration-300 hover:-translate-y-1 hover:border-white/25 hover:bg-white/10"
+                  variant="outline"
+                  className="h-14 rounded-full border-slate-700 bg-slate-800 px-8 text-[15px] font-medium text-white transition-transform hover:-translate-y-0.5 hover:bg-slate-700"
                 >
                   <Link href="/pilot-sample">
                     Start with a Pilot

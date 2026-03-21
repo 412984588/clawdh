@@ -39,7 +39,7 @@ describe('LandingPage', () => {
 
     expect(screen.getByText(/635 tests/i)).toBeInTheDocument()
     expect(screen.getByText(/SOC2-ready/i)).toBeInTheDocument()
-    expect(screen.getByText(/operational confidence for revops agencies/i)).toBeInTheDocument()
+    expect(screen.getByText(/operational confidence for revops/i)).toBeInTheDocument()
     expect(screen.getAllByRole('link', { name: /request access/i }).length).toBeGreaterThan(0)
   })
 
@@ -64,8 +64,8 @@ describe('LandingPage', () => {
     render(<LandingPage />)
 
     expect(screen.getByText('Tickets Processed')).toBeInTheDocument()
-    expect(screen.getByText('Average Delivery Time')).toBeInTheDocument()
+    expect(screen.getByText('Average Delivery')).toBeInTheDocument()
     expect(screen.getByText('Partner Satisfaction')).toBeInTheDocument()
-    expect(screen.getByText(/what partners say/i)).toBeInTheDocument()
+    expect(screen.getByText(/RevOps Agency Director/i)).toBeInTheDocument()
   })
 })

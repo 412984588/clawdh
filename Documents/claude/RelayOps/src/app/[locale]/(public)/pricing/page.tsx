@@ -158,15 +158,15 @@ const comparisonRows = [
 
 function FeatureList({ features }: { features: Tier['features'] }) {
   return (
-    <ul className="space-y-3">
+    <ul className="space-y-4">
       {features.map((feature) => (
-        <li key={feature.label} className="flex items-start gap-3 text-sm leading-6 text-zinc-700">
+        <li key={feature.label} className="flex items-start gap-3 text-[15px] font-normal leading-relaxed text-slate-600">
           {feature.included ? (
-            <Check className="mt-1 h-4 w-4 flex-none text-emerald-600" aria-hidden="true" />
+            <Check className="mt-1 h-4 w-4 flex-none text-slate-800" aria-hidden="true" />
           ) : (
-            <X className="mt-1 h-4 w-4 flex-none text-zinc-400" aria-hidden="true" />
+            <X className="mt-1 h-4 w-4 flex-none text-slate-300" aria-hidden="true" />
           )}
-          <span>{feature.label}</span>
+          <span className={cn(!feature.included && "text-slate-400")}>{feature.label}</span>
         </li>
       ))}
     </ul>
@@ -176,20 +176,21 @@ function FeatureList({ features }: { features: Tier['features'] }) {
 export default function PricingPage() {
   return (
     <MotionProvider>
-      <div className="bg-[#f8fafc]">
-        <section className="relative overflow-hidden border-b border-slate-200 bg-[#f8fafc] py-20 md:py-28">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.14),transparent_30%),radial-gradient(circle_at_82%_18%,rgba(20,184,166,0.1),transparent_24%)]" />
-          <div className="absolute inset-0 bg-[linear-gradient(rgba(148,163,184,0.11)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.11)_1px,transparent_1px)] bg-[size:120px_120px] opacity-25" />
+      <div className="bg-[#FAFAFA] text-slate-900 font-sans">
+        <section className="relative overflow-hidden pt-28 pb-20 md:pt-40 md:pb-28">
+          <div className="absolute top-0 left-1/2 w-full -translate-x-1/2 h-[500px] bg-[radial-gradient(ellipse_at_top,rgba(59,130,246,0.06)_0%,transparent_70%)] pointer-events-none" />
 
-          <div className="container relative">
-            <FadeIn className="max-w-4xl">
-              <Badge className="rounded-full border border-blue-200 bg-white px-4 py-2 font-mono text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-700 hover:bg-white">
-                Pricing Strategy
-              </Badge>
-              <h1 className="font-display mt-6 max-w-[11ch] text-[2.85rem] font-bold leading-[0.93] tracking-[-0.08em] text-slate-950 sm:mt-8 sm:max-w-4xl sm:text-5xl md:text-7xl lg:leading-[0.94]">
-                Placeholder pricing built to explain positioning before final commercial terms.
+          <div className="container relative max-w-7xl text-center">
+            <FadeIn className="mx-auto max-w-4xl">
+              <div className="inline-flex items-center gap-2 rounded-full border border-slate-200/50 bg-white/50 px-3 py-1.5 shadow-[0_2px_8px_rgb(0,0,0,0.04)] backdrop-blur-md">
+                <span className="font-mono text-[10px] font-medium uppercase tracking-widest text-slate-600">
+                  Pricing Strategy
+                </span>
+              </div>
+              <h1 className="font-display mt-8 mx-auto max-w-[15ch] text-[3.5rem] font-bold leading-[1.05] tracking-tighter text-slate-900 sm:text-5xl md:text-7xl lg:leading-[1]">
+                Clear margins. Predictable delivery.
               </h1>
-              <p className="mt-5 max-w-3xl text-base leading-7 text-slate-600 sm:mt-6 sm:text-lg sm:leading-8 md:text-xl">
+              <p className="mx-auto mt-8 max-w-2xl text-lg font-normal leading-relaxed text-slate-500 md:text-xl">
                 RelayOps is positioned as a structured operating model, not generic task labor. The
                 page shows how the offer scales from a small team entry point to enterprise support.
               </p>
@@ -197,102 +198,99 @@ export default function PricingPage() {
           </div>
         </section>
 
-        <section className="py-16 md:py-24">
-          <div className="container">
-            <FadeIn className="mx-auto max-w-3xl text-center">
-              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-700">
-                Pricing tiers
-              </p>
-              <h2 className="font-display mt-5 text-3xl font-bold tracking-[-0.06em] text-zinc-950 text-balance sm:text-4xl md:text-5xl">
-                Three ways to package the RelayOps operating model
-              </h2>
-            </FadeIn>
-
-            <StaggerList className="mt-14 grid gap-6 lg:grid-cols-3">
-              {tiers.map((tier) => {
+        <section className="py-20 md:py-32">
+          <div className="container max-w-7xl">
+            <StaggerList className="grid gap-6 lg:grid-cols-3 lg:items-end">
+              {tiers.map((tier, index) => {
                 const Icon = tier.icon
 
                 return (
                   <StaggerItem
                     key={tier.name}
-                    className="h-full"
+                    className={cn(
+                      "h-full w-full",
+                      tier.featured ? "lg:pb-0" : "lg:pb-8" // Creates the asymmetrical height
+                    )}
                   >
-                    <Card
+                    <div
                       className={cn(
-                        "h-full rounded-[2rem] border-zinc-200 shadow-[0_24px_70px_-42px_rgba(15,23,42,0.18)] transition-all duration-300 hover:-translate-y-1",
+                        "flex h-full flex-col rounded-[32px] border transition-all duration-300",
                         tier.featured
-                          ? 'relative border-blue-500/40 bg-[#0B1220] text-white shadow-[0_34px_90px_-40px_rgba(59,130,246,0.35)] hover:shadow-[0_44px_110px_-38px_rgba(59,130,246,0.45)]'
-                          : 'bg-white hover:border-blue-200 hover:shadow-[0_30px_80px_-36px_rgba(59,130,246,0.16)]'
+                          ? 'border-slate-900 bg-slate-900 text-white shadow-[0_24px_80px_-12px_rgb(0,0,0,0.2)]'
+                          : 'border-slate-200/60 bg-white hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)]'
                       )}
                     >
-                      <CardHeader className="p-8">
+                      <div className="p-8 md:p-10 flex-1">
                         <div className="flex items-center justify-between gap-4">
                           <div
                             className={cn(
-                              "flex h-12 w-12 items-center justify-center rounded-2xl",
-                              tier.featured ? 'bg-white/10 text-blue-200' : 'bg-blue-500/10 text-blue-600'
+                              "flex h-12 w-12 items-center justify-center rounded-xl",
+                              tier.featured ? 'bg-white/10 text-white' : 'bg-slate-50 text-slate-900 shadow-[0_2px_8px_rgb(0,0,0,0.04)]'
                             )}
                           >
                             <Icon className="h-5 w-5" />
                           </div>
                           {tier.featured ? (
-                            <Badge className="rounded-full border border-blue-400/20 bg-blue-500/15 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-blue-200">
+                            <Badge className="rounded-full bg-blue-600 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white hover:bg-blue-600 border-none">
                               Recommended
                             </Badge>
                           ) : null}
                         </div>
-                        <CardTitle
+                        <h3
                           className={cn(
-                            "font-display mt-4 text-3xl font-bold tracking-[-0.05em]",
-                            tier.featured ? 'text-white' : 'text-zinc-950'
+                            "font-display mt-8 text-2xl font-bold tracking-tight",
+                            tier.featured ? 'text-white' : 'text-slate-900'
                           )}
                         >
                           {tier.name}
-                        </CardTitle>
-                        <CardDescription
+                        </h3>
+                        <p
                           className={cn(
-                            "text-base leading-7",
-                            tier.featured ? 'text-zinc-300' : 'text-zinc-600'
+                            "mt-4 text-[15px] font-normal leading-relaxed",
+                            tier.featured ? 'text-slate-300' : 'text-slate-500'
                           )}
                         >
                           {tier.summary}
-                        </CardDescription>
-                      </CardHeader>
-
-                      <CardContent className="space-y-8 p-8 pt-0">
-                        <div className="space-y-2">
+                        </p>
+                        
+                        <div className="mt-10 mb-10">
                           <p
                             className={cn(
-                              "font-display text-4xl font-bold tracking-[-0.06em]",
-                              tier.featured ? 'text-white' : 'text-zinc-950'
+                              "font-display text-[2.5rem] font-bold tracking-tighter leading-none",
+                              tier.featured ? 'text-white' : 'text-slate-900'
                             )}
                           >
                             {tier.price}
                           </p>
-                          <p className={tier.featured ? 'text-sm text-zinc-400' : 'text-sm text-zinc-500'}>
+                          <p className={cn(
+                            "mt-3 text-[13px] font-medium",
+                            tier.featured ? 'text-slate-400' : 'text-slate-500'
+                          )}>
                             {tier.billing}
                           </p>
                         </div>
 
                         <FeatureList features={tier.features} />
-
+                      </div>
+                      
+                      <div className="p-8 md:p-10 pt-0 mt-auto">
                         <Button
                           asChild
-                          size="lg"
+                          size={tier.featured ? "lg" : "default"}
                           className={cn(
-                            "w-full rounded-full transition-all duration-300",
+                            "w-full rounded-full transition-transform hover:-translate-y-0.5",
                             tier.featured
-                              ? 'border border-blue-400/30 bg-blue-600 text-white hover:bg-blue-700 shadow-[0_18px_38px_-20px_rgba(59,130,246,0.5)]'
-                              : 'border border-zinc-200 bg-white text-zinc-950 hover:bg-zinc-50 shadow-[0_14px_30px_-24px_rgba(15,23,42,0.12)]'
+                              ? 'h-14 bg-white text-slate-900 hover:bg-slate-50 shadow-[0_8px_16px_rgb(255,255,255,0.1)]'
+                              : 'h-12 border-slate-200/80 bg-white text-slate-900 hover:bg-slate-50 shadow-[0_2px_8px_rgb(0,0,0,0.04)]'
                           )}
+                          variant={tier.featured ? "default" : "outline"}
                         >
                           <Link href="/request-access">
                             {tier.ctaLabel}
-                            <ArrowRight className="ml-2 h-4 w-4" />
                           </Link>
                         </Button>
-                      </CardContent>
-                    </Card>
+                      </div>
+                    </div>
                   </StaggerItem>
                 )
               })}
@@ -300,106 +298,65 @@ export default function PricingPage() {
           </div>
         </section>
 
-        <section className="bg-zinc-50 py-16 md:py-24">
-          <div className="container">
-            <FadeIn className="mx-auto max-w-3xl text-center">
-              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-700">
-                Frequently Asked Questions
-              </p>
-              <h2 className="font-display mt-5 text-3xl font-bold tracking-[-0.06em] text-zinc-950 text-balance sm:text-4xl md:text-5xl">
-                Frequently Asked Questions
+        {/* COMPARISON SECTION */}
+        <section className="py-24 md:py-32 bg-white border-y border-slate-100">
+          <div className="container max-w-7xl">
+            <FadeIn className="max-w-3xl">
+              <h2 className="font-display text-4xl font-bold tracking-tight text-slate-900 md:text-5xl">
+                How RelayOps stacks up.
               </h2>
             </FadeIn>
 
-            <StaggerList className="mx-auto mt-14 grid max-w-5xl gap-5 md:grid-cols-2">
-              {faqs.map((item) => (
-                <StaggerItem key={item.question}>
-                  <Card
-                    className="h-full rounded-[2rem] border-zinc-200 bg-white shadow-[0_18px_50px_-34px_rgba(15,23,42,0.14)] transition-all duration-300 hover:border-blue-200 hover:shadow-[0_24px_60px_-30px_rgba(59,130,246,0.1)]"
-                  >
-                    <CardHeader className="p-7">
-                      <div className="flex items-start gap-3">
-                        <BadgeCheck className="mt-1 h-5 w-5 flex-none text-blue-600" />
-                        <div>
-                          <CardTitle className="text-xl font-bold tracking-[-0.03em] text-zinc-950">
-                            {item.question}
-                          </CardTitle>
-                          <CardDescription className="mt-4 text-base leading-7 text-zinc-600">
-                            {item.answer}
-                          </CardDescription>
-                        </div>
-                      </div>
-                    </CardHeader>
-                  </Card>
-                </StaggerItem>
-              ))}
-            </StaggerList>
-          </div>
-        </section>
-
-        <section className="py-16 md:py-24">
-          <div className="container">
-            <FadeIn className="mx-auto max-w-3xl text-center">
-              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-700">
-                Competitive positioning
-              </p>
-              <h2 className="font-display mt-5 text-3xl font-bold tracking-[-0.06em] text-zinc-950 text-balance sm:text-4xl md:text-5xl">
-                How RelayOps stacks up against the alternatives
-              </h2>
-            </FadeIn>
-
-            <SlideUp className="mt-14 space-y-4 md:hidden">
+            <SlideUp className="mt-20 space-y-4 md:hidden">
               {comparisonRows.map((row) => (
-                <Card
+                <div
                   key={row.dimension}
-                  className="rounded-[1.75rem] border-zinc-200 bg-white shadow-[0_18px_50px_-34px_rgba(15,23,42,0.14)]"
+                  className="rounded-[24px] border border-slate-200/60 bg-white p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)]"
                 >
-                  <CardHeader className="px-5 pb-4 pt-5">
-                    <CardTitle className="text-xl font-black tracking-[-0.04em] text-zinc-950">
-                      {row.dimension}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4 px-5 pb-5 pt-0">
-                    <div className="rounded-2xl border border-blue-100 bg-blue-50/60 p-4">
-                      <p className="text-xs font-semibold uppercase tracking-[0.24em] text-blue-700">
+                  <h3 className="text-xl font-bold tracking-tight text-slate-900 mb-6">
+                    {row.dimension}
+                  </h3>
+                  <div className="space-y-4">
+                    <div className="rounded-[16px] bg-slate-50 p-5">
+                      <p className="font-mono text-[10px] font-medium uppercase tracking-widest text-blue-600">
                         RelayOps
                       </p>
-                      <p className="mt-2 text-sm leading-6 text-zinc-700">{row.relayops}</p>
+                      <p className="mt-3 text-[15px] leading-relaxed text-slate-700">{row.relayops}</p>
                     </div>
-                    <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-4">
-                      <p className="text-xs font-semibold uppercase tracking-[0.24em] text-zinc-500">
+                    <div className="rounded-[16px] border border-slate-200/60 bg-white p-5">
+                      <p className="font-mono text-[10px] font-medium uppercase tracking-widest text-slate-400">
                         Self-built team
                       </p>
-                      <p className="mt-2 text-sm leading-6 text-zinc-700">{row.selfBuilt}</p>
+                      <p className="mt-3 text-[15px] leading-relaxed text-slate-600">{row.selfBuilt}</p>
                     </div>
-                    <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-4">
-                      <p className="text-xs font-semibold uppercase tracking-[0.24em] text-zinc-500">
+                    <div className="rounded-[16px] border border-slate-200/60 bg-white p-5">
+                      <p className="font-mono text-[10px] font-medium uppercase tracking-widest text-slate-400">
                         Traditional outsourcing
                       </p>
-                      <p className="mt-2 text-sm leading-6 text-zinc-700">{row.outsourcing}</p>
+                      <p className="mt-3 text-[15px] leading-relaxed text-slate-600">{row.outsourcing}</p>
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               ))}
             </SlideUp>
 
-            <SlideUp className="mt-14 hidden overflow-hidden rounded-[2rem] border border-zinc-200 bg-white shadow-[0_24px_70px_-42px_rgba(15,23,42,0.18)] md:block">
+            <SlideUp className="mt-20 hidden overflow-hidden rounded-[24px] border border-slate-200/60 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] md:block">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-zinc-50">
-                    <TableHead className="w-40">Dimension</TableHead>
-                    <TableHead>RelayOps</TableHead>
-                    <TableHead>Self-built team</TableHead>
-                    <TableHead>Traditional outsourcing</TableHead>
+                  <TableRow className="bg-slate-50 hover:bg-slate-50 border-b-slate-200/60">
+                    <TableHead className="w-48 py-6 px-8 font-mono text-[10px] font-medium uppercase tracking-widest text-slate-400">Dimension</TableHead>
+                    <TableHead className="py-6 px-8 font-mono text-[10px] font-medium uppercase tracking-widest text-blue-600">RelayOps</TableHead>
+                    <TableHead className="py-6 px-8 font-mono text-[10px] font-medium uppercase tracking-widest text-slate-400">Self-built team</TableHead>
+                    <TableHead className="py-6 px-8 font-mono text-[10px] font-medium uppercase tracking-widest text-slate-400">Traditional outsourcing</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {comparisonRows.map((row) => (
-                    <TableRow key={row.dimension}>
-                      <TableCell className="font-semibold text-zinc-950">{row.dimension}</TableCell>
-                      <TableCell className="text-zinc-700">{row.relayops}</TableCell>
-                      <TableCell className="text-zinc-700">{row.selfBuilt}</TableCell>
-                      <TableCell className="text-zinc-700">{row.outsourcing}</TableCell>
+                    <TableRow key={row.dimension} className="border-b-slate-100 hover:bg-transparent">
+                      <TableCell className="py-8 px-8 align-top text-base font-bold text-slate-900">{row.dimension}</TableCell>
+                      <TableCell className="py-8 px-8 align-top text-[15px] leading-relaxed text-slate-900 font-medium">{row.relayops}</TableCell>
+                      <TableCell className="py-8 px-8 align-top text-[15px] leading-relaxed text-slate-500">{row.selfBuilt}</TableCell>
+                      <TableCell className="py-8 px-8 align-top text-[15px] leading-relaxed text-slate-500">{row.outsourcing}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -408,24 +365,47 @@ export default function PricingPage() {
           </div>
         </section>
 
-        <section className="pb-20 md:pb-28">
-          <div className="container">
-            <FadeIn className="rounded-[2rem] border border-[#0B1220] bg-[#0B1220] px-6 py-8 text-white shadow-[0_30px_90px_-48px_rgba(11,18,32,0.82)] sm:px-8 sm:py-10 md:px-12">
-              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-300">
-                Ready to price the real version?
-              </p>
-              <h2 className="font-display mt-5 max-w-3xl text-3xl font-bold tracking-[-0.06em] text-balance sm:text-4xl md:text-5xl">
-                Use the placeholder model to frame value, then move the buyer into a real access conversation.
+        {/* FAQS SECTION */}
+        <section className="py-24 md:py-32">
+          <div className="container max-w-3xl">
+            <FadeIn>
+              <h2 className="font-display text-4xl font-bold tracking-tight text-slate-900 md:text-5xl mb-16 text-center">
+                Frequently Asked Questions
               </h2>
-              <p className="mt-5 max-w-2xl text-base leading-7 text-zinc-300">
+            </FadeIn>
+
+            <StaggerList className="space-y-6">
+              {faqs.map((item) => (
+                <StaggerItem key={item.question}>
+                  <div className="group rounded-[24px] border border-slate-200/60 bg-white p-8 transition-shadow hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+                    <h3 className="text-[17px] font-bold tracking-tight text-slate-900">
+                      {item.question}
+                    </h3>
+                    <p className="mt-4 text-[15px] font-normal leading-relaxed text-slate-500">
+                      {item.answer}
+                    </p>
+                  </div>
+                </StaggerItem>
+              ))}
+            </StaggerList>
+          </div>
+        </section>
+
+        <section className="py-24 md:py-32">
+          <div className="container max-w-5xl">
+            <FadeIn className="rounded-[32px] bg-slate-900 p-12 text-center text-white shadow-[0_32px_64px_-16px_rgb(0,0,0,0.2)] md:p-20">
+              <h2 className="font-display text-4xl font-bold tracking-tight md:text-5xl">
+                Ready to frame the value?
+              </h2>
+              <p className="mx-auto mt-6 max-w-2xl text-[17px] font-normal leading-relaxed text-slate-400">
                 The pricing page establishes commercial positioning without locking in final numbers
                 before the market story is ready.
               </p>
-              <div className="mt-8">
+              <div className="mt-10">
                 <Button
                   asChild
                   size="lg"
-                  className="rounded-full border border-blue-500/30 bg-blue-600 px-7 text-white shadow-[0_24px_50px_-24px_rgba(59,130,246,0.6)] transition-all duration-300 hover:-translate-y-1 hover:bg-blue-500"
+                  className="h-14 rounded-full bg-blue-600 px-8 text-[15px] font-medium text-white shadow-[0_8px_16px_rgb(59,130,246,0.2)] hover:bg-blue-700 hover:-translate-y-0.5 transition-transform"
                 >
                   <Link href="/request-access">
                     Request Access
