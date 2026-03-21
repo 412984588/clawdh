@@ -110,10 +110,11 @@ describe('Full business lifecycle', () => {
     supabase.from.mockReturnValueOnce(ok(null)) // notifyTicketEvent ticket query
 
     // ── Step 4: handlePaymentWorkflow — invoiced → paid → queued ────────────
-    //            (10 mockAdmin.from calls — atomic claim flow)
+    //            (12 mockAdmin.from calls — atomic claim + idempotency check + ledger + transitions + confirm + notify + clearRetry)
     mockAdmin.from
       .mockReturnValueOnce(ok({ id: TICKET_ID, organization_id: ORG_ID })) // atomic claim
-      .mockReturnValueOnce(ok({ id: LEDGER_ID }))                           // createLedgerEntry insert
+      .mockReturnValueOnce(ok(null))                                         // idempotency check: no existing ledger
+      .mockReturnValueOnce(ok({ id: LEDGER_ID, status: 'pending' }))        // createLedgerEntry insert
     // engine: invoiced → paid (3 calls)
     mockAdmin.from
       .mockReturnValueOnce(ok({ id: TICKET_ID, status: 'invoiced' }))
@@ -229,8 +230,8 @@ describe('Full business lifecycle', () => {
     )
     expect(toCompleted.success).toBe(true)
 
-    // Confirm admin client calls: 2 (claim+ledger) + 3+3 (transitions) + 1 (confirm) + 1 (notify) + 1 (clearRetry) = 11
-    expect(mockAdmin.from).toHaveBeenCalledTimes(11)
+    // Confirm admin client calls: 1 (claim) + 1 (idempotency) + 1 (ledger) + 3+3 (transitions) + 1 (confirm) + 1 (notify) + 1 (clearRetry) = 12
+    expect(mockAdmin.from).toHaveBeenCalledTimes(12)
     // Confirm ledger was written during payment
     expect(mockAdmin.from).toHaveBeenCalledWith('ledger_entries')
   })

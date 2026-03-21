@@ -121,20 +121,32 @@ export async function handlePaymentWorkflow(
     return { success: false, error: `Unexpected ticket status: ${existing.status}` }
   }
 
-  // 2. 创建账本条目（Store in dollars — all amounts in DB are dollars, not cents）
-  const { data: ledgerEntry, error: ledgerError } = await createLedgerEntry(admin, {
-    ticketId: claimed.id,
-    organizationId: claimed.organization_id,
-    type: 'invoice_payment',
-    amountDollars: params.amountPaidDollars,
-    currency: params.currency.toUpperCase(),
-    metadata: {
-      stripe_invoice_id: params.stripeInvoiceId,
-      stripe_customer_id: params.stripeCustomerId,
-    },
-  })
-  if (ledgerError) {
-    return { success: false, error: 'Failed to create payment ledger entry' }
+  // 2. 幂等性检查：同一 stripe_invoice_id 不重复创建 ledger entry
+  //    防止 webhook 并发重试时创建重复账本记录
+  const { data: existingLedger } = await admin
+    .from('ledger_entries')
+    .select('id, status')
+    .eq('ticket_id', claimed.id)
+    .eq('type', 'invoice_payment')
+    .maybeSingle()
+
+  let ledgerEntry = existingLedger
+  if (!ledgerEntry) {
+    const { data: newLedger, error: ledgerError } = await createLedgerEntry(admin, {
+      ticketId: claimed.id,
+      organizationId: claimed.organization_id,
+      type: 'invoice_payment',
+      amountDollars: params.amountPaidDollars,
+      currency: params.currency.toUpperCase(),
+      metadata: {
+        stripe_invoice_id: params.stripeInvoiceId,
+        stripe_customer_id: params.stripeCustomerId,
+      },
+    })
+    if (ledgerError) {
+      return { success: false, error: 'Failed to create payment ledger entry' }
+    }
+    ledgerEntry = newLedger
   }
 
   // Use the ticket id as the system actor — admin role grants the transition
@@ -155,7 +167,7 @@ export async function handlePaymentWorkflow(
 
   // 4. 两次 transition 全部成功后才确认账本
   //    若先确认再 transition 失败，账本确认但工单状态仍在 invoiced，会导致不一致
-  if (ledgerEntry) {
+  if (ledgerEntry && ledgerEntry.status !== 'confirmed') {
     await confirmLedgerEntry(admin, ledgerEntry.id)
   }
 

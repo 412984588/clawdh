@@ -97,11 +97,14 @@ export async function submitWorkWorkflow(
       .in('id', params.attachmentIds)
       .eq('ticket_id', params.ticketId)
     if (attachmentError) {
-      logger.error('Failed to link attachments to submission', {
+      // 回滚：attachment 链接失败时删除已创建的 submission
+      logger.error('Failed to link attachments — rolling back submission', {
         context: 'submit-work-workflow',
         submissionId: submission.id,
         error: attachmentError.message,
       })
+      await supabase.from('submissions').delete().eq('id', submission.id)
+      return { success: false, error: 'Failed to link attachments to submission' }
     }
   }
 

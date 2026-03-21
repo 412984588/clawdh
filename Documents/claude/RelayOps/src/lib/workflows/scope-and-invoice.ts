@@ -30,6 +30,17 @@ export async function scopeAndInvoiceWorkflow(
   supabase: SupabaseClient,
   params: ScopeAndInvoiceParams
 ): Promise<ScopeAndInvoiceResult> {
+  // 0. 金额校验 — 防止无效发票
+  if (typeof params.priceDollars !== 'number' || !isFinite(params.priceDollars)) {
+    return { success: false, error: 'Price must be a valid number' }
+  }
+  if (params.priceDollars <= 0) {
+    return { success: false, error: 'Price must be positive' }
+  }
+  if (params.priceDollars > 100_000) {
+    return { success: false, error: 'Price exceeds maximum ($100,000)' }
+  }
+
   // 1. Fetch ticket + validate current state
   const { data: ticket } = await supabase
     .from('tickets')

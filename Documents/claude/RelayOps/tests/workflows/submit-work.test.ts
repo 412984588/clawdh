@@ -164,25 +164,21 @@ describe('submitWorkWorkflow', () => {
     expect(result.error).toBeTruthy()
   })
 
-  it('logs logger.error but succeeds when attachment update fails', async () => {
+  it('rolls back submission and returns error when attachment link fails', async () => {
     const supabase = createMockSupabase()
     supabase.from
       .mockReturnValueOnce(ok({ id: 'ticket-1', status: 'in_progress' }))           // fetch ticket
       .mockReturnValueOnce(ok({ id: 'assignment-1', status: 'acknowledged' }))       // fetch assignment
       .mockReturnValueOnce(ok({ id: 'submission-1' }))                               // insert submission
-      .mockReturnValueOnce(err('attachment update failed'))                           // update attachments → error, but not blocking
-      .mockReturnValueOnce(ok(null))                                                   // update assignment status
-      .mockReturnValueOnce(ok({ id: 'ticket-1', status: 'in_progress' }))            // engine: fetch
-      .mockReturnValueOnce(ok(null))                                                   // engine: update
-      .mockReturnValueOnce(ok(null))                                                   // engine: event
-      .mockReturnValueOnce(ok(null))                                                   // work_submitted event
+      .mockReturnValueOnce(err('attachment update failed'))                           // update attachments → error → rollback
+      .mockReturnValueOnce(ok(null))                                                   // delete submission (rollback)
 
     const result = await submitWorkWorkflow(supabase as any, params)
 
-    expect(result.success).toBe(true)
-    expect(result.submissionId).toBe('submission-1')
+    expect(result.success).toBe(false)
+    expect(result.error).toMatch(/attachment/)
     expect(logger.error).toHaveBeenCalledWith(
-      'Failed to link attachments to submission',
+      'Failed to link attachments — rolling back submission',
       expect.objectContaining({
         context: 'submit-work-workflow',
         submissionId: 'submission-1',

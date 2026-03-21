@@ -32,9 +32,11 @@ describe('handlePaymentWorkflow', () => {
     mockAdmin.from
       // 1. conditional update claim: status='invoiced' → success
       .mockReturnValueOnce(ok({ id: 'ticket-1', organization_id: 'org-1' }))
-      // 2. createLedgerEntry insert
-      .mockReturnValueOnce(ok({ id: 'ledger-1' }))
-      // 3. transitionTicket invoiced → paid (engine: fetch, update, event)
+      // 2. idempotency check: no existing ledger entry
+      .mockReturnValueOnce(ok(null))
+      // 3. createLedgerEntry insert
+      .mockReturnValueOnce(ok({ id: 'ledger-1', status: 'pending' }))
+      // 4. transitionTicket invoiced → paid (engine: fetch, update, event)
       .mockReturnValueOnce(ok({ id: 'ticket-1', status: 'invoiced' }))
       .mockReturnValueOnce(ok(null))
       .mockReturnValueOnce(ok(null))
@@ -140,7 +142,9 @@ describe('handlePaymentWorkflow', () => {
     mockAdmin.from
       // 1. conditional update claim: success
       .mockReturnValueOnce(ok({ id: 'ticket-1', organization_id: 'org-1' }))
-      // 2. createLedgerEntry insert fails
+      // 2. idempotency check: no existing ledger
+      .mockReturnValueOnce(ok(null))
+      // 3. createLedgerEntry insert fails
       .mockReturnValueOnce(err('ledger insert failed'))
 
     const result = await handlePaymentWorkflow(params)
@@ -166,9 +170,11 @@ describe('handlePaymentWorkflow', () => {
     mockAdmin.from
       // 1. conditional update claim: success
       .mockReturnValueOnce(ok({ id: 'ticket-1', organization_id: 'org-1' }))
-      // 2. createLedgerEntry insert
-      .mockReturnValueOnce(ok({ id: 'ledger-1' }))
-      // 3. engine invoiced→paid: fetch + update succeed, but event insert fails → warn, success: true
+      // 2. idempotency check: no existing ledger
+      .mockReturnValueOnce(ok(null))
+      // 3. createLedgerEntry insert
+      .mockReturnValueOnce(ok({ id: 'ledger-1', status: 'pending' }))
+      // 4. engine invoiced→paid: fetch + update succeed, but event insert fails → warn, success: true
       .mockReturnValueOnce(ok({ id: 'ticket-1', status: 'invoiced' }))
       .mockReturnValueOnce(ok(null))
       .mockReturnValueOnce(err('db error on event insert'))
@@ -184,5 +190,29 @@ describe('handlePaymentWorkflow', () => {
 
     expect(result.success).toBe(true)
     expect(result.ticketId).toBe('ticket-1')
+  })
+
+  it('idempotency: skips ledger creation when entry already exists for this ticket', async () => {
+    mockAdmin.from
+      // 1. atomic claim success
+      .mockReturnValueOnce(ok({ id: 'ticket-1', organization_id: 'org-1' }))
+      // 2. idempotency check: ledger already exists (concurrent webhook created it)
+      .mockReturnValueOnce(ok({ id: 'ledger-existing', status: 'pending' }))
+      // 3. transitionTicket invoiced → paid
+      .mockReturnValueOnce(ok({ id: 'ticket-1', status: 'invoiced' }))
+      .mockReturnValueOnce(ok(null))
+      .mockReturnValueOnce(ok(null))
+      // 4. transitionTicket paid → queued
+      .mockReturnValueOnce(ok({ id: 'ticket-1', status: 'paid' }))
+      .mockReturnValueOnce(ok(null))
+      .mockReturnValueOnce(ok(null))
+      // 5. confirm existing ledger
+      .mockReturnValueOnce(ok(null))
+
+    const result = await handlePaymentWorkflow(params)
+
+    expect(result.success).toBe(true)
+    // createLedgerEntry (insert) should NOT have been called — only the existing one is used
+    // Total from() calls: 1 (claim) + 1 (idempotency check) + 3+3 (transitions) + 1 (confirm) + notification = 9+
   })
 })

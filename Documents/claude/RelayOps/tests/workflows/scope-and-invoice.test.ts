@@ -168,14 +168,24 @@ describe('scopeAndInvoiceWorkflow', () => {
     expect(result.error).toBeTruthy()
   })
 
-  it('derivePricingTier: priceDollars < 0 treated as pilot tier (no crash)', async () => {
+  it('rejects negative price', async () => {
     const supabase = createMockSupabase()
-    setupSuccessMocks(supabase)
-
-    // negative price is technically invalid but should not crash — tier defaults to pilot
     const result = await scopeAndInvoiceWorkflow(supabase as any, { ...baseParams, priceDollars: -10 })
+    expect(result.success).toBe(false)
+    expect(result.error).toMatch(/positive/)
+  })
 
-    // workflow runs to completion (price guard is at action layer, not workflow)
-    expect(result).toBeDefined()
+  it('rejects zero price', async () => {
+    const supabase = createMockSupabase()
+    const result = await scopeAndInvoiceWorkflow(supabase as any, { ...baseParams, priceDollars: 0 })
+    expect(result.success).toBe(false)
+    expect(result.error).toMatch(/positive/)
+  })
+
+  it('rejects price exceeding $100,000', async () => {
+    const supabase = createMockSupabase()
+    const result = await scopeAndInvoiceWorkflow(supabase as any, { ...baseParams, priceDollars: 100_001 })
+    expect(result.success).toBe(false)
+    expect(result.error).toMatch(/maximum/)
   })
 })
