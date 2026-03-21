@@ -44,3 +44,8 @@ test-results/
 # load tests reports
 load-tests/reports/*.json
 load-tests/reports/*.html
+
+# database backups
+/backups/
+*.sql.gz
+*.dump
