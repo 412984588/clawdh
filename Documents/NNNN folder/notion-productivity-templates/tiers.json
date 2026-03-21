@@ -1,0 +1,35 @@
+{
+  "product": "Notion Productivity Templates",
+  "version": "1.0.0",
+  "tiers": [
+    {
+      "id": "starter",
+      "price_usd": 29,
+      "zip_name": "notion-productivity-templates-starter-v1.0.0.zip",
+      "templates": [
+        "01-project-management",
+        "02-goal-tracker",
+        "03-habit-tracker",
+        "04-weekly-review",
+        "05-monthly-review"
+      ]
+    },
+    {
+      "id": "pro",
+      "price_usd": 49,
+      "zip_name": "notion-productivity-templates-pro-v1.0.0.zip",
+      "templates": [
+        "01-project-management",
+        "02-goal-tracker",
+        "03-habit-tracker",
+        "04-weekly-review",
+        "05-monthly-review",
+        "06-reading-notes",
+        "07-meeting-notes",
+        "08-second-brain",
+        "09-personal-crm",
+        "10-daily-planner"
+      ]
+    }
+  ]
+}
