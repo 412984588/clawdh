@@ -1,0 +1,33 @@
+{
+  "tiers": [
+    {
+      "id": "starter",
+      "price_usd": 19,
+      "zip_name": "wedding-planning-templates-starter-v1.0.0.zip",
+      "templates": [
+        "01-master-checklist",
+        "02-budget-tracker",
+        "03-vendor-manager",
+        "04-guest-list",
+        "05-timeline-day-of"
+      ]
+    },
+    {
+      "id": "pro",
+      "price_usd": 39,
+      "zip_name": "wedding-planning-templates-pro-v1.0.0.zip",
+      "templates": [
+        "01-master-checklist",
+        "02-budget-tracker",
+        "03-vendor-manager",
+        "04-guest-list",
+        "05-timeline-day-of",
+        "06-seating-chart",
+        "07-invitation-wording",
+        "08-registry-guide",
+        "09-honeymoon-planner",
+        "10-diy-decorations"
+      ]
+    }
+  ]
+}
