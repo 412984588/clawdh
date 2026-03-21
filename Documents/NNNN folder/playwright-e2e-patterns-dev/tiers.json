@@ -1,0 +1,35 @@
+{
+  "product": "Playwright E2E Patterns",
+  "version": "1.0.0",
+  "tiers": [
+    {
+      "id": "starter",
+      "price_usd": 19,
+      "zip_name": "playwright-e2e-patterns-starter-v1.0.0.zip",
+      "templates": [
+        "01-page-objects",
+        "02-fixtures-hooks",
+        "03-api-testing",
+        "04-visual-regression",
+        "05-auth-flows"
+      ]
+    },
+    {
+      "id": "pro",
+      "price_usd": 39,
+      "zip_name": "playwright-e2e-patterns-pro-v1.0.0.zip",
+      "templates": [
+        "01-page-objects",
+        "02-fixtures-hooks",
+        "03-api-testing",
+        "04-visual-regression",
+        "05-auth-flows",
+        "06-component-testing",
+        "07-parallel-sharding",
+        "08-network-mocking",
+        "09-mobile-emulation",
+        "10-ci-reporting"
+      ]
+    }
+  ]
+}

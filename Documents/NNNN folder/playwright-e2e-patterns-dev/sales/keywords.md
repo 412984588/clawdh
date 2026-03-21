@@ -1,0 +1,3 @@
+# Keywords
+
+playwright, playwright typescript, playwright e2e, playwright patterns, playwright testing, playwright templates, playwright page object model, playwright fixtures, playwright visual regression, playwright api testing, playwright authentication, playwright storageState, playwright component testing, playwright network mocking, playwright mobile emulation, playwright sharding, playwright ci, playwright parallel, playwright page object, playwright locators, playwright best practices, e2e testing typescript, end to end testing, browser testing typescript, playwright 2024, playwright 1.40, @playwright/test, playwright jest alternative, playwright cypress alternative, typescript testing, frontend testing patterns
