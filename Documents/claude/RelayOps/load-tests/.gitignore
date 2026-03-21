@@ -1,0 +1,4 @@
+# 负载测试报告（本地生成，不提交）
+reports/*.json
+reports/*.html
+!reports/.gitkeep
