@@ -1,0 +1,39 @@
+{
+  "product": "React Email Templates Pack",
+  "version": "1.0.0",
+  "tiers": [
+    {
+      "id": "starter",
+      "name": "Starter",
+      "price_usd": 19,
+      "template_count": 5,
+      "templates": [
+        "01-welcome",
+        "02-verify-email",
+        "03-reset-password",
+        "04-magic-link",
+        "05-invoice"
+      ],
+      "zip_name": "react-email-templates-starter-v1.0.0.zip"
+    },
+    {
+      "id": "pro",
+      "name": "Pro",
+      "price_usd": 39,
+      "template_count": 10,
+      "templates": [
+        "01-welcome",
+        "02-verify-email",
+        "03-reset-password",
+        "04-magic-link",
+        "05-invoice",
+        "06-subscription-started",
+        "07-subscription-cancelled",
+        "08-team-invitation",
+        "09-payment-failed",
+        "10-onboarding"
+      ],
+      "zip_name": "react-email-templates-pro-v1.0.0.zip"
+    }
+  ]
+}
