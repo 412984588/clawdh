@@ -1,4 +1,12 @@
+'use client'
+
+import { AnimatePresence, m } from 'framer-motion'
 import { Badge } from '@/components/ui/badge'
+import {
+  MOTION_DURATIONS,
+  MOTION_EASE,
+  useReducedMotionPreference,
+} from '@/components/ui/motion'
 import type { TicketStatus } from '@/lib/types/enums'
 import { cn } from '@/lib/utils/cn'
 
@@ -50,12 +58,37 @@ const STATUS_COLORS: Record<TicketStatus, string> = {
 }
 
 export function TicketStatusBadge({ status, className }: TicketStatusBadgeProps) {
+  const reduced = useReducedMotionPreference()
+
   return (
-    <Badge
-      variant="outline"
-      className={cn('text-xs font-medium', STATUS_COLORS[status], className)}
-    >
-      {STATUS_LABELS[status]}
-    </Badge>
+    <AnimatePresence initial={false} mode="wait">
+      <m.span
+        key={status}
+        data-motion="status-badge"
+        data-status={status}
+        data-testid="ticket-status-badge-motion"
+        initial={reduced ? false : { opacity: 0.92, scale: 0.96 }}
+        animate={
+          reduced
+            ? undefined
+            : { opacity: 1, scale: [0.96, 1.05, 1] }
+        }
+        exit={reduced ? undefined : { opacity: 0.96, scale: 0.98 }}
+        transition={
+          reduced
+            ? undefined
+            : { duration: MOTION_DURATIONS.base, ease: MOTION_EASE }
+        }
+        className="inline-flex motion-reduce:transform-none motion-reduce:transition-none"
+        style={reduced ? undefined : { willChange: 'transform, opacity' }}
+      >
+        <Badge
+          variant="outline"
+          className={cn('text-xs font-medium', STATUS_COLORS[status], className)}
+        >
+          {STATUS_LABELS[status]}
+        </Badge>
+      </m.span>
+    </AnimatePresence>
   )
 }
