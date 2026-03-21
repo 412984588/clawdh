@@ -1,0 +1,35 @@
+{
+  "product": "Redis Patterns",
+  "version": "1.0.0",
+  "tiers": [
+    {
+      "id": "starter",
+      "price_usd": 19,
+      "zip_name": "redis-patterns-starter-v1.0.0.zip",
+      "templates": [
+        "01-string-operations",
+        "02-hash-maps",
+        "03-lists-queues",
+        "04-sets-sorted-sets",
+        "05-pub-sub"
+      ]
+    },
+    {
+      "id": "pro",
+      "price_usd": 39,
+      "zip_name": "redis-patterns-pro-v1.0.0.zip",
+      "templates": [
+        "01-string-operations",
+        "02-hash-maps",
+        "03-lists-queues",
+        "04-sets-sorted-sets",
+        "05-pub-sub",
+        "06-caching-strategy",
+        "07-rate-limiting",
+        "08-session-store",
+        "09-distributed-locks",
+        "10-streams-events"
+      ]
+    }
+  ]
+}
