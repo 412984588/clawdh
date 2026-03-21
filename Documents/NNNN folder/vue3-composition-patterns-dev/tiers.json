@@ -1,0 +1,37 @@
+{
+  "product": "Vue 3 Composition API Patterns",
+  "version": "1.0.0",
+  "tiers": [
+    {
+      "id": "starter",
+      "name": "Starter",
+      "price_usd": 19,
+      "zip_name": "vue3-composition-patterns-starter-v1.0.0.zip",
+      "templates": [
+        "01-script-setup",
+        "02-composables",
+        "03-pinia-store",
+        "04-vue-router",
+        "05-reactive-forms"
+      ]
+    },
+    {
+      "id": "pro",
+      "name": "Pro",
+      "price_usd": 39,
+      "zip_name": "vue3-composition-patterns-pro-v1.0.0.zip",
+      "templates": [
+        "01-script-setup",
+        "02-composables",
+        "03-pinia-store",
+        "04-vue-router",
+        "05-reactive-forms",
+        "06-provide-inject",
+        "07-async-patterns",
+        "08-typescript-vue",
+        "09-transitions",
+        "10-testing-patterns"
+      ]
+    }
+  ]
+}
