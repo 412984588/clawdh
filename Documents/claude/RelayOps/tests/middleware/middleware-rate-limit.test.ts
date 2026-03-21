@@ -39,6 +39,7 @@ vi.mock('@/lib/middleware/rate-limit-config', () => ({
 
 import { middleware } from '../../middleware'
 import { NextRequest } from 'next/server'
+import { updateSession } from '@/lib/supabase/middleware'
 
 function createRequest(path: string, method = 'GET', ip = '1.2.3.4') {
   const url = `http://localhost:3000${path}`
@@ -86,6 +87,38 @@ describe('middleware rate limiting integration', () => {
 
     // 不是 429，请求正常通过
     expect(res.status).not.toBe(429)
+  })
+
+  it('treats locale-prefixed public pricing route as public without auth redirect', async () => {
+    mockGetConfigForPath.mockReturnValue({ maxRequests: 100, windowMs: 60_000 })
+    mockCheckRateLimit.mockReturnValue({
+      allowed: true,
+      remaining: 99,
+      resetAt: Date.now() + 60_000,
+    })
+
+    const req = createRequest('/en/pricing', 'GET')
+    const res = await middleware(req)
+
+    expect(updateSession).not.toHaveBeenCalled()
+    expect(res.headers.get('location')).toBeNull()
+    expect(res.status).toBe(200)
+  })
+
+  it('treats locale-prefixed public case studies route as public without auth redirect', async () => {
+    mockGetConfigForPath.mockReturnValue({ maxRequests: 100, windowMs: 60_000 })
+    mockCheckRateLimit.mockReturnValue({
+      allowed: true,
+      remaining: 99,
+      resetAt: Date.now() + 60_000,
+    })
+
+    const req = createRequest('/en/case-studies', 'GET')
+    const res = await middleware(req)
+
+    expect(updateSession).not.toHaveBeenCalled()
+    expect(res.headers.get('location')).toBeNull()
+    expect(res.status).toBe(200)
   })
 
   it('skips rate limiting when config is null (cron routes)', async () => {

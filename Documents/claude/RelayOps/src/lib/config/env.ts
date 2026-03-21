@@ -22,7 +22,7 @@ export const envSchema = z.object({
   MIXPANEL_TOKEN: z.string().optional(),
 
   // Cron
-  CRON_SECRET: z.string().optional(),
+  CRON_SECRET: z.string(),
   ADMIN_NOTIFICATION_EMAIL: z.string().email().optional(),
 
   // App
@@ -49,6 +49,10 @@ if (process.env.VERCEL_ENV === 'production' && env.INTEGRATION_MODE === 'mock') 
     'FATAL: INTEGRATION_MODE=mock is not allowed in production. ' +
     'Set INTEGRATION_MODE=live in your production environment.'
   )
+}
+
+if (process.env.VERCEL_ENV === 'production' && !env.CRON_SECRET.trim()) {
+  throw new Error('FATAL: CRON_SECRET is required in production.')
 }
 
 export type Env = z.infer<typeof envSchema>

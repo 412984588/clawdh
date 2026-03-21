@@ -14,6 +14,7 @@ const intlMiddleware = createIntlMiddleware(routing)
 
 const PUBLIC_ROUTES = [
   '/',
+  '/design-preview',
   '/how-it-works',
   '/for-partners',
   '/request-access',
@@ -34,10 +35,24 @@ const ROLE_ROUTES: Record<string, string> = {
   worker_internal: '/worker',
 }
 
+function stripLocalePrefix(pathname: string): string {
+  const segments = pathname.split('/')
+  const locale = segments[1]
+
+  if (!locale || !routing.locales.some((candidate) => candidate === locale)) {
+    return pathname
+  }
+
+  const normalizedPath = `/${segments.slice(2).join('/')}`.replace(/\/$/, '')
+  return normalizedPath === '' ? '/' : normalizedPath
+}
+
 // Check if path is a public route
 function isPublicPath(pathname: string): boolean {
+  const normalizedPathname = stripLocalePrefix(pathname)
+
   return PUBLIC_ROUTES.some(
-    (r) => pathname === r || pathname.startsWith(r + '/')
+    (r) => normalizedPathname === r || normalizedPathname.startsWith(r + '/')
   )
 }
 
