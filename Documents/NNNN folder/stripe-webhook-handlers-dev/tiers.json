@@ -1,0 +1,39 @@
+{
+  "product": "Stripe Webhook Handlers Pack",
+  "version": "1.0.0",
+  "tiers": [
+    {
+      "id": "starter",
+      "name": "Starter",
+      "price_usd": 19,
+      "template_count": 5,
+      "templates": [
+        "01-payment-intent-succeeded",
+        "02-payment-intent-failed",
+        "03-subscription-created",
+        "04-subscription-updated",
+        "05-subscription-deleted"
+      ],
+      "zip_name": "stripe-webhook-handlers-starter-v1.0.0.zip"
+    },
+    {
+      "id": "pro",
+      "name": "Pro",
+      "price_usd": 39,
+      "template_count": 10,
+      "templates": [
+        "01-payment-intent-succeeded",
+        "02-payment-intent-failed",
+        "03-subscription-created",
+        "04-subscription-updated",
+        "05-subscription-deleted",
+        "06-invoice-paid",
+        "07-invoice-payment-failed",
+        "08-trial-ending",
+        "09-checkout-session-completed",
+        "10-webhook-router"
+      ],
+      "zip_name": "stripe-webhook-handlers-pro-v1.0.0.zip"
+    }
+  ]
+}
