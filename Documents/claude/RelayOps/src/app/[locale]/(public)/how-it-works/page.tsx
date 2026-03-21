@@ -143,22 +143,22 @@ const FAQS = [
 export default function HowItWorksPage() {
   return (
     <div className="flex flex-col bg-white">
-      <section className="relative overflow-hidden bg-zinc-950 py-20 text-white md:py-28">
+      <section className="relative overflow-hidden bg-zinc-950 py-16 text-white sm:py-20 md:py-28">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(180,83,9,0.28),transparent_28%),radial-gradient(circle_at_82%_20%,rgba(180,83,9,0.16),transparent_24%)]" />
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:120px_120px] opacity-20" />
         <div className="container relative">
           <div className="mx-auto max-w-4xl text-center">
             <div
               data-reveal
-              className="opacity-0 translate-y-6 transition-all duration-700 ease-out motion-reduce:translate-y-0 motion-reduce:opacity-100"
+              className="translate-y-0 opacity-100 transition-all duration-700 ease-out lg:translate-y-6 lg:opacity-0 motion-reduce:translate-y-0 motion-reduce:opacity-100"
             >
-              <Badge className="rounded-full border border-amber-500/20 bg-white/10 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.28em] text-amber-200 hover:bg-white/10">
+              <Badge className="rounded-full border border-amber-500/20 bg-white/10 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-amber-200 hover:bg-white/10 sm:px-4 sm:text-[11px] sm:tracking-[0.28em]">
                 Process
               </Badge>
-              <h1 className="mt-8 text-5xl font-black tracking-[-0.08em] text-balance text-white md:text-7xl lg:leading-[0.96]">
+              <h1 className="mx-auto mt-6 max-w-[10ch] text-[2.75rem] font-black leading-[0.93] tracking-[-0.08em] text-balance text-white sm:mt-8 sm:max-w-4xl sm:text-5xl md:text-7xl lg:leading-[0.96]">
                 From Brief to Clean Data in 5 Steps
               </h1>
-              <p className="mx-auto mt-6 max-w-3xl text-lg leading-8 text-zinc-300 md:text-xl">
+              <p className="mx-auto mt-5 max-w-3xl text-base leading-7 text-zinc-300 sm:mt-6 sm:text-lg sm:leading-8 md:text-xl">
                 Every job follows the same structured process — scoped before it starts, reviewed
                 before it closes.
               </p>
@@ -167,17 +167,17 @@ export default function HowItWorksPage() {
         </div>
       </section>
 
-      <section className="bg-white py-20 md:py-28">
+      <section className="bg-white py-16 sm:py-20 md:py-28">
         <div className="container">
           <div className="grid gap-6 xl:grid-cols-[0.7fr_1fr]">
             <div
               data-reveal
-              className="opacity-0 translate-y-6 transition-all duration-700 ease-out motion-reduce:translate-y-0 motion-reduce:opacity-100"
+              className="translate-y-0 opacity-100 transition-all duration-700 ease-out lg:translate-y-6 lg:opacity-0 motion-reduce:translate-y-0 motion-reduce:opacity-100"
             >
               <p className="text-xs font-semibold uppercase tracking-[0.28em] text-amber-700">
                 Timeline
               </p>
-              <h2 className="mt-5 max-w-lg text-4xl font-black tracking-[-0.06em] text-zinc-950 text-balance md:text-5xl">
+              <h2 className="mt-5 max-w-[11ch] text-3xl font-black tracking-[-0.06em] text-zinc-950 text-balance sm:max-w-lg sm:text-4xl md:text-5xl">
                 The five-step process from brief to clean, import-ready CRM data.
               </h2>
             </div>
@@ -189,10 +189,10 @@ export default function HowItWorksPage() {
                   <div
                     key={item.step}
                     data-reveal
-                    className="opacity-0 translate-y-6 transition-all duration-700 ease-out motion-reduce:translate-y-0 motion-reduce:opacity-100"
+                    className="translate-y-0 opacity-100 transition-all duration-700 ease-out lg:translate-y-6 lg:opacity-0 motion-reduce:translate-y-0 motion-reduce:opacity-100"
                     style={{ transitionDelay: `${index * 100}ms` }}
                   >
-                    <div className={`rounded-[2rem] border border-zinc-200 border-t-4 ${item.accent} bg-white p-6 shadow-[0_18px_50px_-34px_rgba(15,23,42,0.18)] transition-all duration-300 hover:-translate-y-1 hover:border-amber-200 hover:shadow-[0_30px_70px_-36px_rgba(180,83,9,0.18)]`}>
+                    <div className={`rounded-[2rem] border border-zinc-200 border-t-4 ${item.accent} bg-white p-5 shadow-[0_18px_50px_-34px_rgba(15,23,42,0.18)] transition-all duration-300 hover:-translate-y-1 hover:border-amber-200 hover:shadow-[0_30px_70px_-36px_rgba(180,83,9,0.18)] sm:p-6`}>
                       <div className="flex flex-col gap-5 sm:flex-row">
                         <div className="flex items-center gap-4">
                           <div className={`flex h-14 w-14 items-center justify-center rounded-2xl ${item.iconBg}`}>
@@ -206,10 +206,10 @@ export default function HowItWorksPage() {
                           </div>
                         </div>
                         <div className="flex-1">
-                          <h3 className="text-2xl font-bold tracking-[-0.04em] text-zinc-950">
+                          <h3 className="text-xl font-bold tracking-[-0.04em] text-zinc-950 sm:text-2xl">
                             {item.title}
                           </h3>
-                          <p className="mt-3 text-base leading-7 text-zinc-600">
+                          <p className="mt-3 text-[15px] leading-7 text-zinc-600 sm:text-base">
                             {item.description}
                           </p>
                           <div className="mt-4 flex items-start gap-2 rounded-2xl border border-zinc-100 bg-zinc-50 px-4 py-3">
@@ -227,20 +227,20 @@ export default function HowItWorksPage() {
         </div>
       </section>
 
-      <section className="relative overflow-hidden bg-zinc-950 py-20 text-white md:py-28">
+      <section className="relative overflow-hidden bg-zinc-950 py-16 text-white sm:py-20 md:py-28">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(180,83,9,0.22),transparent_38%)]" />
         <div className="container relative">
           <div
             data-reveal
-            className="mx-auto max-w-2xl text-center opacity-0 translate-y-6 transition-all duration-700 ease-out motion-reduce:translate-y-0 motion-reduce:opacity-100"
+            className="mx-auto max-w-2xl translate-y-0 text-center opacity-100 transition-all duration-700 ease-out lg:translate-y-6 lg:opacity-0 motion-reduce:translate-y-0 motion-reduce:opacity-100"
           >
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-amber-300">
               Pricing Tiers
             </p>
-            <h2 className="mt-5 text-4xl font-black tracking-[-0.06em] text-white text-balance md:text-5xl">
+            <h2 className="mt-5 text-3xl font-black tracking-[-0.06em] text-white text-balance sm:text-4xl md:text-5xl">
               Pricing Tiers
             </h2>
-            <p className="mt-5 text-lg leading-8 text-zinc-300">
+            <p className="mt-5 text-base leading-7 text-zinc-300 sm:text-lg sm:leading-8">
               All prices are per job. Volume agreements available for partners with predictable monthly flow.
             </p>
           </div>
@@ -250,7 +250,7 @@ export default function HowItWorksPage() {
               <div
                 key={tier.tier}
                 data-reveal
-                className={`rounded-[2rem] border p-6 opacity-0 translate-y-6 transition-all duration-300 ease-out motion-reduce:translate-y-0 motion-reduce:opacity-100 ${
+                className={`rounded-[2rem] border p-5 translate-y-0 opacity-100 transition-all duration-300 ease-out lg:translate-y-6 lg:opacity-0 motion-reduce:translate-y-0 motion-reduce:opacity-100 sm:p-6 ${
                   index === 1
                     ? 'border-amber-500/40 bg-gradient-to-b from-amber-700/18 via-zinc-900 to-zinc-950 shadow-[0_30px_90px_-44px_rgba(180,83,9,0.6)] hover:-translate-y-1 hover:shadow-[0_36px_110px_-38px_rgba(180,83,9,0.7)]'
                     : 'border-white/10 bg-white/5 shadow-[0_24px_60px_-40px_rgba(15,23,42,0.82)] hover:-translate-y-1 hover:bg-white/10 hover:shadow-[0_28px_70px_-34px_rgba(180,83,9,0.25)]'
@@ -260,7 +260,7 @@ export default function HowItWorksPage() {
                 <p className="text-xs font-semibold uppercase tracking-[0.28em] text-zinc-400">
                   {tier.tier}
                 </p>
-                <p className="mt-4 text-4xl font-black tracking-[-0.06em] text-white">
+                <p className="mt-4 text-3xl font-black tracking-[-0.06em] text-white sm:text-4xl">
                   {tier.price}
                 </p>
                 <div className="mt-5 space-y-3 text-sm leading-6 text-zinc-300">
@@ -276,16 +276,16 @@ export default function HowItWorksPage() {
         </div>
       </section>
 
-      <section className="bg-white py-20 md:py-28">
+      <section className="bg-white py-16 sm:py-20 md:py-28">
         <div className="container">
           <div
             data-reveal
-            className="mx-auto max-w-2xl text-center opacity-0 translate-y-6 transition-all duration-700 ease-out motion-reduce:translate-y-0 motion-reduce:opacity-100"
+            className="mx-auto max-w-2xl translate-y-0 text-center opacity-100 transition-all duration-700 ease-out lg:translate-y-6 lg:opacity-0 motion-reduce:translate-y-0 motion-reduce:opacity-100"
           >
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-amber-700">
               Frequently Asked Questions
             </p>
-            <h2 className="mt-5 text-4xl font-black tracking-[-0.06em] text-zinc-950 text-balance md:text-5xl">
+            <h2 className="mt-5 text-3xl font-black tracking-[-0.06em] text-zinc-950 text-balance sm:text-4xl md:text-5xl">
               Frequently Asked Questions
             </h2>
           </div>
@@ -294,42 +294,42 @@ export default function HowItWorksPage() {
               <div
                 key={item.q}
                 data-reveal
-                className="rounded-[2rem] border border-zinc-200 bg-white p-7 opacity-0 translate-y-6 shadow-[0_18px_50px_-34px_rgba(15,23,42,0.18)] transition-all duration-300 ease-out hover:-translate-y-1 hover:border-amber-200 hover:shadow-[0_30px_70px_-36px_rgba(180,83,9,0.18)] motion-reduce:translate-y-0 motion-reduce:opacity-100"
+                className="rounded-[2rem] border border-zinc-200 bg-white p-6 translate-y-0 opacity-100 shadow-[0_18px_50px_-34px_rgba(15,23,42,0.18)] transition-all duration-300 ease-out hover:-translate-y-1 hover:border-amber-200 hover:shadow-[0_30px_70px_-36px_rgba(180,83,9,0.18)] lg:translate-y-6 lg:opacity-0 motion-reduce:translate-y-0 motion-reduce:opacity-100 sm:p-7"
                 style={{ transitionDelay: `${index * 90}ms` }}
               >
                 <h3 className="text-xl font-bold tracking-[-0.03em] text-zinc-950">{item.q}</h3>
-                <p className="mt-4 text-base leading-7 text-zinc-600">{item.a}</p>
+                <p className="mt-4 text-[15px] leading-7 text-zinc-600 sm:text-base">{item.a}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="relative overflow-hidden bg-zinc-950 py-20 text-white md:py-24">
+      <section className="relative overflow-hidden bg-zinc-950 py-16 text-white sm:py-20 md:py-24">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(180,83,9,0.22),transparent_36%)]" />
         <div className="container relative text-center">
           <div
             data-reveal
-            className="mx-auto max-w-3xl opacity-0 translate-y-6 transition-all duration-700 ease-out motion-reduce:translate-y-0 motion-reduce:opacity-100"
+            className="mx-auto max-w-3xl translate-y-0 opacity-100 transition-all duration-700 ease-out lg:translate-y-6 lg:opacity-0 motion-reduce:translate-y-0 motion-reduce:opacity-100"
           >
-            <h2 className="text-4xl font-black tracking-[-0.06em] text-balance md:text-5xl">
+            <h2 className="text-3xl font-black tracking-[-0.06em] text-balance sm:text-4xl md:text-5xl">
               Ready to get started?
             </h2>
-            <p className="mx-auto mt-5 max-w-md text-lg leading-8 text-zinc-300">
+            <p className="mx-auto mt-5 max-w-md text-base leading-7 text-zinc-300 sm:text-lg sm:leading-8">
               Apply for partner access and have your portal set up within 2 business days.
             </p>
             <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
               <Button
                 asChild
                 size="lg"
-                className="rounded-full border border-amber-600/40 bg-amber-700 px-7 text-white shadow-[0_24px_44px_-20px_rgba(180,83,9,0.7)] transition-all duration-300 hover:-translate-y-1 hover:bg-amber-600 hover:shadow-[0_34px_55px_-18px_rgba(180,83,9,0.75)]"
+                className="w-full rounded-full border border-blue-600/40 bg-blue-600 px-7 text-white shadow-[0_24px_44px_-20px_rgba(37,99,235,0.72)] transition-all duration-300 hover:-translate-y-1 hover:bg-blue-700 hover:shadow-[0_34px_55px_-18px_rgba(37,99,235,0.82)] sm:w-auto"
               >
                 <Link href="/request-access">Apply for partner access</Link>
               </Button>
               <Button
                 asChild
                 size="lg"
-                className="rounded-full border border-white/15 bg-white/5 px-7 text-white transition-all duration-300 hover:-translate-y-1 hover:border-white/25 hover:bg-white/10"
+                className="w-full rounded-full border border-white/15 bg-white/5 px-7 text-white transition-all duration-300 hover:-translate-y-1 hover:border-white/25 hover:bg-white/10 sm:w-auto"
               >
                 <Link href="/pilot-sample">Start with a Pilot</Link>
               </Button>
