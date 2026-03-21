@@ -1,0 +1,100 @@
+// Prisma Schema: Analytics
+// Page views, events, sessions, and daily aggregated metrics
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model AnalyticsSession {
+  id          String    @id @default(cuid())
+  visitorId   String    // anonymous fingerprint
+  userId      String?   // logged-in user
+  startedAt   DateTime  @default(now())
+  endedAt     DateTime?
+  duration    Int?      // seconds
+  referrer    String?
+  utmSource   String?
+  utmMedium   String?
+  utmCampaign String?
+  country     String?
+  city        String?
+  device      String?   // "desktop" | "mobile" | "tablet"
+  browser     String?
+  os          String?
+
+  pageViews PageView[]
+  events    Event[]
+
+  @@index([visitorId])
+  @@index([userId])
+  @@index([startedAt])
+  @@map("analytics_sessions")
+}
+
+model PageView {
+  id         String          @id @default(cuid())
+  sessionId  String
+  url        String
+  path       String
+  title      String?
+  referrer   String?
+  timeOnPage Int?            // seconds
+  timestamp  DateTime        @default(now())
+
+  session AnalyticsSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
+  @@index([path, timestamp])
+  @@map("page_views")
+}
+
+model Event {
+  id         String          @id @default(cuid())
+  sessionId  String
+  name       String          // "button_click", "form_submit", "purchase"
+  category   String?         // "engagement", "conversion"
+  label      String?
+  value      Float?
+  properties Json            @default("{}")
+  timestamp  DateTime        @default(now())
+
+  session AnalyticsSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([name, timestamp])
+  @@index([sessionId])
+  @@map("events")
+}
+
+model DailyMetric {
+  id          String   @id @default(cuid())
+  date        DateTime @db.Date
+  metric      String   // "pageviews", "sessions", "unique_visitors"
+  dimension   String   @default("total")  // "country:US", "device:mobile"
+  value       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([date, metric, dimension])
+  @@index([date])
+  @@index([metric])
+  @@map("daily_metrics")
+}
+
+model GoalConversion {
+  id        String   @id @default(cuid())
+  goalName  String
+  sessionId String
+  userId    String?
+  value     Float?
+  metadata  Json     @default("{}")
+  occurredAt DateTime @default(now())
+
+  @@index([goalName, occurredAt])
+  @@index([sessionId])
+  @@map("goal_conversions")
+}

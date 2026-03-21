@@ -1,0 +1,72 @@
+// Prisma Schema: Audit Log
+// Immutable event log with field-level change tracking
+// Rows are never updated or deleted (append-only)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Insert-only audit log — never UPDATE or DELETE rows
+model AuditLog {
+  id             String      @id @default(cuid())
+  organizationId String?
+  actorId        String?     // user who performed the action
+  actorEmail     String?     // denormalized for historical accuracy
+  actorIp        String?
+  actorUserAgent String?
+  action         String      // "user.created", "post.deleted", "settings.updated"
+  resourceType   String      // "User", "Post", "Organization"
+  resourceId     String      // ID of the affected resource
+  resourceName   String?     // human-readable name at time of action
+  outcome        AuditOutcome @default(SUCCESS)
+  metadata       Json        @default("{}")  // additional context
+  requestId      String?     // trace/correlation ID
+  occurredAt     DateTime    @default(now())
+
+  fieldChanges FieldChange[]
+
+  @@index([organizationId, occurredAt])
+  @@index([actorId, occurredAt])
+  @@index([resourceType, resourceId])
+  @@index([action])
+  @@map("audit_logs")
+}
+
+// Field-level change records attached to an audit log entry
+model FieldChange {
+  id           String @id @default(cuid())
+  auditLogId   String
+  fieldName    String
+  oldValue     String? @db.Text  // JSON-serialized previous value
+  newValue     String? @db.Text  // JSON-serialized new value
+  isSensitive  Boolean @default(false)  // true = mask in UI
+
+  auditLog AuditLog @relation(fields: [auditLogId], references: [id], onDelete: Cascade)
+
+  @@index([auditLogId])
+  @@map("field_changes")
+}
+
+// Optional: snapshot of resource state at time of audit event
+model ResourceSnapshot {
+  id           String   @id @default(cuid())
+  auditLogId   String   @unique
+  resourceType String
+  resourceId   String
+  snapshot     Json     // full resource state
+  capturedAt   DateTime @default(now())
+
+  @@index([resourceType, resourceId])
+  @@map("resource_snapshots")
+}
+
+enum AuditOutcome {
+  SUCCESS
+  FAILURE
+  PARTIAL
+}

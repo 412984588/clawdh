@@ -1,0 +1,122 @@
+// Prisma Schema: Blog CMS
+// Full-featured blog with authors, categories, tags, posts, and comments
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Author {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  bio       String?  @db.Text
+  avatar    String?
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  posts Post[]
+
+  @@index([slug])
+  @@map("authors")
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+
+  posts Post[]
+
+  @@index([slug])
+  @@map("categories")
+}
+
+model Tag {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  slug      String   @unique
+  createdAt DateTime @default(now())
+
+  postTags PostTag[]
+
+  @@index([slug])
+  @@map("tags")
+}
+
+model Post {
+  id          String      @id @default(cuid())
+  title       String
+  slug        String      @unique
+  excerpt     String?     @db.Text
+  content     String      @db.Text
+  coverImage  String?
+  status      PostStatus  @default(DRAFT)
+  authorId    String
+  categoryId  String?
+  publishedAt DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  viewCount   Int         @default(0)
+
+  author    Author    @relation(fields: [authorId], references: [id])
+  category  Category? @relation(fields: [categoryId], references: [id])
+  comments  Comment[]
+  postTags  PostTag[]
+
+  @@index([slug])
+  @@index([authorId])
+  @@index([status, publishedAt])
+  @@map("posts")
+}
+
+model PostTag {
+  postId String
+  tagId  String
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([postId, tagId])
+  @@map("post_tags")
+}
+
+model Comment {
+  id        String        @id @default(cuid())
+  content   String        @db.Text
+  postId    String
+  authorName  String
+  authorEmail String
+  status    CommentStatus @default(PENDING)
+  parentId  String?       // for nested comments
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  post     Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  parent   Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies  Comment[] @relation("CommentReplies")
+
+  @@index([postId])
+  @@index([status])
+  @@map("comments")
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum CommentStatus {
+  PENDING
+  APPROVED
+  SPAM
+  DELETED
+}

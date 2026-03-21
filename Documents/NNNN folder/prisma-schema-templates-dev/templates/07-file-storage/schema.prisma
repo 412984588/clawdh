@@ -1,0 +1,109 @@
+// Prisma Schema: File Storage
+// Folders, files, versioning, and sharing
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Folder {
+  id          String   @id @default(cuid())
+  name        String
+  parentId    String?
+  ownerId     String
+  path        String   // materialized path: "/root/docs/reports"
+  isRoot      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  parent   Folder?  @relation("FolderTree", fields: [parentId], references: [id])
+  children Folder[] @relation("FolderTree")
+  files    File[]
+
+  @@index([ownerId])
+  @@index([path])
+  @@index([parentId])
+  @@map("folders")
+}
+
+model File {
+  id           String     @id @default(cuid())
+  name         String
+  originalName String
+  mimeType     String
+  size         BigInt     // bytes — BigInt for large files
+  folderId     String?
+  ownerId      String
+  storageKey   String     @unique  // S3/GCS object key
+  storageUrl   String     // public or signed base URL
+  checksum     String?    // MD5 or SHA256 for integrity
+  isPublic     Boolean    @default(false)
+  status       FileStatus @default(READY)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  deletedAt    DateTime?  // soft delete
+
+  folder   Folder?       @relation(fields: [folderId], references: [id])
+  versions FileVersion[]
+  shares   FileShare[]
+
+  @@index([ownerId])
+  @@index([folderId])
+  @@index([storageKey])
+  @@map("files")
+}
+
+model FileVersion {
+  id         String   @id @default(cuid())
+  fileId     String
+  version    Int      // 1, 2, 3...
+  storageKey String   @unique
+  size       BigInt
+  createdById String
+  comment    String?
+  createdAt  DateTime @default(now())
+
+  file File @relation(fields: [fileId], references: [id], onDelete: Cascade)
+
+  @@unique([fileId, version])
+  @@index([fileId])
+  @@map("file_versions")
+}
+
+model FileShare {
+  id         String      @id @default(cuid())
+  fileId     String
+  shareToken String      @unique @default(cuid())
+  sharedById String
+  sharedWithEmail String?
+  permission SharePermission @default(VIEW)
+  expiresAt  DateTime?
+  accessCount Int        @default(0)
+  maxAccess  Int?        // null = unlimited
+  password   String?     // bcrypt hash
+  createdAt  DateTime    @default(now())
+
+  file File @relation(fields: [fileId], references: [id], onDelete: Cascade)
+
+  @@index([shareToken])
+  @@index([fileId])
+  @@map("file_shares")
+}
+
+enum FileStatus {
+  UPLOADING
+  PROCESSING
+  READY
+  ERROR
+  DELETED
+}
+
+enum SharePermission {
+  VIEW
+  DOWNLOAD
+  EDIT
+}

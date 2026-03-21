@@ -1,0 +1,135 @@
+// Prisma Schema: Social Network
+// Users, follows, posts, likes, comments, and hashtags
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id @default(cuid())
+  username    String   @unique
+  displayName String
+  bio         String?  @db.Text
+  avatarUrl   String?
+  website     String?
+  isVerified  Boolean  @default(false)
+  isPrivate   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  posts       Post[]
+  likes       Like[]
+  comments    Comment[]
+
+  // Self-referential many-to-many for follows
+  following   Follow[] @relation("Follower")
+  followers   Follow[] @relation("Following")
+
+  @@index([username])
+  @@map("users")
+}
+
+model Follow {
+  id          String       @id @default(cuid())
+  followerId  String
+  followingId String
+  status      FollowStatus @default(ACCEPTED)  // PENDING for private accounts
+  createdAt   DateTime     @default(now())
+
+  follower  User @relation("Follower",  fields: [followerId],  references: [id], onDelete: Cascade)
+  following User @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+  @@index([followingId])
+  @@map("follows")
+}
+
+model Post {
+  id          String   @id @default(cuid())
+  authorId    String
+  content     String   @db.Text
+  imageUrls   String[]
+  viewCount   Int      @default(0)
+  likeCount   Int      @default(0)  // denormalized counter
+  commentCount Int     @default(0)  // denormalized counter
+  isPublic    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  author      User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  likes       Like[]
+  comments    Comment[]
+  postHashtags PostHashtag[]
+
+  @@index([authorId, createdAt])
+  @@index([createdAt])
+  @@map("posts")
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  userId    String
+  postId    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+  @@index([postId])
+  @@map("likes")
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  postId    String
+  authorId  String
+  content   String   @db.Text
+  parentId  String?  // for nested replies
+  likeCount Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  post     Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author   User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  parent   Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies  Comment[] @relation("CommentReplies")
+
+  @@index([postId])
+  @@index([authorId])
+  @@map("comments")
+}
+
+model Hashtag {
+  id        String   @id @default(cuid())
+  tag       String   @unique  // without #, lowercase
+  postCount Int      @default(0)  // denormalized
+  createdAt DateTime @default(now())
+
+  postHashtags PostHashtag[]
+
+  @@index([postCount])
+  @@map("hashtags")
+}
+
+model PostHashtag {
+  postId    String
+  hashtagId String
+
+  post    Post    @relation(fields: [postId],    references: [id], onDelete: Cascade)
+  hashtag Hashtag @relation(fields: [hashtagId], references: [id], onDelete: Cascade)
+
+  @@id([postId, hashtagId])
+  @@map("post_hashtags")
+}
+
+enum FollowStatus {
+  PENDING   // for private accounts requiring approval
+  ACCEPTED
+  REJECTED
+}

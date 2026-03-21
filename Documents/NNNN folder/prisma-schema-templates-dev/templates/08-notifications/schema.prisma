@@ -1,0 +1,115 @@
+// Prisma Schema: Notifications
+// In-app, email, push notification system with user preferences
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model NotificationType {
+  id          String  @id @default(cuid())
+  key         String  @unique  // "new_message", "order_shipped"
+  name        String
+  description String?
+  category    String  @default("general")
+  template    Json    // { subject, body } templates
+  isActive    Boolean @default(true)
+
+  notifications   Notification[]
+  preferences     UserNotificationPreference[]
+
+  @@map("notification_types")
+}
+
+model UserNotificationPreference {
+  id                 String   @id @default(cuid())
+  userId             String
+  notificationTypeId String
+  inApp              Boolean  @default(true)
+  email              Boolean  @default(true)
+  push               Boolean  @default(false)
+  updatedAt          DateTime @updatedAt
+
+  notificationType NotificationType @relation(fields: [notificationTypeId], references: [id])
+
+  @@unique([userId, notificationTypeId])
+  @@index([userId])
+  @@map("user_notification_preferences")
+}
+
+model Notification {
+  id                 String             @id @default(cuid())
+  userId             String
+  notificationTypeId String
+  title              String
+  body               String
+  imageUrl           String?
+  actionUrl          String?
+  metadata           Json               @default("{}")
+  channel            NotificationChannel @default(IN_APP)
+  status             NotificationStatus @default(UNREAD)
+  readAt             DateTime?
+  sentAt             DateTime?
+  failedAt           DateTime?
+  failReason         String?
+  createdAt          DateTime           @default(now())
+
+  notificationType NotificationType @relation(fields: [notificationTypeId], references: [id])
+
+  @@index([userId, status])
+  @@index([userId, createdAt])
+  @@map("notifications")
+}
+
+model PushToken {
+  id        String      @id @default(cuid())
+  userId    String
+  token     String      @unique
+  platform  PushPlatform
+  deviceId  String?
+  appVersion String?
+  isActive  Boolean     @default(true)
+  lastUsedAt DateTime?
+  createdAt DateTime    @default(now())
+
+  @@index([userId])
+  @@map("push_tokens")
+}
+
+model NotificationDigest {
+  id           String   @id @default(cuid())
+  userId       String
+  frequency    String   // "daily", "weekly"
+  lastSentAt   DateTime?
+  nextSendAt   DateTime
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  @@unique([userId, frequency])
+  @@index([nextSendAt])
+  @@map("notification_digests")
+}
+
+enum NotificationChannel {
+  IN_APP
+  EMAIL
+  PUSH
+  SMS
+}
+
+enum NotificationStatus {
+  UNREAD
+  READ
+  ARCHIVED
+  FAILED
+}
+
+enum PushPlatform {
+  IOS
+  ANDROID
+  WEB
+}

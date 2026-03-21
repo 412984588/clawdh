@@ -1,0 +1,137 @@
+// Prisma Schema: SaaS Billing
+// Plans, subscriptions, invoices, and usage tracking
+// Designed for Stripe integration
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String   @id @default(cuid())
+  email            String   @unique
+  name             String?
+  stripeCustomerId String?  @unique
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  subscriptions Subscription[]
+
+  @@map("users")
+}
+
+model Plan {
+  id               String   @id @default(cuid())
+  name             String   @unique  // "free", "pro", "enterprise"
+  displayName      String
+  stripePriceId    String?  @unique  // Stripe Price ID
+  stripeProductId  String?  @unique  // Stripe Product ID
+  priceMonthly     Int      @default(0)  // cents
+  priceYearly      Int      @default(0)  // cents
+  features         Json     @default("[]")  // array of feature strings
+  limits           Json     @default("{}")  // { seats: 5, storage: 10 }
+  isActive         Boolean  @default(true)
+  sortOrder        Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  subscriptions Subscription[]
+
+  @@index([isActive])
+  @@map("plans")
+}
+
+model Subscription {
+  id                   String             @id @default(cuid())
+  userId               String
+  planId               String
+  stripeSubscriptionId String?            @unique
+  status               SubscriptionStatus @default(ACTIVE)
+  currentPeriodStart   DateTime
+  currentPeriodEnd     DateTime
+  cancelAtPeriodEnd    Boolean            @default(false)
+  canceledAt           DateTime?
+  trialStart           DateTime?
+  trialEnd             DateTime?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan     Plan      @relation(fields: [planId], references: [id])
+  invoices Invoice[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([currentPeriodEnd])
+  @@map("subscriptions")
+}
+
+model Invoice {
+  id               String        @id @default(cuid())
+  subscriptionId   String
+  stripeInvoiceId  String?       @unique
+  amount           Int           // cents
+  currency         String        @default("usd")
+  status           InvoiceStatus @default(DRAFT)
+  hostedUrl        String?
+  pdfUrl           String?
+  periodStart      DateTime
+  periodEnd        DateTime
+  paidAt           DateTime?
+  createdAt        DateTime      @default(now())
+
+  subscription Subscription  @relation(fields: [subscriptionId], references: [id])
+  lineItems    InvoiceItem[]
+
+  @@index([subscriptionId])
+  @@index([status])
+  @@map("invoices")
+}
+
+model InvoiceItem {
+  id          String   @id @default(cuid())
+  invoiceId   String
+  description String
+  quantity    Int      @default(1)
+  unitAmount  Int      // cents
+  amount      Int      // quantity * unitAmount
+  createdAt   DateTime @default(now())
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@map("invoice_items")
+}
+
+model UsageRecord {
+  id             String   @id @default(cuid())
+  subscriptionId String
+  metric         String   // "api_calls", "storage_gb", "seats"
+  quantity       Int
+  recordedAt     DateTime @default(now())
+
+  @@index([subscriptionId, metric])
+  @@index([recordedAt])
+  @@map("usage_records")
+}
+
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  UNPAID
+  INCOMPLETE
+  PAUSED
+}
+
+enum InvoiceStatus {
+  DRAFT
+  OPEN
+  PAID
+  VOID
+  UNCOLLECTIBLE
+}
