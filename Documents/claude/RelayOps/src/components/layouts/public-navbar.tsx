@@ -6,6 +6,7 @@ import { ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 const navLinks = [
+  { href: '/demo', label: 'Demo' },
   { href: '/case-studies', label: 'Case Studies' },
   { href: '/how-it-works', label: 'How It Works' },
   { href: '/for-partners', label: 'For Partners' },

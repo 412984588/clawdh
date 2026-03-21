@@ -20,6 +20,12 @@ vi.mock('next/link', () => ({
 }))
 
 describe('PublicNavbar', () => {
+  it('includes a demo navigation link', () => {
+    render(<PublicNavbar />)
+
+    expect(screen.getByRole('link', { name: /demo/i })).toHaveAttribute('href', '/demo')
+  })
+
   it('includes a case studies navigation link', () => {
     render(<PublicNavbar />)
 

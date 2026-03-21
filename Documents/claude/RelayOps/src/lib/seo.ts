@@ -45,6 +45,13 @@ export const publicPageDefinitions = {
       'White-label HubSpot and CRM import prep for RevOps agencies with a 2-business-day turnaround.',
     keywords: ['crm import prep', 'hubspot import prep'],
   },
+  demo: {
+    path: '/demo',
+    title: 'Interactive Product Demo',
+    description:
+      'Walk through the RelayOps workflow from partner intake to pricing, fulfillment, and delivery approval in one interactive product demo.',
+    keywords: ['product demo', 'crm workflow demo', 'revops demo'],
+  },
   caseStudies: {
     path: '/case-studies',
     title: 'Case Studies',
@@ -111,6 +118,7 @@ export const publicPageDefinitions = {
 export const publicSitemapPaths = [
   publicPageDefinitions.landing.path,
   publicPageDefinitions.home.path,
+  publicPageDefinitions.demo.path,
   publicPageDefinitions.caseStudies.path,
   publicPageDefinitions.howItWorks.path,
   publicPageDefinitions.forPartners.path,

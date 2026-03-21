@@ -47,6 +47,7 @@ describe('site seo configuration', () => {
   it.each([
     publicPageDefinitions.landing,
     publicPageDefinitions.home,
+    publicPageDefinitions.demo,
     publicPageDefinitions.caseStudies,
     publicPageDefinitions.howItWorks,
     publicPageDefinitions.forPartners,
@@ -105,6 +106,7 @@ describe('site seo configuration', () => {
     expect(sitemap()).toEqual([
       { url: 'http://localhost:3000/' },
       { url: 'http://localhost:3000/home' },
+      { url: 'http://localhost:3000/demo' },
       { url: 'http://localhost:3000/case-studies' },
       { url: 'http://localhost:3000/how-it-works' },
       { url: 'http://localhost:3000/for-partners' },
