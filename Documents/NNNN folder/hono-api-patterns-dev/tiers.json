@@ -1,0 +1,35 @@
+{
+  "product": "Hono.js API Patterns",
+  "version": "1.0.0",
+  "tiers": [
+    {
+      "id": "starter",
+      "price_usd": 19,
+      "zip_name": "hono-api-patterns-starter-v1.0.0.zip",
+      "templates": [
+        "01-app-basics",
+        "02-zod-validation",
+        "03-jwt-auth",
+        "04-cors-middleware",
+        "05-rpc-client"
+      ]
+    },
+    {
+      "id": "pro",
+      "price_usd": 39,
+      "zip_name": "hono-api-patterns-pro-v1.0.0.zip",
+      "templates": [
+        "01-app-basics",
+        "02-zod-validation",
+        "03-jwt-auth",
+        "04-cors-middleware",
+        "05-rpc-client",
+        "06-cloudflare-workers",
+        "07-streaming-sse",
+        "08-testing-hono",
+        "09-websockets",
+        "10-openapi-spec"
+      ]
+    }
+  ]
+}
