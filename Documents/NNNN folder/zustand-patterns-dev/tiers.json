@@ -1,0 +1,25 @@
+{
+  "product": "Zustand State Management Patterns Pack",
+  "version": "1.0.0",
+  "tiers": [
+    {
+      "id": "starter",
+      "name": "Starter",
+      "price_usd": 19,
+      "template_count": 5,
+      "templates": ["01-auth-store","02-cart-store","03-ui-store","04-form-store","05-notification-store"],
+      "zip_name": "zustand-patterns-starter-v1.0.0.zip"
+    },
+    {
+      "id": "pro",
+      "name": "Pro",
+      "price_usd": 39,
+      "template_count": 10,
+      "templates": [
+        "01-auth-store","02-cart-store","03-ui-store","04-form-store","05-notification-store",
+        "06-settings-store","07-infinite-list-store","08-websocket-store","09-undo-redo-store","10-slices-pattern"
+      ],
+      "zip_name": "zustand-patterns-pro-v1.0.0.zip"
+    }
+  ]
+}
