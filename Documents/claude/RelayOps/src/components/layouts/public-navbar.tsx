@@ -80,14 +80,14 @@ export function PublicNavbar() {
               asChild
               variant="ghost"
               size="sm"
-              className="min-h-[44px] rounded-full px-4 text-slate-600 hover:bg-slate-100 hover:text-slate-950"
+              className="min-h-[44px] rounded-full px-4 text-slate-600 hover:bg-slate-100 hover:text-slate-950 transition-colors duration-300"
             >
               <Link href="/login">{t('login')}</Link>
             </Button>
             <Button
               asChild
               size="sm"
-              className="min-h-[44px] rounded-full border border-blue-600/30 bg-blue-600 px-5 text-white shadow-[0_18px_34px_-18px_rgba(59,130,246,0.52)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-blue-700 hover:shadow-[0_0_0_1px_rgba(37,99,235,0.16),0_22px_44px_-18px_rgba(37,99,235,0.64)]"
+              className="min-h-[44px] rounded-full border border-blue-600/30 bg-blue-600 px-5 text-white shadow-[0_18px_34px_-18px_rgba(59,130,246,0.52)] transition-all duration-300 hover:-translate-y-1 hover:bg-gradient-to-r hover:from-blue-600 hover:to-blue-500 hover:shadow-[0_12px_24px_rgb(59,130,246,0.3)]"
             >
               <Link href="/request-access">
                 {t('requestAccess')}

@@ -1,4 +1,7 @@
+'use client'
+
 import Link from 'next/link'
+import { useState } from 'react'
 import {
   ArrowRight,
   BadgeCheck,
@@ -7,6 +10,7 @@ import {
   CircleDollarSign,
   Sparkles,
   X,
+  ChevronDown,
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -26,10 +30,8 @@ import {
   StaggerList,
   StaggerItem,
 } from '@/components/ui/motion'
-import { createPublicMetadata, publicPageDefinitions } from '@/lib/seo'
+import { m, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils/cn'
-
-export const metadata = createPublicMetadata(publicPageDefinitions.pricing)
 
 type Tier = {
   name: string
@@ -173,7 +175,55 @@ function FeatureList({ features }: { features: Tier['features'] }) {
   )
 }
 
+function FaqItem({ question, answer }: { question: string; answer: string }) {
+  const [isOpen, setIsOpen] = useState(false)
+
+  return (
+    <StaggerItem>
+      <div 
+        role="button"
+        tabIndex={0}
+        className={cn(
+          "group rounded-[24px] border border-slate-200/60 bg-white p-8 transition-all duration-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] cursor-pointer hover:border-blue-500/30",
+          isOpen && "border-blue-500/30 shadow-[0_8px_30px_rgb(0,0,0,0.04)]"
+        )}
+        onClick={() => setIsOpen(!isOpen)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            setIsOpen(!isOpen)
+          }
+        }}
+      >
+        <div className="flex items-center justify-between gap-4">
+          <h3 className="text-[17px] font-bold tracking-tight text-slate-900">
+            {question}
+          </h3>
+          <ChevronDown className={cn("h-5 w-5 text-slate-400 transition-transform duration-300", isOpen && "rotate-180 text-blue-500")} />
+        </div>
+        <AnimatePresence>
+          {isOpen && (
+            <m.div
+              initial={{ height: 0, opacity: 0, marginTop: 0 }}
+              animate={{ height: 'auto', opacity: 1, marginTop: 16 }}
+              exit={{ height: 0, opacity: 0, marginTop: 0 }}
+              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              className="overflow-hidden"
+            >
+              <p className="text-[15px] font-normal leading-relaxed text-slate-500">
+                {answer}
+              </p>
+            </m.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </StaggerItem>
+  )
+}
+
 export default function PricingPage() {
+  const [hoveredTier, setHoveredTier] = useState<string | null>(null)
+
   return (
     <MotionProvider>
       <div className="bg-[#FAFAFA] text-slate-900 font-sans">
@@ -203,29 +253,34 @@ export default function PricingPage() {
             <StaggerList className="grid gap-6 lg:grid-cols-3 lg:items-end">
               {tiers.map((tier, index) => {
                 const Icon = tier.icon
+                const isHovered = hoveredTier === tier.name
 
                 return (
                   <StaggerItem
                     key={tier.name}
                     className={cn(
-                      "h-full w-full",
+                      "h-full w-full relative",
                       tier.featured ? "lg:pb-0" : "lg:pb-8" // Creates the asymmetrical height
                     )}
                   >
                     <div
+                      onMouseEnter={() => setHoveredTier(tier.name)}
+                      onMouseLeave={() => setHoveredTier(null)}
                       className={cn(
-                        "flex h-full flex-col rounded-[32px] border transition-all duration-300",
+                        "flex h-full flex-col rounded-[32px] border transition-all duration-300 relative z-10",
                         tier.featured
-                          ? 'border-slate-900 bg-slate-900 text-white shadow-[0_24px_80px_-12px_rgb(0,0,0,0.2)]'
-                          : 'border-slate-200/60 bg-white hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)]'
+                          ? 'border-slate-900 bg-slate-900 text-white shadow-[0_24px_80px_-12px_rgb(0,0,0,0.2)] hover:shadow-[0_32px_90px_-12px_rgb(0,0,0,0.3)] hover:-translate-y-1'
+                          : 'border-slate-200/60 bg-white hover:shadow-[0_16px_40px_rgb(0,0,0,0.06)] hover:border-blue-500/30 hover:-translate-y-1',
+                        isHovered && !tier.featured && 'ring-1 ring-blue-500/30 ring-offset-2 ring-offset-[#FAFAFA]'
                       )}
                     >
                       <div className="p-8 md:p-10 flex-1">
                         <div className="flex items-center justify-between gap-4">
                           <div
                             className={cn(
-                              "flex h-12 w-12 items-center justify-center rounded-xl",
-                              tier.featured ? 'bg-white/10 text-white' : 'bg-slate-50 text-slate-900 shadow-[0_2px_8px_rgb(0,0,0,0.04)]'
+                              "flex h-12 w-12 items-center justify-center rounded-xl transition-colors duration-300",
+                              tier.featured ? 'bg-white/10 text-white' : 'bg-slate-50 text-slate-900 shadow-[0_2px_8px_rgb(0,0,0,0.04)]',
+                              isHovered && !tier.featured && 'bg-blue-50 text-blue-600'
                             )}
                           >
                             <Icon className="h-5 w-5" />
@@ -256,8 +311,9 @@ export default function PricingPage() {
                         <div className="mt-10 mb-10">
                           <p
                             className={cn(
-                              "font-display text-[2.5rem] font-bold tracking-tighter leading-none",
-                              tier.featured ? 'text-white' : 'text-slate-900'
+                              "font-display text-[2.5rem] font-bold tracking-tighter leading-none transition-colors duration-300",
+                              tier.featured ? 'text-white' : 'text-slate-900',
+                              isHovered && !tier.featured && 'text-blue-600'
                             )}
                           >
                             {tier.price}
@@ -278,10 +334,11 @@ export default function PricingPage() {
                           asChild
                           size={tier.featured ? "lg" : "default"}
                           className={cn(
-                            "w-full rounded-full transition-transform hover:-translate-y-0.5",
+                            "w-full rounded-full transition-all duration-300 hover:-translate-y-1",
                             tier.featured
-                              ? 'h-14 bg-white text-slate-900 hover:bg-slate-50 shadow-[0_8px_16px_rgb(255,255,255,0.1)]'
-                              : 'h-12 border-slate-200/80 bg-white text-slate-900 hover:bg-slate-50 shadow-[0_2px_8px_rgb(0,0,0,0.04)]'
+                              ? 'h-14 bg-white text-slate-900 hover:bg-slate-50 shadow-[0_8px_16px_rgb(255,255,255,0.1)] hover:shadow-[0_12px_24px_rgb(255,255,255,0.2)]'
+                              : 'h-12 border-slate-200/80 bg-white text-slate-900 hover:bg-slate-50 shadow-[0_2px_8px_rgb(0,0,0,0.04)]',
+                            isHovered && !tier.featured && 'border-blue-500/30 bg-blue-50/50 text-blue-700'
                           )}
                           variant={tier.featured ? "default" : "outline"}
                         >
@@ -376,16 +433,7 @@ export default function PricingPage() {
 
             <StaggerList className="space-y-6">
               {faqs.map((item) => (
-                <StaggerItem key={item.question}>
-                  <div className="group rounded-[24px] border border-slate-200/60 bg-white p-8 transition-shadow hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
-                    <h3 className="text-[17px] font-bold tracking-tight text-slate-900">
-                      {item.question}
-                    </h3>
-                    <p className="mt-4 text-[15px] font-normal leading-relaxed text-slate-500">
-                      {item.answer}
-                    </p>
-                  </div>
-                </StaggerItem>
+                <FaqItem key={item.question} question={item.question} answer={item.answer} />
               ))}
             </StaggerList>
           </div>
@@ -405,7 +453,7 @@ export default function PricingPage() {
                 <Button
                   asChild
                   size="lg"
-                  className="h-14 rounded-full bg-blue-600 px-8 text-[15px] font-medium text-white shadow-[0_8px_16px_rgb(59,130,246,0.2)] hover:bg-blue-700 hover:-translate-y-0.5 transition-transform"
+                  className="h-14 rounded-full bg-blue-600 px-8 text-[15px] font-medium text-white shadow-[0_8px_16px_rgb(59,130,246,0.2)] transition-all duration-300 hover:-translate-y-1 hover:bg-gradient-to-r hover:from-blue-600 hover:to-blue-500 hover:shadow-[0_12px_24px_rgb(59,130,246,0.3)]"
                 >
                   <Link href="/request-access">
                     Request Access

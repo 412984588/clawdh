@@ -1,3 +1,5 @@
+'use client'
+
 import Link from 'next/link'
 import {
   ArrowRight,
@@ -21,10 +23,8 @@ import {
   StaggerList,
   StaggerItem,
 } from '@/components/ui/motion'
-import { createPublicMetadata, publicPageDefinitions } from '@/lib/seo'
+import { m, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils/cn'
-
-export const metadata = createPublicMetadata(publicPageDefinitions.demo)
 
 type DemoStep = {
   value: string
@@ -245,12 +245,80 @@ function MockDashboardPreview({ step }: { step: DemoStep }) {
   )
 }
 
+function DemoTabContent({ step }: { step: DemoStep }) {
+  const RoleIcon = roleIcons[step.role]
+
+  return (
+    <m.div
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -20 }}
+      transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+      className="overflow-hidden rounded-[32px] border border-slate-200/60 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)]"
+    >
+      <div className="grid gap-0 lg:grid-cols-[1fr_1.2fr]">
+        <div className={`bg-gradient-to-br ${step.accent} p-10 md:p-14`}>
+          <div className="flex items-center gap-3">
+            <Badge
+              className={cn(
+                `rounded-full border px-3 py-1 font-mono text-[10px] font-semibold uppercase tracking-widest shadow-sm`,
+                roleStyles[step.role]
+              )}
+            >
+              <RoleIcon className="mr-2 h-3.5 w-3.5" />
+              {step.role}
+            </Badge>
+          </div>
+
+          <div className="mt-10 space-y-5">
+            <h2 className="font-display text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">
+              {step.detailTitle}
+            </h2>
+            <p className="text-[15px] font-normal leading-relaxed text-slate-600">{step.detailBody}</p>
+            <p className="text-[15px] font-semibold text-slate-900">{step.outcome}</p>
+          </div>
+
+          <div className="mt-10 rounded-[24px] border border-slate-200/60 bg-white/60 p-6 backdrop-blur-sm">
+            <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-slate-500">
+              What happens in this step
+            </p>
+            <ul className="mt-5 space-y-4">
+              {step.bullets.map((bullet) => (
+                <li key={bullet} className="flex gap-3 text-[14px] leading-relaxed text-slate-700">
+                  <FileStack className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
+                  <span>{bullet}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        <CardContent className="p-10 md:p-14 border-l border-slate-100 bg-white">
+          <CardHeader className="p-0 mb-10">
+            <CardTitle className="text-[17px] font-bold tracking-tight text-slate-900">
+              Mock dashboard preview
+            </CardTitle>
+            <CardDescription className="mt-3 text-[15px] font-normal leading-relaxed text-slate-500">
+              A CSS-only interface placeholder that mirrors the information a buyer
+              needs to understand at this stage of the workflow.
+            </CardDescription>
+          </CardHeader>
+
+          <div>
+            <MockDashboardPreview step={step} />
+          </div>
+        </CardContent>
+      </div>
+    </m.div>
+  )
+}
+
 export default function DemoPage() {
   return (
     <MotionProvider>
       <div className="bg-[#FAFAFA] font-sans text-slate-900">
         <section className="relative overflow-hidden pt-28 pb-20 md:pt-40 md:pb-28">
-          <div className="absolute top-0 left-1/2 w-full -translate-x-1/2 h-[500px] bg-[radial-gradient(ellipse_at_top,rgba(59,130,246,0.06)_0%,transparent_70%)] pointer-events-none" />
+          <div className="absolute top-0 left-1/2 w-full -translate-x-1/2 h-[500px] bg-hero-glow-animated pointer-events-none" />
 
           <div className="container relative max-w-4xl text-center">
             <FadeIn>
@@ -274,15 +342,15 @@ export default function DemoPage() {
                   <StaggerItem
                     key={step.value}
                     className={cn(
-                      `rounded-[24px] border border-slate-200/60 bg-white px-6 py-6 shadow-[0_4px_20px_rgb(0,0,0,0.02)] transition-shadow hover:shadow-[0_12px_40px_rgb(0,0,0,0.06)]`,
+                      `group rounded-[24px] border border-slate-200/60 bg-white px-6 py-6 shadow-[0_4px_20px_rgb(0,0,0,0.02)] transition-all duration-300 hover:scale-[1.02] hover:border-blue-500/30 hover:shadow-[0_16px_40px_rgb(0,0,0,0.06)]`,
                       index % 2 !== 0 ? "md:translate-y-4" : ""
                     )}
                   >
                     <div className="flex items-center justify-between gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-50 text-slate-900 border border-slate-100">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-50 text-slate-900 border border-slate-100 transition-colors group-hover:bg-blue-50 group-hover:text-blue-600 group-hover:border-blue-100">
                         <Icon className="h-4 w-4" />
                       </div>
-                      <span className="font-mono text-[10px] font-semibold uppercase tracking-widest text-slate-400">
+                      <span className="font-mono text-[10px] font-semibold uppercase tracking-widest text-slate-400 transition-colors group-hover:text-blue-600">
                         Step {index + 1}
                       </span>
                     </div>
@@ -301,12 +369,12 @@ export default function DemoPage() {
           <div className="container max-w-6xl">
             <Tabs defaultValue={demoSteps[0].value} className="space-y-12">
               <FadeIn>
-                <TabsList className="grid h-auto grid-cols-1 gap-3 rounded-[24px] bg-white p-3 border border-slate-200/60 shadow-sm md:grid-cols-4">
+                <TabsList className="grid h-auto grid-cols-1 gap-3 rounded-[24px] bg-white p-3 border border-slate-200/60 shadow-[0_4px_20px_rgb(0,0,0,0.02)] md:grid-cols-4">
                   {demoSteps.map((step) => (
                     <TabsTrigger
                       key={step.value}
                       value={step.value}
-                      className="min-h-[64px] rounded-[16px] border border-transparent px-5 py-4 text-left data-[state=active]:border-slate-200/60 data-[state=active]:bg-slate-50 data-[state=active]:shadow-[0_2px_8px_rgb(0,0,0,0.04)] transition-all duration-300"
+                      className="min-h-[64px] rounded-[16px] border border-transparent px-5 py-4 text-left data-[state=active]:border-slate-200/60 data-[state=active]:bg-slate-50 data-[state=active]:shadow-[0_2px_8px_rgb(0,0,0,0.04)] hover:bg-slate-50 transition-all duration-300"
                     >
                       <span className="flex flex-col gap-1.5">
                         <span className="font-mono text-[10px] font-semibold uppercase tracking-widest text-slate-500">
@@ -319,74 +387,20 @@ export default function DemoPage() {
                 </TabsList>
               </FadeIn>
 
-              {demoSteps.map((step) => {
-                const RoleIcon = roleIcons[step.role]
-
-                return (
-                  <TabsContent key={step.value} value={step.value} className="focus-visible:outline-none">
-                    <SlideUp className="overflow-hidden rounded-[32px] border border-slate-200/60 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
-                      <div className="grid gap-0 lg:grid-cols-[1fr_1.2fr]">
-                        <div className={`bg-gradient-to-br ${step.accent} p-10 md:p-14`}>
-                          <div className="flex items-center gap-3">
-                            <Badge
-                              className={cn(
-                                `rounded-full border px-3 py-1 font-mono text-[10px] font-semibold uppercase tracking-widest shadow-sm`,
-                                roleStyles[step.role]
-                              )}
-                            >
-                              <RoleIcon className="mr-2 h-3.5 w-3.5" />
-                              {step.role}
-                            </Badge>
-                          </div>
-
-                          <div className="mt-10 space-y-5">
-                            <h2 className="font-display text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">
-                              {step.detailTitle}
-                            </h2>
-                            <p className="text-[15px] font-normal leading-relaxed text-slate-600">{step.detailBody}</p>
-                            <p className="text-[15px] font-semibold text-slate-900">{step.outcome}</p>
-                          </div>
-
-                          <div className="mt-10 rounded-[24px] border border-slate-200/60 bg-white/60 p-6 backdrop-blur-sm">
-                            <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-slate-500">
-                              What happens in this step
-                            </p>
-                            <ul className="mt-5 space-y-4">
-                              {step.bullets.map((bullet) => (
-                                <li key={bullet} className="flex gap-3 text-[14px] leading-relaxed text-slate-700">
-                                  <FileStack className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
-                                  <span>{bullet}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        </div>
-
-                        <CardContent className="p-10 md:p-14 border-l border-slate-100 bg-white">
-                          <CardHeader className="p-0 mb-10">
-                            <CardTitle className="text-[17px] font-bold tracking-tight text-slate-900">
-                              Mock dashboard preview
-                            </CardTitle>
-                            <CardDescription className="mt-3 text-[15px] font-normal leading-relaxed text-slate-500">
-                              A CSS-only interface placeholder that mirrors the information a buyer
-                              needs to understand at this stage of the workflow.
-                            </CardDescription>
-                          </CardHeader>
-
-                          <div>
-                            <MockDashboardPreview step={step} />
-                          </div>
-                        </CardContent>
-                      </div>
-                    </SlideUp>
+              <div className="relative">
+                {demoSteps.map((step) => (
+                  <TabsContent key={step.value} value={step.value} className="focus-visible:outline-none" forceMount>
+                    <AnimatePresence mode="wait">
+                      <DemoTabContent step={step} />
+                    </AnimatePresence>
                   </TabsContent>
-                )
-              })}
+                ))}
+              </div>
             </Tabs>
           </div>
         </section>
 
-        <section className="pb-24 md:pb-32">
+        <section className="pb-24 md:py-32">
           <div className="container max-w-5xl">
             <FadeIn className="rounded-[32px] bg-slate-900 px-10 py-16 text-center text-white shadow-[0_32px_64px_-16px_rgb(0,0,0,0.2)] md:px-16 md:py-24">
               <p className="font-mono text-[10px] font-medium uppercase tracking-widest text-slate-400 mb-6">
@@ -403,7 +417,7 @@ export default function DemoPage() {
                 <Button
                   asChild
                   size="lg"
-                  className="h-14 rounded-full bg-blue-600 px-10 text-[15px] font-medium text-white shadow-[0_8px_16px_rgb(59,130,246,0.2)] transition-transform hover:-translate-y-0.5 hover:bg-blue-700"
+                  className="h-14 rounded-full bg-blue-600 px-10 text-[15px] font-medium text-white shadow-[0_8px_16px_rgb(59,130,246,0.2)] transition-all duration-300 hover:-translate-y-1 hover:bg-gradient-to-r hover:from-blue-600 hover:to-blue-500 hover:shadow-[0_12px_24px_rgb(59,130,246,0.3)]"
                 >
                   <Link href="/request-access">
                     Request Access

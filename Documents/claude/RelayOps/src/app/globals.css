@@ -145,7 +145,26 @@
     background-image: radial-gradient(#e4e4e7 1px, transparent 1px);
     background-size: 20px 20px;
   }
+  
+  @keyframes hero-glow-flow {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
   .bg-hero-glow {
     background: radial-gradient(ellipse at top, rgba(59, 130, 246, 0.14) 0%, transparent 70%);
+  }
+
+  .bg-hero-glow-animated {
+    background: linear-gradient(270deg, rgba(59, 130, 246, 0.12), rgba(20, 184, 166, 0.08), rgba(59, 130, 246, 0.12));
+    background-size: 200% 200%;
+    animation: hero-glow-flow 15s ease infinite;
   }
 }

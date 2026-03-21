@@ -7,8 +7,10 @@ import {
   MotionConfig,
   domAnimation,
   m,
+  AnimatePresence,
   type HTMLMotionProps,
 } from 'framer-motion'
+import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils/cn'
 
 export const MOTION_EASE = [0.22, 1, 0.36, 1] as const
@@ -41,6 +43,26 @@ export function MotionProvider({ children }: { children: ReactNode }) {
     <LazyMotion features={domAnimation}>
       <MotionConfig reducedMotion="user">{children}</MotionConfig>
     </LazyMotion>
+  )
+}
+
+export function PageTransition({ children }: { children: ReactNode }) {
+  const pathname = usePathname()
+  const reduced = useReducedMotionPreference()
+
+  return (
+    <AnimatePresence mode="wait">
+      <m.div
+        key={pathname}
+        initial={reduced ? false : { opacity: 0, y: 8 }}
+        animate={reduced ? undefined : { opacity: 1, y: 0 }}
+        exit={reduced ? undefined : { opacity: 0, y: -8 }}
+        transition={{ duration: MOTION_DURATIONS.fast, ease: MOTION_EASE }}
+        className="flex-1 flex flex-col"
+      >
+        {children}
+      </m.div>
+    </AnimatePresence>
   )
 }
 
@@ -79,6 +101,7 @@ export function FadeIn({
   className,
   style,
   transition,
+  viewport = { once: true, margin: "-50px" },
   ...props
 }: HTMLMotionProps<'div'>) {
   const reduced = useReducedMotionPreference()
@@ -88,7 +111,8 @@ export function FadeIn({
       data-motion="fade-in"
       data-reduced-motion={reduced ? 'true' : 'false'}
       initial={reduced ? false : { opacity: 0 }}
-      animate={reduced ? undefined : { opacity: 1 }}
+      whileInView={reduced ? undefined : { opacity: 1 }}
+      viewport={viewport}
       transition={
         reduced
           ? undefined
@@ -105,6 +129,7 @@ export function SlideUp({
   className,
   style,
   transition,
+  viewport = { once: true, margin: "-50px" },
   ...props
 }: HTMLMotionProps<'div'>) {
   const reduced = useReducedMotionPreference()
@@ -113,12 +138,13 @@ export function SlideUp({
     <m.div
       data-motion="slide-up"
       data-reduced-motion={reduced ? 'true' : 'false'}
-      initial={reduced ? false : { opacity: 0.92, y: 12 }}
-      animate={reduced ? undefined : { opacity: 1, y: 0 }}
+      initial={reduced ? false : { opacity: 0, y: 24 }}
+      whileInView={reduced ? undefined : { opacity: 1, y: 0 }}
+      viewport={viewport}
       transition={
         reduced
           ? undefined
-          : { duration: MOTION_DURATIONS.base, ease: MOTION_EASE, ...transition }
+          : { duration: MOTION_DURATIONS.slow, ease: MOTION_EASE, ...transition }
       }
       className={cn(MOTION_REDUCE_CLASS, className)}
       style={mergeMotionStyle(style as CSSProperties | undefined, reduced, 'transform, opacity')}
@@ -130,6 +156,7 @@ export function SlideUp({
 type StaggerListProps =
   | ({ as?: 'div'; children: ReactNode } & Omit<HTMLMotionProps<'div'>, 'children'>)
   | ({ as: 'tbody'; children: ReactNode } & Omit<HTMLMotionProps<'tbody'>, 'children'>)
+  | ({ as: 'ul'; children: ReactNode } & Omit<HTMLMotionProps<'ul'>, 'children'>)
 
 export function StaggerList(props: StaggerListProps) {
   const reduced = useReducedMotionPreference()
@@ -137,16 +164,17 @@ export function StaggerList(props: StaggerListProps) {
     'data-motion': 'stagger-list' as const,
     'data-reduced-motion': reduced ? 'true' : 'false',
     initial: reduced ? false : 'hidden',
-    animate: reduced ? undefined : 'show',
+    whileInView: reduced ? undefined : 'show',
+    viewport: { once: true, margin: "-50px" },
     variants: reduced
       ? undefined
       : {
-          hidden: { opacity: 1 },
+          hidden: { opacity: 0 },
           show: {
             opacity: 1,
             transition: {
-              staggerChildren: 0.05,
-              delayChildren: 0.04,
+              staggerChildren: 0.1,
+              delayChildren: 0.05,
             },
           },
         },
@@ -163,6 +191,20 @@ export function StaggerList(props: StaggerListProps) {
       >
         {children}
       </m.tbody>
+    )
+  }
+
+  if (props.as === 'ul') {
+    const { as: _as, children, className, style, ...ulProps } = props
+    return (
+      <m.ul
+        {...baseProps}
+        className={cn(MOTION_REDUCE_CLASS, className)}
+        style={mergeMotionStyle(style as CSSProperties | undefined, reduced, 'transform, opacity')}
+        {...ulProps}
+      >
+        {children}
+      </m.ul>
     )
   }
 
@@ -192,12 +234,12 @@ export function StaggerItem(props: StaggerItemProps) {
     variants: reduced
       ? undefined
       : {
-          hidden: { opacity: 0, y: 12 },
+          hidden: { opacity: 0, y: 24 },
           show: {
             opacity: 1,
             y: 0,
             transition: {
-              duration: MOTION_DURATIONS.base,
+              duration: MOTION_DURATIONS.slow,
               ease: MOTION_EASE,
             },
           },
