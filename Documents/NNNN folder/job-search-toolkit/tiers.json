@@ -1,0 +1,33 @@
+{
+  "tiers": [
+    {
+      "id": "starter",
+      "price_usd": 19,
+      "zip_name": "job-search-toolkit-starter-v1.0.0.zip",
+      "templates": [
+        "01-resume-template",
+        "02-cover-letter",
+        "03-interview-prep",
+        "04-job-tracker",
+        "05-salary-negotiation"
+      ]
+    },
+    {
+      "id": "pro",
+      "price_usd": 39,
+      "zip_name": "job-search-toolkit-pro-v1.0.0.zip",
+      "templates": [
+        "01-resume-template",
+        "02-cover-letter",
+        "03-interview-prep",
+        "04-job-tracker",
+        "05-salary-negotiation",
+        "06-linkedin-optimization",
+        "07-portfolio-builder",
+        "08-networking-scripts",
+        "09-follow-up-emails",
+        "10-90day-onboarding"
+      ]
+    }
+  ]
+}
