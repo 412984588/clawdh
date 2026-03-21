@@ -1,0 +1,250 @@
+openapi: "3.1.0"
+info:
+  title: Multi-Tenant API
+  version: "1.0.0"
+  description: Organization management, member roles, invitations, and tenant settings.
+
+servers:
+  - url: https://api.example.com/v1
+
+tags:
+  - name: organizations
+  - name: members
+  - name: invitations
+
+paths:
+  /organizations:
+    post:
+      tags: [organizations]
+      summary: Create organization
+      operationId: createOrganization
+      security: [{ BearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreateOrgRequest" }
+      responses:
+        "201":
+          description: Organization created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/OrgResponse" }
+
+  /organizations/{orgId}:
+    get:
+      tags: [organizations]
+      summary: Get organization
+      operationId: getOrganization
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - name: orgId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: Organization detail
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/OrgResponse" }
+    patch:
+      tags: [organizations]
+      summary: Update organization settings
+      operationId: updateOrganization
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - name: orgId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/UpdateOrgRequest" }
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/OrgResponse" }
+
+  /organizations/{orgId}/members:
+    get:
+      tags: [members]
+      summary: List members
+      operationId: listMembers
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - name: orgId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: Member list
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/MemberListResponse" }
+
+  /organizations/{orgId}/members/{userId}:
+    patch:
+      tags: [members]
+      summary: Update member role
+      operationId: updateMemberRole
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - name: orgId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+        - name: userId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [role]
+              properties:
+                role: { type: string, enum: [owner, admin, member, viewer] }
+      responses:
+        "200":
+          description: Role updated
+    delete:
+      tags: [members]
+      summary: Remove member
+      operationId: removeMember
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - name: orgId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+        - name: userId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "204": { description: Removed }
+
+  /organizations/{orgId}/invitations:
+    post:
+      tags: [invitations]
+      summary: Invite member
+      operationId: inviteMember
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - name: orgId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/InviteRequest" }
+      responses:
+        "201":
+          description: Invitation sent
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/InvitationResponse" }
+
+  /invitations/{token}/accept:
+    post:
+      tags: [invitations]
+      summary: Accept invitation
+      operationId: acceptInvitation
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Joined organization
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/OrgResponse" }
+
+components:
+  schemas:
+    Organization:
+      type: object
+      required: [id, name, slug, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        slug: { type: string }
+        logoUrl: { type: string, format: uri, nullable: true }
+        plan: { type: string, enum: [free, pro, enterprise] }
+        memberCount: { type: integer }
+        createdAt: { type: string, format: date-time }
+
+    CreateOrgRequest:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string, minLength: 1 }
+        slug: { type: string, pattern: "^[a-z0-9-]+$" }
+
+    UpdateOrgRequest:
+      type: object
+      properties:
+        name: { type: string }
+        logoUrl: { type: string, format: uri, nullable: true }
+
+    OrgResponse:
+      type: object
+      properties:
+        data: { $ref: "#/components/schemas/Organization" }
+
+    Member:
+      type: object
+      required: [userId, name, email, role, joinedAt]
+      properties:
+        userId: { type: string, format: uuid }
+        name: { type: string }
+        email: { type: string, format: email }
+        role: { type: string, enum: [owner, admin, member, viewer] }
+        joinedAt: { type: string, format: date-time }
+
+    MemberListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items: { $ref: "#/components/schemas/Member" }
+
+    InviteRequest:
+      type: object
+      required: [email, role]
+      properties:
+        email: { type: string, format: email }
+        role: { type: string, enum: [admin, member, viewer] }
+
+    Invitation:
+      type: object
+      required: [id, email, role, expiresAt]
+      properties:
+        id: { type: string, format: uuid }
+        email: { type: string, format: email }
+        role: { type: string }
+        expiresAt: { type: string, format: date-time }
+
+    InvitationResponse:
+      type: object
+      properties:
+        data: { $ref: "#/components/schemas/Invitation" }
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

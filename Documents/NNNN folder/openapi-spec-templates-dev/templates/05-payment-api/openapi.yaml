@@ -1,0 +1,234 @@
+openapi: "3.1.0"
+info:
+  title: Payment API
+  version: "1.0.0"
+  description: Payment intents, subscriptions, invoices, and billing portal.
+
+servers:
+  - url: https://api.example.com/v1
+
+tags:
+  - name: payments
+  - name: subscriptions
+  - name: invoices
+
+paths:
+  /payments/intent:
+    post:
+      tags: [payments]
+      summary: Create payment intent
+      operationId: createPaymentIntent
+      security: [{ BearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreatePaymentIntentRequest" }
+      responses:
+        "201":
+          description: Payment intent created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PaymentIntentResponse" }
+
+  /payments/{id}:
+    get:
+      tags: [payments]
+      summary: Get payment status
+      operationId: getPayment
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Payment details
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PaymentResponse" }
+
+  /subscriptions:
+    get:
+      tags: [subscriptions]
+      summary: Get current subscription
+      operationId: getSubscription
+      security: [{ BearerAuth: [] }]
+      responses:
+        "200":
+          description: Subscription details
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SubscriptionResponse" }
+
+    post:
+      tags: [subscriptions]
+      summary: Create subscription
+      operationId: createSubscription
+      security: [{ BearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreateSubscriptionRequest" }
+      responses:
+        "201":
+          description: Subscription created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SubscriptionResponse" }
+
+  /subscriptions/cancel:
+    post:
+      tags: [subscriptions]
+      summary: Cancel subscription
+      operationId: cancelSubscription
+      security: [{ BearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cancelAtPeriodEnd: { type: boolean, default: true }
+                reason: { type: string }
+      responses:
+        "200":
+          description: Cancellation scheduled
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SubscriptionResponse" }
+
+  /invoices:
+    get:
+      tags: [invoices]
+      summary: List invoices
+      operationId: listInvoices
+      security: [{ BearerAuth: [] }]
+      responses:
+        "200":
+          description: Invoice list
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/InvoiceListResponse" }
+
+  /billing/portal:
+    post:
+      tags: [payments]
+      summary: Create billing portal session
+      operationId: createBillingPortal
+      security: [{ BearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [returnUrl]
+              properties:
+                returnUrl: { type: string, format: uri }
+      responses:
+        "200":
+          description: Billing portal URL
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url: { type: string, format: uri }
+
+components:
+  schemas:
+    CreatePaymentIntentRequest:
+      type: object
+      required: [amount, currency]
+      properties:
+        amount: { type: integer, description: Amount in smallest currency unit (cents) }
+        currency: { type: string, example: usd }
+        description: { type: string }
+        metadata: { type: object, additionalProperties: { type: string } }
+
+    PaymentIntentResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          required: [id, clientSecret, amount, currency, status]
+          properties:
+            id: { type: string }
+            clientSecret: { type: string }
+            amount: { type: integer }
+            currency: { type: string }
+            status:
+              type: string
+              enum: [requires_payment_method, requires_confirmation, processing, succeeded, cancelled]
+
+    PaymentResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          required: [id, amount, currency, status]
+          properties:
+            id: { type: string }
+            amount: { type: integer }
+            currency: { type: string }
+            status: { type: string }
+            createdAt: { type: string, format: date-time }
+
+    CreateSubscriptionRequest:
+      type: object
+      required: [priceId, paymentMethodId]
+      properties:
+        priceId: { type: string }
+        paymentMethodId: { type: string }
+
+    Subscription:
+      type: object
+      required: [id, status, plan, currentPeriodEnd]
+      properties:
+        id: { type: string }
+        status:
+          type: string
+          enum: [active, past_due, cancelled, trialing, unpaid]
+        plan:
+          type: object
+          properties:
+            id: { type: string }
+            name: { type: string }
+            amount: { type: integer }
+            currency: { type: string }
+            interval: { type: string, enum: [month, year] }
+        cancelAtPeriodEnd: { type: boolean }
+        currentPeriodEnd: { type: string, format: date-time }
+
+    SubscriptionResponse:
+      type: object
+      properties:
+        data: { $ref: "#/components/schemas/Subscription" }
+
+    Invoice:
+      type: object
+      required: [id, amount, currency, status, createdAt]
+      properties:
+        id: { type: string }
+        amount: { type: integer }
+        currency: { type: string }
+        status: { type: string, enum: [draft, open, paid, void, uncollectible] }
+        pdfUrl: { type: string, format: uri, nullable: true }
+        createdAt: { type: string, format: date-time }
+
+    InvoiceListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items: { $ref: "#/components/schemas/Invoice" }
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

@@ -1,0 +1,143 @@
+openapi: "3.1.0"
+info:
+  title: Search API
+  version: "1.0.0"
+  description: Full-text search, faceted filters, autocomplete, and suggestions.
+
+servers:
+  - url: https://api.example.com/v1
+
+tags:
+  - name: search
+
+paths:
+  /search:
+    get:
+      tags: [search]
+      summary: Full-text search
+      operationId: search
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema: { type: string, minLength: 1 }
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [all, products, users, articles]
+            default: all
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 20 }
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum: [relevance, date_desc, date_asc, price_asc, price_desc]
+            default: relevance
+      responses:
+        "200":
+          description: Search results
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SearchResponse" }
+
+  /search/suggest:
+    get:
+      tags: [search]
+      summary: Search suggestions / autocomplete
+      operationId: suggest
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema: { type: string }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 5 }
+      responses:
+        "200":
+          description: Suggestions
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SuggestResponse" }
+
+  /search/facets:
+    get:
+      tags: [search]
+      summary: Get available facet counts for a query
+      operationId: getFacets
+      parameters:
+        - name: q
+          in: query
+          schema: { type: string }
+        - name: type
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: Facet counts
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/FacetsResponse" }
+
+components:
+  schemas:
+    SearchHit:
+      type: object
+      required: [id, type, title, score]
+      properties:
+        id: { type: string }
+        type: { type: string }
+        title: { type: string }
+        description: { type: string, nullable: true }
+        url: { type: string }
+        score: { type: number }
+        highlights:
+          type: object
+          additionalProperties:
+            type: array
+            items: { type: string }
+
+    SearchResponse:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          type: array
+          items: { $ref: "#/components/schemas/SearchHit" }
+        meta:
+          type: object
+          properties:
+            total: { type: integer }
+            page: { type: integer }
+            limit: { type: integer }
+            took: { type: integer, description: Milliseconds }
+
+    SuggestResponse:
+      type: object
+      properties:
+        suggestions:
+          type: array
+          items:
+            type: object
+            properties:
+              text: { type: string }
+              type: { type: string }
+
+    FacetsResponse:
+      type: object
+      properties:
+        facets:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: object
+              properties:
+                value: { type: string }
+                count: { type: integer }

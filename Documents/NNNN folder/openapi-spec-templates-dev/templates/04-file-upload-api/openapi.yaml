@@ -1,0 +1,165 @@
+openapi: "3.1.0"
+info:
+  title: File Upload API
+  version: "1.0.0"
+  description: Single and multipart file upload, CDN URLs, and file management.
+
+servers:
+  - url: https://api.example.com/v1
+
+tags:
+  - name: files
+
+paths:
+  /files:
+    post:
+      tags: [files]
+      summary: Upload a file
+      operationId: uploadFile
+      security: [{ BearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                folder:
+                  type: string
+                  description: Optional folder/prefix for organization
+      responses:
+        "201":
+          description: File uploaded
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/FileResponse" }
+        "413":
+          description: File too large
+        "422":
+          description: Unsupported file type
+
+    get:
+      tags: [files]
+      summary: List uploaded files
+      operationId: listFiles
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - name: folder
+          in: query
+          schema: { type: string }
+        - name: mimeType
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: File list
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/FileListResponse" }
+
+  /files/presigned:
+    post:
+      tags: [files]
+      summary: Generate presigned upload URL
+      operationId: getPresignedUrl
+      security: [{ BearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PresignedUrlRequest" }
+      responses:
+        "200":
+          description: Presigned URL
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PresignedUrlResponse" }
+
+  /files/{id}:
+    get:
+      tags: [files]
+      summary: Get file metadata
+      operationId: getFile
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: File metadata
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/FileResponse" }
+    delete:
+      tags: [files]
+      summary: Delete file
+      operationId: deleteFile
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "204":
+          description: File deleted
+
+components:
+  schemas:
+    File:
+      type: object
+      required: [id, filename, mimeType, size, url, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        filename: { type: string }
+        originalName: { type: string }
+        mimeType: { type: string }
+        size: { type: integer, description: Size in bytes }
+        url: { type: string, format: uri }
+        thumbnailUrl: { type: string, format: uri, nullable: true }
+        folder: { type: string, nullable: true }
+        createdAt: { type: string, format: date-time }
+
+    FileResponse:
+      type: object
+      properties:
+        data: { $ref: "#/components/schemas/File" }
+
+    FileListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items: { $ref: "#/components/schemas/File" }
+
+    PresignedUrlRequest:
+      type: object
+      required: [filename, mimeType, size]
+      properties:
+        filename: { type: string }
+        mimeType: { type: string }
+        size: { type: integer, minimum: 1 }
+        folder: { type: string }
+
+    PresignedUrlResponse:
+      type: object
+      required: [uploadUrl, fileId, expiresAt]
+      properties:
+        uploadUrl: { type: string, format: uri }
+        fileId: { type: string, format: uuid }
+        expiresAt: { type: string, format: date-time }
+        headers:
+          type: object
+          additionalProperties: { type: string }
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

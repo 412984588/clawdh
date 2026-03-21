@@ -1,0 +1,167 @@
+openapi: "3.1.0"
+info:
+  title: Webhook API
+  version: "1.0.0"
+  description: Webhook subscription management, delivery logs, and signature verification.
+
+servers:
+  - url: https://api.example.com/v1
+
+tags:
+  - name: webhooks
+
+paths:
+  /webhooks:
+    get:
+      tags: [webhooks]
+      summary: List webhook endpoints
+      operationId: listWebhooks
+      security: [{ BearerAuth: [] }]
+      responses:
+        "200":
+          description: Webhook list
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/WebhookListResponse" }
+    post:
+      tags: [webhooks]
+      summary: Register webhook endpoint
+      operationId: createWebhook
+      security: [{ BearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreateWebhookRequest" }
+      responses:
+        "201":
+          description: Webhook registered
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/WebhookResponse" }
+
+  /webhooks/{id}:
+    delete:
+      tags: [webhooks]
+      summary: Delete webhook
+      operationId: deleteWebhook
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "204": { description: Deleted }
+
+  /webhooks/{id}/deliveries:
+    get:
+      tags: [webhooks]
+      summary: Get delivery logs
+      operationId: getDeliveries
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: Delivery logs
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DeliveryListResponse" }
+
+  /webhooks/{id}/test:
+    post:
+      tags: [webhooks]
+      summary: Send test event
+      operationId: testWebhook
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [eventType]
+              properties:
+                eventType: { type: string }
+      responses:
+        "200":
+          description: Test delivery result
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DeliveryResponse" }
+
+components:
+  schemas:
+    Webhook:
+      type: object
+      required: [id, url, events, active, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        url: { type: string, format: uri }
+        events:
+          type: array
+          items: { type: string }
+        active: { type: boolean }
+        secret: { type: string, description: Shown only on creation }
+        createdAt: { type: string, format: date-time }
+
+    CreateWebhookRequest:
+      type: object
+      required: [url, events]
+      properties:
+        url: { type: string, format: uri }
+        events:
+          type: array
+          items: { type: string }
+          minItems: 1
+
+    WebhookResponse:
+      type: object
+      properties:
+        data: { $ref: "#/components/schemas/Webhook" }
+
+    WebhookListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items: { $ref: "#/components/schemas/Webhook" }
+
+    Delivery:
+      type: object
+      required: [id, eventType, statusCode, success, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        eventType: { type: string }
+        statusCode: { type: integer }
+        success: { type: boolean }
+        responseBody: { type: string, nullable: true }
+        duration: { type: integer, description: Milliseconds }
+        createdAt: { type: string, format: date-time }
+
+    DeliveryResponse:
+      type: object
+      properties:
+        data: { $ref: "#/components/schemas/Delivery" }
+
+    DeliveryListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items: { $ref: "#/components/schemas/Delivery" }
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

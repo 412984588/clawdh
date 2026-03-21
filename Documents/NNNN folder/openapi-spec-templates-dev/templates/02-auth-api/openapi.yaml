@@ -1,0 +1,215 @@
+openapi: "3.1.0"
+info:
+  title: Authentication API
+  version: "1.0.0"
+  description: JWT-based authentication with refresh tokens, OAuth2, and user management.
+
+servers:
+  - url: https://api.example.com/v1
+
+tags:
+  - name: auth
+    description: Authentication flows
+  - name: users
+    description: User profile management
+
+paths:
+  /auth/register:
+    post:
+      tags: [auth]
+      summary: Register new user
+      operationId: register
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/RegisterRequest" }
+      responses:
+        "201":
+          description: User registered
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AuthResponse" }
+        "409":
+          description: Email already exists
+
+  /auth/login:
+    post:
+      tags: [auth]
+      summary: Login with email/password
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/LoginRequest" }
+      responses:
+        "200":
+          description: Authenticated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AuthResponse" }
+        "401":
+          description: Invalid credentials
+
+  /auth/refresh:
+    post:
+      tags: [auth]
+      summary: Refresh access token
+      operationId: refreshToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refreshToken]
+              properties:
+                refreshToken: { type: string }
+      responses:
+        "200":
+          description: New access token issued
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TokenPair" }
+
+  /auth/logout:
+    post:
+      tags: [auth]
+      summary: Logout (revoke refresh token)
+      operationId: logout
+      security:
+        - BearerAuth: []
+      responses:
+        "204":
+          description: Logged out
+
+  /auth/forgot-password:
+    post:
+      tags: [auth]
+      summary: Request password reset email
+      operationId: forgotPassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email: { type: string, format: email }
+      responses:
+        "204":
+          description: Reset email sent (if account exists)
+
+  /auth/reset-password:
+    post:
+      tags: [auth]
+      summary: Reset password with token
+      operationId: resetPassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ResetPasswordRequest" }
+      responses:
+        "204":
+          description: Password reset
+
+  /users/me:
+    get:
+      tags: [users]
+      summary: Get current user profile
+      operationId: getMe
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/UserResponse" }
+    patch:
+      tags: [users]
+      summary: Update current user profile
+      operationId: updateMe
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/UpdateProfileRequest" }
+      responses:
+        "200":
+          description: Profile updated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/UserResponse" }
+
+components:
+  schemas:
+    RegisterRequest:
+      type: object
+      required: [email, password, name]
+      properties:
+        email: { type: string, format: email }
+        password: { type: string, minLength: 8 }
+        name: { type: string, minLength: 1 }
+
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email: { type: string, format: email }
+        password: { type: string }
+
+    TokenPair:
+      type: object
+      required: [accessToken, refreshToken, expiresIn]
+      properties:
+        accessToken: { type: string }
+        refreshToken: { type: string }
+        expiresIn: { type: integer, description: Seconds until access token expires }
+
+    AuthResponse:
+      type: object
+      required: [user, tokens]
+      properties:
+        user: { $ref: "#/components/schemas/User" }
+        tokens: { $ref: "#/components/schemas/TokenPair" }
+
+    User:
+      type: object
+      required: [id, email, name, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        email: { type: string, format: email }
+        name: { type: string }
+        avatarUrl: { type: string, format: uri, nullable: true }
+        createdAt: { type: string, format: date-time }
+
+    UserResponse:
+      type: object
+      required: [data]
+      properties:
+        data: { $ref: "#/components/schemas/User" }
+
+    UpdateProfileRequest:
+      type: object
+      properties:
+        name: { type: string, minLength: 1 }
+        avatarUrl: { type: string, format: uri, nullable: true }
+
+    ResetPasswordRequest:
+      type: object
+      required: [token, newPassword]
+      properties:
+        token: { type: string }
+        newPassword: { type: string, minLength: 8 }
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

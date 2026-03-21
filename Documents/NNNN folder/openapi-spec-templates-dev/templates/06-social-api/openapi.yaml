@@ -1,0 +1,247 @@
+openapi: "3.1.0"
+info:
+  title: Social API
+  version: "1.0.0"
+  description: Posts, follows, likes, comments, and feed for a social platform.
+
+servers:
+  - url: https://api.example.com/v1
+
+tags:
+  - name: posts
+  - name: social
+
+paths:
+  /posts:
+    get:
+      tags: [posts]
+      summary: Get feed
+      operationId: getFeed
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - name: cursor
+          in: query
+          schema: { type: string }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 20 }
+      responses:
+        "200":
+          description: Feed posts
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PostListResponse" }
+    post:
+      tags: [posts]
+      summary: Create post
+      operationId: createPost
+      security: [{ BearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreatePostRequest" }
+      responses:
+        "201":
+          description: Post created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PostResponse" }
+
+  /posts/{id}:
+    get:
+      tags: [posts]
+      summary: Get post
+      operationId: getPost
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: Post detail
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PostResponse" }
+    delete:
+      tags: [posts]
+      summary: Delete post
+      operationId: deletePost
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "204":
+          description: Deleted
+
+  /posts/{id}/like:
+    post:
+      tags: [social]
+      summary: Like post
+      operationId: likePost
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "204": { description: Liked }
+    delete:
+      tags: [social]
+      summary: Unlike post
+      operationId: unlikePost
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "204": { description: Unliked }
+
+  /posts/{id}/comments:
+    get:
+      tags: [social]
+      summary: Get comments
+      operationId: getComments
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: Comments
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CommentListResponse" }
+    post:
+      tags: [social]
+      summary: Add comment
+      operationId: addComment
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [content]
+              properties:
+                content: { type: string, minLength: 1 }
+      responses:
+        "201":
+          description: Comment added
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CommentResponse" }
+
+  /users/{id}/follow:
+    post:
+      tags: [social]
+      summary: Follow user
+      operationId: followUser
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "204": { description: Following }
+    delete:
+      tags: [social]
+      summary: Unfollow user
+      operationId: unfollowUser
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "204": { description: Unfollowed }
+
+components:
+  schemas:
+    Author:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        username: { type: string }
+        avatarUrl: { type: string, format: uri, nullable: true }
+
+    Post:
+      type: object
+      required: [id, content, author, likeCount, commentCount, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        content: { type: string }
+        author: { $ref: "#/components/schemas/Author" }
+        likeCount: { type: integer }
+        commentCount: { type: integer }
+        liked: { type: boolean }
+        imageUrls:
+          type: array
+          items: { type: string, format: uri }
+        createdAt: { type: string, format: date-time }
+
+    CreatePostRequest:
+      type: object
+      required: [content]
+      properties:
+        content: { type: string, minLength: 1, maxLength: 2000 }
+        imageUrls:
+          type: array
+          items: { type: string, format: uri }
+
+    PostResponse:
+      type: object
+      properties:
+        data: { $ref: "#/components/schemas/Post" }
+
+    PostListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items: { $ref: "#/components/schemas/Post" }
+        nextCursor: { type: string, nullable: true }
+
+    Comment:
+      type: object
+      required: [id, content, author, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        content: { type: string }
+        author: { $ref: "#/components/schemas/Author" }
+        createdAt: { type: string, format: date-time }
+
+    CommentResponse:
+      type: object
+      properties:
+        data: { $ref: "#/components/schemas/Comment" }
+
+    CommentListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items: { $ref: "#/components/schemas/Comment" }
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

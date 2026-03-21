@@ -1,0 +1,26 @@
+{
+  "product": "OpenAPI Spec Templates",
+  "version": "1.0.0",
+  "tiers": [
+    {
+      "id": "starter",
+      "name": "Starter",
+      "price_usd": 19,
+      "template_count": 4,
+      "templates": ["01-rest-crud","02-auth-api","03-ecommerce-api","04-file-upload-api"],
+      "zip_name": "openapi-spec-templates-starter-v1.0.0.zip"
+    },
+    {
+      "id": "pro",
+      "name": "Pro",
+      "price_usd": 39,
+      "template_count": 10,
+      "templates": [
+        "01-rest-crud","02-auth-api","03-ecommerce-api","04-file-upload-api",
+        "05-payment-api","06-social-api","07-search-api","08-webhook-api",
+        "09-admin-api","10-multi-tenant-api"
+      ],
+      "zip_name": "openapi-spec-templates-pro-v1.0.0.zip"
+    }
+  ]
+}
