@@ -26,8 +26,8 @@ describe('PricingPage', () => {
     expect(screen.getByRole('heading', { name: /^starter$/i })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: /^professional$/i })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: /^enterprise$/i })).toBeInTheDocument()
-    expect(screen.getAllByText(/starting at \$x\/mo/i).length).toBeGreaterThan(0)
-    expect(screen.getByText(/custom quote/i)).toBeInTheDocument()
+    expect(screen.getByText(/\$499\/mo/)).toBeInTheDocument()
+    expect(screen.getByText(/Contact Sales/)).toBeInTheDocument()
     expect(screen.getAllByRole('link', { name: /request access/i }).length).toBeGreaterThan(0)
   })
 

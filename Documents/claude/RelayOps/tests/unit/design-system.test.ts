@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest'
 import { existsSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
@@ -9,10 +10,10 @@ describe('design system audit', () => {
   it('uses RelayOps blue brand tokens in globals.css', () => {
     const css = readWorkspaceFile('src/app/globals.css')
 
-    expect(css).toContain('--primary: 217 91% 60%')
-    expect(css).toContain('--ring: 217 91% 60%')
-    expect(css).toContain('--cta: 217 91% 60%')
-    expect(css).toContain('--sidebar-item-active: 217 91% 60%')
+    expect(css).toContain('--primary: 217 91% 48%')
+    expect(css).toContain('--ring: 217 91% 48%')
+    expect(css).toContain('--cta: 217 91% 48%')
+    expect(css).toContain('--sidebar-item-active: 217 91% 48%')
   })
 
   it('removes decorative indigo and violet accents from dashboard chrome', () => {

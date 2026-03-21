@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { MotionProvider } from '@/components/ui/motion'
 import { TicketStatusBadge } from '@/components/tickets/ticket-status-badge'
