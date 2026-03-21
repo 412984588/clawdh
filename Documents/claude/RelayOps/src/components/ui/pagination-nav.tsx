@@ -3,11 +3,11 @@ import Link from 'next/link'
 interface PaginationNavProps {
   page: number
   totalPages: number
-  /** 生成带页码的 href，调用者负责保留已有 query params */
+  /** Generate href with page number; caller retains existing query params */
   buildHref: (page: number) => string
 }
 
-// 通用服务端分页导航 — 上一页/下一页 + 页码信息
+// Generic server-side pagination nav — prev/next + page info
 export function PaginationNav({ page, totalPages, buildHref }: PaginationNavProps) {
   if (totalPages <= 1) return null
 

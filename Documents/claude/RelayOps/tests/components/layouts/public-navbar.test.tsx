@@ -66,8 +66,8 @@ describe('PublicNavbar', () => {
     expect(screen.getByRole('link', { name: /case studies/i })).toHaveAttribute('href', '/case-studies')
   })
 
-  it('renders language switcher', () => {
+  it('does not render a language switcher', () => {
     render(<PublicNavbar />)
-    expect(screen.getByRole('button', { name: /switch language/i })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /switch language/i })).not.toBeInTheDocument()
   })
 })

@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 
 export function RevealObserver() {
   useEffect(() => {
-    // 初始化滚动显示目标
+    // Initialize scroll reveal targets
     const revealTargets = document.querySelectorAll('[data-reveal]:not([data-reveal-ready])')
     revealTargets.forEach((element) => {
       element.setAttribute('data-reveal-ready', 'true')
@@ -33,7 +33,7 @@ export function RevealObserver() {
       revealTargets.forEach(show)
     }
 
-    // 计数器动画
+    // Counter animation
     const counters = document.querySelectorAll('[data-counter-end]:not([data-counter-ready])')
     counters.forEach((element) => {
       element.setAttribute('data-counter-ready', 'true')

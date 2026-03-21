@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { LocaleSwitcher } from '@/components/ui/locale-switcher'
 import { Link } from '@/i18n/navigation'
 
 export function PublicNavbar() {
@@ -71,7 +70,6 @@ export function PublicNavbar() {
           </div>
 
           <div className="flex items-center gap-2">
-            <LocaleSwitcher />
             <Button
               asChild
               variant="ghost"

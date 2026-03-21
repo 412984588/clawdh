@@ -22,7 +22,7 @@ const CATEGORY_SHORT: Record<string, string> = {
 
 interface TicketListTableProps {
   tickets: Ticket[]
-  // 基路径决定链接到 partner 还是 admin 视图
+  // Base path determines whether links go to partner or admin view
   basePath: '/partner/tickets' | '/admin/tickets'
   emptyMessage?: string
 }

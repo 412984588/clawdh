@@ -34,12 +34,10 @@ const ROLE_ROUTES: Record<string, string> = {
   worker_internal: '/worker',
 }
 
-// 判断路径是否为公开路由（含 /zh 前缀）
+// Check if path is a public route
 function isPublicPath(pathname: string): boolean {
-  // 去掉 locale 前缀后判断
-  const pathWithoutLocale = pathname.replace(/^\/(zh)/, '') || '/'
   return PUBLIC_ROUTES.some(
-    (r) => pathWithoutLocale === r || pathWithoutLocale.startsWith(r + '/')
+    (r) => pathname === r || pathname.startsWith(r + '/')
   )
 }
 

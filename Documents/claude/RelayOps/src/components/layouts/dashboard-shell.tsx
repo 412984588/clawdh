@@ -4,7 +4,7 @@ import { DashboardChrome } from './dashboard-chrome'
 import type { UserRole } from '@/lib/types/enums'
 
 export async function DashboardShell({ children }: { children: React.ReactNode }) {
-  // React.cache 保证同请求内 auth + role 只查一次
+  // React.cache ensures auth + role is queried only once per request
   const sessionUser = await getSessionUser()
 
   if (!sessionUser) {

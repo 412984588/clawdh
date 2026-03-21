@@ -106,25 +106,9 @@ describe('site seo configuration', () => {
   })
 
   it('generates a sitemap for every public marketing route', () => {
-    const expected = publicSitemapPaths.flatMap((path) => {
-      const alternates = Object.fromEntries(
-        routing.locales.map((locale) => {
-          const prefix = locale === routing.defaultLocale ? '' : `/${locale}`
-          return [locale, absoluteUrl(`${prefix}${path}`)]
-        }),
-      )
-
-      return routing.locales.map((locale) => {
-        const prefix = locale === routing.defaultLocale ? '' : `/${locale}`
-
-        return {
-          url: absoluteUrl(`${prefix}${path}`),
-          alternates: {
-            languages: alternates,
-          },
-        }
-      })
-    })
+    const expected = publicSitemapPaths.map((path) => ({
+      url: absoluteUrl(path),
+    }))
 
     expect(sitemap()).toEqual(expected)
   })
