@@ -5,6 +5,7 @@ import { notifyTicketEvent } from '@/lib/services/notification.service'
 import { clearPaymentRetryFields } from '@/lib/services/payment-retry.service'
 import { logger } from '@/lib/utils/logger'
 import { triggerAlert } from '@/lib/utils/alerts'
+import { trackEvent, ANALYTICS_EVENTS } from '@/lib/integrations/analytics/events'
 
 interface HandlePaymentParams {
   stripeInvoiceId: string
@@ -168,6 +169,13 @@ export async function handlePaymentWorkflow(
     amountDollars: params.amountPaidDollars,
     stripeInvoiceId: params.stripeInvoiceId,
   }, { context: 'handlePayment' })
+
+  // 用户行为追踪
+  trackEvent(ANALYTICS_EVENTS.PAYMENT_SUCCEEDED, {
+    ticketId: claimed.id,
+    amount: params.amountPaidDollars,
+    currency: params.currency,
+  })
 
   // 6. 清理支付重试字段（支付成功后重置重试状态）
   await clearPaymentRetryFields(admin, claimed.id)

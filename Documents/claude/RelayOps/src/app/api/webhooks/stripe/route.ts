@@ -5,6 +5,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { notifyTicketEvent } from '@/lib/services/notification.service'
 import { schedulePaymentRetry } from '@/lib/services/payment-retry.service'
 import { logger } from '@/lib/utils/logger'
+import { trackEvent, ANALYTICS_EVENTS } from '@/lib/integrations/analytics/events'
 
 // Stripe sends the raw body as a string for signature verification —
 // disable Next.js body parsing so we receive it as text.
@@ -58,6 +59,11 @@ export async function POST(request: NextRequest) {
     const errorMessage = ((invoice as unknown as Record<string, unknown>)?.last_payment_error as { message?: string } | undefined)?.message ?? 'Payment failed'
 
     logger.warn(`Payment failed for invoice ${stripeInvoiceId}`, { context: 'stripe-webhook' })
+
+    trackEvent(ANALYTICS_EVENTS.PAYMENT_FAILED, {
+      ticketId: stripeInvoiceId, // 此时还不知道 ticketId，用 invoiceId 暂代
+      invoiceId: stripeInvoiceId,
+    })
 
     try {
       const admin = createAdminClient()

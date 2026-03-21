@@ -4,6 +4,7 @@ import { VALID_TRANSITIONS } from './transitions'
 import { canTransition } from './guards'
 import { logger } from '@/lib/utils/logger'
 import { triggerAlert } from '@/lib/utils/alerts'
+import { trackEvent, ANALYTICS_EVENTS } from '@/lib/integrations/analytics/events'
 
 export interface TransitionActor {
   id?: string  // cron/系统操作时可省略（无真实用户 ID）
@@ -136,6 +137,13 @@ export async function transitionTicket(
     to: toStatus,
     actorRole: actor.role,
   }, { context: 'state-machine-engine' })
+
+  // 用户行为追踪
+  trackEvent(ANALYTICS_EVENTS.TICKET_STATUS_CHANGED, {
+    ticketId,
+    from: fromStatus,
+    to: toStatus,
+  })
 
   return { success: true }
 }
