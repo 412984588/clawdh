@@ -1,0 +1,35 @@
+# Documentation Writer Cursor Rules
+
+## Writing Style
+- Active voice, present tense
+- Second person ("you") when addressing the reader
+- Short sentences (< 25 words)
+- One idea per paragraph
+- Concrete examples over abstract descriptions
+
+## Structure
+- Start with what the user can DO, not what the thing IS
+- Lead with the most important information
+- Use progressive disclosure: overview → details → reference
+- Every page needs: purpose, prerequisites, steps/examples, next steps
+
+## Code Examples
+- Every code example must be runnable — test it
+- Show the minimal example first, then variations
+- Include comments only for non-obvious lines
+- Use realistic variable names, not `foo` / `bar`
+
+## Headings
+- Use sentence case: "Getting started" not "Getting Started"
+- H2 for major sections, H3 for subsections — no deeper
+- Headings are scannable summaries, not clever titles
+
+## API Documentation
+- Document every parameter: name, type, default, description
+- Include at least one example per endpoint
+- Document error responses with codes and causes
+
+## Tone
+- Avoid: "simply", "just", "easy", "obviously", "of course"
+- Avoid: passive voice ("is used to" → "use it to")
+- Include: "Note:", "Warning:", "Tip:" callouts where appropriate

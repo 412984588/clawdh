@@ -1,0 +1,338 @@
+You are an expert in TypeScript, Turborepo, pnpm workspaces, Next.js, shared packages, and monorepo architecture.
+
+# Project Type
+This is a Turborepo monorepo with pnpm workspaces, containing multiple apps and shared packages.
+
+## Tech Stack
+- Turborepo 2.x
+- pnpm workspaces
+- TypeScript 5+
+- Next.js (apps)
+- Vite (packages)
+- ESLint + Prettier (shared configs)
+- Changesets for versioning
+
+## Monorepo Structure
+
+```
+apps/
+  web/                   # Next.js main web app
+    package.json         # { "name": "@acme/web" }
+    next.config.mjs
+    src/
+  docs/                  # Next.js documentation site
+  admin/                 # Admin dashboard
+packages/
+  ui/                    # Shared UI component library
+    package.json         # { "name": "@acme/ui" }
+    src/
+      components/
+      index.ts           # Public exports
+  config/
+    package.json         # { "name": "@acme/config" }
+    eslint/
+      next.js
+      library.js
+    tsconfig/
+      base.json
+      nextjs.json
+      react-library.json
+  database/              # Shared database package (Prisma)
+    package.json         # { "name": "@acme/database" }
+    prisma/
+      schema.prisma
+    src/
+      index.ts           # Export prisma client
+  api/                   # Shared API types and utilities
+    package.json         # { "name": "@acme/api" }
+    src/
+      types/
+      validators/
+  auth/                  # Shared auth utilities
+    package.json         # { "name": "@acme/auth" }
+turbo.json
+pnpm-workspace.yaml
+package.json             # Root package.json
+```
+
+## turbo.json Configuration
+
+```json
+{
+  "$schema": "https://turbo.build/schema.json",
+  "ui": "tui",
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "outputs": [".next/**", "!.next/cache/**", "dist/**"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "test": {
+      "dependsOn": ["^build"],
+      "inputs": ["src/**/*.ts", "src/**/*.tsx", "test/**/*.ts"],
+      "outputs": ["coverage/**"]
+    },
+    "lint": {
+      "dependsOn": ["^build"]
+    },
+    "type-check": {
+      "dependsOn": ["^build"]
+    },
+    "clean": {
+      "cache": false
+    }
+  },
+  "globalDotEnv": [".env", ".env.local"]
+}
+```
+
+## pnpm-workspace.yaml
+
+```yaml
+packages:
+  - 'apps/*'
+  - 'packages/*'
+```
+
+## Shared UI Package
+
+```typescript
+// packages/ui/package.json
+{
+  "name": "@acme/ui",
+  "version": "0.0.1",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./button": "./src/components/Button/index.ts"
+  },
+  "scripts": {
+    "build": "tsc",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint ."
+  },
+  "devDependencies": {
+    "@acme/config": "workspace:*",
+    "@types/react": "*",
+    "react": "*",
+    "typescript": "*"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0"
+  }
+}
+
+// packages/ui/src/components/Button/Button.tsx
+import type { ButtonHTMLAttributes, ReactNode } from 'react';
+import { cn } from '../../utils/cn';
+
+export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 'primary' | 'secondary' | 'ghost' | 'destructive';
+  size?: 'sm' | 'md' | 'lg';
+  children: ReactNode;
+  isLoading?: boolean;
+}
+
+export function Button({
+  variant = 'primary',
+  size = 'md',
+  children,
+  isLoading = false,
+  className,
+  disabled,
+  ...props
+}: ButtonProps) {
+  return (
+    <button
+      className={cn(
+        'inline-flex items-center justify-center rounded-md font-medium transition-colors',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+        {
+          'bg-blue-600 text-white hover:bg-blue-700': variant === 'primary',
+          'bg-gray-200 text-gray-900 hover:bg-gray-300': variant === 'secondary',
+          'bg-transparent hover:bg-gray-100': variant === 'ghost',
+          'bg-red-600 text-white hover:bg-red-700': variant === 'destructive',
+          'h-8 px-3 text-sm': size === 'sm',
+          'h-10 px-4': size === 'md',
+          'h-12 px-6 text-lg': size === 'lg',
+          'opacity-50 cursor-not-allowed': disabled || isLoading,
+        },
+        className
+      )}
+      disabled={disabled || isLoading}
+      {...props}
+    >
+      {isLoading ? <span className="mr-2">...</span> : null}
+      {children}
+    </button>
+  );
+}
+```
+
+## Shared Database Package
+
+```typescript
+// packages/database/src/index.ts
+import { PrismaClient } from '@prisma/client';
+
+const globalForPrisma = globalThis as unknown as {
+  prisma: PrismaClient | undefined;
+};
+
+export const prisma =
+  globalForPrisma.prisma ??
+  new PrismaClient({
+    log: process.env.NODE_ENV === 'development' ? ['query', 'error'] : ['error'],
+  });
+
+if (process.env.NODE_ENV !== 'production') {
+  globalForPrisma.prisma = prisma;
+}
+
+export * from '@prisma/client';
+```
+
+## Shared TypeScript Config
+
+```json
+// packages/config/tsconfig/base.json
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Default",
+  "compilerOptions": {
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true
+  }
+}
+
+// packages/config/tsconfig/nextjs.json
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Next.js",
+  "extends": "./base.json",
+  "compilerOptions": {
+    "target": "es6",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "allowJs": true,
+    "jsx": "preserve",
+    "noEmit": true,
+    "plugins": [{ "name": "next" }]
+  }
+}
+```
+
+## Shared ESLint Config
+
+```javascript
+// packages/config/eslint/library.js
+module.exports = {
+  extends: [
+    'eslint:recommended',
+    'plugin:@typescript-eslint/recommended',
+    'prettier',
+  ],
+  plugins: ['@typescript-eslint'],
+  parser: '@typescript-eslint/parser',
+  rules: {
+    '@typescript-eslint/no-explicit-any': 'error',
+    '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+  },
+};
+```
+
+## App — Using Shared Packages
+
+```typescript
+// apps/web/package.json
+{
+  "name": "@acme/web",
+  "dependencies": {
+    "@acme/ui": "workspace:*",
+    "@acme/database": "workspace:*",
+    "@acme/api": "workspace:*",
+    "next": "15.x"
+  }
+}
+
+// apps/web/src/app/page.tsx
+import { Button } from '@acme/ui';
+import { prisma } from '@acme/database';
+
+export default async function Home() {
+  const users = await prisma.user.findMany({ take: 5 });
+
+  return (
+    <main>
+      <Button variant="primary">Click me</Button>
+      {users.map(user => <p key={user.id}>{user.name}</p>)}
+    </main>
+  );
+}
+```
+
+## Changesets Workflow
+
+```bash
+# 修改了 packages/ui 后：
+pnpm changeset          # 声明版本变更
+pnpm changeset version  # 更新版本号
+pnpm changeset publish  # 发布到 npm
+```
+
+## Common Turborepo Commands
+
+```bash
+# 构建所有包
+pnpm turbo build
+
+# 仅运行受变更影响的任务（利用缓存）
+pnpm turbo build --filter=...[origin/main]
+
+# 只在特定 app 运行
+pnpm turbo dev --filter=@acme/web
+
+# 运行 web 及其所有依赖
+pnpm turbo build --filter=@acme/web...
+```
+
+## Error Handling Patterns
+
+- Each package should export its own error types
+- Apps consume and handle errors from packages
+- Use Result types or throw named errors
+
+## File Naming Conventions
+
+- Packages: kebab-case names with @org/ scope
+- Configs: `[name].json` or `[name].js`
+- Exports: `index.ts` as main export
+
+## What Cursor Should Do
+
+- Always use `workspace:*` for internal dependencies
+- Export everything through `index.ts` in packages
+- Share configs (tsconfig, eslint) from `packages/config`
+- Use Turborepo's dependency graph (`^build`) for build ordering
+- Generate package.json with proper `name`, `main`, `types`, `exports`
+- Suggest `--filter` flags for targeted task running
+
+## What Cursor Should Avoid
+
+- Do NOT import directly from internal package files — use published exports
+- Do NOT add package-specific deps to root package.json
+- Do NOT skip the `dependsOn: ["^build"]` for tasks that need built packages
+- Do NOT use `*` version ranges for workspace packages — use `workspace:*`
+- Do NOT duplicate configs — share via `packages/config`

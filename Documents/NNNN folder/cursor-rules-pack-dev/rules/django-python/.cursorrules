@@ -1,0 +1,364 @@
+You are an expert in Python, Django 4+, Django REST Framework, PostgreSQL, Celery, and modern Django patterns.
+
+# Project Type
+This is a Django 4+ web application with Django REST Framework (DRF) for API development, PostgreSQL database, and Celery for async tasks.
+
+## Tech Stack
+- Python 3.11+
+- Django 4.2+ (LTS)
+- Django REST Framework 3.14+
+- PostgreSQL
+- Celery + Redis
+- pytest-django
+- Black + isort + flake8
+
+## Code Style and Structure
+
+- Follow PEP 8; use Black (88 char line length)
+- Use Django's built-in tools over third-party when appropriate
+- Organize apps by domain/feature, not by type
+- Keep views thin; put business logic in services or model managers
+- Use class-based views (CBVs) for CRUD; function-based views (FBVs) for complex logic
+
+## Project Structure
+
+```
+project_name/
+  settings/
+    base.py
+    development.py
+    production.py
+  urls.py
+  wsgi.py
+  asgi.py
+apps/
+  users/
+    migrations/
+    models.py
+    serializers.py
+    views.py
+    urls.py
+    services.py
+    admin.py
+    tests/
+      test_models.py
+      test_views.py
+      test_services.py
+  posts/
+    ...
+requirements/
+  base.txt
+  development.txt
+  production.txt
+manage.py
+```
+
+## Django Models
+
+```python
+# apps/users/models.py
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
+from django.db import models
+from django.utils import timezone
+
+class UserManager(BaseUserManager):
+    def create_user(self, email: str, password: str | None = None, **extra_fields):
+        if not email:
+            raise ValueError('邮箱不能为空')
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, email: str, password: str, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        return self.create_user(email, password, **extra_fields)
+
+
+class User(AbstractBaseUser, PermissionsMixin):
+    email = models.EmailField(unique=True, db_index=True)
+    name = models.CharField(max_length=100)
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    objects = UserManager()
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['name']
+
+    class Meta:
+        db_table = 'users'
+        ordering = ['-created_at']
+
+    def __str__(self) -> str:
+        return f"{self.name} <{self.email}>"
+```
+
+## DRF Serializers
+
+```python
+# apps/users/serializers.py
+from rest_framework import serializers
+from django.contrib.auth.password_validation import validate_password
+from .models import User
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'email', 'name', 'created_at']
+        read_only_fields = ['id', 'created_at']
+
+class UserCreateSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, validators=[validate_password])
+    password_confirm = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = User
+        fields = ['email', 'name', 'password', 'password_confirm']
+
+    def validate(self, attrs):
+        if attrs['password'] != attrs.pop('password_confirm'):
+            raise serializers.ValidationError({'password_confirm': '两次密码不一致'})
+        return attrs
+
+    def create(self, validated_data):
+        password = validated_data.pop('password')
+        user = User(**validated_data)
+        user.set_password(password)
+        user.save()
+        return user
+```
+
+## DRF Views
+
+```python
+# apps/users/views.py
+from rest_framework import generics, status, permissions
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
+from django.db import IntegrityError
+from .models import User
+from .serializers import UserSerializer, UserCreateSerializer
+
+class UserListCreateView(generics.ListCreateAPIView):
+    """用户列表与创建"""
+    queryset = User.objects.filter(is_active=True)
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return UserCreateSerializer
+        return UserSerializer
+
+    def perform_create(self, serializer):
+        try:
+            serializer.save()
+        except IntegrityError:
+            raise serializers.ValidationError({'email': '该邮箱已被注册'})
+
+
+class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    lookup_field = 'pk'
+
+    def get_object(self):
+        obj = super().get_object()
+        if obj != self.request.user and not self.request.user.is_staff:
+            self.permission_denied(self.request, message='无权访问其他用户信息')
+        return obj
+```
+
+## URL Configuration
+
+```python
+# apps/users/urls.py
+from django.urls import path
+from . import views
+
+app_name = 'users'
+
+urlpatterns = [
+    path('', views.UserListCreateView.as_view(), name='list-create'),
+    path('<int:pk>/', views.UserDetailView.as_view(), name='detail'),
+    path('me/', views.CurrentUserView.as_view(), name='me'),
+]
+```
+
+## Service Layer
+
+```python
+# apps/users/services.py
+from django.db import transaction
+from django.core.mail import send_mail
+from .models import User
+
+class UserService:
+    @staticmethod
+    @transaction.atomic
+    def register_user(email: str, name: str, password: str) -> User:
+        """注册新用户并发送欢迎邮件"""
+        if User.objects.filter(email=email).exists():
+            raise ValueError(f"邮箱 {email} 已被注册")
+
+        user = User.objects.create_user(
+            email=email,
+            name=name,
+            password=password,
+        )
+
+        # 异步发送欢迎邮件
+        from apps.users.tasks import send_welcome_email
+        send_welcome_email.delay(user.id)
+
+        return user
+```
+
+## Celery Tasks
+
+```python
+# apps/users/tasks.py
+from celery import shared_task
+from django.core.mail import send_mail
+from django.conf import settings
+import logging
+
+logger = logging.getLogger(__name__)
+
+@shared_task(bind=True, max_retries=3, default_retry_delay=60)
+def send_welcome_email(self, user_id: int) -> str:
+    """发送欢迎邮件，失败自动重试"""
+    from apps.users.models import User
+    try:
+        user = User.objects.get(id=user_id)
+        send_mail(
+            subject='欢迎加入！',
+            message=f'你好 {user.name}，欢迎注册！',
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[user.email],
+        )
+        logger.info(f'欢迎邮件已发送至 {user.email}')
+        return f'邮件发送成功: {user.email}'
+    except User.DoesNotExist:
+        logger.error(f'用户 {user_id} 不存在，跳过发送邮件')
+        return '用户不存在'
+    except Exception as exc:
+        logger.exception(f'发送邮件失败: {exc}')
+        raise self.retry(exc=exc)
+```
+
+## Error Handling Patterns
+
+```python
+# Custom exception handler for DRF
+from rest_framework.views import exception_handler
+from rest_framework.response import Response
+
+def custom_exception_handler(exc, context):
+    response = exception_handler(exc, context)
+
+    if response is not None:
+        response.data = {
+            'error': True,
+            'message': _extract_error_message(response.data),
+            'details': response.data,
+        }
+    return response
+
+def _extract_error_message(data) -> str:
+    if isinstance(data, dict):
+        for key, value in data.items():
+            if isinstance(value, list):
+                return f"{key}: {value[0]}"
+    if isinstance(data, list):
+        return str(data[0])
+    return str(data)
+```
+
+## Django Admin
+
+```python
+# apps/users/admin.py
+from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from .models import User
+
+@admin.register(User)
+class UserAdmin(BaseUserAdmin):
+    list_display = ['email', 'name', 'is_active', 'is_staff', 'created_at']
+    list_filter = ['is_active', 'is_staff', 'created_at']
+    search_fields = ['email', 'name']
+    ordering = ['-created_at']
+    fieldsets = (
+        (None, {'fields': ('email', 'password')}),
+        ('个人信息', {'fields': ('name',)}),
+        ('权限', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups')}),
+    )
+```
+
+## Testing with pytest-django
+
+```python
+# apps/users/tests/test_views.py
+import pytest
+from rest_framework.test import APIClient
+from django.urls import reverse
+from apps.users.models import User
+
+@pytest.fixture
+def api_client():
+    return APIClient()
+
+@pytest.fixture
+def user(db):
+    return User.objects.create_user(
+        email='test@example.com',
+        name='测试用户',
+        password='TestPass123!',
+    )
+
+@pytest.mark.django_db
+def test_create_user(api_client):
+    url = reverse('users:list-create')
+    data = {
+        'email': 'new@example.com',
+        'name': '新用户',
+        'password': 'SecurePass123!',
+        'password_confirm': 'SecurePass123!',
+    }
+    response = api_client.post(url, data, format='json')
+    assert response.status_code == 201
+    assert User.objects.filter(email='new@example.com').exists()
+```
+
+## File Naming Conventions
+
+- Models: `models.py` per app
+- Serializers: `serializers.py`
+- Views: `views.py`
+- Services: `services.py`
+- Tasks: `tasks.py`
+- Tests: `tests/test_[module].py`
+
+## What Cursor Should Do
+
+- Generate migrations when models change (`makemigrations`)
+- Suggest `select_related` and `prefetch_related` to avoid N+1 queries
+- Use `@transaction.atomic` for operations that should be atomic
+- Generate proper DRF serializers with validation
+- Suggest Django's built-in user model customization
+- Recommend `@shared_task` for Celery tasks with retry logic
+- Generate pytest fixtures for common test scenarios
+
+## What Cursor Should Avoid
+
+- Do NOT use `User.objects.get()` without try/except
+- Do NOT do heavy work in Django views — use Celery tasks
+- Do NOT use raw SQL without parameterization
+- Do NOT skip migrations — always generate them
+- Do NOT use `settings.py` directly — use `django.conf.settings`
+- Do NOT return sensitive data in API responses (passwords, tokens)
+- Do NOT use `request.data` without serializer validation

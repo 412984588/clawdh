@@ -1,0 +1,20 @@
+---
+description: Code review rules — severity tiers, security checklist, constructive feedback
+alwaysApply: true
+---
+
+# Code Review Rules
+
+## Severity Tiers
+- `[P0]` Security / data loss / broken functionality — block merge
+- `[P1]` Logic errors / missing error handling — block merge
+- `[P2]` Maintainability / test coverage — suggest fix
+- `[P3]` Style / naming — optional
+
+## Security (always check)
+- No hardcoded secrets
+- Parameterized queries only
+- Input validated before use
+
+## Comment Format
+`[P1] Change X to Y — reason: Z`

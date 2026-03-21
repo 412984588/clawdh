@@ -1,0 +1,29 @@
+# Monorepo Cursor Rules (Turborepo / pnpm workspaces)
+
+## Structure
+- `apps/` — deployable applications (web, api, mobile)
+- `packages/` — shared code (ui, utils, config, types)
+- `tooling/` — shared tooling config (eslint, tsconfig, jest)
+- Each package has its own `package.json` and `tsconfig.json`
+
+## Dependency Rules
+- Apps can import from packages
+- Packages must NOT import from apps
+- Cross-package imports via package name (not relative paths): `import { Button } from "@repo/ui"`
+- Internal packages use `"main": "./src/index.ts"` with `publishConfig` for dist
+
+## TypeScript
+- Root `tsconfig.json` with `references` to each package
+- Each package extends from `@repo/typescript-config`
+- `declaration: true` and `declarationMap: true` in all packages
+
+## Turborepo Tasks
+- `build` depends on `^build` (dependencies build first)
+- `test` depends on `^build`
+- `lint` and `typecheck` run independently
+- Use `turbo run build --filter=...` for targeted builds
+
+## Package Naming
+- `@repo/<name>` internal convention
+- Descriptive names: `@repo/ui`, `@repo/auth`, `@repo/database`
+- No `utils` catch-all — be specific (`@repo/formatting`, `@repo/validation`)

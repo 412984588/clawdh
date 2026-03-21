@@ -1,0 +1,403 @@
+You are an expert in Swift 5.9+, SwiftUI, SwiftData, Combine, async/await, and iOS/macOS app development.
+
+# Project Type
+This is an iOS/macOS app built with SwiftUI, SwiftData (or Core Data), and modern Swift concurrency patterns.
+
+## Tech Stack
+- Swift 5.9+
+- SwiftUI (iOS 17+ target)
+- SwiftData (or Core Data for older targets)
+- Combine for reactive programming
+- async/await for concurrency
+- URLSession for networking
+- KeychainWrapper for secure storage
+
+## Code Style and Structure
+
+- Follow Swift API Design Guidelines
+- Use `camelCase` for properties and functions, `PascalCase` for types
+- Prefer value types (structs) over reference types (classes)
+- Use `@Observable` macro (Swift 5.9) or `ObservableObject` for view models
+- Keep views small and focused — extract subviews aggressively
+- Separate concerns: View, ViewModel, Model, Service
+- Use property wrappers correctly: @State, @Binding, @Environment, @Query
+
+## SwiftUI Architecture — MVVM
+
+```swift
+// Models/User.swift
+import Foundation
+import SwiftData
+
+@Model
+final class User {
+    var id: UUID
+    var name: String
+    var email: String
+    var createdAt: Date
+    var isActive: Bool
+
+    init(name: String, email: String) {
+        self.id = UUID()
+        self.name = name
+        self.email = email
+        self.createdAt = Date()
+        self.isActive = true
+    }
+}
+
+// ViewModels/UserListViewModel.swift
+import Foundation
+import Observation
+
+@Observable
+final class UserListViewModel {
+    var users: [UserDTO] = []
+    var isLoading = false
+    var errorMessage: String?
+    var searchText = ""
+
+    private let userService: UserServiceProtocol
+
+    init(userService: UserServiceProtocol = UserService()) {
+        self.userService = userService
+    }
+
+    var filteredUsers: [UserDTO] {
+        guard !searchText.isEmpty else { return users }
+        return users.filter {
+            $0.name.localizedCaseInsensitiveContains(searchText) ||
+            $0.email.localizedCaseInsensitiveContains(searchText)
+        }
+    }
+
+    func loadUsers() async {
+        isLoading = true
+        errorMessage = nil
+        defer { isLoading = false }
+
+        do {
+            users = try await userService.fetchUsers()
+        } catch {
+            errorMessage = "加载用户失败: \(error.localizedDescription)"
+            print("[UserListViewModel] 加载失败:", error)
+        }
+    }
+}
+```
+
+## SwiftUI View Patterns
+
+```swift
+// Views/UserListView.swift
+import SwiftUI
+
+struct UserListView: View {
+    @State private var viewModel = UserListViewModel()
+    @State private var showAddUser = false
+
+    var body: some View {
+        NavigationStack {
+            Group {
+                if viewModel.isLoading && viewModel.users.isEmpty {
+                    ProgressView("加载中...")
+                } else if let errorMessage = viewModel.errorMessage {
+                    ContentUnavailableView(
+                        "加载失败",
+                        systemImage: "exclamationmark.triangle",
+                        description: Text(errorMessage)
+                    )
+                } else if viewModel.filteredUsers.isEmpty {
+                    ContentUnavailableView.search(text: viewModel.searchText)
+                } else {
+                    userList
+                }
+            }
+            .navigationTitle("用户")
+            .searchable(text: $viewModel.searchText, prompt: "搜索用户")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("添加", systemImage: "plus") {
+                        showAddUser = true
+                    }
+                }
+            }
+            .sheet(isPresented: $showAddUser) {
+                AddUserView()
+            }
+        }
+        .task {
+            await viewModel.loadUsers()
+        }
+    }
+
+    private var userList: some View {
+        List(viewModel.filteredUsers) { user in
+            NavigationLink {
+                UserDetailView(userId: user.id)
+            } label: {
+                UserRowView(user: user)
+            }
+        }
+        .refreshable {
+            await viewModel.loadUsers()
+        }
+    }
+}
+
+// Extracted subview
+struct UserRowView: View {
+    let user: UserDTO
+
+    var body: some View {
+        HStack {
+            AsyncImage(url: user.avatarURL) { image in
+                image.resizable().scaledToFill()
+            } placeholder: {
+                Color.gray.opacity(0.3)
+            }
+            .frame(width: 44, height: 44)
+            .clipShape(.circle)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(user.name)
+                    .font(.headline)
+                Text(user.email)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+    }
+}
+```
+
+## SwiftData Patterns
+
+```swift
+// App entry point with SwiftData
+import SwiftUI
+import SwiftData
+
+@main
+struct MyApp: App {
+    var body: some Scene {
+        WindowGroup {
+            ContentView()
+        }
+        .modelContainer(for: [User.self, Post.self])
+    }
+}
+
+// Using @Query in views
+struct UserListView: View {
+    @Query(sort: \User.createdAt, order: .reverse)
+    var users: [User]
+
+    @Environment(\.modelContext) private var modelContext
+
+    var body: some View {
+        List(users) { user in
+            Text(user.name)
+        }
+    }
+
+    func addUser(name: String, email: String) {
+        let user = User(name: name, email: email)
+        modelContext.insert(user)
+    }
+
+    func deleteUsers(at offsets: IndexSet) {
+        for offset in offsets {
+            modelContext.delete(users[offset])
+        }
+    }
+}
+```
+
+## Networking with async/await
+
+```swift
+// Services/UserService.swift
+import Foundation
+
+protocol UserServiceProtocol {
+    func fetchUsers() async throws -> [UserDTO]
+    func createUser(_ user: CreateUserRequest) async throws -> UserDTO
+}
+
+struct UserService: UserServiceProtocol {
+    private let baseURL: URL
+    private let decoder: JSONDecoder
+
+    init(baseURL: URL = URL(string: "https://api.example.com")!) {
+        self.baseURL = baseURL
+        self.decoder = JSONDecoder()
+        self.decoder.keyDecodingStrategy = .convertFromSnakeCase
+        self.decoder.dateDecodingStrategy = .iso8601
+    }
+
+    func fetchUsers() async throws -> [UserDTO] {
+        let url = baseURL.appendingPathComponent("/users")
+        let (data, response) = try await URLSession.shared.data(from: url)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw NetworkError.invalidResponse
+        }
+
+        guard (200..<300).contains(httpResponse.statusCode) else {
+            throw NetworkError.httpError(statusCode: httpResponse.statusCode)
+        }
+
+        return try decoder.decode([UserDTO].self, from: data)
+    }
+
+    func createUser(_ user: CreateUserRequest) async throws -> UserDTO {
+        var request = URLRequest(url: baseURL.appendingPathComponent("/users"))
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try JSONEncoder().encode(user)
+
+        let (data, _) = try await URLSession.shared.data(for: request)
+        return try decoder.decode(UserDTO.self, from: data)
+    }
+}
+
+// Custom errors
+enum NetworkError: LocalizedError {
+    case invalidResponse
+    case httpError(statusCode: Int)
+    case decodingFailed(Error)
+
+    var errorDescription: String? {
+        switch self {
+        case .invalidResponse: return "服务器响应无效"
+        case .httpError(let code): return "HTTP 错误 \(code)"
+        case .decodingFailed: return "数据解析失败"
+        }
+    }
+}
+```
+
+## Form Validation
+
+```swift
+struct AddUserView: View {
+    @Environment(\.dismiss) private var dismiss
+    @State private var name = ""
+    @State private var email = ""
+    @State private var isSubmitting = false
+    @State private var errorMessage: String?
+
+    private var isFormValid: Bool {
+        !name.trimmingCharacters(in: .whitespaces).isEmpty &&
+        email.contains("@") && email.contains(".")
+    }
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section("基本信息") {
+                    TextField("姓名", text: $name)
+                        .textContentType(.name)
+                    TextField("邮箱", text: $email)
+                        .textContentType(.emailAddress)
+                        .keyboardType(.emailAddress)
+                        .autocorrectionDisabled()
+                        .textInputAutocapitalization(.never)
+                }
+
+                if let errorMessage {
+                    Section {
+                        Text(errorMessage)
+                            .foregroundStyle(.red)
+                            .font(.caption)
+                    }
+                }
+            }
+            .navigationTitle("添加用户")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("取消") { dismiss() }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("保存") {
+                        Task { await submit() }
+                    }
+                    .disabled(!isFormValid || isSubmitting)
+                }
+            }
+        }
+    }
+
+    private func submit() async {
+        isSubmitting = true
+        defer { isSubmitting = false }
+
+        do {
+            let service = UserService()
+            _ = try await service.createUser(CreateUserRequest(name: name, email: email))
+            dismiss()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+}
+```
+
+## Error Handling Patterns
+
+```swift
+// 使用 Result type 和自定义错误
+func processData() -> Result<ProcessedData, AppError> {
+    guard let data = loadData() else {
+        return .failure(.dataNotFound)
+    }
+    do {
+        let processed = try transform(data)
+        return .success(processed)
+    } catch {
+        return .failure(.processingFailed(underlying: error))
+    }
+}
+
+// Task 中处理错误
+.task {
+    do {
+        try await loadContent()
+    } catch is CancellationError {
+        // 视图消失导致的取消，忽略
+    } catch {
+        errorMessage = error.localizedDescription
+    }
+}
+```
+
+## File Naming Conventions
+
+- Views: `[Name]View.swift`
+- ViewModels: `[Name]ViewModel.swift`
+- Models: `[Name].swift` (domain models and SwiftData models)
+- Services: `[Name]Service.swift`
+- DTOs: `[Name]DTO.swift`
+- Protocols: `[Name]Protocol.swift`
+
+## What Cursor Should Do
+
+- Use `@Observable` macro (Swift 5.9+) for view models
+- Use `.task` modifier for async work in views
+- Extract complex view logic into private computed properties
+- Generate `ContentUnavailableView` for empty/error states
+- Use `@Query` for SwiftData in views
+- Add `defer` for cleanup code in async functions
+- Generate proper `Codable` conformance with `CodingKeys`
+
+## What Cursor Should Avoid
+
+- Do NOT use `@Published` + `ObservableObject` — use `@Observable` for iOS 17+
+- Do NOT fetch data in `onAppear` — use `.task` modifier
+- Do NOT use `DispatchQueue.main.async` — use `@MainActor`
+- Do NOT put networking in views — use services/view models
+- Do NOT use `AnyView` type erasure — restructure to avoid it
+- Do NOT force unwrap optionals with `!` — use `guard let` or `if let`
+- Do NOT use deprecated APIs — check iOS 17 minimum target

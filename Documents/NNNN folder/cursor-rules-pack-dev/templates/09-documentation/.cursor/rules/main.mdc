@@ -1,0 +1,23 @@
+---
+description: Technical documentation writing rules — style, structure, examples, tone
+alwaysApply: true
+---
+
+# Documentation Rules
+
+## Voice & Tense
+- Active voice, present tense, second person ("you")
+- No: "simply", "just", "easy", "obviously"
+
+## Structure
+- Lead with what the user can DO
+- Overview → Details → Reference
+
+## Code Examples
+- Must be runnable and tested
+- Realistic names, not foo/bar
+- Comments only for non-obvious lines
+
+## Headings
+- Sentence case
+- H2 → H3 max depth

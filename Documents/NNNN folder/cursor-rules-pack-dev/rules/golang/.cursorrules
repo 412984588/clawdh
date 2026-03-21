@@ -1,0 +1,409 @@
+You are an expert in Go (Golang), Gin/Echo/Chi HTTP frameworks, GORM, PostgreSQL, and idiomatic Go patterns.
+
+# Project Type
+This is a Go backend service using idiomatic Go patterns, clean architecture, and modern Go tooling.
+
+## Tech Stack
+- Go 1.21+
+- Gin or Chi for HTTP routing
+- GORM or sqlx for database
+- PostgreSQL
+- Redis for caching
+- Docker for deployment
+- testify for testing
+
+## Code Style and Structure
+
+- Follow Effective Go and Go Code Review Comments
+- Use `gofmt` and `goimports` for formatting
+- Keep functions short and focused (single responsibility)
+- Return errors, don't panic
+- Accept interfaces, return concrete types
+- Use context for cancellation and deadline propagation
+- Prefer table-driven tests
+- Write idiomatic Go — no classes, use structs + methods
+
+## Project Structure
+
+```
+cmd/
+  api/
+    main.go              # Entry point — minimal, just wires things up
+internal/
+  api/
+    handlers/
+      user_handler.go
+      post_handler.go
+    middleware/
+      auth.go
+      logger.go
+      cors.go
+    router.go
+  domain/
+    user.go              # Domain types and interfaces
+    post.go
+  service/
+    user_service.go
+    post_service.go
+  repository/
+    user_repo.go
+    post_repo.go
+    db.go                # DB connection
+  config/
+    config.go            # Config loading
+pkg/
+  logger/                # Public packages
+  validator/
+  errors/
+migrations/
+  001_create_users.sql
+  002_create_posts.sql
+```
+
+## HTTP Handler Patterns
+
+```go
+// internal/api/handlers/user_handler.go
+package handlers
+
+import (
+    "net/http"
+    "strconv"
+
+    "github.com/gin-gonic/gin"
+    "yourapp/internal/domain"
+    "yourapp/internal/service"
+)
+
+type UserHandler struct {
+    userService service.UserService
+}
+
+func NewUserHandler(userService service.UserService) *UserHandler {
+    return &UserHandler{userService: userService}
+}
+
+func (h *UserHandler) GetUser(c *gin.Context) {
+    idStr := c.Param("id")
+    id, err := strconv.ParseInt(idStr, 10, 64)
+    if err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "无效的用户 ID"})
+        return
+    }
+
+    user, err := h.userService.GetUserByID(c.Request.Context(), id)
+    if err != nil {
+        if errors.Is(err, domain.ErrNotFound) {
+            c.JSON(http.StatusNotFound, gin.H{"error": "用户不存在"})
+            return
+        }
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "服务器内部错误"})
+        return
+    }
+
+    c.JSON(http.StatusOK, user)
+}
+
+func (h *UserHandler) CreateUser(c *gin.Context) {
+    var req domain.CreateUserRequest
+    if err := c.ShouldBindJSON(&req); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+
+    user, err := h.userService.CreateUser(c.Request.Context(), req)
+    if err != nil {
+        if errors.Is(err, domain.ErrDuplicate) {
+            c.JSON(http.StatusConflict, gin.H{"error": "邮箱已被注册"})
+            return
+        }
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "创建用户失败"})
+        return
+    }
+
+    c.JSON(http.StatusCreated, user)
+}
+```
+
+## Domain Types and Interfaces
+
+```go
+// internal/domain/user.go
+package domain
+
+import (
+    "context"
+    "errors"
+    "time"
+)
+
+// 域错误定义
+var (
+    ErrNotFound  = errors.New("resource not found")
+    ErrDuplicate = errors.New("resource already exists")
+    ErrInvalid   = errors.New("invalid input")
+)
+
+// User 实体
+type User struct {
+    ID        int64     `json:"id" db:"id"`
+    Email     string    `json:"email" db:"email"`
+    Name      string    `json:"name" db:"name"`
+    IsActive  bool      `json:"is_active" db:"is_active"`
+    CreatedAt time.Time `json:"created_at" db:"created_at"`
+}
+
+// 请求/响应类型
+type CreateUserRequest struct {
+    Email    string `json:"email" binding:"required,email"`
+    Name     string `json:"name" binding:"required,min=1,max=100"`
+    Password string `json:"password" binding:"required,min=8"`
+}
+
+// 仓库接口 — 依赖倒置原则
+type UserRepository interface {
+    GetByID(ctx context.Context, id int64) (*User, error)
+    GetByEmail(ctx context.Context, email string) (*User, error)
+    Create(ctx context.Context, user *User) error
+    Update(ctx context.Context, user *User) error
+    Delete(ctx context.Context, id int64) error
+    List(ctx context.Context, offset, limit int) ([]*User, error)
+}
+
+// 服务接口
+type UserService interface {
+    GetUserByID(ctx context.Context, id int64) (*User, error)
+    CreateUser(ctx context.Context, req CreateUserRequest) (*User, error)
+}
+```
+
+## Service Layer
+
+```go
+// internal/service/user_service.go
+package service
+
+import (
+    "context"
+    "fmt"
+
+    "yourapp/internal/domain"
+    "yourapp/pkg/logger"
+)
+
+type userService struct {
+    repo   domain.UserRepository
+    logger *logger.Logger
+}
+
+func NewUserService(repo domain.UserRepository, logger *logger.Logger) domain.UserService {
+    return &userService{repo: repo, logger: logger}
+}
+
+func (s *userService) GetUserByID(ctx context.Context, id int64) (*domain.User, error) {
+    user, err := s.repo.GetByID(ctx, id)
+    if err != nil {
+        return nil, fmt.Errorf("userService.GetUserByID: %w", err)
+    }
+    return user, nil
+}
+
+func (s *userService) CreateUser(ctx context.Context, req domain.CreateUserRequest) (*domain.User, error) {
+    // 检查邮箱是否已存在
+    existing, _ := s.repo.GetByEmail(ctx, req.Email)
+    if existing != nil {
+        return nil, domain.ErrDuplicate
+    }
+
+    hashedPassword, err := hashPassword(req.Password)
+    if err != nil {
+        return nil, fmt.Errorf("userService.CreateUser: hash password: %w", err)
+    }
+
+    user := &domain.User{
+        Email:    req.Email,
+        Name:     req.Name,
+        Password: hashedPassword,
+        IsActive: true,
+    }
+
+    if err := s.repo.Create(ctx, user); err != nil {
+        return nil, fmt.Errorf("userService.CreateUser: %w", err)
+    }
+
+    s.logger.Info("用户创建成功", "user_id", user.ID, "email", user.Email)
+    return user, nil
+}
+```
+
+## Repository Pattern
+
+```go
+// internal/repository/user_repo.go
+package repository
+
+import (
+    "context"
+    "database/sql"
+    "errors"
+    "fmt"
+
+    "yourapp/internal/domain"
+)
+
+type userRepository struct {
+    db *sql.DB
+}
+
+func NewUserRepository(db *sql.DB) domain.UserRepository {
+    return &userRepository{db: db}
+}
+
+func (r *userRepository) GetByID(ctx context.Context, id int64) (*domain.User, error) {
+    user := &domain.User{}
+    query := `SELECT id, email, name, is_active, created_at FROM users WHERE id = $1`
+
+    err := r.db.QueryRowContext(ctx, query, id).Scan(
+        &user.ID, &user.Email, &user.Name, &user.IsActive, &user.CreatedAt,
+    )
+    if err != nil {
+        if errors.Is(err, sql.ErrNoRows) {
+            return nil, domain.ErrNotFound
+        }
+        return nil, fmt.Errorf("userRepository.GetByID: %w", err)
+    }
+    return user, nil
+}
+```
+
+## Error Handling Patterns
+
+```go
+// pkg/errors/errors.go
+package errors
+
+import (
+    "errors"
+    "fmt"
+)
+
+// 包装错误并添加上下文
+func Wrap(err error, msg string) error {
+    if err == nil {
+        return nil
+    }
+    return fmt.Errorf("%s: %w", msg, err)
+}
+
+// 始终使用 errors.Is 检查错误类型
+// if errors.Is(err, domain.ErrNotFound) { ... }
+
+// 使用 fmt.Errorf 包装错误：
+// return fmt.Errorf("userService.GetUser: %w", err)
+```
+
+## Configuration Management
+
+```go
+// internal/config/config.go
+package config
+
+import (
+    "os"
+    "github.com/joho/godotenv"
+)
+
+type Config struct {
+    DatabaseURL string
+    RedisURL    string
+    JWTSecret   string
+    Port        string
+    LogLevel    string
+}
+
+func Load() (*Config, error) {
+    _ = godotenv.Load() // 忽略 .env 不存在的错误（生产环境使用系统环境变量）
+
+    cfg := &Config{
+        DatabaseURL: getEnvRequired("DATABASE_URL"),
+        RedisURL:    getEnv("REDIS_URL", "redis://localhost:6379"),
+        JWTSecret:   getEnvRequired("JWT_SECRET"),
+        Port:        getEnv("PORT", "8080"),
+        LogLevel:    getEnv("LOG_LEVEL", "info"),
+    }
+    return cfg, nil
+}
+
+func getEnvRequired(key string) string {
+    val := os.Getenv(key)
+    if val == "" {
+        panic(fmt.Sprintf("必需的环境变量 %s 未设置", key))
+    }
+    return val
+}
+```
+
+## Testing Patterns
+
+```go
+// internal/service/user_service_test.go
+package service_test
+
+import (
+    "context"
+    "testing"
+
+    "github.com/stretchr/testify/assert"
+    "github.com/stretchr/testify/mock"
+    "yourapp/internal/domain"
+    "yourapp/internal/service"
+)
+
+type MockUserRepository struct {
+    mock.Mock
+}
+
+func (m *MockUserRepository) GetByID(ctx context.Context, id int64) (*domain.User, error) {
+    args := m.Called(ctx, id)
+    return args.Get(0).(*domain.User), args.Error(1)
+}
+
+func TestGetUserByID_Success(t *testing.T) {
+    mockRepo := new(MockUserRepository)
+    svc := service.NewUserService(mockRepo, nil)
+
+    expectedUser := &domain.User{ID: 1, Email: "test@example.com", Name: "测试用户"}
+    mockRepo.On("GetByID", mock.Anything, int64(1)).Return(expectedUser, nil)
+
+    user, err := svc.GetUserByID(context.Background(), 1)
+
+    assert.NoError(t, err)
+    assert.Equal(t, expectedUser, user)
+    mockRepo.AssertExpectations(t)
+}
+```
+
+## File Naming Conventions
+
+- Packages: `lowercase` (e.g., `handlers`, `service`, `domain`)
+- Files: `snake_case.go` (e.g., `user_handler.go`)
+- Tests: `[file]_test.go`
+- Interfaces: defined in domain package, implemented in infrastructure packages
+
+## What Cursor Should Do
+
+- Use `context.Context` as the first parameter for all functions that do I/O
+- Return errors with context using `fmt.Errorf("fn: %w", err)`
+- Define interfaces close to where they are used (consumer side)
+- Generate table-driven tests with `t.Run()`
+- Suggest `errors.Is()` and `errors.As()` for error checking
+- Use struct embedding for interface composition
+
+## What Cursor Should Avoid
+
+- Do NOT use `panic` in normal error flows
+- Do NOT use global variables for state — use dependency injection
+- Do NOT use `init()` functions for complex setup
+- Do NOT shadow the `err` variable with `:=` when checking
+- Do NOT return naked errors — always wrap with context
+- Do NOT use goroutines without proper synchronization

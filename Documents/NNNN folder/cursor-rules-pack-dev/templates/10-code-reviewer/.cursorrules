@@ -1,0 +1,39 @@
+# Code Reviewer Cursor Rules
+
+## Review Priorities
+P0 — Security vulnerabilities, data loss, broken functionality
+P1 — Performance issues, incorrect logic, missing error handling
+P2 — Code smells, maintainability, test coverage
+P3 — Style, naming, comments (only if not covered by linter)
+
+## Security Checklist
+- [ ] No secrets or credentials in code
+- [ ] SQL queries use parameterized inputs
+- [ ] User input validated before use
+- [ ] Auth/authz checks present for sensitive operations
+- [ ] No sensitive data in logs
+
+## Code Quality
+- Functions do one thing (Single Responsibility)
+- Cyclomatic complexity < 10 per function
+- No magic numbers — use named constants
+- No dead code — remove it
+- No commented-out code — use version control
+
+## Review Comment Format
+- Prefix with severity: `[P0]`, `[P1]`, `[P2]`, `[P3]`
+- Be specific: "change X to Y because Z"
+- For P0/P1: block until resolved
+- For P2/P3: suggest, don't demand
+
+## Testing
+- New functionality needs tests
+- Bug fixes need regression tests
+- Tests should fail before fix, pass after
+- No test skips without explanation and issue link
+
+## Constructive Tone
+- Review the code, not the author
+- Explain the why, not just the what
+- Ask questions for intent: "Is this intentional?"
+- Acknowledge good patterns: "Nice use of X here"

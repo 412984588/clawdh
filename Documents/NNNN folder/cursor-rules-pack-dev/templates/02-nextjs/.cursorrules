@@ -1,0 +1,36 @@
+# Next.js App Router Cursor Rules
+
+## Stack
+- Next.js 14+ App Router
+- TypeScript strict mode
+- Tailwind CSS + shadcn/ui
+- Prisma + PostgreSQL
+- NextAuth.js / Clerk for auth
+
+## App Router Conventions
+- Server Components by default — add `"use client"` only when needed
+- Route handlers in `app/api/<route>/route.ts`
+- Loading states with `loading.tsx`, errors with `error.tsx`
+- Metadata via `generateMetadata()` — never put <head> tags manually
+- `generateStaticParams()` for static routes
+
+## Server vs Client Components
+Server Component (default): data fetching, db calls, heavy computation
+Client Component (`"use client"`): onClick, useState, useEffect, browser APIs
+
+## Data Fetching
+- `fetch()` with `{ next: { revalidate: N } }` for ISR
+- `{ cache: 'no-store' }` for dynamic data
+- Server Actions for mutations — no separate API routes for simple CRUD
+
+## File Conventions
+- Page: `app/<route>/page.tsx`
+- Layout: `app/<route>/layout.tsx`
+- Components: `components/<Name>/<Name>.tsx`
+- Server actions: `app/actions/<feature>.ts`
+- Types: `types/<domain>.ts`
+
+## Performance
+- Use `next/image` for all images
+- Use `next/font` for fonts — no Google Fonts CDN links
+- Dynamic import components not needed on first paint

@@ -1,0 +1,317 @@
+You are an expert in Python, data science, pandas, NumPy, matplotlib, scikit-learn, Jupyter notebooks, and data analysis workflows.
+
+# Project Type
+This is a data science and analysis project using Python, Jupyter notebooks, pandas for data manipulation, and scikit-learn for machine learning.
+
+## Tech Stack
+- Python 3.11+
+- Jupyter Lab or VS Code notebooks
+- pandas 2.x
+- NumPy 1.x / 2.x
+- matplotlib + seaborn for visualization
+- scikit-learn for ML
+- statsmodels for statistical analysis
+- polars (optional, for large datasets)
+- DuckDB for SQL on dataframes
+
+## Code Style and Structure
+
+- Follow PEP 8; use Black (88 char) + isort
+- Use type hints for functions
+- Write modular, reusable functions
+- Keep notebooks clean: one idea per cell
+- Document hypotheses before testing
+- Show intermediate outputs to validate data transformations
+
+## Notebook Structure Convention
+
+```
+01_data_collection.ipynb
+02_eda.ipynb              # Exploratory Data Analysis
+03_preprocessing.ipynb    # Cleaning + Feature Engineering
+04_modeling.ipynb         # Model training + evaluation
+05_visualization.ipynb    # Final charts for reports
+notebooks/
+  utils/
+    data_utils.py         # Reusable functions (not in notebooks)
+    plot_utils.py
+    feature_engineering.py
+data/
+  raw/                    # Never modify
+  processed/
+  external/
+models/
+  saved/
+reports/
+  figures/
+```
+
+## Pandas Best Practices
+
+```python
+import pandas as pd
+import numpy as np
+from typing import Optional
+
+# 始终指定 dtype 和编码
+df = pd.read_csv(
+    'data/raw/sales.csv',
+    dtype={'order_id': str, 'customer_id': str, 'amount': float},
+    parse_dates=['order_date', 'ship_date'],
+    encoding='utf-8',
+)
+
+# 链式操作 — 清晰且高效
+cleaned_df = (
+    df
+    .copy()
+    .dropna(subset=['order_id', 'amount'])
+    .query('amount > 0')
+    .assign(
+        year=lambda x: x['order_date'].dt.year,
+        month=lambda x: x['order_date'].dt.month,
+        amount_log=lambda x: np.log1p(x['amount']),
+    )
+    .rename(columns={'order_date': 'date'})
+    .reset_index(drop=True)
+)
+
+# 分组聚合
+monthly_sales = (
+    cleaned_df
+    .groupby(['year', 'month'])
+    .agg(
+        total_sales=('amount', 'sum'),
+        order_count=('order_id', 'nunique'),
+        avg_order=('amount', 'mean'),
+        median_order=('amount', 'median'),
+    )
+    .round(2)
+    .reset_index()
+)
+
+# 高效的条件筛选（避免 iterrows）
+high_value_customers = df[
+    (df['amount'] > df['amount'].quantile(0.9)) &
+    (df['order_count'] >= 5) &
+    (df['country'].isin(['CN', 'US', 'UK']))
+].copy()
+```
+
+## Exploratory Data Analysis Template
+
+```python
+def quick_eda(df: pd.DataFrame, name: str = "dataset") -> None:
+    """快速探索数据集的基本信息"""
+    print(f"=== {name} 概览 ===")
+    print(f"形状: {df.shape[0]:,} 行 × {df.shape[1]} 列")
+    print(f"\n数据类型:")
+    print(df.dtypes.value_counts())
+
+    print(f"\n缺失值:")
+    missing = df.isnull().sum()
+    missing_pct = (missing / len(df) * 100).round(2)
+    missing_info = pd.DataFrame({
+        '缺失数量': missing[missing > 0],
+        '缺失比例(%)': missing_pct[missing_pct > 0]
+    })
+    if len(missing_info) > 0:
+        print(missing_info.sort_values('缺失比例(%)', ascending=False))
+    else:
+        print("无缺失值")
+
+    print(f"\n数值特征统计:")
+    print(df.describe().round(2))
+
+    print(f"\n重复行: {df.duplicated().sum():,}")
+
+def check_distribution(series: pd.Series) -> None:
+    """检查单列的分布情况"""
+    print(f"列: {series.name}")
+    print(f"类型: {series.dtype}")
+    print(f"唯一值: {series.nunique():,}")
+    print(f"缺失: {series.isnull().sum()} ({series.isnull().mean():.1%})")
+    if series.dtype in ['int64', 'float64']:
+        print(f"均值: {series.mean():.4f}, 中位数: {series.median():.4f}")
+        print(f"偏度: {series.skew():.4f}, 峰度: {series.kurtosis():.4f}")
+```
+
+## Visualization Patterns
+
+```python
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# 全局样式设置
+plt.rcParams.update({
+    'figure.dpi': 150,
+    'figure.figsize': (10, 6),
+    'axes.spines.right': False,
+    'axes.spines.top': False,
+    'font.family': 'DejaVu Sans',
+})
+sns.set_theme(style='whitegrid', palette='husl')
+
+def plot_distribution(data: pd.Series, title: str = '') -> None:
+    """绘制分布图（直方图 + KDE + 箱线图）"""
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
+
+    # 直方图 + KDE
+    data.hist(bins=50, ax=ax1, edgecolor='white', alpha=0.8)
+    ax1.set_title(f'{title} 分布')
+    ax1.set_xlabel(data.name)
+
+    # 箱线图（含异常值）
+    ax1_twin = ax1.twinx()
+    data.plot.kde(ax=ax1_twin, color='red', alpha=0.6)
+
+    # 箱线图
+    ax2.boxplot(data.dropna(), vert=True, patch_artist=True)
+    ax2.set_title(f'{title} 箱线图')
+
+    plt.tight_layout()
+    plt.savefig(f'reports/figures/{title.lower().replace(" ", "_")}.png', bbox_inches='tight')
+    plt.show()
+
+def plot_correlation_heatmap(df: pd.DataFrame, title: str = '相关性热图') -> None:
+    """绘制相关性热图"""
+    numeric_df = df.select_dtypes(include=[np.number])
+    corr = numeric_df.corr()
+
+    mask = np.triu(np.ones_like(corr, dtype=bool))
+    plt.figure(figsize=(12, 10))
+    sns.heatmap(
+        corr,
+        mask=mask,
+        annot=True,
+        fmt='.2f',
+        cmap='RdYlGn',
+        center=0,
+        square=True,
+        linewidths=0.5,
+    )
+    plt.title(title)
+    plt.tight_layout()
+    plt.show()
+```
+
+## Feature Engineering
+
+```python
+from sklearn.preprocessing import StandardScaler, LabelEncoder
+from sklearn.impute import SimpleImputer
+
+def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
+    """特征工程管道"""
+    df = df.copy()
+
+    # 时间特征
+    if 'date' in df.columns:
+        df['year'] = df['date'].dt.year
+        df['month'] = df['date'].dt.month
+        df['day_of_week'] = df['date'].dt.dayofweek
+        df['is_weekend'] = df['day_of_week'].isin([5, 6]).astype(int)
+        df['quarter'] = df['date'].dt.quarter
+
+    # 数值特征
+    numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
+    for col in numeric_cols:
+        if df[col].skew() > 1:
+            df[f'{col}_log'] = np.log1p(df[col].clip(lower=0))
+
+    # 交互特征
+    # df['feature_interaction'] = df['feature_a'] * df['feature_b']
+
+    return df
+```
+
+## Scikit-learn ML Pipeline
+
+```python
+from sklearn.pipeline import Pipeline
+from sklearn.model_selection import cross_val_score, StratifiedKFold
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.metrics import classification_report, confusion_matrix
+import joblib
+
+def build_ml_pipeline(X_train, y_train, X_test, y_test):
+    """构建并评估 ML 管道"""
+    pipeline = Pipeline([
+        ('imputer', SimpleImputer(strategy='median')),
+        ('scaler', StandardScaler()),
+        ('classifier', RandomForestClassifier(
+            n_estimators=200,
+            max_depth=10,
+            min_samples_split=5,
+            random_state=42,
+            n_jobs=-1,
+        )),
+    ])
+
+    # 交叉验证
+    cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+    cv_scores = cross_val_score(pipeline, X_train, y_train, cv=cv, scoring='f1_macro')
+    print(f"交叉验证 F1（宏平均）: {cv_scores.mean():.4f} ± {cv_scores.std():.4f}")
+
+    # 训练
+    pipeline.fit(X_train, y_train)
+
+    # 评估
+    y_pred = pipeline.predict(X_test)
+    print("\n=== 测试集结果 ===")
+    print(classification_report(y_test, y_pred))
+
+    # 保存模型
+    joblib.dump(pipeline, 'models/saved/pipeline.pkl')
+    print("模型已保存到 models/saved/pipeline.pkl")
+
+    return pipeline
+```
+
+## Error Handling Patterns
+
+```python
+# 数据读取错误处理
+def safe_read_csv(filepath: str, **kwargs) -> Optional[pd.DataFrame]:
+    """安全读取 CSV，返回 None 而非抛出异常"""
+    try:
+        df = pd.read_csv(filepath, **kwargs)
+        print(f"读取成功: {filepath}，{df.shape[0]:,} 行 × {df.shape[1]} 列")
+        return df
+    except FileNotFoundError:
+        print(f"错误: 文件不存在 — {filepath}")
+        return None
+    except pd.errors.ParserError as e:
+        print(f"CSV 解析错误: {e}")
+        return None
+    except Exception as e:
+        print(f"未知错误: {e}")
+        raise
+```
+
+## File Naming Conventions
+
+- Notebooks: `NN_[descriptive_name].ipynb` (numbered)
+- Python utils: `snake_case.py`
+- Data files: `[source]_[description]_[date].csv`
+- Models: `[model_type]_[version]_[date].pkl`
+- Reports: `[name]_report_[date].pdf`
+
+## What Cursor Should Do
+
+- Add `df.copy()` before modifying DataFrames to avoid SettingWithCopyWarning
+- Use chained `.assign()` for feature creation instead of repeated `df[col] = ...`
+- Suggest `pd.read_csv` with explicit dtypes for faster loading
+- Generate proper train/test/validation splits
+- Include cross-validation in ML evaluations
+- Save models with `joblib.dump()`
+- Add markdown cells before each major analysis step
+
+## What Cursor Should Avoid
+
+- Do NOT use `iterrows()` — use vectorized operations
+- Do NOT modify raw data files — always write to processed/
+- Do NOT ignore data leakage — fit scalers on train only, transform test
+- Do NOT use `df['col']` in a loop — use vectorized pandas operations
+- Do NOT hardcode file paths — use `pathlib.Path`
+- Do NOT train models without cross-validation

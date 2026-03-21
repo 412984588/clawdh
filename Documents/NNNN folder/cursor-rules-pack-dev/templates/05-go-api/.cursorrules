@@ -1,0 +1,37 @@
+# Go API Cursor Rules
+
+## Stack
+- Go 1.22+
+- net/http standard library or Chi router
+- sqlx or pgx for PostgreSQL
+- testify for testing
+
+## Idioms
+- Errors are values — always check, never ignore
+- Accept interfaces, return structs
+- Prefer composition over inheritance
+- Short, descriptive variable names (idiomatic Go)
+- Context propagation required for all IO operations
+
+## Error Handling
+- Wrap errors with context: `fmt.Errorf("service.GetUser: %w", err)`
+- Sentinel errors for known conditions: `var ErrNotFound = errors.New("not found")`
+- Never use panic for normal error flow
+
+## Project Layout (Standard)
+- `cmd/` — application entrypoints
+- `internal/` — private packages
+- `pkg/` — public reusable packages
+- `internal/handler/` — HTTP handlers
+- `internal/service/` — business logic
+- `internal/repository/` — data access
+
+## HTTP Handlers
+- Handlers decode input, call service, encode output — nothing else
+- JSON encode/decode with `encoding/json`
+- Consistent error response: `{"error": "message"}`
+
+## Testing
+- Table-driven tests for pure functions
+- httptest.NewRecorder for handler tests
+- Interfaces for dependency injection / mocking

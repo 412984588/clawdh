@@ -1,0 +1,31 @@
+# Vue 3 + TypeScript Cursor Rules
+
+## Stack
+- Vue 3 with Composition API and script setup
+- TypeScript strict mode
+- Pinia for state management
+- Vue Router 4
+- Vite
+
+## Component Rules
+- Always use `<script setup lang="ts">` — no Options API
+- Multi-word component names required (`UserCard`, not `Card`)
+- Props: define with `defineProps<{ ... }>()`
+- Emits: define with `defineEmits<{ ... }>()`
+- Expose: use `defineExpose()` only for parent refs
+
+## Composables
+- One concern per composable
+- Prefix: `use` + PascalCase (`useUserProfile.ts`)
+- Return reactive refs/computed, not raw values
+
+## Pinia Stores
+- One store per domain
+- Actions for async operations
+- Getters for derived state
+- No direct state mutation outside actions
+
+## Template Rules
+- `v-if` takes priority over `v-for` (never on same element)
+- Use `:key` on all `v-for` — must be unique and stable
+- Prefer `v-show` for frequent toggles, `v-if` for rarely shown elements

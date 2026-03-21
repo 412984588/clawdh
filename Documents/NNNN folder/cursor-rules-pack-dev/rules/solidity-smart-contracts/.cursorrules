@@ -1,0 +1,314 @@
+You are an expert in Solidity, Ethereum, Hardhat, OpenZeppelin, ethers.js, and smart contract security best practices.
+
+# Project Type
+This is an Ethereum smart contract project using Solidity 0.8.x, Hardhat for development, and OpenZeppelin contracts.
+
+## Tech Stack
+- Solidity 0.8.20+
+- Hardhat 2.x
+- OpenZeppelin Contracts 5.x
+- ethers.js v6
+- TypeScript for tests and scripts
+- Chai for assertions
+- Slither for security analysis
+
+## Code Style and Structure
+
+- Follow Solidity style guide (https://docs.soliditylang.org/en/latest/style-guide.html)
+- Use NatSpec comments for all public functions
+- Order: state variables, events, errors, modifiers, constructor, functions
+- Prefer custom errors over require strings (cheaper gas)
+- Use events for all state changes
+- Keep contracts small and focused — use inheritance and composition
+
+## Contract Structure
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+
+/**
+ * @title MyToken
+ * @author YourName
+ * @notice ERC20 token with custom features
+ * @dev Extends OpenZeppelin's ERC20 implementation
+ */
+contract MyToken is Ownable, ReentrancyGuard {
+    // ========== State Variables ==========
+    uint256 public constant MAX_SUPPLY = 1_000_000 * 10 ** 18;
+    uint256 private _totalMinted;
+    mapping(address => uint256) private _balances;
+
+    // ========== Events ==========
+    event Minted(address indexed to, uint256 amount);
+    event Burned(address indexed from, uint256 amount);
+
+    // ========== Custom Errors ==========
+    error ExceedsMaxSupply(uint256 requested, uint256 available);
+    error InsufficientBalance(uint256 requested, uint256 available);
+    error ZeroAddress();
+    error ZeroAmount();
+
+    // ========== Modifiers ==========
+    modifier notZeroAddress(address addr) {
+        if (addr == address(0)) revert ZeroAddress();
+        _;
+    }
+
+    modifier notZeroAmount(uint256 amount) {
+        if (amount == 0) revert ZeroAmount();
+        _;
+    }
+
+    // ========== Constructor ==========
+    constructor(address initialOwner) Ownable(initialOwner) {}
+
+    // ========== External Functions ==========
+    /**
+     * @notice Mints tokens to a specified address
+     * @param to The recipient address
+     * @param amount The amount to mint
+     */
+    function mint(address to, uint256 amount)
+        external
+        onlyOwner
+        notZeroAddress(to)
+        notZeroAmount(amount)
+        nonReentrant
+    {
+        uint256 available = MAX_SUPPLY - _totalMinted;
+        if (amount > available) {
+            revert ExceedsMaxSupply(amount, available);
+        }
+        _totalMinted += amount;
+        _balances[to] += amount;
+        emit Minted(to, amount);
+    }
+
+    // ========== View Functions ==========
+    function balanceOf(address account) public view returns (uint256) {
+        return _balances[account];
+    }
+
+    function totalMinted() public view returns (uint256) {
+        return _totalMinted;
+    }
+}
+```
+
+## Security Best Practices
+
+### Checks-Effects-Interactions (CEI) Pattern
+```solidity
+// 正确：先检查，再修改状态，最后外部调用
+function withdraw(uint256 amount) external nonReentrant {
+    // 1. Checks
+    if (amount == 0) revert ZeroAmount();
+    if (balances[msg.sender] < amount) revert InsufficientBalance(amount, balances[msg.sender]);
+
+    // 2. Effects
+    balances[msg.sender] -= amount;
+
+    // 3. Interactions
+    (bool success, ) = msg.sender.call{value: amount}("");
+    if (!success) revert TransferFailed();
+
+    emit Withdrawal(msg.sender, amount);
+}
+```
+
+### Access Control with OpenZeppelin
+```solidity
+import "@openzeppelin/contracts/access/AccessControl.sol";
+
+contract MyContract is AccessControl {
+    bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
+    bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
+
+    constructor(address admin) {
+        _grantRole(DEFAULT_ADMIN_ROLE, admin);
+        _grantRole(MINTER_ROLE, admin);
+    }
+
+    function mint(address to, uint256 amount) external onlyRole(MINTER_ROLE) {
+        _mint(to, amount);
+    }
+}
+```
+
+### SafeERC20 for Token Transfers
+```solidity
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+
+contract TokenVault {
+    using SafeERC20 for IERC20;
+
+    // 永远使用 safeTransfer，不用 transfer
+    function deposit(IERC20 token, uint256 amount) external {
+        token.safeTransferFrom(msg.sender, address(this), amount);
+    }
+}
+```
+
+## Hardhat Test Patterns
+
+```typescript
+// test/MyToken.test.ts
+import { expect } from "chai";
+import { ethers } from "hardhat";
+import { loadFixture } from "@nomicfoundation/hardhat-toolbox/network-helpers";
+
+describe("MyToken", function () {
+  async function deployFixture() {
+    const [owner, alice, bob] = await ethers.getSigners();
+    const MyToken = await ethers.getContractFactory("MyToken");
+    const token = await MyToken.deploy(owner.address);
+    return { token, owner, alice, bob };
+  }
+
+  describe("Deployment", function () {
+    it("Should set the right owner", async function () {
+      const { token, owner } = await loadFixture(deployFixture);
+      expect(await token.owner()).to.equal(owner.address);
+    });
+  });
+
+  describe("Minting", function () {
+    it("Should mint tokens to recipient", async function () {
+      const { token, alice } = await loadFixture(deployFixture);
+      const amount = ethers.parseEther("1000");
+
+      await token.mint(alice.address, amount);
+
+      expect(await token.balanceOf(alice.address)).to.equal(amount);
+    });
+
+    it("Should revert when minting zero amount", async function () {
+      const { token, alice } = await loadFixture(deployFixture);
+
+      await expect(token.mint(alice.address, 0))
+        .to.be.revertedWithCustomError(token, "ZeroAmount");
+    });
+
+    it("Should revert when non-owner tries to mint", async function () {
+      const { token, alice } = await loadFixture(deployFixture);
+
+      await expect(token.connect(alice).mint(alice.address, 1000))
+        .to.be.revertedWithCustomError(token, "OwnableUnauthorizedAccount");
+    });
+  });
+
+  describe("Events", function () {
+    it("Should emit Minted event", async function () {
+      const { token, alice } = await loadFixture(deployFixture);
+      const amount = ethers.parseEther("500");
+
+      await expect(token.mint(alice.address, amount))
+        .to.emit(token, "Minted")
+        .withArgs(alice.address, amount);
+    });
+  });
+});
+```
+
+## Hardhat Configuration
+
+```typescript
+// hardhat.config.ts
+import { HardhatUserConfig } from "hardhat/config";
+import "@nomicfoundation/hardhat-toolbox";
+
+const config: HardhatUserConfig = {
+  solidity: {
+    version: "0.8.20",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 200,
+      },
+    },
+  },
+  networks: {
+    hardhat: {},
+    sepolia: {
+      url: process.env.SEPOLIA_RPC_URL || "",
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+    },
+  },
+  etherscan: {
+    apiKey: process.env.ETHERSCAN_API_KEY,
+  },
+  gasReporter: {
+    enabled: process.env.REPORT_GAS === "true",
+    currency: "USD",
+  },
+};
+
+export default config;
+```
+
+## Gas Optimization Patterns
+
+```solidity
+// 使用 immutable 替代 constant 进行只在构造函数中设置的变量
+address public immutable factory;
+
+// 使用 uint256 而非 uint8 — EVM 总是以 32 字节操作
+uint256 public counter; // 比 uint8 更省 gas
+
+// 打包 storage slots — 相邻的 uint128 共用一个 slot
+struct PackedData {
+    uint128 value1;  // slot 0, bytes 0-15
+    uint128 value2;  // slot 0, bytes 16-31
+}
+
+// 使用 calldata 而非 memory 对只读参数
+function processData(uint256[] calldata data) external {
+    // calldata 比 memory 便宜
+}
+```
+
+## Error Handling Patterns
+
+```solidity
+// 自定义错误（比 require 字符串省 gas）
+error Unauthorized(address caller);
+error InvalidAmount(uint256 provided, uint256 minimum);
+
+// 用法
+function restrictedAction() external {
+    if (msg.sender != owner) revert Unauthorized(msg.sender);
+}
+```
+
+## File Naming Conventions
+
+- Contracts: `PascalCase.sol` (e.g., `TokenVault.sol`)
+- Tests: `[Contract].test.ts`
+- Scripts: `deploy[Contract].ts`
+- Interfaces: `I[Contract].sol` (e.g., `ITokenVault.sol`)
+- Mocks: `Mock[Contract].sol` for testing
+
+## What Cursor Should Do
+
+- Always use OpenZeppelin's audited implementations when available
+- Add NatSpec comments to all public and external functions
+- Use custom errors instead of require strings
+- Emit events for all state-changing operations
+- Apply CEI pattern for functions involving transfers
+- Generate comprehensive test cases including edge cases and reverts
+- Suggest reentrancy guards for functions with external calls
+
+## What Cursor Should Avoid
+
+- Do NOT use `tx.origin` for authentication — use `msg.sender`
+- Do NOT use `block.timestamp` for randomness
+- Do NOT use floating pragma — pin to specific version
+- Do NOT use `transfer()` or `send()` — use `call{value: ...}()`
+- Do NOT ignore return values from external calls
+- Do NOT store sensitive data on-chain — it's public
+- Do NOT use `selfdestruct` — deprecated in recent EIPs
+- Do NOT skip reentrancy guards on withdrawal functions

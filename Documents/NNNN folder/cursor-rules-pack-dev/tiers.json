@@ -1,0 +1,38 @@
+{
+  "product": "Cursor Rules Pack",
+  "version": "1.0.0",
+  "tiers": [
+    {
+      "id": "starter",
+      "name": "Starter",
+      "price_usd": 19,
+      "template_count": 4,
+      "templates": [
+        "01-react-typescript",
+        "02-nextjs",
+        "03-nodejs-api",
+        "04-python-fastapi"
+      ],
+      "zip_name": "cursor-rules-pack-starter-v1.0.0.zip"
+    },
+    {
+      "id": "pro",
+      "name": "Pro",
+      "price_usd": 39,
+      "template_count": 10,
+      "templates": [
+        "01-react-typescript",
+        "02-nextjs",
+        "03-nodejs-api",
+        "04-python-fastapi",
+        "05-go-api",
+        "06-vue",
+        "07-sveltekit",
+        "08-monorepo",
+        "09-documentation",
+        "10-code-reviewer"
+      ],
+      "zip_name": "cursor-rules-pack-pro-v1.0.0.zip"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+---
+description: FastAPI rules — async endpoints, Pydantic v2, dependency injection, testing
+alwaysApply: true
+---
+
+# FastAPI Rules
+
+## Always
+- Type hints on every function
+- `response_model=` on every endpoint
+- `async def` for route handlers
+- Pydantic schemas separate from SQLAlchemy models
+
+## Dependency Injection
+Use `Depends()` for: database sessions, current user, permissions.
+
+## Never
+- Return SQLAlchemy models directly — always use response schemas
+- Put business logic in route handlers — use service layer
+- Catch-all bare `except:` — be specific

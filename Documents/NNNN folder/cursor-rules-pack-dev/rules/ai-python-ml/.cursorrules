@@ -1,0 +1,346 @@
+You are an expert in Python, machine learning, PyTorch, scikit-learn, Hugging Face Transformers, LangChain, and AI/ML engineering best practices.
+
+# Project Type
+This is a Python AI/ML project covering model training, fine-tuning, inference pipelines, and LLM application development.
+
+## Tech Stack
+- Python 3.11+
+- PyTorch 2.x or TensorFlow 2.x
+- Hugging Face Transformers + Datasets + PEFT
+- LangChain / LlamaIndex for LLM applications
+- scikit-learn for classical ML
+- Weights & Biases (wandb) for experiment tracking
+- FastAPI for model serving
+- Docker for deployment
+
+## Code Style and Structure
+
+- Follow PEP 8; use Black (88 char) and isort
+- Use type hints for all functions
+- Document with NumPy-style docstrings
+- Prefer reproducible experiments with fixed seeds
+- Log all experiments with wandb or MLflow
+- Version datasets and models with DVC or MLflow
+
+## Project Structure
+
+```
+project/
+  data/
+    raw/                   # Original, unprocessed data
+    processed/             # Cleaned, processed data
+    external/              # Third-party data
+  notebooks/
+    01_eda.ipynb           # Exploratory data analysis
+    02_preprocessing.ipynb
+    03_training.ipynb
+  src/
+    data/
+      dataset.py           # PyTorch Dataset classes
+      preprocessing.py
+      augmentation.py
+    models/
+      model.py             # Model architecture
+      losses.py
+      metrics.py
+    training/
+      trainer.py
+      callbacks.py
+    inference/
+      predictor.py
+      pipeline.py
+    utils/
+      seed.py
+      logging.py
+      visualization.py
+  configs/
+    base.yaml              # Hydra or YAML configs
+    train.yaml
+    inference.yaml
+  scripts/
+    train.py
+    evaluate.py
+    infer.py
+  tests/
+    test_dataset.py
+    test_model.py
+```
+
+## PyTorch Model Patterns
+
+```python
+# src/models/model.py
+import torch
+import torch.nn as nn
+from torch import Tensor
+from dataclasses import dataclass
+
+@dataclass
+class ModelConfig:
+    """模型配置，所有超参数集中管理"""
+    hidden_size: int = 256
+    num_layers: int = 4
+    num_heads: int = 8
+    dropout: float = 0.1
+    vocab_size: int = 30522
+    max_seq_length: int = 512
+
+class TransformerClassifier(nn.Module):
+    """Transformer-based 文本分类模型"""
+
+    def __init__(self, config: ModelConfig, num_classes: int) -> None:
+        super().__init__()
+        self.config = config
+        self.embedding = nn.Embedding(config.vocab_size, config.hidden_size)
+        encoder_layer = nn.TransformerEncoderLayer(
+            d_model=config.hidden_size,
+            nhead=config.num_heads,
+            dropout=config.dropout,
+            batch_first=True,
+        )
+        self.encoder = nn.TransformerEncoder(encoder_layer, num_layers=config.num_layers)
+        self.classifier = nn.Linear(config.hidden_size, num_classes)
+        self.dropout = nn.Dropout(config.dropout)
+
+    def forward(self, input_ids: Tensor, attention_mask: Tensor | None = None) -> Tensor:
+        # input_ids: (batch, seq_len)
+        x = self.embedding(input_ids)  # (batch, seq_len, hidden)
+        x = self.dropout(x)
+        if attention_mask is not None:
+            # PyTorch Transformer 使用 True 表示 padding（mask）
+            src_key_padding_mask = (attention_mask == 0)
+        else:
+            src_key_padding_mask = None
+        x = self.encoder(x, src_key_padding_mask=src_key_padding_mask)
+        # 使用 [CLS] token 表示
+        cls_output = x[:, 0, :]
+        logits = self.classifier(self.dropout(cls_output))
+        return logits
+```
+
+## Training Loop
+
+```python
+# src/training/trainer.py
+import torch
+from torch.utils.data import DataLoader
+from torch.optim import AdamW
+from torch.optim.lr_scheduler import CosineAnnealingLR
+from tqdm import tqdm
+import wandb
+
+class Trainer:
+    def __init__(self, model, config):
+        self.model = model
+        self.config = config
+        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        self.model.to(self.device)
+
+    def train(self, train_loader: DataLoader, val_loader: DataLoader) -> None:
+        optimizer = AdamW(
+            self.model.parameters(),
+            lr=self.config.learning_rate,
+            weight_decay=self.config.weight_decay,
+        )
+        scheduler = CosineAnnealingLR(optimizer, T_max=self.config.num_epochs)
+        criterion = torch.nn.CrossEntropyLoss()
+        best_val_acc = 0.0
+
+        for epoch in range(self.config.num_epochs):
+            train_loss = self._train_epoch(train_loader, optimizer, criterion)
+            val_loss, val_acc = self._eval_epoch(val_loader, criterion)
+            scheduler.step()
+
+            # 记录到 wandb
+            wandb.log({
+                'epoch': epoch,
+                'train/loss': train_loss,
+                'val/loss': val_loss,
+                'val/accuracy': val_acc,
+                'lr': optimizer.param_groups[0]['lr'],
+            })
+
+            if val_acc > best_val_acc:
+                best_val_acc = val_acc
+                self._save_checkpoint(epoch, val_acc)
+                print(f"Epoch {epoch}: 新最佳模型，验证准确率 {val_acc:.4f}")
+
+    def _train_epoch(self, loader, optimizer, criterion):
+        self.model.train()
+        total_loss = 0.0
+        for batch in tqdm(loader, desc='训练中'):
+            input_ids = batch['input_ids'].to(self.device)
+            attention_mask = batch['attention_mask'].to(self.device)
+            labels = batch['labels'].to(self.device)
+
+            optimizer.zero_grad()
+            logits = self.model(input_ids, attention_mask)
+            loss = criterion(logits, labels)
+            loss.backward()
+            torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=1.0)
+            optimizer.step()
+            total_loss += loss.item()
+
+        return total_loss / len(loader)
+```
+
+## HuggingFace Fine-tuning Pattern
+
+```python
+# Fine-tuning with PEFT (LoRA)
+from transformers import AutoModelForCausalLM, AutoTokenizer, TrainingArguments
+from peft import LoraConfig, get_peft_model, TaskType
+from trl import SFTTrainer
+
+def finetune_with_lora(
+    model_name: str,
+    train_dataset,
+    output_dir: str,
+) -> None:
+    """使用 LoRA 微调因果语言模型"""
+    model = AutoModelForCausalLM.from_pretrained(
+        model_name,
+        torch_dtype=torch.bfloat16,
+        device_map="auto",
+    )
+
+    lora_config = LoraConfig(
+        task_type=TaskType.CAUSAL_LM,
+        r=16,                       # LoRA 秩
+        lora_alpha=32,              # 缩放因子
+        lora_dropout=0.05,
+        target_modules=["q_proj", "v_proj", "k_proj", "o_proj"],
+    )
+
+    model = get_peft_model(model, lora_config)
+    model.print_trainable_parameters()  # 显示可训练参数比例
+
+    training_args = TrainingArguments(
+        output_dir=output_dir,
+        num_train_epochs=3,
+        per_device_train_batch_size=4,
+        gradient_accumulation_steps=4,
+        learning_rate=2e-4,
+        bf16=True,
+        logging_steps=10,
+        save_strategy="epoch",
+        report_to="wandb",
+    )
+
+    trainer = SFTTrainer(
+        model=model,
+        args=training_args,
+        train_dataset=train_dataset,
+    )
+    trainer.train()
+    trainer.save_model()
+```
+
+## LangChain LLM Application
+
+```python
+# src/inference/pipeline.py
+from langchain_openai import ChatOpenAI
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+from langchain_community.vectorstores import Chroma
+from langchain_openai import OpenAIEmbeddings
+
+def create_rag_chain(documents: list[str]):
+    """创建 RAG（检索增强生成）链"""
+    # 向量存储
+    embeddings = OpenAIEmbeddings()
+    vectorstore = Chroma.from_texts(documents, embeddings)
+    retriever = vectorstore.as_retriever(search_kwargs={"k": 4})
+
+    # LLM
+    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+
+    # Prompt
+    template = """根据以下上下文回答问题。如果上下文中没有答案，请如实说明。
+
+上下文：
+{context}
+
+问题：{question}
+
+回答："""
+
+    prompt = ChatPromptTemplate.from_template(template)
+
+    # 链式组合
+    chain = (
+        {"context": retriever, "question": lambda x: x}
+        | prompt
+        | llm
+        | StrOutputParser()
+    )
+    return chain
+```
+
+## Reproducibility
+
+```python
+# utils/seed.py
+import random
+import numpy as np
+import torch
+
+def set_seed(seed: int = 42) -> None:
+    """设置所有随机种子保证实验可复现"""
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    # 注意：以下会降低训练速度
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+```
+
+## Error Handling Patterns
+
+```python
+from contextlib import contextmanager
+import torch
+
+@contextmanager
+def gpu_memory_guard():
+    """自动释放 GPU 内存的上下文管理器"""
+    try:
+        yield
+    except torch.cuda.OutOfMemoryError as e:
+        print(f"GPU 内存不足: {e}")
+        torch.cuda.empty_cache()
+        raise
+    finally:
+        torch.cuda.empty_cache()
+```
+
+## File Naming Conventions
+
+- Datasets: `[name]_dataset.py`
+- Models: `[name]_model.py`
+- Training: `trainer.py` or `[task]_trainer.py`
+- Notebooks: `NN_[description].ipynb` (numbered)
+- Configs: `[task].yaml`
+- Scripts: `train.py`, `evaluate.py`, `infer.py`
+
+## What Cursor Should Do
+
+- Set random seeds at the start of every training script
+- Use `wandb.log()` or `mlflow.log_metrics()` for all experiments
+- Generate type hints for all ML functions
+- Suggest `torch.no_grad()` for inference loops
+- Recommend gradient clipping for transformer training
+- Suggest batch-first tensors for clarity
+- Generate proper PyTorch Dataset and DataLoader patterns
+
+## What Cursor Should Avoid
+
+- Do NOT hardcode dataset paths — use config files
+- Do NOT skip experiment logging — always track with wandb/mlflow
+- Do NOT ignore GPU memory management in production
+- Do NOT use `float32` when `bfloat16` suffices for LLMs
+- Do NOT train without validation loop and early stopping
+- Do NOT put data preprocessing in the training loop
+- Do NOT use Python lists for tensor operations — use vectorized numpy/torch

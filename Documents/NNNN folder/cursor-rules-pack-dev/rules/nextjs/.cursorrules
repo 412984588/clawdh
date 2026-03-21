@@ -1,0 +1,209 @@
+You are an expert in TypeScript, Node.js, Next.js App Router, React, Shadcn UI, Radix UI, and Tailwind CSS.
+
+# Project Type
+This is a Next.js 14+ project using the App Router architecture with TypeScript, Tailwind CSS, and Shadcn UI components.
+
+## Code Style and Structure
+
+- Write concise, technical TypeScript code with accurate examples
+- Use functional and declarative programming patterns; avoid classes
+- Prefer iteration and modularization over code duplication
+- Use descriptive variable names with auxiliary verbs (e.g., isLoading, hasError, canSubmit)
+- Structure files: exported component, subcomponents, helpers, static content, types
+- Keep components small and focused — single responsibility principle
+- Co-locate related files (component + its types + its styles)
+
+## Naming Conventions
+
+- Use lowercase with dashes for directories (e.g., components/auth-wizard)
+- Use PascalCase for component files (e.g., AuthWizard.tsx)
+- Use camelCase for utility files (e.g., formatDate.ts)
+- Use UPPER_SNAKE_CASE for constants (e.g., MAX_RETRY_COUNT)
+- Favor named exports for components over default exports
+- Prefix event handlers with "handle" (e.g., handleSubmit, handleClick)
+- Prefix boolean state with "is", "has", "can", "should" (e.g., isOpen, hasError)
+
+## TypeScript Usage
+
+- Use TypeScript for all code; prefer interfaces over type aliases for object shapes
+- Avoid enums; use const objects or string literal unions instead
+- Use generic types to avoid code duplication
+- Leverage TypeScript's discriminated unions for complex state
+- Always type function parameters and return values explicitly
+- Use `satisfies` operator to validate types without losing specificity
+- Prefer `unknown` over `any`; use type guards to narrow types
+
+## Next.js App Router Patterns
+
+- Use Server Components by default; add "use client" only when necessary
+- Implement proper loading states with loading.tsx files
+- Use error.tsx for error boundaries at the route level
+- Implement not-found.tsx for 404 handling
+- Use route handlers (route.ts) for API endpoints
+- Leverage generateMetadata() for dynamic SEO metadata
+- Use generateStaticParams() for static generation of dynamic routes
+- Implement proper caching with fetch() options and revalidate
+- Use server actions for form submissions and mutations
+- Organize routes in the (group) convention for logical grouping without URL impact
+
+## File Organization
+
+```
+app/
+  (auth)/
+    login/page.tsx
+    register/page.tsx
+  (dashboard)/
+    layout.tsx
+    page.tsx
+    settings/page.tsx
+  api/
+    users/route.ts
+components/
+  ui/              (shadcn generated)
+  common/          (shared across pages)
+  features/        (feature-specific)
+lib/
+  utils.ts
+  validations/
+  hooks/
+  actions/         (server actions)
+types/
+  index.ts
+  api.ts
+```
+
+## React and Component Patterns
+
+- Use React Server Components (RSC) as the default
+- Minimize `use client`, `useEffect`, and `useState`
+- Use Zustand or React Context for client-side global state
+- Implement Suspense boundaries for async data fetching
+- Use `react-hook-form` with `zod` for form validation
+- Wrap expensive computations with `useMemo` and `useCallback`
+- Use `forwardRef` when passing refs to custom components
+- Implement compound component pattern for complex UI
+
+## Tailwind CSS Usage
+
+- Use Tailwind utility classes exclusively; avoid custom CSS when possible
+- Follow mobile-first responsive design (sm: md: lg: xl:)
+- Use CSS variables for design tokens via Tailwind config
+- Use `cn()` utility (clsx + tailwind-merge) for conditional classes
+- Group related Tailwind classes logically (layout, spacing, color, typography)
+- Extract repeated class combinations into component variants using CVA
+
+## Shadcn UI and Radix UI
+
+- Install components via `npx shadcn-ui@latest add [component]`
+- Extend Shadcn components rather than modifying generated files
+- Use Radix UI primitives for accessible, unstyled base components
+- Always include proper aria labels and roles
+- Implement keyboard navigation for interactive components
+
+## Data Fetching
+
+- Use React Query (TanStack Query) for client-side data fetching
+- Implement optimistic updates for better UX
+- Use SWR as alternative for simple cases
+- Always handle loading, error, and empty states
+- Implement proper error boundaries
+- Cache server component fetches with appropriate strategies
+
+## Error Handling Patterns
+
+```typescript
+// Server Action error handling
+async function createUser(formData: FormData) {
+  try {
+    const validated = UserSchema.parse(Object.fromEntries(formData));
+    await db.user.create({ data: validated });
+    revalidatePath('/users');
+    return { success: true };
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return { error: '输入数据验证失败', details: error.flatten() };
+    }
+    console.error('[createUser] 创建用户失败:', error);
+    return { error: '服务器内部错误，请稍后重试' };
+  }
+}
+
+// API Route error handling
+export async function GET(request: Request) {
+  try {
+    const data = await fetchData();
+    return Response.json(data);
+  } catch (error) {
+    console.error('[GET /api/resource]:', error);
+    return Response.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
+}
+```
+
+## Performance Optimization
+
+- Use `next/image` for all images with proper width/height
+- Implement lazy loading with `next/dynamic` for heavy components
+- Use `next/font` for font optimization
+- Implement route prefetching strategically
+- Use `Suspense` for granular loading states
+- Analyze bundle with `@next/bundle-analyzer`
+- Implement proper cache headers for static assets
+
+## File Naming Conventions
+
+- Pages: `page.tsx` (required by Next.js)
+- Layouts: `layout.tsx`
+- Loading states: `loading.tsx`
+- Error boundaries: `error.tsx`
+- Not found: `not-found.tsx`
+- Server actions: `actions.ts` or `[feature].actions.ts`
+- API routes: `route.ts`
+- Components: `PascalCase.tsx`
+- Utilities: `camelCase.ts`
+- Types: `types.ts` or `[domain].types.ts`
+- Hooks: `use[Name].ts`
+
+## What Cursor Should Do
+
+- Suggest App Router patterns over Pages Router
+- Auto-import from correct paths (next/navigation over next/router)
+- Generate Server Components by default, prompt "use client" only when needed
+- Suggest `revalidatePath` or `revalidateTag` after mutations
+- Recommend Zod schemas for all data validation
+- Generate proper TypeScript types for API responses
+- Suggest proper error handling with try/catch and user-friendly messages
+- Recommend `next/image` whenever an `<img>` tag is used
+- Generate accessible components with proper aria attributes
+- Suggest parallel routes and intercepting routes for advanced layouts
+
+## What Cursor Should Avoid
+
+- Do NOT use `getServerSideProps` or `getStaticProps` (Pages Router patterns)
+- Do NOT use `useRouter` from `next/router`; use `next/navigation` instead
+- Do NOT use `class` components; use functional components only
+- Do NOT use inline styles; use Tailwind classes
+- Do NOT use `any` type; suggest proper typing
+- Do NOT fetch data in Client Components when Server Components can do it
+- Do NOT use `useEffect` for data fetching; use React Query or Server Components
+- Do NOT hardcode API URLs; use environment variables
+- Do NOT commit sensitive data or API keys
+- Do NOT use deprecated Next.js APIs
+
+## Environment Variables
+
+- Prefix client-side vars with `NEXT_PUBLIC_`
+- Keep server-side secrets without `NEXT_PUBLIC_` prefix
+- Use `.env.local` for local development
+- Document all required env vars in `.env.example`
+- Validate env vars at startup using `zod` or `t3-env`
+
+## Testing Conventions
+
+- Write unit tests with Vitest or Jest
+- Use React Testing Library for component tests
+- Use Playwright or Cypress for E2E tests
+- Mock server responses with MSW (Mock Service Worker)
+- Test user interactions, not implementation details
+- Aim for >80% coverage on business logic

@@ -1,0 +1,341 @@
+You are an expert in Chrome Extension Manifest V3, JavaScript/TypeScript, Web APIs, Chrome Extension APIs, and browser security.
+
+# Project Type
+This is a Chrome Extension built with Manifest V3 (MV3), using TypeScript, and following Google's latest extension development guidelines.
+
+## Tech Stack
+- Manifest V3
+- TypeScript or modern JavaScript (ES2022+)
+- Chrome Extension APIs
+- Service Worker (background)
+- Web APIs (DOM, Fetch, Storage)
+- Vite or webpack for bundling
+
+## Manifest V3 Key Changes from MV2
+
+- Background pages replaced with **Service Workers** (no persistent state)
+- `chrome.scripting.executeScript()` replaces `chrome.tabs.executeScript()`
+- `chrome.action` replaces `chrome.browserAction` / `chrome.pageAction`
+- Host permissions must be declared separately from optional permissions
+- Remote code execution is PROHIBITED
+- Use `declarativeNetRequest` instead of `webRequest` for blocking
+
+## Project Structure
+
+```
+extension/
+  manifest.json
+  src/
+    background/
+      service-worker.ts      # Background service worker
+      message-handler.ts
+    content/
+      content-script.ts      # Injected into web pages
+      injected.ts            # Injected into page context
+    popup/
+      popup.html
+      popup.ts
+    options/
+      options.html
+      options.ts
+    sidepanel/               # If using side panel
+      sidepanel.html
+      sidepanel.ts
+    utils/
+      storage.ts
+      messaging.ts
+      api.ts
+    types/
+      chrome.d.ts            # Custom Chrome type extensions
+      messages.ts            # Message type definitions
+  icons/
+    icon16.png
+    icon48.png
+    icon128.png
+  dist/                      # Built output
+```
+
+## manifest.json Structure
+
+```json
+{
+  "manifest_version": 3,
+  "name": "My Extension",
+  "version": "1.0.0",
+  "description": "Extension description",
+  "permissions": [
+    "storage",
+    "tabs",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://api.example.com/*"
+  ],
+  "optional_permissions": [
+    "notifications"
+  ],
+  "background": {
+    "service_worker": "dist/background/service-worker.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["dist/content/content-script.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  }
+}
+```
+
+## Service Worker (Background) Patterns
+
+```typescript
+// background/service-worker.ts
+// 注意：Service Worker 无法访问 DOM，也无持久状态
+// 不要在顶层保存状态 — 使用 chrome.storage
+
+chrome.runtime.onInstalled.addListener((details) => {
+  if (details.reason === 'install') {
+    // 初始化默认设置
+    chrome.storage.sync.set({ theme: 'light', enabled: true });
+    console.log('[Background] 扩展安装完成');
+  }
+});
+
+// 监听来自 popup/content script 的消息
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  // 必须返回 true 才能使用异步 sendResponse
+  handleMessage(message, sender)
+    .then(sendResponse)
+    .catch((error) => {
+      console.error('[Background] 消息处理失败:', error);
+      sendResponse({ error: error.message });
+    });
+  return true; // 保持消息通道开放
+});
+
+async function handleMessage(message: ExtensionMessage, sender: chrome.runtime.MessageSender) {
+  switch (message.type) {
+    case 'FETCH_DATA':
+      return await fetchData(message.payload);
+    case 'GET_SETTINGS':
+      return await getSettings();
+    default:
+      throw new Error(`未知消息类型: ${message.type}`);
+  }
+}
+```
+
+## Messaging System
+
+```typescript
+// types/messages.ts — 类型安全的消息系统
+export type ExtensionMessage =
+  | { type: 'FETCH_DATA'; payload: { url: string } }
+  | { type: 'GET_SETTINGS' }
+  | { type: 'UPDATE_SETTING'; payload: { key: string; value: unknown } }
+  | { type: 'CONTENT_READY' };
+
+export type ExtensionResponse<T = unknown> =
+  | { success: true; data: T }
+  | { success: false; error: string };
+
+// utils/messaging.ts
+export async function sendToBackground<T>(
+  message: ExtensionMessage
+): Promise<ExtensionResponse<T>> {
+  return chrome.runtime.sendMessage(message);
+}
+
+export async function sendToTab<T>(
+  tabId: number,
+  message: ExtensionMessage
+): Promise<ExtensionResponse<T>> {
+  return chrome.tabs.sendMessage(tabId, message);
+}
+```
+
+## Storage Utilities
+
+```typescript
+// utils/storage.ts
+interface ExtensionSettings {
+  theme: 'light' | 'dark';
+  enabled: boolean;
+  apiKey?: string;
+}
+
+export const storage = {
+  async get<K extends keyof ExtensionSettings>(
+    key: K
+  ): Promise<ExtensionSettings[K] | undefined> {
+    const result = await chrome.storage.sync.get(key);
+    return result[key];
+  },
+
+  async set<K extends keyof ExtensionSettings>(
+    key: K,
+    value: ExtensionSettings[K]
+  ): Promise<void> {
+    await chrome.storage.sync.set({ [key]: value });
+  },
+
+  async getAll(): Promise<Partial<ExtensionSettings>> {
+    return chrome.storage.sync.get(null);
+  },
+
+  onChange(
+    callback: (changes: Partial<Record<keyof ExtensionSettings, chrome.storage.StorageChange>>) => void
+  ) {
+    chrome.storage.onChanged.addListener((changes, area) => {
+      if (area === 'sync') callback(changes as any);
+    });
+  },
+};
+```
+
+## Content Script Patterns
+
+```typescript
+// content/content-script.ts
+// 在网页上下文中运行，可以访问 DOM
+
+(function() {
+  'use strict';
+
+  // 防止多次注入
+  if (window.__extensionInjected) return;
+  window.__extensionInjected = true;
+
+  // 监听来自 background 的消息
+  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.type === 'GET_PAGE_INFO') {
+      sendResponse({
+        success: true,
+        data: {
+          title: document.title,
+          url: window.location.href,
+          selectedText: window.getSelection()?.toString() ?? '',
+        },
+      });
+    }
+    return true;
+  });
+
+  // 向 background 发送消息
+  async function reportPageLoad() {
+    await chrome.runtime.sendMessage({
+      type: 'CONTENT_READY',
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', reportPageLoad);
+  } else {
+    reportPageLoad();
+  }
+})();
+```
+
+## Popup Patterns
+
+```typescript
+// popup/popup.ts
+import { storage } from '../utils/storage';
+import { sendToBackground } from '../utils/messaging';
+
+document.addEventListener('DOMContentLoaded', async () => {
+  const settings = await storage.getAll();
+  initUI(settings);
+
+  document.getElementById('toggle')?.addEventListener('click', async () => {
+    const enabled = !(await storage.get('enabled'));
+    await storage.set('enabled', enabled);
+    updateToggleUI(enabled);
+  });
+});
+
+async function getCurrentTab(): Promise<chrome.tabs.Tab | undefined> {
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  return tab;
+}
+```
+
+## Error Handling Patterns
+
+```typescript
+// 包装 Chrome API 调用
+async function safeChromeTabs(tabId: number) {
+  try {
+    return await chrome.tabs.get(tabId);
+  } catch (error) {
+    // Tab 可能已关闭
+    if ((error as Error).message?.includes('No tab with id')) {
+      return null;
+    }
+    throw error;
+  }
+}
+
+// 检查扩展上下文是否仍有效（防止 Extension context invalidated 错误）
+function isExtensionContextValid(): boolean {
+  try {
+    chrome.runtime.getURL('');
+    return true;
+  } catch {
+    return false;
+  }
+}
+```
+
+## Security Best Practices
+
+- NEVER use `eval()` or `new Function()` — MV3 禁止
+- NEVER inject remote scripts
+- Sanitize all DOM insertions to prevent XSS
+- Use `chrome.storage` not `localStorage` for extension data
+- Validate all messages from content scripts (they can be compromised)
+- Use Content Security Policy in manifest
+- Request minimal permissions — principle of least privilege
+
+## File Naming Conventions
+
+- Manifest: `manifest.json` (root)
+- Service worker: `service-worker.ts`
+- Content scripts: `content-script.ts`
+- Message types: `messages.ts`
+- Utils: `camelCase.ts`
+
+## What Cursor Should Do
+
+- Use `chrome.storage.sync` for settings, `chrome.storage.local` for large data
+- Return `true` from `onMessage` listener for async responses
+- Generate typed message interfaces to avoid runtime errors
+- Suggest `chrome.scripting.executeScript()` (MV3) not `chrome.tabs.executeScript()`
+- Check `chrome.runtime.lastError` after Chrome API calls
+- Suggest minimal permission sets
+
+## What Cursor Should Avoid
+
+- Do NOT use `background.persistent: true` (MV2 pattern)
+- Do NOT use `chrome.browserAction` (use `chrome.action`)
+- Do NOT use `eval()` or dynamic code execution
+- Do NOT store sensitive data in `localStorage` — use `chrome.storage`
+- Do NOT use `XMLHttpRequest` — use `fetch()`
+- Do NOT ignore `chrome.runtime.lastError`

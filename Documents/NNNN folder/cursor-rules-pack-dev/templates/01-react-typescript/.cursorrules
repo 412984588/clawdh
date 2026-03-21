@@ -1,0 +1,39 @@
+# React + TypeScript Cursor Rules
+
+## Tech Stack
+- React 18+ with TypeScript
+- Vite or Next.js as build tool
+- Tailwind CSS for styling
+- React Query / SWR for data fetching
+- Zustand or Context API for state
+
+## Code Style
+- Functional components only — no class components
+- Prefer named exports over default exports
+- Use `const` arrow functions for components: `const MyComponent = () => {}`
+- Props interfaces must be explicitly typed — never use `any`
+- Co-locate types with the component file unless shared
+
+## File & Folder Conventions
+- Component files: PascalCase (`UserCard.tsx`)
+- Hook files: camelCase starting with `use` (`useAuth.ts`)
+- Utility files: camelCase (`formatDate.ts`)
+- Each component in its own folder with index barrel export
+
+## React Patterns
+- Custom hooks for all business logic — keep components presentational
+- `useCallback` / `useMemo` only when profiling shows it helps
+- Error boundaries for async components
+- Lazy-load routes with `React.lazy` and `Suspense`
+
+## TypeScript
+- Strict mode required (`"strict": true` in tsconfig)
+- Prefer `interface` for object shapes, `type` for unions/intersections
+- No `!` non-null assertions — handle undefined explicitly
+- Import types with `import type { Foo }` syntax
+
+## Testing
+- Vitest + React Testing Library
+- Test behavior, not implementation
+- One describe block per component
+- Name tests: "should <expected behavior> when <condition>"

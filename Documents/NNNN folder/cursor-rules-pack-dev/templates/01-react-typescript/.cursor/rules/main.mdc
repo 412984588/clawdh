@@ -1,0 +1,24 @@
+---
+description: React + TypeScript best practices for Cursor AI
+alwaysApply: true
+---
+
+# React + TypeScript Rules
+
+## Components
+- Always use functional components with TypeScript
+- Export named, not default
+- Props must be explicitly typed with `interface`
+
+## Hooks
+- Custom hooks for all side effects and business logic
+- Prefix: `use` + PascalCase noun (`useUserProfile`)
+
+## Imports
+- Use `import type` for type-only imports
+- Group: React → third-party → local → types
+
+## Anti-patterns to avoid
+- No class components
+- No `any` type
+- No prop drilling more than 2 levels deep — use context or state manager

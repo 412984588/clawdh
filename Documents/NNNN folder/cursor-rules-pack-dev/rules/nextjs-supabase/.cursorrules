@@ -1,0 +1,307 @@
+You are an expert in TypeScript, Next.js App Router, Supabase, PostgreSQL, Row Level Security, and Tailwind CSS.
+
+# Project Type
+This is a Next.js 14+ full-stack application with Supabase as the backend (database, auth, storage, realtime).
+
+## Tech Stack
+- Next.js 14+ App Router
+- Supabase (PostgreSQL + Auth + Storage + Realtime)
+- TypeScript (strict mode)
+- Tailwind CSS
+- Shadcn UI
+- Zod for validation
+
+## Code Style and Structure
+
+- Write concise, typed TypeScript with proper Supabase client usage
+- Use Server Components for data fetching from Supabase by default
+- Keep Supabase client initialization centralized in `lib/supabase/`
+- Separate server-side and client-side Supabase clients
+- Use Supabase-generated types for type safety
+
+## Supabase Client Setup
+
+```typescript
+// lib/supabase/server.ts — for Server Components and Route Handlers
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
+import type { Database } from '@/types/supabase';
+
+export function createClient() {
+  const cookieStore = cookies();
+  return createServerClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() { return cookieStore.getAll(); },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            cookieStore.set(name, value, options)
+          );
+        },
+      },
+    }
+  );
+}
+
+// lib/supabase/client.ts — for Client Components
+import { createBrowserClient } from '@supabase/ssr';
+export function createClient() {
+  return createBrowserClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+}
+```
+
+## Authentication Patterns
+
+- Use Supabase Auth with SSR package (`@supabase/ssr`)
+- Implement middleware for session refresh and route protection
+- Use `auth.getUser()` in Server Components (never `auth.getSession()`)
+- Handle auth callbacks in `/auth/callback/route.ts`
+- Implement proper sign-out that clears both client and server sessions
+
+```typescript
+// middleware.ts
+import { createServerClient } from '@supabase/ssr';
+import { NextResponse, type NextRequest } from 'next/server';
+
+export async function middleware(request: NextRequest) {
+  let supabaseResponse = NextResponse.next({ request });
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() { return request.cookies.getAll(); },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) =>
+            request.cookies.set(name, value)
+          );
+          supabaseResponse = NextResponse.next({ request });
+          cookiesToSet.forEach(({ name, value, options }) =>
+            supabaseResponse.cookies.set(name, value, options)
+          );
+        },
+      },
+    }
+  );
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user && !request.nextUrl.pathname.startsWith('/auth')) {
+    return NextResponse.redirect(new URL('/auth/login', request.url));
+  }
+  return supabaseResponse;
+}
+```
+
+## Database Query Patterns
+
+```typescript
+// 正确的查询方式 — 带类型推断
+const { data: users, error } = await supabase
+  .from('users')
+  .select('id, name, email, created_at')
+  .eq('is_active', true)
+  .order('created_at', { ascending: false })
+  .limit(20);
+
+if (error) {
+  console.error('[fetchUsers] Supabase 查询失败:', error.message);
+  throw new Error('用户数据加载失败');
+}
+
+// 关联查询
+const { data: posts } = await supabase
+  .from('posts')
+  .select(`
+    id,
+    title,
+    content,
+    author:users(id, name, avatar_url),
+    tags(id, name)
+  `)
+  .eq('published', true);
+```
+
+## Row Level Security (RLS)
+
+- ALWAYS enable RLS on all tables containing user data
+- Write RLS policies using Supabase's policy editor
+- Test policies with different user contexts
+- Use `auth.uid()` in RLS policies to scope data to current user
+- Document RLS policies alongside table definitions
+
+```sql
+-- 示例 RLS 策略
+ALTER TABLE posts ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view their own posts"
+  ON posts FOR SELECT
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own posts"
+  ON posts FOR INSERT
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own posts"
+  ON posts FOR UPDATE
+  USING (auth.uid() = user_id);
+```
+
+## Type Generation
+
+- Run `npx supabase gen types typescript --project-id [id] > types/supabase.ts`
+- Use generated Database type for client initialization
+- Create helper types for common queries
+- Regenerate types after schema changes
+
+```typescript
+// types/supabase.ts — generated, do not edit manually
+export type Database = { ... }
+
+// types/models.ts — derived types for convenience
+import type { Database } from './supabase';
+type Tables = Database['public']['Tables'];
+export type User = Tables['users']['Row'];
+export type Post = Tables['posts']['Row'];
+export type PostInsert = Tables['posts']['Insert'];
+export type PostUpdate = Tables['posts']['Update'];
+```
+
+## Realtime Subscriptions
+
+```typescript
+// Client Component with realtime
+'use client';
+import { useEffect, useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
+
+export function RealtimeMessages({ roomId }: { roomId: string }) {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const supabase = createClient();
+
+  useEffect(() => {
+    const channel = supabase
+      .channel(`room:${roomId}`)
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'messages',
+        filter: `room_id=eq.${roomId}`,
+      }, (payload) => {
+        setMessages(prev => [...prev, payload.new as Message]);
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [roomId, supabase]);
+}
+```
+
+## Storage Usage
+
+```typescript
+// 上传文件
+const { data, error } = await supabase.storage
+  .from('avatars')
+  .upload(`${userId}/avatar.png`, file, {
+    cacheControl: '3600',
+    upsert: true,
+  });
+
+// 获取公开 URL
+const { data: { publicUrl } } = supabase.storage
+  .from('avatars')
+  .getPublicUrl(`${userId}/avatar.png`);
+```
+
+## Server Actions with Supabase
+
+```typescript
+// app/actions/posts.ts
+'use server';
+import { createClient } from '@/lib/supabase/server';
+import { revalidatePath } from 'next/cache';
+import { z } from 'zod';
+
+const CreatePostSchema = z.object({
+  title: z.string().min(1).max(200),
+  content: z.string().min(10),
+});
+
+export async function createPost(formData: FormData) {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: '请先登录' };
+  }
+
+  const validated = CreatePostSchema.safeParse({
+    title: formData.get('title'),
+    content: formData.get('content'),
+  });
+
+  if (!validated.success) {
+    return { error: '输入验证失败', details: validated.error.flatten() };
+  }
+
+  const { error } = await supabase.from('posts').insert({
+    ...validated.data,
+    user_id: user.id,
+  });
+
+  if (error) {
+    console.error('[createPost]:', error);
+    return { error: '发布失败，请重试' };
+  }
+
+  revalidatePath('/posts');
+  return { success: true };
+}
+```
+
+## Error Handling Patterns
+
+- Always check for `error` from Supabase calls
+- Log errors with context for debugging
+- Return user-friendly messages to the client
+- Never expose Supabase error details to the client
+- Use Sentry or similar for production error tracking
+
+## File Naming Conventions
+
+- Supabase client: `lib/supabase/client.ts`, `lib/supabase/server.ts`
+- Server actions: `app/actions/[domain].ts`
+- Types: `types/supabase.ts` (generated), `types/models.ts` (derived)
+- Middleware: `middleware.ts` (project root)
+- Auth routes: `app/auth/[action]/route.ts`
+
+## Environment Variables
+
+```
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=  # only for admin operations, never expose
+```
+
+## What Cursor Should Do
+
+- Always use `createServerClient` for Server Components and Route Handlers
+- Always check for errors on Supabase query results
+- Suggest RLS policies when creating new tables
+- Generate proper TypeScript types from Supabase schema
+- Use `auth.getUser()` not `auth.getSession()` on the server
+- Recommend `revalidatePath()` after mutations
+- Suggest proper cookie handling for SSR auth
+
+## What Cursor Should Avoid
+
+- Do NOT use `createClient` from `@supabase/supabase-js` directly in Next.js SSR
+- Do NOT use `SUPABASE_SERVICE_ROLE_KEY` in client-side code
+- Do NOT skip RLS when creating tables with sensitive data
+- Do NOT use `auth.getSession()` on the server (it can be spoofed)
+- Do NOT store auth tokens in localStorage manually
+- Do NOT make Supabase queries in Client Components when Server Components can handle it

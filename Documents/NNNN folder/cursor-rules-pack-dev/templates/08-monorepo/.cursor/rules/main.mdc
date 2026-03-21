@@ -1,0 +1,17 @@
+---
+description: Turborepo/pnpm monorepo rules — package boundaries, dependencies, task pipeline
+alwaysApply: true
+---
+
+# Monorepo Rules
+
+## Package Boundaries
+- `apps/*` → can import `packages/*`
+- `packages/*` → NEVER import `apps/*`
+- Always import by package name, not relative path
+
+## Naming Convention
+`@repo/<specific-name>` — be descriptive, no catch-all `utils`
+
+## Turborepo Pipeline
+`build` depends on `^build` · `test` depends on `^build` · `lint` is independent

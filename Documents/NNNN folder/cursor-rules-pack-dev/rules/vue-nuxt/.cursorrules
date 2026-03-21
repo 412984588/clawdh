@@ -1,0 +1,301 @@
+You are an expert in TypeScript, Vue 3, Nuxt 3, Pinia, Vue Router, VueUse, and Tailwind CSS.
+
+# Project Type
+This is a Nuxt 3 full-stack application using the Composition API, TypeScript, Pinia, and Tailwind CSS.
+
+## Tech Stack
+- Nuxt 3 (latest)
+- Vue 3 Composition API
+- TypeScript 5+
+- Pinia for state management
+- VueUse composables
+- Tailwind CSS
+- Nuxt UI or shadcn-vue
+- Zod for validation
+
+## Code Style and Structure
+
+- Use `<script setup>` syntax for all components
+- Use Composition API exclusively — no Options API
+- Use TypeScript for all files
+- Use `defineProps`, `defineEmits`, `defineExpose` with TypeScript
+- Prefer composables over mixins
+- Keep templates clean; extract complex logic to composables
+
+## Nuxt 3 Auto-imports
+
+```vue
+<!-- Nuxt auto-imports: no need to manually import these -->
+<!-- ref, computed, watch, onMounted — from Vue -->
+<!-- useFetch, useAsyncData, navigateTo, useRoute — from Nuxt -->
+<!-- All composables from ~/composables/ -->
+<!-- All utils from ~/utils/ -->
+```
+
+## Component Patterns
+
+```vue
+<!-- components/UserCard.vue -->
+<script setup lang="ts">
+interface Props {
+  user: User;
+  showActions?: boolean;
+}
+
+interface Emits {
+  (e: 'edit', userId: string): void;
+  (e: 'delete', userId: string): void;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  showActions: false,
+});
+
+const emit = defineEmits<Emits>();
+
+const formattedDate = computed(() =>
+  new Date(props.user.createdAt).toLocaleDateString('zh-CN')
+);
+
+function handleEdit() {
+  emit('edit', props.user.id);
+}
+</script>
+
+<template>
+  <div class="rounded-lg border p-4">
+    <h3 class="font-semibold">{{ user.name }}</h3>
+    <p class="text-sm text-gray-500">{{ formattedDate }}</p>
+    <div v-if="showActions" class="mt-2 flex gap-2">
+      <button @click="handleEdit">编辑</button>
+    </div>
+  </div>
+</template>
+```
+
+## Data Fetching Patterns
+
+```typescript
+// pages/users/index.vue
+<script setup lang="ts">
+// useFetch — 自动处理 SSR hydration
+const { data: users, pending, error, refresh } = await useFetch<User[]>('/api/users', {
+  key: 'users-list',
+  transform: (data) => data.map(formatUser),
+});
+
+// useAsyncData — 更多控制
+const { data: post } = await useAsyncData(
+  `post-${route.params.id}`,
+  () => $fetch(`/api/posts/${route.params.id}`),
+  { watch: [() => route.params.id] }
+);
+
+// $fetch — 仅客户端事件触发的请求
+async function submitForm(data: FormData) {
+  try {
+    await $fetch('/api/posts', { method: 'POST', body: data });
+    await refresh();
+  } catch (error) {
+    console.error('[submitForm] 提交失败:', error);
+  }
+}
+</script>
+```
+
+## Server API Routes (Nitro)
+
+```typescript
+// server/api/users/index.get.ts
+import { z } from 'zod';
+
+const QuerySchema = z.object({
+  page: z.coerce.number().min(1).default(1),
+  limit: z.coerce.number().min(1).max(100).default(20),
+});
+
+export default defineEventHandler(async (event) => {
+  const query = await getValidatedQuery(event, QuerySchema.parse);
+  const users = await usersService.list(query);
+  return users;
+});
+
+// server/api/users/[id].get.ts
+export default defineEventHandler(async (event) => {
+  const id = getRouterParam(event, 'id');
+  if (!id) {
+    throw createError({ statusCode: 400, statusMessage: '缺少用户 ID' });
+  }
+  const user = await usersService.findById(id);
+  if (!user) {
+    throw createError({ statusCode: 404, statusMessage: '用户不存在' });
+  }
+  return user;
+});
+
+// server/api/users/index.post.ts
+import { z } from 'zod';
+const CreateUserSchema = z.object({
+  name: z.string().min(1),
+  email: z.string().email(),
+});
+
+export default defineEventHandler(async (event) => {
+  const body = await readValidatedBody(event, CreateUserSchema.parse);
+  const user = await usersService.create(body);
+  setResponseStatus(event, 201);
+  return user;
+});
+```
+
+## Pinia Store Patterns
+
+```typescript
+// stores/useAuthStore.ts
+import { defineStore } from 'pinia';
+
+interface User {
+  id: string;
+  name: string;
+  email: string;
+}
+
+export const useAuthStore = defineStore('auth', () => {
+  // State
+  const user = ref<User | null>(null);
+  const token = ref<string | null>(null);
+
+  // Getters
+  const isAuthenticated = computed(() => !!user.value && !!token.value);
+  const displayName = computed(() => user.value?.name ?? '游客');
+
+  // Actions
+  async function login(credentials: LoginCredentials) {
+    const response = await $fetch<{ user: User; token: string }>('/api/auth/login', {
+      method: 'POST',
+      body: credentials,
+    });
+    user.value = response.user;
+    token.value = response.token;
+  }
+
+  function logout() {
+    user.value = null;
+    token.value = null;
+    navigateTo('/login');
+  }
+
+  return { user, token, isAuthenticated, displayName, login, logout };
+}, {
+  persist: {
+    storage: persistedState.localStorage,
+    paths: ['user', 'token'],
+  },
+});
+```
+
+## Composables
+
+```typescript
+// composables/useUsers.ts
+export function useUsers() {
+  const { data: users, pending: isLoading, error, refresh } = useFetch<User[]>('/api/users');
+
+  const activeUsers = computed(() =>
+    users.value?.filter(u => u.isActive) ?? []
+  );
+
+  async function createUser(data: CreateUserInput) {
+    await $fetch('/api/users', { method: 'POST', body: data });
+    await refresh();
+  }
+
+  async function deleteUser(id: string) {
+    await $fetch(`/api/users/${id}`, { method: 'DELETE' });
+    await refresh();
+  }
+
+  return { users, activeUsers, isLoading, error, createUser, deleteUser };
+}
+```
+
+## Nuxt Configuration
+
+```typescript
+// nuxt.config.ts
+export default defineNuxtConfig({
+  modules: [
+    '@nuxtjs/tailwindcss',
+    '@pinia/nuxt',
+    '@vueuse/nuxt',
+    'nuxt-ui',
+  ],
+  runtimeConfig: {
+    // Server-only (private)
+    databaseUrl: '',
+    secretKey: '',
+    // Public (exposed to client)
+    public: {
+      apiBase: 'http://localhost:3000',
+    },
+  },
+  typescript: {
+    strict: true,
+  },
+});
+```
+
+## Error Handling Patterns
+
+```typescript
+// 全局错误处理
+export default defineNuxtPlugin((nuxtApp) => {
+  nuxtApp.vueApp.config.errorHandler = (error, context) => {
+    console.error('[Global Error]', error, context);
+  };
+});
+
+// 组件中的错误处理
+const error = useError();
+
+// API 路由错误处理
+export default defineEventHandler(async (event) => {
+  try {
+    return await processRequest(event);
+  } catch (err) {
+    if (err instanceof ValidationError) {
+      throw createError({ statusCode: 422, data: err.details });
+    }
+    throw createError({ statusCode: 500, statusMessage: '服务器内部错误' });
+  }
+});
+```
+
+## File Naming Conventions
+
+- Components: `PascalCase.vue`
+- Pages: `kebab-case.vue` (e.g., `user-profile.vue`)
+- Composables: `use[Name].ts`
+- Stores: `use[Name]Store.ts`
+- Server routes: `[resource]/index.[method].ts`
+- Middleware: `[name].ts` or `[name].global.ts`
+
+## What Cursor Should Do
+
+- Use `<script setup>` syntax always
+- Auto-import Vue and Nuxt composables (no manual imports needed)
+- Use Composition API with TypeScript generics
+- Suggest `useFetch` for SSR-compatible data fetching
+- Generate Pinia stores using the Setup Store pattern
+- Suggest proper server route file naming ([id].get.ts, index.post.ts)
+- Recommend `getValidatedQuery` and `readValidatedBody` for input validation
+
+## What Cursor Should Avoid
+
+- Do NOT use Options API
+- Do NOT manually import auto-imported composables
+- Do NOT use Vuex (use Pinia instead)
+- Do NOT use `axios` in Nuxt (use `$fetch` or `useFetch`)
+- Do NOT mix SSR and client-only code without proper guards
+- Do NOT use `process.env` directly in Nuxt — use `useRuntimeConfig()`
+- Do NOT skip error handling in server routes

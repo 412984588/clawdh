@@ -1,0 +1,32 @@
+---
+description: Use when working in a project that needs team-specific implementation rules.
+globs:
+  - "**/*"
+alwaysApply: false
+---
+
+# Team Project Rule Template
+
+## Apply When
+
+- The repository uses [PRIMARY FRAMEWORK]
+- The team wants code generation to follow local patterns
+
+## Preferred Patterns
+
+- Data fetching: [YOUR PATTERN]
+- State management: [YOUR PATTERN]
+- Validation: [YOUR PATTERN]
+- Testing: [YOUR PATTERN]
+
+## Required Constraints
+
+- Use [NAMING CONVENTION]
+- Keep files under [DIRECTORY SHAPE]
+- Reuse [INTERNAL LIBRARY OR UTILITIES]
+
+## Avoid
+
+- [ANTI-PATTERN 1]
+- [ANTI-PATTERN 2]
+- [ANTI-PATTERN 3]

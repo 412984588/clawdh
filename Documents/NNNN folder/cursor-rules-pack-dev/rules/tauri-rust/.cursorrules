@@ -1,0 +1,311 @@
+You are an expert in Rust, Tauri 2.0, TypeScript, React/Vue, and cross-platform desktop application development.
+
+# Project Type
+This is a Tauri 2.0 desktop application with a Rust backend and TypeScript/React frontend.
+
+## Tech Stack
+- Tauri 2.0
+- Rust (2021 edition)
+- TypeScript + React (or Vue 3)
+- Vite for frontend bundling
+- SQLite (via rusqlite or sqlx) for local data
+- tokio for async Rust
+
+## Code Style and Structure
+
+### Rust Backend
+- Follow Rust naming conventions: snake_case for variables/functions, PascalCase for types
+- Use `thiserror` for custom error types, `anyhow` for application errors
+- Implement proper error propagation with `?` operator
+- Keep Tauri commands thin; business logic in separate modules
+- Use `#[derive(Debug, Serialize, Deserialize)]` for data transfer types
+- Document public functions with `///` doc comments
+
+### TypeScript Frontend
+- Use TypeScript strict mode
+- Invoke Tauri commands via `@tauri-apps/api`
+- Handle errors from invoke() explicitly
+- Use React Query or SWR for data that comes from Rust backend
+
+## Project Structure
+
+```
+src-tauri/
+  src/
+    main.rs            # Entry point
+    lib.rs             # App setup, command registration
+    commands/
+      mod.rs
+      file_ops.rs      # File operation commands
+      settings.rs      # Settings commands
+    models/
+      mod.rs
+      user.rs
+    db/
+      mod.rs
+      migrations.rs
+    error.rs           # Custom error types
+    state.rs           # App state
+  Cargo.toml
+  tauri.conf.json
+src/                   # Frontend (React/Vue)
+  components/
+  pages/
+  hooks/
+    useTauri.ts        # Tauri API wrapper
+  services/
+    tauri.ts
+  types/
+    commands.ts        # Command input/output types
+```
+
+## Tauri Commands (Rust)
+
+```rust
+// src-tauri/src/commands/file_ops.rs
+use tauri::AppHandle;
+use crate::error::AppError;
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct FileInfo {
+    pub path: String,
+    pub size: u64,
+    pub modified: String,
+}
+
+/// 读取文件内容
+#[tauri::command]
+pub async fn read_file(path: String) -> Result<String, AppError> {
+    tokio::fs::read_to_string(&path)
+        .await
+        .map_err(|e| AppError::Io(format!("读取文件 {} 失败: {}", path, e)))
+}
+
+/// 写入文件内容
+#[tauri::command]
+pub async fn write_file(path: String, content: String) -> Result<(), AppError> {
+    tokio::fs::write(&path, content)
+        .await
+        .map_err(|e| AppError::Io(format!("写入文件 {} 失败: {}", path, e)))
+}
+
+/// 获取目录中的文件列表
+#[tauri::command]
+pub async fn list_directory(dir_path: String) -> Result<Vec<FileInfo>, AppError> {
+    let mut entries = tokio::fs::read_dir(&dir_path)
+        .await
+        .map_err(|e| AppError::Io(format!("读取目录失败: {}", e)))?;
+
+    let mut files = Vec::new();
+    while let Some(entry) = entries.next_entry().await.map_err(|e| AppError::Io(e.to_string()))? {
+        let metadata = entry.metadata().await.map_err(|e| AppError::Io(e.to_string()))?;
+        files.push(FileInfo {
+            path: entry.path().to_string_lossy().to_string(),
+            size: metadata.len(),
+            modified: format!("{:?}", metadata.modified()?),
+        });
+    }
+    Ok(files)
+}
+```
+
+## Error Handling (Rust)
+
+```rust
+// src-tauri/src/error.rs
+use serde::Serialize;
+use thiserror::Error;
+
+#[derive(Debug, Error, Serialize)]
+#[serde(tag = "type", content = "message")]
+pub enum AppError {
+    #[error("IO 错误: {0}")]
+    Io(String),
+
+    #[error("数据库错误: {0}")]
+    Database(String),
+
+    #[error("权限不足: {0}")]
+    PermissionDenied(String),
+
+    #[error("未找到: {0}")]
+    NotFound(String),
+
+    #[error("序列化错误: {0}")]
+    Serialization(String),
+}
+
+// 让 AppError 可以被 Tauri 序列化为 JSON 返回给前端
+impl From<AppError> for tauri::InvokeError {
+    fn from(err: AppError) -> Self {
+        serde_json::to_string(&err)
+            .map(tauri::InvokeError::from)
+            .unwrap_or_else(|_| tauri::InvokeError::from("序列化错误失败"))
+    }
+}
+```
+
+## App State (Rust)
+
+```rust
+// src-tauri/src/state.rs
+use std::sync::Mutex;
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Default, Serialize, Deserialize)]
+pub struct AppSettings {
+    pub theme: String,
+    pub language: String,
+    pub auto_save: bool,
+}
+
+pub struct AppState {
+    pub settings: Mutex<AppSettings>,
+    pub db: Mutex<Option<rusqlite::Connection>>,
+}
+
+impl AppState {
+    pub fn new() -> Self {
+        Self {
+            settings: Mutex::new(AppSettings::default()),
+            db: Mutex::new(None),
+        }
+    }
+}
+```
+
+## Registering Commands (Rust)
+
+```rust
+// src-tauri/src/lib.rs
+use tauri::Manager;
+mod commands;
+mod error;
+mod state;
+
+pub fn run() {
+    tauri::Builder::default()
+        .manage(state::AppState::new())
+        .invoke_handler(tauri::generate_handler![
+            commands::file_ops::read_file,
+            commands::file_ops::write_file,
+            commands::file_ops::list_directory,
+            commands::settings::get_settings,
+            commands::settings::update_settings,
+        ])
+        .setup(|app| {
+            let app_handle = app.handle();
+            // 初始化数据库
+            setup_database(&app_handle)?;
+            Ok(())
+        })
+        .run(tauri::generate_context!())
+        .expect("Tauri 应用启动失败");
+}
+```
+
+## TypeScript Frontend — Calling Tauri Commands
+
+```typescript
+// services/tauri.ts
+import { invoke } from '@tauri-apps/api/core';
+import { open, save } from '@tauri-apps/plugin-dialog';
+import { readTextFile, writeTextFile } from '@tauri-apps/plugin-fs';
+
+// 类型化的 invoke 包装器
+export async function readFile(path: string): Promise<string> {
+  return invoke<string>('read_file', { path });
+}
+
+export async function writeFile(path: string, content: string): Promise<void> {
+  return invoke<void>('write_file', { path, content });
+}
+
+export async function listDirectory(dirPath: string): Promise<FileInfo[]> {
+  return invoke<FileInfo[]>('list_directory', { dirPath });
+}
+
+// hooks/useTauri.ts
+import { useState, useCallback } from 'react';
+
+export function useInvoke<T, A extends Record<string, unknown>>(
+  command: string
+) {
+  const [data, setData] = useState<T | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const execute = useCallback(async (args?: A) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const result = await invoke<T>(command, args);
+      setData(result);
+      return result;
+    } catch (err) {
+      const message = typeof err === 'string' ? err : JSON.stringify(err);
+      setError(message);
+      console.error(`[${command}] 调用失败:`, err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [command]);
+
+  return { data, isLoading, error, execute };
+}
+```
+
+## Tauri Events
+
+```typescript
+// 监听来自 Rust 的事件
+import { listen } from '@tauri-apps/api/event';
+import { useEffect } from 'react';
+
+export function useProgressEvent(onProgress: (progress: number) => void) {
+  useEffect(() => {
+    const unlisten = listen<{ progress: number }>('download-progress', (event) => {
+      onProgress(event.payload.progress);
+    });
+    return () => { unlisten.then(fn => fn()); };
+  }, [onProgress]);
+}
+```
+
+```rust
+// 从 Rust 发送事件到前端
+use tauri::{AppHandle, Emitter};
+
+fn emit_progress(app: &AppHandle, progress: f64) {
+    app.emit("download-progress", serde_json::json!({ "progress": progress }))
+        .expect("事件发送失败");
+}
+```
+
+## File Naming Conventions
+
+- Rust modules: `snake_case.rs`
+- Rust commands: group by domain in `commands/[domain].rs`
+- TypeScript services: `camelCase.ts`
+- TypeScript hooks: `use[Name].ts`
+- Types: `types/commands.ts` (mirrors Rust structs)
+
+## What Cursor Should Do
+
+- Generate Rust commands with proper `#[tauri::command]` annotation
+- Create TypeScript types that mirror Rust structs
+- Handle errors from `invoke()` with try/catch
+- Use `serde::{Serialize, Deserialize}` for all data transfer types
+- Generate `thiserror` error enums for custom errors
+- Suggest `tokio::fs` for async file operations
+- Use `AppHandle` to access app-wide resources in commands
+
+## What Cursor Should Avoid
+
+- Do NOT use synchronous Rust file I/O in async commands
+- Do NOT pass raw pointers across FFI boundary
+- Do NOT ignore error types — always use `Result<T, E>`
+- Do NOT expose internal Rust implementation details in command interfaces
+- Do NOT use `unwrap()` in production code — use `?` operator
+- Do NOT store large amounts of data in Tauri state — use SQLite

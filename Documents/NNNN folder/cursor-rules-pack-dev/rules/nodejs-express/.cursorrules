@@ -1,0 +1,404 @@
+You are an expert in Node.js, Express.js, TypeScript, Prisma, PostgreSQL, JWT authentication, and REST API design.
+
+# Project Type
+This is a Node.js REST API built with Express.js, TypeScript, Prisma ORM, and PostgreSQL.
+
+## Tech Stack
+- Node.js 20+ (LTS)
+- Express.js 4.x
+- TypeScript 5+
+- Prisma ORM
+- PostgreSQL
+- JWT for authentication
+- Zod for validation
+- Jest for testing
+- Winston for logging
+
+## Code Style and Structure
+
+- Write typed TypeScript — no `any`
+- Use async/await with proper error handling
+- Structure code in layers: routes → controllers → services → repositories
+- Use dependency injection pattern
+- Keep controllers thin; business logic in services
+- Use middleware for cross-cutting concerns
+
+## Project Structure
+
+```
+src/
+  app.ts               # Express app setup
+  server.ts            # Server entry point
+  config/
+    index.ts           # Config from env vars
+    database.ts        # Prisma client
+  routes/
+    index.ts           # Route registration
+    users.ts
+    auth.ts
+    posts.ts
+  controllers/
+    userController.ts
+    authController.ts
+  services/
+    userService.ts
+    authService.ts
+    emailService.ts
+  middleware/
+    authenticate.ts    # JWT auth middleware
+    validate.ts        # Zod validation middleware
+    rateLimiter.ts
+    errorHandler.ts
+    requestLogger.ts
+  schemas/
+    user.schema.ts     # Zod schemas
+    auth.schema.ts
+  types/
+    express.d.ts       # Augment Express types
+    api.ts
+  utils/
+    jwt.ts
+    password.ts
+    pagination.ts
+  prisma/
+    schema.prisma
+    migrations/
+```
+
+## Express App Setup
+
+```typescript
+// src/app.ts
+import express, { Application } from 'express';
+import helmet from 'helmet';
+import cors from 'cors';
+import compression from 'compression';
+import { requestLogger } from './middleware/requestLogger';
+import { errorHandler } from './middleware/errorHandler';
+import { router } from './routes';
+import { config } from './config';
+
+export function createApp(): Application {
+  const app = express();
+
+  // Security middleware
+  app.use(helmet());
+  app.use(cors({ origin: config.corsOrigins, credentials: true }));
+
+  // Parsing
+  app.use(express.json({ limit: '10mb' }));
+  app.use(express.urlencoded({ extended: true }));
+  app.use(compression());
+
+  // Logging
+  app.use(requestLogger);
+
+  // Routes
+  app.use('/api/v1', router);
+
+  // Health check
+  app.get('/health', (req, res) => {
+    res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  });
+
+  // Error handling — must be last
+  app.use(errorHandler);
+
+  return app;
+}
+```
+
+## Controller Pattern
+
+```typescript
+// src/controllers/userController.ts
+import { Request, Response, NextFunction } from 'express';
+import { UserService } from '../services/userService';
+import { CreateUserSchema, UpdateUserSchema } from '../schemas/user.schema';
+
+export class UserController {
+  constructor(private userService: UserService) {}
+
+  getUsers = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { page = '1', limit = '20' } = req.query;
+      const users = await this.userService.listUsers({
+        page: parseInt(page as string),
+        limit: parseInt(limit as string),
+      });
+      res.json({ data: users.items, meta: users.meta });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  createUser = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const data = CreateUserSchema.parse(req.body);
+      const user = await this.userService.createUser(data);
+      res.status(201).json({ data: user });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getUserById = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const user = await this.userService.getUserById(req.params.id);
+      if (!user) {
+        return res.status(404).json({ error: '用户不存在' });
+      }
+      res.json({ data: user });
+    } catch (error) {
+      next(error);
+    }
+  };
+}
+```
+
+## Service Layer
+
+```typescript
+// src/services/userService.ts
+import { prisma } from '../config/database';
+import { hashPassword } from '../utils/password';
+import { AppError } from '../utils/errors';
+
+interface CreateUserInput {
+  email: string;
+  name: string;
+  password: string;
+}
+
+export class UserService {
+  async createUser(input: CreateUserInput) {
+    const existing = await prisma.user.findUnique({
+      where: { email: input.email },
+    });
+
+    if (existing) {
+      throw new AppError('EMAIL_EXISTS', '邮箱已被注册', 409);
+    }
+
+    const hashedPassword = await hashPassword(input.password);
+
+    const user = await prisma.user.create({
+      data: {
+        email: input.email,
+        name: input.name,
+        password: hashedPassword,
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        createdAt: true,
+      },
+    });
+
+    return user;
+  }
+
+  async listUsers({ page, limit }: { page: number; limit: number }) {
+    const skip = (page - 1) * limit;
+    const [items, total] = await prisma.$transaction([
+      prisma.user.findMany({
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+        select: { id: true, email: true, name: true, createdAt: true },
+      }),
+      prisma.user.count(),
+    ]);
+
+    return {
+      items,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+}
+```
+
+## Authentication Middleware
+
+```typescript
+// src/middleware/authenticate.ts
+import { Request, Response, NextFunction } from 'express';
+import { verifyToken } from '../utils/jwt';
+import { prisma } from '../config/database';
+
+export async function authenticate(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader?.startsWith('Bearer ')) {
+    return res.status(401).json({ error: '未提供认证令牌' });
+  }
+
+  const token = authHeader.substring(7);
+
+  try {
+    const payload = verifyToken(token);
+    const user = await prisma.user.findUnique({
+      where: { id: payload.userId },
+      select: { id: true, email: true, name: true },
+    });
+
+    if (!user) {
+      return res.status(401).json({ error: '用户不存在' });
+    }
+
+    req.user = user;
+    next();
+  } catch (error) {
+    res.status(401).json({ error: '无效或已过期的令牌' });
+  }
+}
+```
+
+## Validation Middleware
+
+```typescript
+// src/middleware/validate.ts
+import { Request, Response, NextFunction } from 'express';
+import { z, ZodSchema } from 'zod';
+
+export function validate(schema: ZodSchema) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const result = schema.safeParse(req.body);
+    if (!result.success) {
+      return res.status(422).json({
+        error: '输入验证失败',
+        details: result.error.flatten().fieldErrors,
+      });
+    }
+    req.body = result.data;
+    next();
+  };
+}
+```
+
+## Error Handler Middleware
+
+```typescript
+// src/middleware/errorHandler.ts
+import { Request, Response, NextFunction } from 'express';
+import { ZodError } from 'zod';
+import { AppError } from '../utils/errors';
+import logger from '../utils/logger';
+
+export function errorHandler(
+  err: Error,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  logger.error({
+    message: err.message,
+    stack: err.stack,
+    path: req.path,
+    method: req.method,
+  });
+
+  if (err instanceof AppError) {
+    return res.status(err.statusCode).json({
+      error: err.code,
+      message: err.message,
+    });
+  }
+
+  if (err instanceof ZodError) {
+    return res.status(422).json({
+      error: 'VALIDATION_ERROR',
+      details: err.flatten().fieldErrors,
+    });
+  }
+
+  // 未知错误 — 不暴露内部细节
+  res.status(500).json({ error: 'INTERNAL_ERROR', message: '服务器内部错误' });
+}
+```
+
+## Prisma Schema
+
+```prisma
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  posts     Post[]
+
+  @@map("users")
+}
+```
+
+## Error Handling Patterns
+
+```typescript
+// src/utils/errors.ts
+export class AppError extends Error {
+  constructor(
+    public code: string,
+    message: string,
+    public statusCode: number = 400
+  ) {
+    super(message);
+    this.name = 'AppError';
+  }
+}
+
+export class NotFoundError extends AppError {
+  constructor(resource: string) {
+    super('NOT_FOUND', `${resource} 不存在`, 404);
+  }
+}
+```
+
+## File Naming Conventions
+
+- Controllers: `camelCase.controller.ts` or `[name]Controller.ts`
+- Services: `[name]Service.ts`
+- Middleware: `[name].ts` in middleware/
+- Schemas: `[name].schema.ts`
+- Routes: `[name].ts` in routes/
+
+## What Cursor Should Do
+
+- Wrap all async route handlers to pass errors to `next()`
+- Generate Prisma schema when models are discussed
+- Use `prisma.$transaction()` for related operations
+- Generate Zod schemas for request body validation
+- Suggest proper HTTP status codes
+- Add request logging middleware
+- Generate JWT utility functions with proper expiry
+
+## What Cursor Should Avoid
+
+- Do NOT use callbacks — use async/await
+- Do NOT use `any` type
+- Do NOT skip error handling middleware registration
+- Do NOT hardcode secrets — use environment variables
+- Do NOT use raw SQL with string interpolation — use Prisma
+- Do NOT return stack traces in production responses
+- Do NOT skip input validation on any POST/PUT endpoint

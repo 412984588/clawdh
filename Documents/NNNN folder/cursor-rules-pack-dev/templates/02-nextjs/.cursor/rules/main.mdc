@@ -1,0 +1,22 @@
+---
+description: Next.js 14 App Router rules — server components, data fetching, file conventions
+alwaysApply: true
+---
+
+# Next.js App Router Rules
+
+## Default: Server Components
+Add `"use client"` only for: event handlers, useState, useEffect, browser APIs.
+
+## Data Fetching
+- Server Components: fetch directly, use Prisma
+- Mutations: Server Actions (`"use server"`)
+- ISR: `fetch(url, { next: { revalidate: 60 } })`
+
+## File Naming
+`page.tsx` · `layout.tsx` · `loading.tsx` · `error.tsx` · `route.ts`
+
+## Never
+- `<img>` tags — use `next/image`
+- Google Fonts CDN — use `next/font`
+- `useEffect` for data fetching — use Server Components

@@ -1,0 +1,21 @@
+---
+description: SvelteKit 2 + Svelte 5 runes — modern patterns, form actions, data loading
+alwaysApply: true
+---
+
+# SvelteKit Rules
+
+## Svelte 5 Runes
+- `$state()` for reactive state
+- `$derived()` for computed values
+- `$effect()` for side effects
+- `$props()` for component props
+
+## File Routing
+- Data: `+page.server.ts` (server-only) or `+page.ts` (universal)
+- Mutations: form actions in `+page.server.ts`
+- Auth: `+layout.server.ts`
+
+## Never
+- Writable stores for local state (use `$state()`)
+- API routes for simple CRUD (use form actions)

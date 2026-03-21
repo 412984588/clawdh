@@ -1,0 +1,391 @@
+You are an expert in TypeScript, Next.js App Router, Stripe payments, Supabase, and SaaS application patterns.
+
+# Project Type
+This is a SaaS (Software as a Service) application built with Next.js, Stripe for payments, Supabase for auth/database, and subscription management patterns.
+
+## Tech Stack
+- Next.js 14+ App Router
+- TypeScript 5+
+- Stripe (payments + subscriptions)
+- Supabase (auth + database)
+- Tailwind CSS + Shadcn UI
+- Zod for validation
+- Resend or Postmark for email
+
+## SaaS-Specific Patterns
+
+### Subscription Tiers
+
+```typescript
+// lib/stripe/plans.ts
+export const PLANS = {
+  free: {
+    name: 'Free',
+    price: 0,
+    priceId: null,
+    features: ['5 projects', '1 user', '1GB storage'],
+    limits: {
+      projects: 5,
+      users: 1,
+      storageGb: 1,
+    },
+  },
+  pro: {
+    name: 'Pro',
+    price: 29,
+    priceId: process.env.STRIPE_PRO_PRICE_ID!,
+    features: ['Unlimited projects', '10 users', '100GB storage', 'Priority support'],
+    limits: {
+      projects: Infinity,
+      users: 10,
+      storageGb: 100,
+    },
+  },
+  enterprise: {
+    name: 'Enterprise',
+    price: 99,
+    priceId: process.env.STRIPE_ENTERPRISE_PRICE_ID!,
+    features: ['Everything in Pro', 'Unlimited users', '1TB storage', 'SSO', 'SLA'],
+    limits: {
+      projects: Infinity,
+      users: Infinity,
+      storageGb: 1000,
+    },
+  },
+} as const;
+
+export type PlanName = keyof typeof PLANS;
+```
+
+### Stripe Checkout
+
+```typescript
+// app/api/stripe/checkout/route.ts
+import { NextRequest } from 'next/server';
+import Stripe from 'stripe';
+import { createClient } from '@/lib/supabase/server';
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: '2024-06-20',
+});
+
+export async function POST(request: NextRequest) {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return Response.json({ error: '未授权' }, { status: 401 });
+  }
+
+  try {
+    const { priceId, successUrl, cancelUrl } = await request.json();
+
+    // 获取或创建 Stripe 客户
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('stripe_customer_id')
+      .eq('id', user.id)
+      .single();
+
+    let customerId = profile?.stripe_customer_id;
+
+    if (!customerId) {
+      const customer = await stripe.customers.create({
+        email: user.email!,
+        metadata: { userId: user.id },
+      });
+      customerId = customer.id;
+
+      await supabase
+        .from('profiles')
+        .update({ stripe_customer_id: customerId })
+        .eq('id', user.id);
+    }
+
+    const session = await stripe.checkout.sessions.create({
+      customer: customerId,
+      payment_method_types: ['card'],
+      line_items: [{ price: priceId, quantity: 1 }],
+      mode: 'subscription',
+      success_url: successUrl,
+      cancel_url: cancelUrl,
+      subscription_data: {
+        metadata: { userId: user.id },
+      },
+      allow_promotion_codes: true,
+    });
+
+    return Response.json({ url: session.url });
+  } catch (error) {
+    console.error('[checkout] Stripe 结账失败:', error);
+    return Response.json({ error: '创建结账会话失败' }, { status: 500 });
+  }
+}
+```
+
+### Stripe Webhook Handler
+
+```typescript
+// app/api/stripe/webhook/route.ts
+import { headers } from 'next/headers';
+import Stripe from 'stripe';
+import { createClient } from '@/lib/supabase/server';
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: '2024-06-20',
+});
+
+export async function POST(request: Request) {
+  const body = await request.text();
+  const signature = headers().get('stripe-signature')!;
+
+  let event: Stripe.Event;
+
+  try {
+    event = stripe.webhooks.constructEvent(
+      body,
+      signature,
+      process.env.STRIPE_WEBHOOK_SECRET!
+    );
+  } catch (error) {
+    console.error('[webhook] 签名验证失败:', error);
+    return Response.json({ error: 'Invalid signature' }, { status: 400 });
+  }
+
+  const supabase = createClient();
+
+  switch (event.type) {
+    case 'checkout.session.completed': {
+      const session = event.data.object as Stripe.CheckoutSession;
+      const userId = session.metadata?.userId;
+
+      if (userId && session.subscription) {
+        await supabase.from('subscriptions').upsert({
+          user_id: userId,
+          stripe_subscription_id: session.subscription as string,
+          stripe_customer_id: session.customer as string,
+          status: 'active',
+          plan: getPlanFromPriceId(session),
+        });
+      }
+      break;
+    }
+
+    case 'customer.subscription.updated': {
+      const subscription = event.data.object as Stripe.Subscription;
+      await supabase
+        .from('subscriptions')
+        .update({
+          status: subscription.status,
+          current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+        })
+        .eq('stripe_subscription_id', subscription.id);
+      break;
+    }
+
+    case 'customer.subscription.deleted': {
+      const subscription = event.data.object as Stripe.Subscription;
+      await supabase
+        .from('subscriptions')
+        .update({ status: 'canceled' })
+        .eq('stripe_subscription_id', subscription.id);
+      break;
+    }
+
+    default:
+      console.log(`[webhook] 未处理的事件类型: ${event.type}`);
+  }
+
+  return Response.json({ received: true });
+}
+```
+
+### Feature Gating
+
+```typescript
+// lib/subscription.ts
+import { createClient } from '@/lib/supabase/server';
+import { PLANS, type PlanName } from './stripe/plans';
+
+export async function getUserPlan(): Promise<PlanName> {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) return 'free';
+
+  const { data: subscription } = await supabase
+    .from('subscriptions')
+    .select('plan, status')
+    .eq('user_id', user.id)
+    .eq('status', 'active')
+    .single();
+
+  return (subscription?.plan as PlanName) ?? 'free';
+}
+
+export async function checkLimit(
+  feature: keyof typeof PLANS.free.limits
+): Promise<{ allowed: boolean; current: number; limit: number }> {
+  const plan = await getUserPlan();
+  const limit = PLANS[plan].limits[feature];
+
+  // 查询当前使用量
+  const current = await getCurrentUsage(feature);
+
+  return {
+    allowed: current < limit,
+    current,
+    limit,
+  };
+}
+
+// Server Component usage
+export async function requirePlan(minPlan: PlanName) {
+  const plan = await getUserPlan();
+  const planOrder: PlanName[] = ['free', 'pro', 'enterprise'];
+
+  if (planOrder.indexOf(plan) < planOrder.indexOf(minPlan)) {
+    redirect('/pricing');
+  }
+}
+```
+
+### Customer Portal
+
+```typescript
+// app/api/stripe/portal/route.ts
+export async function POST() {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) return Response.json({ error: '未授权' }, { status: 401 });
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('stripe_customer_id')
+    .eq('id', user.id)
+    .single();
+
+  if (!profile?.stripe_customer_id) {
+    return Response.json({ error: '未找到客户记录' }, { status: 404 });
+  }
+
+  const portalSession = await stripe.billingPortal.sessions.create({
+    customer: profile.stripe_customer_id,
+    return_url: `${process.env.NEXT_PUBLIC_APP_URL}/settings/billing`,
+  });
+
+  return Response.json({ url: portalSession.url });
+}
+```
+
+### Pricing Page Component
+
+```typescript
+// components/PricingCards.tsx
+'use client';
+import { useState } from 'react';
+import { PLANS } from '@/lib/stripe/plans';
+import { useRouter } from 'next/navigation';
+
+export function PricingCards({ currentPlan }: { currentPlan: string }) {
+  const [isAnnual, setIsAnnual] = useState(false);
+  const [isLoading, setIsLoading] = useState<string | null>(null);
+  const router = useRouter();
+
+  async function handleSubscribe(priceId: string, planName: string) {
+    setIsLoading(planName);
+    try {
+      const response = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          priceId,
+          successUrl: `${window.location.origin}/dashboard?upgraded=true`,
+          cancelUrl: `${window.location.origin}/pricing`,
+        }),
+      });
+      const { url, error } = await response.json();
+      if (error) throw new Error(error);
+      router.push(url);
+    } catch (error) {
+      console.error('[PricingCards] 结账失败:', error);
+    } finally {
+      setIsLoading(null);
+    }
+  }
+
+  return (
+    <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+      {Object.entries(PLANS).map(([key, plan]) => (
+        <div key={key} className="rounded-lg border p-6">
+          <h3 className="text-xl font-bold">{plan.name}</h3>
+          <p className="text-3xl font-bold mt-2">${plan.price}<span className="text-sm font-normal">/mo</span></p>
+          <ul className="mt-4 space-y-2">
+            {plan.features.map(f => <li key={f} className="flex items-center gap-2">✓ {f}</li>)}
+          </ul>
+          <button
+            onClick={() => plan.priceId && handleSubscribe(plan.priceId, key)}
+            disabled={currentPlan === key || isLoading === key}
+            className="mt-6 w-full rounded-md bg-blue-600 py-2 text-white"
+          >
+            {currentPlan === key ? '当前套餐' : isLoading === key ? '跳转中...' : '升级'}
+          </button>
+        </div>
+      ))}
+    </div>
+  );
+}
+```
+
+## Database Schema (Supabase/PostgreSQL)
+
+```sql
+-- subscriptions 表
+CREATE TABLE subscriptions (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  stripe_customer_id TEXT NOT NULL,
+  stripe_subscription_id TEXT UNIQUE,
+  plan TEXT NOT NULL DEFAULT 'free',
+  status TEXT NOT NULL DEFAULT 'active',
+  current_period_end TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE subscriptions ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users can view their own subscription"
+  ON subscriptions FOR SELECT USING (auth.uid() = user_id);
+```
+
+## Error Handling Patterns
+
+- Catch Stripe errors with `Stripe.errors.StripeError`
+- Always verify webhook signatures before processing
+- Return 200 to Stripe webhooks even when handling is complete
+- Log all payment events for audit purposes
+
+## File Naming Conventions
+
+- Stripe utilities: `lib/stripe/[feature].ts`
+- Webhook handler: `app/api/stripe/webhook/route.ts`
+- Checkout: `app/api/stripe/checkout/route.ts`
+- Plans config: `lib/stripe/plans.ts`
+
+## What Cursor Should Do
+
+- Always verify Stripe webhook signatures
+- Use Stripe metadata to link Stripe objects to user IDs
+- Generate proper TypeScript types from Stripe API
+- Implement idempotent webhook handlers
+- Suggest feature gating based on subscription plan
+- Generate Customer Portal integration for subscription management
+
+## What Cursor Should Avoid
+
+- Do NOT process webhooks without signature verification
+- Do NOT store card numbers — always use Stripe
+- Do NOT trust client-sent plan/price information — verify server-side
+- Do NOT skip error handling for payment failures
+- Do NOT forget to handle subscription cancellation in webhooks

@@ -1,0 +1,357 @@
+You are an expert in TypeScript, Svelte 5, SvelteKit 2, Tailwind CSS, and modern Svelte patterns.
+
+# Project Type
+This is a SvelteKit 2 application using Svelte 5 with runes, TypeScript, and Tailwind CSS.
+
+## Tech Stack
+- SvelteKit 2.x
+- Svelte 5 (runes mode)
+- TypeScript 5+
+- Tailwind CSS
+- Vite
+- Drizzle ORM or Prisma
+- PostgreSQL
+
+## Svelte 5 Runes (New Syntax)
+
+```svelte
+<script lang="ts">
+  // $state — reactive state
+  let count = $state(0);
+  let user = $state<User | null>(null);
+
+  // $derived — computed values
+  let doubled = $derived(count * 2);
+  let isLoggedIn = $derived(user !== null);
+
+  // $effect — side effects (replaces onMount for reactivity)
+  $effect(() => {
+    console.log('count changed to', count);
+    return () => {
+      // cleanup
+    };
+  });
+
+  // $props — component props
+  interface Props {
+    title: string;
+    items?: string[];
+    onSelect?: (item: string) => void;
+  }
+  let { title, items = [], onSelect }: Props = $props();
+</script>
+```
+
+## Component Patterns
+
+```svelte
+<!-- components/UserCard.svelte -->
+<script lang="ts">
+  interface Props {
+    user: User;
+    compact?: boolean;
+    onEdit?: (userId: string) => void;
+  }
+
+  let { user, compact = false, onEdit }: Props = $props();
+
+  let isHovered = $state(false);
+  let formattedDate = $derived(
+    new Date(user.createdAt).toLocaleDateString('zh-CN')
+  );
+</script>
+
+<div
+  class="rounded-lg border p-4 transition-shadow"
+  class:shadow-md={isHovered}
+  class:p-2={compact}
+  onmouseenter={() => (isHovered = true)}
+  onmouseleave={() => (isHovered = false)}
+>
+  <h3 class="font-semibold">{user.name}</h3>
+  <p class="text-sm text-gray-500">{user.email}</p>
+  {#if !compact}
+    <p class="text-xs text-gray-400">注册于 {formattedDate}</p>
+  {/if}
+  {#if onEdit}
+    <button onclick={() => onEdit(user.id)} class="mt-2 text-blue-600">
+      编辑
+    </button>
+  {/if}
+</div>
+```
+
+## SvelteKit Page and Layout
+
+```svelte
+<!-- src/routes/+layout.svelte -->
+<script lang="ts">
+  import '../app.css';
+  import type { LayoutData } from './$types';
+
+  let { data, children } = $props();
+</script>
+
+<nav class="bg-white shadow">
+  <a href="/">首页</a>
+  {#if data.user}
+    <a href="/dashboard">控制台</a>
+    <span>{data.user.name}</span>
+  {:else}
+    <a href="/login">登录</a>
+  {/if}
+</nav>
+
+<main class="container mx-auto p-4">
+  {@render children()}
+</main>
+```
+
+```typescript
+// src/routes/+layout.server.ts
+import type { LayoutServerLoad } from './$types';
+
+export const load: LayoutServerLoad = async ({ locals }) => {
+  return {
+    user: locals.user ?? null,
+  };
+};
+```
+
+## Data Loading
+
+```typescript
+// src/routes/posts/+page.server.ts
+import type { PageServerLoad } from './$types';
+import { error } from '@sveltejs/kit';
+import { db } from '$lib/server/database';
+
+export const load: PageServerLoad = async ({ url }) => {
+  const page = Number(url.searchParams.get('page')) || 1;
+  const limit = 20;
+
+  try {
+    const [posts, total] = await Promise.all([
+      db.post.findMany({
+        skip: (page - 1) * limit,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+      }),
+      db.post.count(),
+    ]);
+
+    return { posts, total, page, limit };
+  } catch (err) {
+    console.error('[load posts]:', err);
+    error(500, '加载文章失败');
+  }
+};
+```
+
+## Form Actions
+
+```typescript
+// src/routes/posts/new/+page.server.ts
+import type { Actions, PageServerLoad } from './$types';
+import { fail, redirect } from '@sveltejs/kit';
+import { z } from 'zod';
+import { db } from '$lib/server/database';
+
+const CreatePostSchema = z.object({
+  title: z.string().min(1, '标题不能为空').max(200),
+  content: z.string().min(10, '内容至少10字'),
+});
+
+export const actions: Actions = {
+  default: async ({ request, locals }) => {
+    if (!locals.user) {
+      redirect(303, '/login');
+    }
+
+    const formData = await request.formData();
+    const result = CreatePostSchema.safeParse({
+      title: formData.get('title'),
+      content: formData.get('content'),
+    });
+
+    if (!result.success) {
+      return fail(422, {
+        errors: result.error.flatten().fieldErrors,
+        values: { title: formData.get('title'), content: formData.get('content') },
+      });
+    }
+
+    const post = await db.post.create({
+      data: {
+        ...result.data,
+        authorId: locals.user.id,
+      },
+    });
+
+    redirect(303, `/posts/${post.id}`);
+  },
+};
+```
+
+```svelte
+<!-- src/routes/posts/new/+page.svelte -->
+<script lang="ts">
+  import type { ActionData } from './$types';
+  import { enhance } from '$app/forms';
+
+  let { form }: { form: ActionData } = $props();
+  let isSubmitting = $state(false);
+</script>
+
+<form
+  method="POST"
+  use:enhance={() => {
+    isSubmitting = true;
+    return async ({ update }) => {
+      await update();
+      isSubmitting = false;
+    };
+  }}
+>
+  <div>
+    <label for="title">标题</label>
+    <input
+      id="title"
+      name="title"
+      value={form?.values?.title ?? ''}
+      class="border rounded p-2 w-full"
+    />
+    {#if form?.errors?.title}
+      <p class="text-red-500 text-sm">{form.errors.title[0]}</p>
+    {/if}
+  </div>
+
+  <button type="submit" disabled={isSubmitting}>
+    {isSubmitting ? '发布中...' : '发布文章'}
+  </button>
+</form>
+```
+
+## Authentication with Hooks
+
+```typescript
+// src/hooks.server.ts
+import type { Handle } from '@sveltejs/kit';
+import { verifyToken } from '$lib/server/auth';
+
+export const handle: Handle = async ({ event, resolve }) => {
+  const token = event.cookies.get('session');
+
+  if (token) {
+    try {
+      const user = await verifyToken(token);
+      event.locals.user = user;
+    } catch {
+      // 令牌无效，清除 cookie
+      event.cookies.delete('session', { path: '/' });
+    }
+  }
+
+  return resolve(event);
+};
+```
+
+## SvelteKit Configuration
+
+```typescript
+// svelte.config.js
+import adapter from '@sveltejs/adapter-vercel'; // or adapter-node
+import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
+
+const config = {
+  preprocess: vitePreprocess(),
+  kit: {
+    adapter: adapter(),
+    alias: {
+      '$lib': './src/lib',
+      '$components': './src/lib/components',
+    },
+  },
+};
+
+export default config;
+```
+
+## Store Pattern (Legacy, still valid)
+
+```typescript
+// src/lib/stores/cart.ts
+import { writable, derived } from 'svelte/store';
+
+interface CartItem {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+}
+
+function createCartStore() {
+  const { subscribe, update, set } = writable<CartItem[]>([]);
+
+  return {
+    subscribe,
+    addItem: (item: CartItem) => update(items => {
+      const existing = items.find(i => i.id === item.id);
+      if (existing) {
+        return items.map(i => i.id === item.id
+          ? { ...i, quantity: i.quantity + 1 }
+          : i
+        );
+      }
+      return [...items, { ...item, quantity: 1 }];
+    }),
+    removeItem: (id: string) => update(items => items.filter(i => i.id !== id)),
+    clear: () => set([]),
+  };
+}
+
+export const cart = createCartStore();
+export const cartTotal = derived(cart, $cart =>
+  $cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
+);
+```
+
+## Error Handling Patterns
+
+```typescript
+// src/routes/+error.svelte
+<script lang="ts">
+  import { page } from '$app/stores';
+</script>
+
+<h1>{$page.status} — 出错了</h1>
+<p>{$page.error?.message}</p>
+<a href="/">返回首页</a>
+```
+
+## File Naming Conventions
+
+- Pages: `+page.svelte`, `+page.server.ts`
+- Layouts: `+layout.svelte`, `+layout.server.ts`
+- Error: `+error.svelte`
+- Components: `PascalCase.svelte` in `$lib/components/`
+- Stores: `camelCase.ts` or `[name]Store.ts`
+- Server utilities: `$lib/server/[name].ts`
+
+## What Cursor Should Do
+
+- Use Svelte 5 runes syntax ($state, $derived, $effect, $props)
+- Generate `+page.server.ts` load functions for data fetching
+- Use form actions with `fail()` for form error handling
+- Use `enhance` directive for progressive enhancement
+- Generate proper TypeScript from SvelteKit `$types`
+- Suggest `locals` for passing data from hooks to load functions
+
+## What Cursor Should Avoid
+
+- Do NOT use legacy Svelte 4 reactive syntax (`$: `, `export let`)
+- Do NOT use `onMount` for reactivity that can use `$effect`
+- Do NOT fetch data in components — use load functions
+- Do NOT use client-side fetch for initial page data
+- Do NOT use Svelte stores when `$state` suffices
+- Do NOT put business logic in `.svelte` files — use `$lib/server/`

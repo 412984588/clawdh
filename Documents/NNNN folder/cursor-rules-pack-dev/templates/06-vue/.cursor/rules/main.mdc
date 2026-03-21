@@ -1,0 +1,20 @@
+---
+description: Vue 3 Composition API rules — script setup, Pinia, composables, TypeScript
+alwaysApply: true
+---
+
+# Vue 3 Rules
+
+## Always
+- `<script setup lang="ts">` — never Options API
+- `defineProps<{}>()` with TypeScript generics
+- Multi-word component names
+
+## Composables
+- `use` prefix + single concern
+- Return reactive values (refs/computed)
+
+## Never
+- `v-for` and `v-if` on same element
+- Direct Pinia state mutation outside actions
+- `any` in TypeScript

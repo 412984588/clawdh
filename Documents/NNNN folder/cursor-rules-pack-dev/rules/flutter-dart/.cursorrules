@@ -1,0 +1,366 @@
+You are an expert in Flutter, Dart, Riverpod, GoRouter, Firebase, and cross-platform mobile/desktop app development.
+
+# Project Type
+This is a Flutter application using Riverpod for state management, GoRouter for navigation, and following clean architecture principles.
+
+## Tech Stack
+- Flutter 3.x (stable channel)
+- Dart 3.x (null safety required)
+- Riverpod 2.x (code generation)
+- GoRouter for navigation
+- Freezed for immutable data models
+- Retrofit/Dio for HTTP
+- Firebase (Auth, Firestore, Storage) or Supabase
+
+## Code Style
+
+- Use Dart 3 patterns: null safety, records, patterns matching
+- Follow Effective Dart guidelines
+- Prefer `const` constructors whenever possible
+- Use named parameters for clarity
+- Keep widgets small and focused; extract to separate files when >100 lines
+- Use `final` for all state; prefer immutable data
+
+## Architecture — Clean Architecture
+
+```
+lib/
+  main.dart
+  app/
+    router.dart            # GoRouter configuration
+    theme.dart             # App theme
+    providers.dart         # Root providers
+  features/
+    auth/
+      data/
+        auth_repository.dart
+        auth_remote_source.dart
+      domain/
+        auth_models.dart
+        i_auth_repository.dart
+      presentation/
+        auth_screen.dart
+        auth_controller.dart
+        widgets/
+    home/
+      ...
+  shared/
+    widgets/               # Shared UI components
+    extensions/            # Dart extensions
+    utils/                 # Utilities
+  core/
+    network/
+      dio_client.dart
+    error/
+      failures.dart
+    constants/
+```
+
+## Riverpod Patterns (code generation)
+
+```dart
+// features/auth/presentation/auth_controller.dart
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'auth_controller.g.dart';
+
+@riverpod
+class AuthController extends _$AuthController {
+  @override
+  FutureOr<void> build() {}
+
+  Future<void> signIn({required String email, required String password}) async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      final authRepo = ref.read(authRepositoryProvider);
+      await authRepo.signIn(email: email, password: password);
+    });
+  }
+
+  Future<void> signOut() async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() =>
+      ref.read(authRepositoryProvider).signOut()
+    );
+  }
+}
+
+// Watching current user
+@riverpod
+Stream<User?> currentUser(CurrentUserRef ref) {
+  return ref.watch(authRepositoryProvider).watchCurrentUser();
+}
+
+// Simple state provider
+@riverpod
+class ThemeMode extends _$ThemeMode {
+  @override
+  ThemeMode build() => ThemeMode.system;
+
+  void toggle() {
+    state = state == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
+  }
+}
+```
+
+## Freezed Data Models
+
+```dart
+// features/auth/domain/auth_models.dart
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'auth_models.freezed.dart';
+part 'auth_models.g.dart';
+
+@freezed
+class UserProfile with _$UserProfile {
+  const factory UserProfile({
+    required String id,
+    required String email,
+    required String displayName,
+    String? avatarUrl,
+    @Default(false) bool isPremium,
+    required DateTime createdAt,
+  }) = _UserProfile;
+
+  factory UserProfile.fromJson(Map<String, dynamic> json) =>
+      _$UserProfileFromJson(json);
+}
+
+// Sealed class for auth state
+@freezed
+sealed class AuthState with _$AuthState {
+  const factory AuthState.initial() = _Initial;
+  const factory AuthState.loading() = _Loading;
+  const factory AuthState.authenticated(UserProfile user) = _Authenticated;
+  const factory AuthState.unauthenticated() = _Unauthenticated;
+  const factory AuthState.error(String message) = _Error;
+}
+```
+
+## Widget Patterns
+
+```dart
+// features/home/presentation/home_screen.dart
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+class HomeScreen extends ConsumerWidget {
+  const HomeScreen({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final userAsync = ref.watch(currentUserProvider);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('首页'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () => ref.read(authControllerProvider.notifier).signOut(),
+          ),
+        ],
+      ),
+      body: userAsync.when(
+        data: (user) => user != null
+            ? _buildUserContent(context, user)
+            : const _UnauthorizedView(),
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, _) => Center(child: Text('加载失败: $error')),
+      ),
+    );
+  }
+
+  Widget _buildUserContent(BuildContext context, User user) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('你好, ${user.displayName}!', style: Theme.of(context).textTheme.headlineMedium),
+        ],
+      ),
+    );
+  }
+}
+```
+
+## GoRouter Configuration
+
+```dart
+// app/router.dart
+import 'package:go_router/go_router.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'router.g.dart';
+
+@riverpod
+GoRouter router(RouterRef ref) {
+  final authState = ref.watch(authStateProvider);
+
+  return GoRouter(
+    initialLocation: '/home',
+    redirect: (context, state) {
+      final isLoggedIn = authState.valueOrNull != null;
+      final isAuthRoute = state.matchedLocation.startsWith('/auth');
+
+      if (!isLoggedIn && !isAuthRoute) return '/auth/login';
+      if (isLoggedIn && isAuthRoute) return '/home';
+      return null;
+    },
+    routes: [
+      GoRoute(
+        path: '/auth/login',
+        builder: (context, state) => const LoginScreen(),
+      ),
+      ShellRoute(
+        builder: (context, state, child) => MainShell(child: child),
+        routes: [
+          GoRoute(
+            path: '/home',
+            builder: (context, state) => const HomeScreen(),
+          ),
+          GoRoute(
+            path: '/profile',
+            builder: (context, state) => const ProfileScreen(),
+          ),
+          GoRoute(
+            path: '/settings',
+            builder: (context, state) => const SettingsScreen(),
+          ),
+        ],
+      ),
+    ],
+  );
+}
+```
+
+## Error Handling Patterns
+
+```dart
+// core/error/failures.dart
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'failures.freezed.dart';
+
+@freezed
+sealed class Failure with _$Failure {
+  const factory Failure.network(String message) = NetworkFailure;
+  const factory Failure.auth(String message) = AuthFailure;
+  const factory Failure.notFound(String resource) = NotFoundFailure;
+  const factory Failure.server({required int statusCode, required String message}) = ServerFailure;
+  const factory Failure.unexpected(String message) = UnexpectedFailure;
+}
+
+// Repository error handling
+Future<Either<Failure, User>> getUser(String id) async {
+  try {
+    final user = await remoteSource.getUser(id);
+    return Right(user);
+  } on NetworkException catch (e) {
+    return Left(Failure.network(e.message));
+  } on NotFoundException {
+    return Left(Failure.notFound('用户 $id'));
+  } catch (e) {
+    return Left(Failure.unexpected(e.toString()));
+  }
+}
+```
+
+## Form Validation
+
+```dart
+// 表单验证示例
+class LoginForm extends ConsumerStatefulWidget {
+  const LoginForm({super.key});
+
+  @override
+  ConsumerState<LoginForm> createState() => _LoginFormState();
+}
+
+class _LoginFormState extends ConsumerState<LoginForm> {
+  final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    await ref.read(authControllerProvider.notifier).signIn(
+      email: _emailController.text.trim(),
+      password: _passwordController.text,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isLoading = ref.watch(authControllerProvider).isLoading;
+
+    return Form(
+      key: _formKey,
+      child: Column(
+        children: [
+          TextFormField(
+            controller: _emailController,
+            decoration: const InputDecoration(labelText: '邮箱'),
+            validator: (v) {
+              if (v == null || v.isEmpty) return '邮箱不能为空';
+              if (!v.contains('@')) return '请输入有效的邮箱地址';
+              return null;
+            },
+          ),
+          TextFormField(
+            controller: _passwordController,
+            obscureText: true,
+            decoration: const InputDecoration(labelText: '密码'),
+            validator: (v) {
+              if (v == null || v.length < 8) return '密码至少8位';
+              return null;
+            },
+          ),
+          ElevatedButton(
+            onPressed: isLoading ? null : _submit,
+            child: isLoading ? const CircularProgressIndicator() : const Text('登录'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+```
+
+## File Naming Conventions
+
+- Screens: `[name]_screen.dart`
+- Controllers: `[name]_controller.dart`
+- Models: `[name]_model.dart` or `[name]_models.dart`
+- Repositories: `[name]_repository.dart`
+- Widgets: `[name]_widget.dart` or `[name].dart`
+- Providers: `[name]_provider.dart`
+
+## What Cursor Should Do
+
+- Use `const` constructors wherever possible
+- Generate Riverpod providers with `@riverpod` annotation
+- Create Freezed models for complex data structures
+- Use `ConsumerWidget` or `ConsumerStatefulWidget` for Riverpod
+- Handle `AsyncValue` with `.when()` in widgets
+- Generate `part` directives for code generation files
+- Suggest `GoRouter` navigation with typed routes
+
+## What Cursor Should Avoid
+
+- Do NOT use `setState` for non-local state — use Riverpod
+- Do NOT use `Navigator.push` directly — use GoRouter
+- Do NOT use `StatefulWidget` when `ConsumerWidget` suffices
+- Do NOT ignore null safety — use `!` only when truly safe
+- Do NOT put business logic in widgets
+- Do NOT use `Provider` package (use Riverpod instead)

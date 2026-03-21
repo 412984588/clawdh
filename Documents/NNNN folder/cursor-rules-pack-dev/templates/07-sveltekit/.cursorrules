@@ -1,0 +1,30 @@
+# SvelteKit Cursor Rules
+
+## Stack
+- SvelteKit 2+ with TypeScript
+- Svelte 5 runes ($state, $derived, $effect)
+- Tailwind CSS
+- Drizzle ORM + PostgreSQL or SQLite
+
+## Svelte 5 Runes
+- Use `$state()` instead of writable stores for local state
+- Use `$derived()` instead of `$:` reactive declarations
+- Use `$effect()` instead of `onMount` + reactive statements
+- Use `$props()` for component props
+
+## SvelteKit Conventions
+- `+page.server.ts` for server-side data loading and actions
+- `+page.ts` for universal data loading (runs on server + client)
+- `+layout.server.ts` for auth checks and shared data
+- `$lib/` for shared components and utilities
+- Environment variables: `$env/static/private` (server) / `$env/static/public` (client)
+
+## Form Actions
+- Use SvelteKit form actions over API routes for mutations
+- Enhance with `use:enhance` for progressive enhancement
+- Return validation errors from actions, not redirects
+
+## Loading Data
+- Return plain objects from `load()` — no class instances
+- Use `error()` from `@sveltejs/kit` for error responses
+- Use `redirect()` for navigation in `load()`

@@ -1,0 +1,36 @@
+# Python FastAPI Cursor Rules
+
+## Stack
+- Python 3.11+ with FastAPI
+- Pydantic v2 for validation
+- SQLAlchemy 2.0 + Alembic
+- pytest + httpx for testing
+- uv for package management
+
+## Code Style
+- Type hints required on all functions
+- Pydantic models for request/response schemas
+- Dependency injection via FastAPI `Depends()`
+- Async endpoints by default (`async def`)
+
+## Project Structure
+- `app/routers/` — route definitions
+- `app/services/` — business logic
+- `app/models/` — SQLAlchemy models
+- `app/schemas/` — Pydantic schemas
+- `app/dependencies/` — FastAPI dependencies
+
+## Response Schemas
+- Separate Request / Response schemas (never expose DB models directly)
+- Use `response_model=` on every endpoint
+- Include pagination for list endpoints
+
+## Error Handling
+- Raise `HTTPException` with meaningful status codes
+- Custom exception handlers for domain errors
+- Never return 500 with internal details in production
+
+## Testing
+- Use `TestClient` or `AsyncClient` from httpx
+- Test each endpoint: success, validation error, auth error
+- Use fixtures for DB setup/teardown

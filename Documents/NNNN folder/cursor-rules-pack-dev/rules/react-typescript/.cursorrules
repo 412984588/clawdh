@@ -1,0 +1,325 @@
+You are an expert in TypeScript, React 18+, Vite, React Query, Zustand, React Router, and Tailwind CSS.
+
+# Project Type
+This is a React 18+ SPA (Single Page Application) built with Vite, TypeScript, and modern React patterns.
+
+## Tech Stack
+- React 18+
+- TypeScript 5+ (strict mode)
+- Vite
+- React Router v6
+- TanStack Query (React Query v5)
+- Zustand for global state
+- Tailwind CSS
+- Axios for HTTP
+- React Hook Form + Zod
+
+## Code Style and Structure
+
+- Write clean, typed TypeScript; no `any` types
+- Use functional components exclusively — no class components
+- Prefer composition over inheritance
+- Extract logic into custom hooks
+- Keep components focused on rendering; put logic in hooks and services
+- Use named exports for all components
+- Co-locate component-specific types with the component
+
+## Component Architecture
+
+```
+src/
+  components/
+    ui/              # Primitive UI components (Button, Input, Modal)
+    common/          # Shared composite components (Header, Sidebar)
+    features/
+      auth/
+        LoginForm.tsx
+        LoginForm.test.tsx
+        useLogin.ts
+      posts/
+        PostList.tsx
+        PostCard.tsx
+        usePostList.ts
+  pages/
+    HomePage.tsx
+    AboutPage.tsx
+  hooks/
+    useDebounce.ts
+    useLocalStorage.ts
+    useMediaQuery.ts
+  services/
+    api.ts           # Axios instance
+    users.ts         # User API functions
+    posts.ts
+  store/
+    authStore.ts
+    uiStore.ts
+  types/
+    api.ts
+    models.ts
+  utils/
+    formatDate.ts
+    validators.ts
+  router/
+    index.tsx
+    guards.tsx
+```
+
+## TypeScript Patterns
+
+```typescript
+// Prefer interfaces for object shapes
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: 'admin' | 'user' | 'guest';
+  createdAt: Date;
+}
+
+// Use discriminated unions for state
+type AsyncState<T> =
+  | { status: 'idle' }
+  | { status: 'loading' }
+  | { status: 'success'; data: T }
+  | { status: 'error'; error: Error };
+
+// Generic components
+interface ListProps<T> {
+  items: T[];
+  renderItem: (item: T) => React.ReactNode;
+  keyExtractor: (item: T) => string;
+  emptyMessage?: string;
+}
+
+function List<T>({ items, renderItem, keyExtractor, emptyMessage }: ListProps<T>) {
+  if (items.length === 0) {
+    return <p className="text-gray-500">{emptyMessage ?? '暂无数据'}</p>;
+  }
+  return (
+    <ul>
+      {items.map(item => (
+        <li key={keyExtractor(item)}>{renderItem(item)}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+## Custom Hooks Pattern
+
+```typescript
+// hooks/useAsync.ts
+import { useState, useCallback } from 'react';
+
+interface AsyncState<T> {
+  data: T | null;
+  isLoading: boolean;
+  error: Error | null;
+}
+
+export function useAsync<T>(asyncFn: () => Promise<T>) {
+  const [state, setState] = useState<AsyncState<T>>({
+    data: null,
+    isLoading: false,
+    error: null,
+  });
+
+  const execute = useCallback(async () => {
+    setState({ data: null, isLoading: true, error: null });
+    try {
+      const data = await asyncFn();
+      setState({ data, isLoading: false, error: null });
+    } catch (error) {
+      setState({ data: null, isLoading: false, error: error as Error });
+    }
+  }, [asyncFn]);
+
+  return { ...state, execute };
+}
+```
+
+## React Query Patterns
+
+```typescript
+// hooks/useUsers.ts
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { userService } from '@/services/users';
+
+export const USER_QUERY_KEYS = {
+  all: ['users'] as const,
+  list: (filters?: UserFilters) => [...USER_QUERY_KEYS.all, 'list', filters] as const,
+  detail: (id: string) => [...USER_QUERY_KEYS.all, 'detail', id] as const,
+};
+
+export function useUsers(filters?: UserFilters) {
+  return useQuery({
+    queryKey: USER_QUERY_KEYS.list(filters),
+    queryFn: () => userService.getUsers(filters),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+}
+
+export function useCreateUser() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: userService.createUser,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: USER_QUERY_KEYS.all });
+    },
+    onError: (error) => {
+      console.error('[useCreateUser] 创建失败:', error);
+    },
+  });
+}
+```
+
+## Zustand Store Pattern
+
+```typescript
+// store/authStore.ts
+import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
+
+interface User {
+  id: string;
+  name: string;
+  email: string;
+}
+
+interface AuthState {
+  user: User | null;
+  token: string | null;
+  isAuthenticated: boolean;
+  login: (user: User, token: string) => void;
+  logout: () => void;
+  updateUser: (updates: Partial<User>) => void;
+}
+
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set) => ({
+      user: null,
+      token: null,
+      isAuthenticated: false,
+      login: (user, token) => set({ user, token, isAuthenticated: true }),
+      logout: () => set({ user: null, token: null, isAuthenticated: false }),
+      updateUser: (updates) =>
+        set((state) => ({
+          user: state.user ? { ...state.user, ...updates } : null,
+        })),
+    }),
+    {
+      name: 'auth-storage',
+      storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({ user: state.user, token: state.token }),
+    }
+  )
+);
+```
+
+## React Hook Form + Zod Pattern
+
+```typescript
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+
+const LoginSchema = z.object({
+  email: z.string().email('请输入有效的邮箱地址'),
+  password: z.string().min(8, '密码至少8位'),
+});
+
+type LoginForm = z.infer<typeof LoginSchema>;
+
+export function LoginForm() {
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginForm>({
+    resolver: zodResolver(LoginSchema),
+  });
+
+  const onSubmit = async (data: LoginForm) => {
+    try {
+      await authService.login(data);
+    } catch (error) {
+      console.error('[LoginForm] 登录失败:', error);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <input {...register('email')} />
+      {errors.email && <span>{errors.email.message}</span>}
+      <button type="submit" disabled={isSubmitting}>
+        {isSubmitting ? '登录中...' : '登录'}
+      </button>
+    </form>
+  );
+}
+```
+
+## Error Handling Patterns
+
+```typescript
+// Error Boundary
+import { Component, ErrorInfo, ReactNode } from 'react';
+
+interface Props {
+  children: ReactNode;
+  fallback?: ReactNode;
+}
+
+interface State {
+  hasError: boolean;
+  error?: Error;
+}
+
+export class ErrorBoundary extends Component<Props, State> {
+  state: State = { hasError: false };
+
+  static getDerivedStateFromError(error: Error): State {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error('[ErrorBoundary] 未捕获错误:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback ?? <div>出错了，请刷新页面</div>;
+    }
+    return this.props.children;
+  }
+}
+```
+
+## File Naming Conventions
+
+- Components: `PascalCase.tsx` (e.g., `UserCard.tsx`)
+- Hooks: `use[Name].ts` (e.g., `useUsers.ts`)
+- Services: `camelCase.ts` (e.g., `userService.ts`)
+- Stores: `[name]Store.ts` (e.g., `authStore.ts`)
+- Types: `camelCase.ts` or `types.ts`
+- Tests: `[Component].test.tsx`
+
+## What Cursor Should Do
+
+- Generate functional components with TypeScript interfaces
+- Suggest React Query for all server state management
+- Suggest Zustand for client-only global state
+- Auto-import from correct paths
+- Generate proper error boundaries
+- Suggest `useCallback` and `useMemo` where appropriate
+- Generate Zod schemas for form validation
+- Suggest proper loading and error states in components
+
+## What Cursor Should Avoid
+
+- Do NOT use class components
+- Do NOT use `any` type — suggest proper typing
+- Do NOT use `useEffect` for data fetching — use React Query
+- Do NOT use Redux for new projects — suggest Zustand
+- Do NOT mutate state directly — always use setter functions
+- Do NOT use inline functions in JSX for performance-critical paths
+- Do NOT ignore TypeScript errors — fix them properly

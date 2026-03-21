@@ -1,0 +1,346 @@
+You are an expert in HTML, Tailwind CSS, TypeScript, Next.js, landing page conversion optimization, SEO, and web performance.
+
+# Project Type
+This is a landing page / marketing site built with Next.js App Router, Tailwind CSS, and conversion-rate optimization best practices.
+
+## Tech Stack
+- Next.js 14+ (App Router)
+- TypeScript
+- Tailwind CSS v3+
+- Framer Motion for animations
+- next/image for optimized images
+- next/font for optimized fonts
+- Shadcn UI components
+
+## Landing Page Structure
+
+```
+app/
+  page.tsx                  # Main landing page
+  layout.tsx                # Root layout with meta
+  (sections)/               # Route group for page sections
+components/
+  sections/
+    Hero.tsx
+    Features.tsx
+    SocialProof.tsx
+    Pricing.tsx
+    FAQ.tsx
+    CTA.tsx
+    Footer.tsx
+  ui/
+    Button.tsx
+    Badge.tsx
+    Card.tsx
+    AnimatedCounter.tsx
+  common/
+    Navigation.tsx
+    MobileMenu.tsx
+```
+
+## Hero Section Pattern
+
+```tsx
+// components/sections/Hero.tsx
+import { ArrowRight, Star } from 'lucide-react';
+import Link from 'next/link';
+import Image from 'next/image';
+
+export function Hero() {
+  return (
+    <section className="relative overflow-hidden bg-gradient-to-b from-white to-gray-50 pt-16 pb-24 sm:pt-24 sm:pb-32">
+      {/* Background decoration */}
+      <div className="absolute inset-0 -z-10">
+        <div className="absolute top-0 right-0 h-96 w-96 rounded-full bg-blue-100 opacity-50 blur-3xl" />
+        <div className="absolute bottom-0 left-0 h-64 w-64 rounded-full bg-purple-100 opacity-50 blur-3xl" />
+      </div>
+
+      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+        {/* Social proof badge */}
+        <div className="mb-8 flex justify-center">
+          <div className="flex items-center gap-2 rounded-full bg-blue-50 px-4 py-1.5 text-sm text-blue-700 ring-1 ring-blue-200">
+            <Star className="h-3.5 w-3.5 fill-current" />
+            <span>4.9/5 rating from 2,000+ users</span>
+          </div>
+        </div>
+
+        {/* Headline */}
+        <div className="mx-auto max-w-4xl text-center">
+          <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl lg:text-6xl">
+            Ship your{' '}
+            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              SaaS 10x faster
+            </span>{' '}
+            with our boilerplate
+          </h1>
+          <p className="mt-6 text-xl leading-8 text-gray-600 max-w-2xl mx-auto">
+            Stop wasting weeks on auth, payments, and infrastructure. Get a
+            production-ready Next.js template with everything you need to launch.
+          </p>
+        </div>
+
+        {/* CTA Buttons */}
+        <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+          <Link
+            href="/checkout"
+            className="inline-flex items-center gap-2 rounded-full bg-blue-600 px-8 py-3.5 text-base font-semibold text-white shadow-sm transition-all hover:bg-blue-700 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+          >
+            Get started today
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+          <Link
+            href="#demo"
+            className="inline-flex items-center gap-2 text-base font-semibold text-gray-900 hover:text-blue-600"
+          >
+            Watch demo
+            <span aria-hidden="true">→</span>
+          </Link>
+        </div>
+
+        {/* Trust signals */}
+        <p className="mt-4 text-center text-sm text-gray-500">
+          No subscription. One-time payment. Lifetime updates.
+        </p>
+      </div>
+    </section>
+  );
+}
+```
+
+## Social Proof Section
+
+```tsx
+// components/sections/SocialProof.tsx
+const TESTIMONIALS = [
+  {
+    quote: "This boilerplate saved me 3 weeks of setup time. Launched my SaaS in record time.",
+    author: "Sarah Chen",
+    role: "Founder at DataPulse",
+    avatar: "/avatars/sarah.jpg",
+    company: "DataPulse",
+  },
+  // ...more testimonials
+] as const;
+
+export function SocialProof() {
+  return (
+    <section className="py-24 bg-gray-50">
+      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+        <div className="mx-auto max-w-xl text-center">
+          <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+            Loved by indie hackers worldwide
+          </h2>
+          <p className="mt-4 text-lg text-gray-600">
+            Join 500+ makers who shipped faster with our template
+          </p>
+        </div>
+
+        {/* Stats */}
+        <dl className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-3 lg:mx-0 lg:max-w-none">
+          {[
+            { value: '500+', label: 'Happy customers' },
+            { value: '4.9/5', label: 'Average rating' },
+            { value: '3 weeks', label: 'Avg time saved' },
+          ].map((stat) => (
+            <div key={stat.label} className="flex flex-col items-center text-center">
+              <dt className="text-4xl font-bold text-blue-600">{stat.value}</dt>
+              <dd className="mt-1 text-sm text-gray-500">{stat.label}</dd>
+            </div>
+          ))}
+        </dl>
+
+        {/* Testimonial cards */}
+        <div className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-6 sm:grid-cols-2 lg:max-w-none lg:grid-cols-3">
+          {TESTIMONIALS.map((t) => (
+            <figure key={t.author} className="rounded-2xl bg-white p-8 shadow-sm ring-1 ring-gray-200">
+              <blockquote className="text-gray-700">
+                <p>"{t.quote}"</p>
+              </blockquote>
+              <figcaption className="mt-6 flex items-center gap-x-4">
+                <Image src={t.avatar} alt={t.author} width={40} height={40} className="rounded-full" />
+                <div>
+                  <div className="font-semibold text-gray-900">{t.author}</div>
+                  <div className="text-sm text-gray-500">{t.role}</div>
+                </div>
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+```
+
+## SEO Metadata Pattern
+
+```typescript
+// app/layout.tsx
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: {
+    template: '%s | YourProduct',
+    default: 'YourProduct — Ship SaaS 10x Faster',
+  },
+  description: 'Production-ready Next.js boilerplate with auth, payments, and analytics built in. Launch your SaaS in days, not weeks.',
+  keywords: ['nextjs', 'saas', 'boilerplate', 'starter', 'template'],
+  authors: [{ name: 'Your Name', url: 'https://yoursite.com' }],
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://yourproduct.com',
+    siteName: 'YourProduct',
+    title: 'YourProduct — Ship SaaS 10x Faster',
+    description: 'Production-ready Next.js boilerplate...',
+    images: [{ url: '/og-image.png', width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'YourProduct',
+    description: 'Production-ready Next.js boilerplate...',
+    images: ['/og-image.png'],
+    creator: '@yourhandle',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+};
+```
+
+## Performance Optimization
+
+```tsx
+// Optimized Image usage
+import Image from 'next/image';
+
+// Hero image — above fold, high priority
+<Image
+  src="/hero.png"
+  alt="Product screenshot showing dashboard"
+  width={1200}
+  height={800}
+  priority           // LCP image — load immediately
+  className="rounded-lg shadow-2xl"
+/>
+
+// Below-fold images — lazy load by default
+<Image
+  src="/feature-screenshot.png"
+  alt="Feature screenshot"
+  width={600}
+  height={400}
+  // no priority — lazy by default
+/>
+```
+
+## FAQ Accordion Pattern
+
+```tsx
+// components/sections/FAQ.tsx
+'use client';
+import { useState } from 'react';
+import { ChevronDown } from 'lucide-react';
+
+const FAQS = [
+  { q: 'Is there a free trial?', a: 'No free trial, but we offer a 30-day money-back guarantee.' },
+  { q: 'What\'s included in the one-time payment?', a: 'Lifetime access to the template and all future updates.' },
+];
+
+export function FAQ() {
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+
+  return (
+    <section id="faq" className="py-24">
+      <div className="mx-auto max-w-3xl px-6">
+        <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
+          Frequently Asked Questions
+        </h2>
+        <dl className="divide-y divide-gray-200">
+          {FAQS.map((faq, index) => (
+            <div key={index} className="py-6">
+              <dt>
+                <button
+                  className="flex w-full items-start justify-between text-left"
+                  onClick={() => setOpenIndex(openIndex === index ? null : index)}
+                  aria-expanded={openIndex === index}
+                >
+                  <span className="text-lg font-semibold text-gray-900">{faq.q}</span>
+                  <ChevronDown
+                    className={`ml-6 h-6 w-6 text-gray-400 transition-transform ${openIndex === index ? 'rotate-180' : ''}`}
+                  />
+                </button>
+              </dt>
+              {openIndex === index && (
+                <dd className="mt-3 text-gray-600">{faq.a}</dd>
+              )}
+            </div>
+          ))}
+        </dl>
+      </div>
+    </section>
+  );
+}
+```
+
+## CTA Section Pattern
+
+```tsx
+export function CTA() {
+  return (
+    <section className="bg-blue-600 py-16 sm:py-24">
+      <div className="mx-auto max-w-7xl px-6 lg:px-8 text-center">
+        <h2 className="text-3xl font-bold text-white sm:text-4xl">
+          Ready to ship your SaaS?
+        </h2>
+        <p className="mt-4 text-lg text-blue-100">
+          Join 500+ makers. One-time payment. Lifetime updates.
+        </p>
+        <div className="mt-10">
+          <a
+            href="/checkout"
+            className="rounded-full bg-white px-8 py-3.5 text-base font-semibold text-blue-600 shadow-sm hover:bg-blue-50"
+          >
+            Get the template — $97
+          </a>
+        </div>
+        <p className="mt-4 text-sm text-blue-200">30-day money-back guarantee · No questions asked</p>
+      </div>
+    </section>
+  );
+}
+```
+
+## File Naming Conventions
+
+- Sections: `PascalCase.tsx` in `components/sections/`
+- Pages: `page.tsx` (Next.js convention)
+- Static data: co-locate with component or in `data/[name].ts`
+
+## What Cursor Should Do
+
+- Add `priority` to hero images (LCP optimization)
+- Generate Open Graph metadata for all pages
+- Use semantic HTML (section, article, figure, figcaption, dl/dt/dd)
+- Add ARIA labels and roles for accessibility
+- Implement Schema.org structured data for products
+- Use `next/font` for Google Fonts
+- Generate CTA with clear value propositions
+
+## What Cursor Should Avoid
+
+- Do NOT use `<img>` — use `next/image`
+- Do NOT use Google Fonts CDN — use `next/font`
+- Do NOT use Lorem Ipsum — suggest real placeholder content
+- Do NOT use generic button text ("Click here") — use action verbs
+- Do NOT skip mobile optimization — always use responsive Tailwind classes
+- Do NOT forget `alt` text on all images
+- Do NOT use `target="_blank"` without `rel="noopener noreferrer"`

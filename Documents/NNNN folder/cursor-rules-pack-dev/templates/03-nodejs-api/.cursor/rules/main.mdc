@@ -1,0 +1,23 @@
+---
+description: Node.js REST API rules — layered architecture, Zod validation, security
+alwaysApply: true
+---
+
+# Node.js API Rules
+
+## Layers (strict separation)
+Controller → Service → Repository → Database
+
+## Validation
+Zod schema on every request. Reject early, before service layer.
+
+## Error Response Shape
+```json
+{ "error": { "code": "VALIDATION_ERROR", "message": "...", "details": [] } }
+```
+
+## Security checklist per endpoint
+- Auth middleware applied?
+- Input validated with Zod?
+- No sensitive data in logs?
+- Rate limit configured?
