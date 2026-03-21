@@ -37,22 +37,28 @@ export function PublicNavbar() {
       <header
         className={`animate-slide-down sticky top-0 z-50 border-b transition-all duration-300 ${
           scrolled
-            ? 'border-zinc-200/70 bg-white/80 shadow-[0_18px_48px_-28px_rgba(24,24,27,0.45)] backdrop-blur-sm'
-            : 'border-zinc-200/40 bg-white/72 backdrop-blur-sm'
+            ? 'border-slate-200/80 bg-[rgba(248,250,252,0.88)] shadow-[0_20px_50px_-34px_rgba(15,23,42,0.22)] backdrop-blur-md'
+            : 'border-slate-200/60 bg-[rgba(248,250,252,0.76)] backdrop-blur-md'
         }`}
       >
         <nav aria-label="Primary" className="container flex h-20 items-center justify-between gap-6">
           <Link
             href="/"
-            className="group flex items-center gap-3 rounded-full border border-zinc-200/70 bg-white/80 px-3 py-2 shadow-[0_16px_40px_-28px_rgba(59,130,246,0.28)] transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-[0_24px_44px_-24px_rgba(59,130,246,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+            className="group flex items-center gap-3 rounded-2xl border border-slate-200/80 bg-white px-3.5 py-2.5 shadow-[0_18px_40px_-30px_rgba(15,23,42,0.22)] transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-[0_24px_48px_-28px_rgba(59,130,246,0.24)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
           >
-            <span className="relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-2xl bg-blue-600 shadow-[0_14px_30px_-18px_rgba(59,130,246,0.6)]">
+            <span className="relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-[1.1rem] bg-[#0B1220] shadow-[0_18px_34px_-22px_rgba(11,18,32,0.6)]">
               <svg width="20" height="20" viewBox="0 0 14 14" fill="none" aria-hidden="true">
                 <path d="M2 4h4v4H2V4zm6 2h4v4H8V6z" fill="white" />
               </svg>
+              <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-teal-400" />
             </span>
-            <span className="text-lg font-black tracking-[-0.04em] text-zinc-950 transition-colors group-hover:text-blue-600">
-              RelayOps
+            <span className="flex flex-col leading-none">
+              <span className="font-display text-lg font-bold tracking-[-0.05em] text-slate-950 transition-colors group-hover:text-blue-600">
+                RelayOps
+              </span>
+              <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">
+                Agency Delivery OS
+              </span>
             </span>
           </Link>
 
@@ -61,7 +67,7 @@ export function PublicNavbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="group relative inline-flex min-h-[44px] items-center rounded-md text-sm font-semibold tracking-[-0.01em] text-zinc-600 transition-colors hover:text-zinc-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-4"
+                className="group relative inline-flex min-h-[44px] items-center rounded-md text-sm font-semibold tracking-[-0.01em] text-slate-600 transition-colors hover:text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-4"
               >
                 {link.label}
                 <span className="absolute inset-x-0 bottom-1.5 h-px origin-left scale-x-0 bg-blue-500 transition-transform duration-300 group-hover:scale-x-100" />
@@ -74,14 +80,14 @@ export function PublicNavbar() {
               asChild
               variant="ghost"
               size="sm"
-              className="min-h-[44px] rounded-full px-4 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-950"
+              className="min-h-[44px] rounded-full px-4 text-slate-600 hover:bg-slate-100 hover:text-slate-950"
             >
               <Link href="/login">{t('login')}</Link>
             </Button>
             <Button
               asChild
               size="sm"
-              className="min-h-[44px] rounded-full border border-blue-600/40 bg-blue-600 px-5 text-white shadow-sm shadow-[0_18px_38px_-20px_rgba(37,99,235,0.55)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-blue-700 hover:shadow-[0_0_0_1px_rgba(37,99,235,0.18),0_22px_44px_-18px_rgba(37,99,235,0.72)]"
+              className="min-h-[44px] rounded-full border border-blue-600/30 bg-blue-600 px-5 text-white shadow-[0_18px_34px_-18px_rgba(59,130,246,0.52)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-blue-700 hover:shadow-[0_0_0_1px_rgba(37,99,235,0.16),0_22px_44px_-18px_rgba(37,99,235,0.64)]"
             >
               <Link href="/request-access">
                 {t('requestAccess')}

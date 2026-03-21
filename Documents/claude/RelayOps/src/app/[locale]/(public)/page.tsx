@@ -23,30 +23,64 @@ export const metadata = createPublicMetadata(publicPageDefinitions.landing)
 
 const trustSignals = ['2-day SLA', '635 tests', 'SOC2-ready', 'White-label delivery']
 
+const deliveryBoardStats = [
+  {
+    label: 'Scope response',
+    value: '4h',
+    detail: 'Brief checked and locked before execution begins.',
+  },
+  {
+    label: 'Handoff quality',
+    value: 'QA gated',
+    detail: 'Every delivery is reviewed before it reaches your portal.',
+  },
+]
+
+const deliveryBoardRows = [
+  {
+    stage: 'Intake',
+    owner: 'Partner',
+    note: 'Files, constraints, and acceptance criteria verified',
+    status: 'Locked',
+  },
+  {
+    stage: 'Production',
+    owner: 'Admin',
+    note: 'Scope, turnaround, and QA path confirmed',
+    status: 'On track',
+  },
+  {
+    stage: 'Delivery',
+    owner: 'QA team',
+    note: 'Review-ready package prepared for agency handoff',
+    status: 'Ready',
+  },
+]
+
 const valueProps = [
   {
     icon: Shield,
     title: 'White-label by default',
     description:
-      'Deliver clean CRM imports under your agency name. RelayOps stays invisible while you keep the client relationship and margin.',
+      'RelayOps disappears behind your agency brand, so the client relationship, margin, and trust stay with your team.',
   },
   {
     icon: Clock,
-    title: '48-hour promise you can sell',
+    title: 'A 48-hour promise with teeth',
     description:
-      'Scope lock, QA, and delivery are designed around a 2-day SLA so your team stops absorbing CSV cleanup as unplanned work.',
+      'Turnaround is anchored to scope lock and QA, not hope. That makes the SLA sellable instead of risky.',
   },
   {
     icon: BarChart3,
-    title: 'Predictable margin on every brief',
+    title: 'Margin stays visible',
     description:
-      'Fixed-scope intake and admin review keep data prep from becoming open-ended consulting disguised as operations.',
+      'Fixed-scope intake keeps cleanup from mutating into open-ended consulting work your PM team has to absorb.',
   },
   {
     icon: CheckCircle,
-    title: 'QA before client handoff',
+    title: 'Review-ready before handoff',
     description:
-      'Each deliverable moves through review before it reaches your portal, so your PMs are not doing the final cleanup pass.',
+      'Your operators stop acting as the final QA layer. RelayOps sends work back in client-safe condition.',
   },
 ]
 
@@ -87,7 +121,7 @@ const proofMetrics = [
   { value: '98%', label: 'Partner Satisfaction' },
 ]
 
-const assuranceRows = [
+const proofChecks = [
   'Scope locked before production starts',
   'QA review before the handoff lands in your portal',
   'Secure data handling built for agency delivery teams',
@@ -95,41 +129,41 @@ const assuranceRows = [
 
 export default function LandingPage() {
   return (
-    <div className="flex flex-col bg-white">
-      <section className="relative overflow-hidden bg-zinc-950 text-white">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.34),transparent_34%),radial-gradient(circle_at_80%_20%,rgba(96,165,250,0.22),transparent_28%),linear-gradient(180deg,rgba(255,255,255,0.04),transparent)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:120px_120px] opacity-20" />
+    <div className="flex flex-col bg-[#f8fafc] text-slate-950">
+      <section className="relative overflow-hidden border-b border-slate-200 bg-[#f8fafc]">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.14),transparent_32%),radial-gradient(circle_at_82%_14%,rgba(20,184,166,0.12),transparent_22%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(148,163,184,0.11)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.11)_1px,transparent_1px)] bg-[size:120px_120px] opacity-30" />
 
         <div className="container relative py-20 md:py-28 lg:py-32">
-          <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
+          <div className="grid items-center gap-12 lg:grid-cols-[1.02fr_0.98fr]">
             <div
               data-reveal
               className="opacity-0 translate-y-6 transition-all duration-700 ease-out motion-reduce:translate-y-0 motion-reduce:opacity-100"
             >
-              <div className="inline-flex items-center gap-2 rounded-full border border-blue-400/30 bg-blue-500/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] text-blue-100 shadow-[0_28px_80px_-48px_rgba(59,130,246,0.75)] backdrop-blur-sm">
-                <span className="h-2 w-2 rounded-full bg-emerald-400" />
-                Revenue ops fulfillment for agency teams
+              <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-white px-4 py-2 shadow-[0_18px_40px_-30px_rgba(15,23,42,0.18)]">
+                <span className="h-2 w-2 rounded-full bg-teal-500" />
+                <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.24em] text-blue-700">
+                  Operational confidence for RevOps agencies
+                </span>
               </div>
 
-              <h1 className="mt-8 max-w-4xl text-5xl font-black tracking-[-0.08em] text-balance text-white md:text-7xl lg:text-[5.4rem] lg:leading-[0.94]">
-                Turn CRM cleanup into a{' '}
-                <span className="bg-gradient-to-r from-blue-300 via-white to-cyan-200 bg-clip-text text-transparent">
-                  48-hour promise
-                </span>{' '}
-                your agency can actually keep.
+              <h1 className="font-display mt-8 max-w-5xl text-5xl font-bold tracking-[-0.08em] text-balance text-slate-950 md:text-7xl lg:text-[5.3rem] lg:leading-[0.92]">
+                Build a{' '}
+                <span className="text-blue-600">48-hour delivery promise</span> on a system your
+                clients never see.
               </h1>
 
-              <p className="mt-6 max-w-2xl text-lg leading-8 text-zinc-300 md:text-xl">
-                RelayOps gives RevOps agencies a commercial-grade fulfillment layer for CRM data
-                cleanup, QA, and white-label delivery. You keep the client. We keep the work
-                scoped, reviewed, and moving.
+              <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600 md:text-xl">
+                RelayOps gives agencies a white-label production floor for CRM cleanup, QA, and
+                delivery handoff. You keep the relationship and the commercial upside. We keep the
+                work scoped, reviewed, and moving.
               </p>
 
               <div className="mt-8 flex flex-col gap-4 sm:flex-row">
                 <Button
                   asChild
                   size="lg"
-                  className="rounded-full border border-blue-600/50 bg-blue-600 px-7 text-white shadow-[0_24px_44px_-20px_rgba(37,99,235,0.72)] transition-all duration-300 hover:-translate-y-1 hover:bg-blue-700 hover:shadow-[0_34px_55px_-18px_rgba(37,99,235,0.82)]"
+                  className="rounded-full border border-blue-600/30 bg-blue-600 px-7 text-white shadow-[0_22px_44px_-22px_rgba(59,130,246,0.55)] transition-all duration-300 hover:-translate-y-1 hover:bg-blue-700 hover:shadow-[0_28px_52px_-20px_rgba(37,99,235,0.62)]"
                 >
                   <Link href="/request-access">
                     Request Access
@@ -139,7 +173,8 @@ export default function LandingPage() {
                 <Button
                   asChild
                   size="lg"
-                  className="rounded-full border border-white/15 bg-white/5 px-7 text-white shadow-[0_18px_40px_-24px_rgba(24,24,27,0.8)] transition-all duration-300 hover:-translate-y-1 hover:border-white/25 hover:bg-white/10 hover:shadow-[0_28px_44px_-22px_rgba(24,24,27,0.95)]"
+                  variant="outline"
+                  className="rounded-full border-slate-300 bg-white px-7 text-slate-900 shadow-[0_18px_42px_-28px_rgba(15,23,42,0.18)] transition-all duration-300 hover:-translate-y-1 hover:border-slate-400 hover:bg-slate-50"
                 >
                   <Link href="/how-it-works">
                     See the workflow
@@ -148,23 +183,23 @@ export default function LandingPage() {
                 </Button>
               </div>
 
-              <div className="mt-8 flex flex-wrap gap-3 text-sm text-zinc-300">
+              <div className="mt-8 flex flex-wrap gap-3 text-sm text-slate-600">
                 {trustSignals.map((item) => (
                   <div
                     key={item}
-                    className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 backdrop-blur-sm"
+                    className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 shadow-[0_14px_30px_-24px_rgba(15,23,42,0.16)]"
                   >
-                    <CheckCircle className="h-4 w-4 text-blue-300" />
+                    <CheckCircle className="h-4 w-4 text-teal-600" />
                     <span>{item}</span>
                   </div>
                 ))}
               </div>
 
               <div className="mt-10 grid gap-4 sm:grid-cols-3">
-                {assuranceRows.map((item) => (
+                {proofChecks.map((item) => (
                   <div
                     key={item}
-                    className="rounded-[1.5rem] border border-white/10 bg-white/5 px-5 py-5 text-sm leading-6 text-zinc-300 shadow-[0_24px_60px_-40px_rgba(15,23,42,0.85)] backdrop-blur-sm"
+                    className="rounded-[1.6rem] border border-slate-200 bg-white px-5 py-5 text-sm leading-6 text-slate-600 shadow-[0_20px_40px_-30px_rgba(15,23,42,0.14)]"
                   >
                     {item}
                   </div>
@@ -176,67 +211,63 @@ export default function LandingPage() {
               data-reveal
               className="opacity-0 translate-y-6 transition-all delay-150 duration-700 ease-out motion-reduce:translate-y-0 motion-reduce:opacity-100"
             >
-              <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/10 p-8 shadow-[0_40px_90px_-45px_rgba(59,130,246,0.45)] backdrop-blur-xl">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.22),transparent_42%)]" />
+              <div className="relative overflow-hidden rounded-[2rem] border border-[#0B1220] bg-[#0B1220] p-8 text-white shadow-[0_36px_90px_-52px_rgba(11,18,32,0.82)]">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.16),transparent_42%),radial-gradient(circle_at_85%_15%,rgba(20,184,166,0.14),transparent_26%)]" />
                 <div className="relative space-y-6">
-                  <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-start justify-between gap-4">
                     <div>
-                      <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-100">
-                        Delivery control room
+                      <p className="font-mono text-xs font-semibold uppercase tracking-[0.28em] text-blue-200">
+                        Live delivery board
                       </p>
-                      <p className="mt-2 text-sm text-zinc-300">
-                        The promise your account team makes is the operating system we optimize for.
+                      <p className="mt-3 max-w-md text-sm leading-6 text-slate-300">
+                        The commercial promise your account team sells is the operating system we
+                        optimize for.
                       </p>
                     </div>
-                    <div className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs font-semibold text-emerald-200">
-                      Live SLA path
+                    <div className="rounded-full border border-teal-400/20 bg-teal-400/10 px-3 py-1 text-xs font-semibold text-teal-200">
+                      2-day SLA path
                     </div>
                   </div>
 
                   <div className="grid gap-4 sm:grid-cols-2">
-                    <div className="rounded-[1.6rem] border border-white/10 bg-zinc-950/55 p-5">
-                      <p className="text-xs uppercase tracking-[0.24em] text-zinc-500">
-                        Scope response
-                      </p>
-                      <p className="mt-3 text-3xl font-black tracking-[-0.05em] text-white">
-                        4 hours
-                      </p>
-                      <p className="mt-2 text-sm leading-6 text-zinc-400">
-                        Admin review locks the brief before a worker ever touches it.
-                      </p>
-                    </div>
-                    <div className="rounded-[1.6rem] border border-white/10 bg-zinc-950/55 p-5">
-                      <p className="text-xs uppercase tracking-[0.24em] text-zinc-500">
-                        Delivery standard
-                      </p>
-                      <p className="mt-3 text-3xl font-black tracking-[-0.05em] text-white">
-                        2 days
-                      </p>
-                      <p className="mt-2 text-sm leading-6 text-zinc-400">
-                        Review-ready handoff built for agencies promising speed without rework.
-                      </p>
-                    </div>
+                    {deliveryBoardStats.map((item) => (
+                      <div
+                        key={item.label}
+                        className="rounded-[1.5rem] border border-white/10 bg-white/5 p-5"
+                      >
+                        <p className="font-mono text-[11px] uppercase tracking-[0.24em] text-slate-500">
+                          {item.label}
+                        </p>
+                        <p className="mt-3 font-display text-4xl font-bold tracking-[-0.05em] text-white">
+                          {item.value}
+                        </p>
+                        <p className="mt-2 text-sm leading-6 text-slate-400">{item.detail}</p>
+                      </div>
+                    ))}
                   </div>
 
-                  <div className="rounded-[1.75rem] border border-white/10 bg-gradient-to-br from-blue-500/14 to-white/5 p-6">
-                    <p className="text-xs font-semibold uppercase tracking-[0.24em] text-zinc-400">
-                      What stays under control
+                  <div className="rounded-[1.75rem] border border-white/10 bg-white/5 p-5">
+                    <p className="font-mono text-[11px] uppercase tracking-[0.24em] text-slate-500">
+                      Delivery sequence
                     </p>
                     <div className="mt-4 space-y-3">
-                      {[
-                        'Scope locked before execution',
-                        'Worker output reviewed against acceptance criteria',
-                        'Delivery notes ready for partner handoff',
-                        'No client-facing RelayOps branding',
-                      ].map((item) => (
+                      {deliveryBoardRows.map((row) => (
                         <div
-                          key={item}
-                          className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+                          key={row.stage}
+                          className="grid gap-3 rounded-[1.25rem] border border-white/10 bg-[#101a2d] px-4 py-4 md:grid-cols-[0.72fr_1.08fr_auto]"
                         >
-                          <span className="text-sm text-zinc-200">{item}</span>
-                          <span className="text-xs font-semibold uppercase tracking-[0.22em] text-blue-200">
-                            Included
-                          </span>
+                          <div>
+                            <p className="font-display text-lg font-semibold tracking-[-0.03em] text-white">
+                              {row.stage}
+                            </p>
+                            <p className="font-mono mt-1 text-[11px] uppercase tracking-[0.22em] text-slate-500">
+                              {row.owner}
+                            </p>
+                          </div>
+                          <p className="text-sm leading-6 text-slate-300">{row.note}</p>
+                          <div className="inline-flex h-fit items-center rounded-full bg-blue-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-blue-200">
+                            {row.status}
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -258,15 +289,15 @@ export default function LandingPage() {
             data-reveal
             className="max-w-2xl opacity-0 translate-y-6 transition-all duration-700 ease-out motion-reduce:translate-y-0 motion-reduce:opacity-100"
           >
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-600">
+            <p className="font-mono text-xs font-semibold uppercase tracking-[0.28em] text-blue-700">
               Customer value
             </p>
-            <h2 className="mt-5 text-4xl font-black tracking-[-0.06em] text-zinc-950 text-balance md:text-5xl">
-              Built to increase agency margin without adding more PM overhead.
+            <h2 className="font-display mt-5 text-4xl font-bold tracking-[-0.06em] text-slate-950 text-balance md:text-5xl">
+              Built for agencies selling certainty, not cleanup hours.
             </h2>
-            <p className="mt-5 max-w-xl text-lg leading-8 text-zinc-600">
-              RelayOps sells certainty, not generic cleanup labor. Each section of the delivery
-              system exists to help your team quote faster, deliver cleaner, and protect margin.
+            <p className="mt-5 max-w-xl text-lg leading-8 text-slate-600">
+              RelayOps should feel like an operating partner with commercial discipline, not a
+              generic back-office vendor. Each module on the homepage reinforces that promise.
             </p>
           </div>
 
@@ -277,16 +308,21 @@ export default function LandingPage() {
                 <div
                   key={item.title}
                   data-reveal
-                  className="rounded-[2rem] border border-zinc-200 bg-white p-6 opacity-0 translate-y-6 shadow-[0_18px_50px_-38px_rgba(15,23,42,0.32)] transition-all duration-300 ease-out hover:-translate-y-1 hover:border-blue-200 hover:shadow-[0_24px_65px_-34px_rgba(59,130,246,0.18)] motion-reduce:translate-y-0 motion-reduce:opacity-100"
+                  className="rounded-[1.9rem] border border-slate-200 bg-white p-6 opacity-0 translate-y-6 shadow-[0_18px_50px_-34px_rgba(15,23,42,0.18)] transition-all duration-300 ease-out hover:-translate-y-1 hover:border-blue-200 hover:shadow-[0_24px_60px_-30px_rgba(59,130,246,0.16)] motion-reduce:translate-y-0 motion-reduce:opacity-100"
                   style={{ transitionDelay: `${index * 100}ms` }}
                 >
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 ring-1 ring-blue-100">
-                    <Icon className="h-5 w-5" />
+                  <div className="flex items-center justify-between gap-4">
+                    <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500">
+                      Signal {index + 1}
+                    </span>
+                    <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] border border-slate-200 bg-slate-50 text-blue-600">
+                      <Icon className="h-5 w-5" />
+                    </div>
                   </div>
-                  <h3 className="mt-6 text-2xl font-bold tracking-[-0.03em] text-zinc-950">
+                  <h3 className="font-display mt-6 text-2xl font-semibold tracking-[-0.04em] text-slate-950">
                     {item.title}
                   </h3>
-                  <p className="mt-4 text-base leading-7 text-zinc-600">{item.description}</p>
+                  <p className="mt-4 text-base leading-7 text-slate-600">{item.description}</p>
                 </div>
               )
             })}
@@ -294,49 +330,60 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="relative overflow-hidden bg-blue-50 py-20 md:py-28">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.12),transparent_34%)]" />
+      <section className="relative overflow-hidden bg-[#E8EEF7] py-20 md:py-28">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.12),transparent_32%)]" />
         <div className="container relative">
-          <div
-            data-reveal
-            className="max-w-2xl opacity-0 translate-y-6 transition-all duration-700 ease-out motion-reduce:translate-y-0 motion-reduce:opacity-100"
-          >
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-700">
-              Workflow
-            </p>
-            <h2 className="mt-5 text-4xl font-black tracking-[-0.06em] text-zinc-950 text-balance md:text-5xl">
-              Partner to delivery, with a clean handoff at every stage.
-            </h2>
-            <p className="mt-5 max-w-2xl text-lg leading-8 text-zinc-600">
-              The homepage should sell operational control, not just labor. This flow makes the
-              commercial story visible in one scan.
-            </p>
-          </div>
+          <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
+            <div
+              data-reveal
+              className="opacity-0 translate-y-6 transition-all duration-700 ease-out motion-reduce:translate-y-0 motion-reduce:opacity-100"
+            >
+              <p className="font-mono text-xs font-semibold uppercase tracking-[0.28em] text-blue-700">
+                Workflow
+              </p>
+              <h2 className="font-display mt-5 text-4xl font-bold tracking-[-0.06em] text-slate-950 text-balance md:text-5xl">
+                Partner to delivery, with a clean handoff at every stage.
+              </h2>
+              <p className="mt-5 max-w-xl text-lg leading-8 text-slate-600">
+                The workflow has to read in one scan. Buyers should understand where ambiguity gets
+                removed and where quality gets enforced.
+              </p>
 
-          <div className="relative mt-14">
-            <div className="pointer-events-none absolute left-14 right-14 top-10 hidden h-px bg-gradient-to-r from-blue-200 via-blue-400 to-blue-200 xl:block" />
-            <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+              <div className="mt-8 rounded-[1.85rem] border border-slate-200 bg-[#0B1220] px-6 py-6 text-white shadow-[0_28px_70px_-44px_rgba(11,18,32,0.7)]">
+                <p className="font-mono text-[11px] uppercase tracking-[0.24em] text-teal-200">
+                  Commercial effect
+                </p>
+                <p className="mt-4 text-base leading-7 text-slate-300">
+                  Scope lock protects margin. Worker QA protects delivery quality. White-label
+                  handoff protects the agency relationship.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid gap-5 md:grid-cols-2">
               {workflowSteps.map((item, index) => {
                 const Icon = item.icon
                 return (
                   <div
                     key={item.title}
                     data-reveal
-                    className="relative rounded-[2rem] border border-blue-100 bg-white p-6 opacity-0 translate-y-6 shadow-[0_18px_50px_-34px_rgba(59,130,246,0.18)] transition-all duration-300 ease-out hover:-translate-y-1 hover:border-blue-200 hover:shadow-[0_24px_60px_-30px_rgba(59,130,246,0.22)] motion-reduce:translate-y-0 motion-reduce:opacity-100"
+                    className="relative rounded-[1.9rem] border border-slate-200 bg-white p-6 opacity-0 translate-y-6 shadow-[0_18px_50px_-34px_rgba(15,23,42,0.16)] transition-all duration-300 ease-out hover:-translate-y-1 hover:border-blue-200 hover:shadow-[0_24px_60px_-30px_rgba(59,130,246,0.16)] motion-reduce:translate-y-0 motion-reduce:opacity-100"
                     style={{ transitionDelay: `${index * 110}ms` }}
                   >
-                    <div className="flex items-center justify-between gap-4">
-                      <span className="text-sm font-black tracking-[0.22em] text-blue-700">
-                        {item.step}
-                      </span>
-                      <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-500 text-white shadow-[0_18px_38px_-22px_rgba(59,130,246,0.55)]">
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <span className="font-mono text-sm font-semibold uppercase tracking-[0.22em] text-blue-700">
+                          {item.step}
+                        </span>
+                        <h3 className="font-display mt-4 text-2xl font-semibold tracking-[-0.04em] text-slate-950">
+                          {item.title}
+                        </h3>
+                      </div>
+                      <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] bg-blue-50 text-blue-600 ring-1 ring-blue-100">
                         <Icon className="h-5 w-5" />
                       </div>
                     </div>
-                    <h3 className="mt-6 text-2xl font-bold tracking-[-0.03em] text-zinc-950">
-                      {item.title}
-                    </h3>
-                    <p className="mt-4 text-base leading-7 text-zinc-600">{item.description}</p>
+                    <p className="mt-4 text-base leading-7 text-slate-600">{item.description}</p>
                   </div>
                 )
               })}
@@ -345,23 +392,22 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="relative overflow-hidden bg-zinc-950 py-20 text-white md:py-28">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.24),transparent_30%),radial-gradient(circle_at_80%_80%,rgba(96,165,250,0.16),transparent_28%)]" />
-        <div className="container relative">
-          <div className="grid gap-10 lg:grid-cols-[0.92fr_1.08fr]">
+      <section className="bg-white py-20 md:py-28">
+        <div className="container">
+          <div className="grid gap-10 lg:grid-cols-[0.88fr_1.12fr]">
             <div
               data-reveal
               className="opacity-0 translate-y-6 transition-all duration-700 ease-out motion-reduce:translate-y-0 motion-reduce:opacity-100"
             >
-              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-200">
+              <p className="font-mono text-xs font-semibold uppercase tracking-[0.28em] text-blue-700">
                 Social proof
               </p>
-              <h2 className="mt-5 text-4xl font-black tracking-[-0.06em] text-white text-balance md:text-5xl">
+              <h2 className="font-display mt-5 text-4xl font-bold tracking-[-0.06em] text-slate-950 text-balance md:text-5xl">
                 Proof that feels commercial, not aspirational.
               </h2>
-              <p className="mt-5 max-w-xl text-lg leading-8 text-zinc-300">
-                This section exists to answer the buyer&apos;s real question: can RelayOps make my
-                delivery promise safer than keeping cleanup work in-house?
+              <p className="mt-5 max-w-xl text-lg leading-8 text-slate-600">
+                Buyers need to believe RelayOps makes delivery safer than keeping cleanup work
+                in-house. The proof stack answers that in metrics and in voice.
               </p>
 
               <div className="mt-10 grid gap-4 sm:grid-cols-3">
@@ -369,11 +415,13 @@ export default function LandingPage() {
                   <div
                     key={item.label}
                     data-reveal
-                    className="rounded-[1.6rem] border border-white/10 bg-white/5 px-5 py-5 opacity-0 translate-y-6 shadow-[0_22px_60px_-40px_rgba(15,23,42,0.85)] backdrop-blur-sm transition-all duration-300 ease-out motion-reduce:translate-y-0 motion-reduce:opacity-100"
+                    className="rounded-[1.6rem] border border-slate-200 bg-[#f8fafc] px-5 py-5 opacity-0 translate-y-6 shadow-[0_18px_45px_-32px_rgba(15,23,42,0.14)] transition-all duration-300 ease-out motion-reduce:translate-y-0 motion-reduce:opacity-100"
                     style={{ transitionDelay: `${index * 100}ms` }}
                   >
-                    <p className="text-4xl font-black tracking-[-0.06em] text-white">{item.value}</p>
-                    <p className="mt-2 text-sm text-zinc-400">{item.label}</p>
+                    <p className="font-display text-4xl font-bold tracking-[-0.06em] text-slate-950">
+                      {item.value}
+                    </p>
+                    <p className="mt-2 text-sm text-slate-500">{item.label}</p>
                   </div>
                 ))}
               </div>
@@ -383,13 +431,13 @@ export default function LandingPage() {
               data-reveal
               className="opacity-0 translate-y-6 transition-all delay-150 duration-700 ease-out motion-reduce:translate-y-0 motion-reduce:opacity-100"
             >
-              <div className="rounded-[2rem] border border-white/10 bg-white/6 p-8 shadow-[0_30px_80px_-48px_rgba(15,23,42,0.9)] backdrop-blur-sm">
+              <div className="rounded-[2rem] border border-[#0B1220] bg-[#0B1220] p-8 text-white shadow-[0_30px_80px_-48px_rgba(11,18,32,0.88)]">
                 <div className="flex items-center justify-between gap-4">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-200">
+                    <p className="font-mono text-xs font-semibold uppercase tracking-[0.28em] text-blue-200">
                       What partners say
                     </p>
-                    <p className="mt-2 text-sm text-zinc-400">
+                    <p className="mt-2 text-sm text-slate-400">
                       Placeholder proof block ready for real testimonials.
                     </p>
                   </div>
@@ -398,12 +446,12 @@ export default function LandingPage() {
                   </div>
                 </div>
 
-                <blockquote className="mt-8 text-2xl font-semibold leading-10 tracking-[-0.03em] text-white">
+                <blockquote className="font-display mt-8 text-2xl font-semibold leading-10 tracking-[-0.03em] text-white">
                   “RelayOps lets us promise fast CRM delivery without pulling senior operators into
                   another week of spreadsheet cleanup.”
                 </blockquote>
 
-                <div className="mt-8 rounded-[1.5rem] border border-white/10 bg-zinc-950/45 px-5 py-5 text-sm leading-6 text-zinc-300">
+                <div className="mt-8 rounded-[1.5rem] border border-white/10 bg-white/5 px-5 py-5 text-sm leading-6 text-slate-300">
                   Placeholder testimonial for launch. Swap in named partner proof when approved, but
                   the module structure, hierarchy, and metrics block are ready now.
                 </div>
@@ -413,28 +461,30 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="bg-white py-20 md:py-28">
+      <section className="bg-[#0B1220] py-20 text-white md:py-28">
         <div className="container">
           <div
             data-reveal
-            className="rounded-[2.25rem] border border-blue-200 bg-gradient-to-br from-blue-700 via-blue-600 to-cyan-700 px-8 py-10 text-center text-white opacity-0 translate-y-6 shadow-[0_30px_80px_-48px_rgba(37,99,235,0.55)] transition-all duration-700 ease-out motion-reduce:translate-y-0 motion-reduce:opacity-100 md:px-12 md:py-14"
+            className="rounded-[2.25rem] border border-white/10 bg-[linear-gradient(135deg,rgba(59,130,246,0.16),rgba(20,184,166,0.08))] px-8 py-10 opacity-0 translate-y-6 shadow-[0_30px_80px_-48px_rgba(11,18,32,0.72)] transition-all duration-700 ease-out motion-reduce:translate-y-0 motion-reduce:opacity-100 md:px-12 md:py-14"
           >
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-blue-50">
-              <Users className="h-3.5 w-3.5" />
-              Request access in under 2 minutes
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-2">
+              <Users className="h-3.5 w-3.5 text-teal-300" />
+              <span className="font-mono text-xs font-semibold uppercase tracking-[0.24em] text-blue-100">
+                Request access in under 2 minutes
+              </span>
             </div>
-            <h2 className="mx-auto mt-6 max-w-4xl text-4xl font-black tracking-[-0.06em] text-balance md:text-5xl">
+            <h2 className="font-display mt-6 max-w-4xl text-4xl font-bold tracking-[-0.06em] text-balance md:text-5xl">
               Give your agency a delivery engine that sells certainty instead of cleanup hours.
             </h2>
-            <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-blue-50/90">
-              If the homepage does its job, the next step should be obvious: open the application,
-              lock the fit, and start quoting work with more confidence.
+            <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-300">
+              The next step should be obvious: open the application, confirm fit, and start quoting
+              work with more confidence.
             </p>
-            <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
+            <div className="mt-8 flex flex-col gap-4 sm:flex-row">
               <Button
                 asChild
                 size="lg"
-                className="rounded-full border border-white/30 bg-white px-7 text-blue-700 shadow-[0_20px_42px_-24px_rgba(15,23,42,0.55)] transition-all duration-300 hover:-translate-y-1 hover:bg-blue-50 hover:text-blue-800"
+                className="rounded-full border border-blue-500/30 bg-blue-600 px-7 text-white shadow-[0_18px_38px_-20px_rgba(59,130,246,0.52)] transition-all duration-300 hover:-translate-y-1 hover:bg-blue-700"
               >
                 <Link href="/request-access">
                   Request Access
@@ -444,7 +494,8 @@ export default function LandingPage() {
               <Button
                 asChild
                 size="lg"
-                className="rounded-full border border-white/25 bg-transparent px-7 text-white shadow-[0_18px_40px_-24px_rgba(24,24,27,0.45)] transition-all duration-300 hover:-translate-y-1 hover:border-white/40 hover:bg-white/10"
+                variant="outline"
+                className="rounded-full border-white/20 bg-transparent px-7 text-white transition-all duration-300 hover:-translate-y-1 hover:border-white/35 hover:bg-white/10"
               >
                 <Link href="/pilot-sample">
                   <Lock className="mr-2 h-4 w-4" aria-hidden="true" />

@@ -169,20 +169,20 @@ function FeatureList({ features }: { features: Tier['features'] }) {
 
 export default function PricingPage() {
   return (
-    <div className="bg-white">
-      <section className="relative overflow-hidden bg-zinc-950 py-20 text-white md:py-28">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.24),transparent_28%),radial-gradient(circle_at_82%_18%,rgba(245,158,11,0.16),transparent_26%)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:120px_120px] opacity-20" />
+    <div className="bg-[#f8fafc]">
+      <section className="relative overflow-hidden border-b border-slate-200 bg-[#f8fafc] py-20 md:py-28">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.14),transparent_30%),radial-gradient(circle_at_82%_18%,rgba(20,184,166,0.1),transparent_24%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(148,163,184,0.11)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.11)_1px,transparent_1px)] bg-[size:120px_120px] opacity-25" />
 
         <div className="container relative">
           <div className="max-w-4xl">
-            <Badge className="rounded-full border border-blue-500/20 bg-white/10 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-200 hover:bg-white/10">
+            <Badge className="rounded-full border border-blue-200 bg-white px-4 py-2 font-mono text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-700 hover:bg-white">
               Pricing Strategy
             </Badge>
-            <h1 className="mt-6 max-w-[11ch] text-[2.85rem] font-black leading-[0.93] tracking-[-0.07em] sm:mt-8 sm:max-w-4xl sm:text-5xl md:text-7xl lg:leading-[0.96]">
+            <h1 className="font-display mt-6 max-w-[11ch] text-[2.85rem] font-bold leading-[0.93] tracking-[-0.08em] text-slate-950 sm:mt-8 sm:max-w-4xl sm:text-5xl md:text-7xl lg:leading-[0.94]">
               Placeholder pricing built to explain positioning before final commercial terms.
             </h1>
-            <p className="mt-5 max-w-3xl text-base leading-7 text-zinc-300 sm:mt-6 sm:text-lg sm:leading-8 md:text-xl">
+            <p className="mt-5 max-w-3xl text-base leading-7 text-slate-600 sm:mt-6 sm:text-lg sm:leading-8 md:text-xl">
               RelayOps is positioned as a structured operating model, not generic task labor. The
               page shows how the offer scales from a small team entry point to enterprise support.
             </p>
@@ -196,7 +196,7 @@ export default function PricingPage() {
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-700">
               Pricing tiers
             </p>
-            <h2 className="mt-5 text-3xl font-black tracking-[-0.06em] text-zinc-950 text-balance sm:text-4xl md:text-5xl">
+            <h2 className="font-display mt-5 text-3xl font-bold tracking-[-0.06em] text-zinc-950 text-balance sm:text-4xl md:text-5xl">
               Three ways to package the RelayOps operating model
             </h2>
           </div>
@@ -210,13 +210,17 @@ export default function PricingPage() {
                   key={tier.name}
                   className={`rounded-[2rem] border-zinc-200 shadow-[0_24px_70px_-42px_rgba(15,23,42,0.18)] ${
                     tier.featured
-                      ? 'relative border-blue-500/40 bg-zinc-950 text-white shadow-[0_34px_90px_-40px_rgba(59,130,246,0.35)]'
+                      ? 'relative border-blue-500/40 bg-[#0B1220] text-white shadow-[0_34px_90px_-40px_rgba(59,130,246,0.35)]'
                       : 'bg-white'
                   }`}
                 >
                   <CardHeader className="p-8">
                     <div className="flex items-center justify-between gap-4">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-600">
+                      <div
+                        className={`flex h-12 w-12 items-center justify-center rounded-2xl ${
+                          tier.featured ? 'bg-white/10 text-blue-200' : 'bg-blue-500/10 text-blue-600'
+                        }`}
+                      >
                         <Icon className="h-5 w-5" />
                       </div>
                       {tier.featured ? (
@@ -226,7 +230,7 @@ export default function PricingPage() {
                       ) : null}
                     </div>
                     <CardTitle
-                      className={`text-3xl font-black tracking-[-0.05em] ${
+                      className={`font-display text-3xl font-bold tracking-[-0.05em] ${
                         tier.featured ? 'text-white' : 'text-zinc-950'
                       }`}
                     >
@@ -244,7 +248,7 @@ export default function PricingPage() {
                   <CardContent className="space-y-8 p-8 pt-0">
                     <div className="space-y-2">
                       <p
-                        className={`text-4xl font-black tracking-[-0.06em] ${
+                        className={`font-display text-4xl font-bold tracking-[-0.06em] ${
                           tier.featured ? 'text-white' : 'text-zinc-950'
                         }`}
                       >
@@ -285,7 +289,7 @@ export default function PricingPage() {
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-700">
               Frequently Asked Questions
             </p>
-            <h2 className="mt-5 text-3xl font-black tracking-[-0.06em] text-zinc-950 text-balance sm:text-4xl md:text-5xl">
+            <h2 className="font-display mt-5 text-3xl font-bold tracking-[-0.06em] text-zinc-950 text-balance sm:text-4xl md:text-5xl">
               Frequently Asked Questions
             </h2>
           </div>
@@ -321,7 +325,7 @@ export default function PricingPage() {
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-700">
               Competitive positioning
             </p>
-            <h2 className="mt-5 text-3xl font-black tracking-[-0.06em] text-zinc-950 text-balance sm:text-4xl md:text-5xl">
+            <h2 className="font-display mt-5 text-3xl font-bold tracking-[-0.06em] text-zinc-950 text-balance sm:text-4xl md:text-5xl">
               How RelayOps stacks up against the alternatives
             </h2>
           </div>
@@ -388,11 +392,11 @@ export default function PricingPage() {
 
       <section className="pb-20 md:pb-28">
         <div className="container">
-          <div className="rounded-[2rem] border border-zinc-200 bg-zinc-950 px-6 py-8 text-white shadow-[0_30px_90px_-48px_rgba(15,23,42,0.82)] sm:px-8 sm:py-10 md:px-12">
+          <div className="rounded-[2rem] border border-[#0B1220] bg-[#0B1220] px-6 py-8 text-white shadow-[0_30px_90px_-48px_rgba(11,18,32,0.82)] sm:px-8 sm:py-10 md:px-12">
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-300">
               Ready to price the real version?
             </p>
-            <h2 className="mt-5 max-w-3xl text-3xl font-black tracking-[-0.06em] text-balance sm:text-4xl md:text-5xl">
+            <h2 className="font-display mt-5 max-w-3xl text-3xl font-bold tracking-[-0.06em] text-balance sm:text-4xl md:text-5xl">
               Use the placeholder model to frame value, then move the buyer into a real access conversation.
             </h2>
             <p className="mt-5 max-w-2xl text-base leading-7 text-zinc-300">

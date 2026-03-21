@@ -25,7 +25,7 @@ const caseStudies = [
     quote:
       '"This placeholder case study mirrors the kind of cleanup project that turns a reporting bottleneck into a repeatable weekly workflow."',
     icon: ShoppingBag,
-    accent: 'from-amber-500/20 via-amber-400/10 to-transparent',
+    accent: 'from-blue-500/14 via-blue-400/8 to-transparent',
     metrics: [
       { label: 'Data Volume', value: '4.2M rows', width: '84%' },
       { label: 'Delivery Time', value: '36 hours', width: '72%' },
@@ -43,7 +43,7 @@ const caseStudies = [
     quote:
       '"This placeholder scenario represents a clean handoff between legacy exports and a live SaaS revenue stack with no operational pause."',
     icon: Sparkles,
-    accent: 'from-sky-500/20 via-sky-400/10 to-transparent',
+    accent: 'from-teal-500/16 via-blue-400/8 to-transparent',
     metrics: [
       { label: 'Data Volume', value: '780K records', width: '68%' },
       { label: 'Delivery Time', value: '48 hours', width: '76%' },
@@ -61,7 +61,7 @@ const caseStudies = [
     quote:
       '"This placeholder engagement reflects the kind of high-trust data restructuring work required before an external audit or regulator review."',
     icon: ShieldCheck,
-    accent: 'from-emerald-500/20 via-emerald-400/10 to-transparent',
+    accent: 'from-slate-400/16 via-teal-400/8 to-transparent',
     metrics: [
       { label: 'Data Volume', value: '125K records', width: '58%' },
       { label: 'Delivery Time', value: '24 hours', width: '62%' },
@@ -72,20 +72,20 @@ const caseStudies = [
 
 export default function CaseStudiesPage() {
   return (
-    <div className="bg-white">
-      <section className="relative overflow-hidden bg-zinc-950 py-20 text-white md:py-28">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(180,83,9,0.22),transparent_30%),radial-gradient(circle_at_78%_20%,rgba(59,130,246,0.18),transparent_28%)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:120px_120px] opacity-20" />
+    <div className="bg-[#f8fafc]">
+      <section className="relative overflow-hidden border-b border-slate-200 bg-[#f8fafc] py-20 md:py-28">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.14),transparent_30%),radial-gradient(circle_at_78%_20%,rgba(20,184,166,0.12),transparent_24%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(148,163,184,0.11)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.11)_1px,transparent_1px)] bg-[size:120px_120px] opacity-25" />
 
         <div className="container relative">
           <div className="max-w-4xl">
-            <Badge className="rounded-full border border-amber-500/20 bg-white/10 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.28em] text-amber-200 hover:bg-white/10">
+            <Badge className="rounded-full border border-blue-200 bg-white px-4 py-2 font-mono text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-700 hover:bg-white">
               Placeholder Case Studies
             </Badge>
-            <h1 className="mt-8 text-5xl font-black tracking-[-0.08em] text-balance md:text-7xl lg:leading-[0.96]">
+            <h1 className="font-display mt-8 text-5xl font-bold tracking-[-0.08em] text-balance text-slate-950 md:text-7xl lg:leading-[0.94]">
               Social proof for data work that has to land cleanly the first time.
             </h1>
-            <p className="mt-6 max-w-3xl text-lg leading-8 text-zinc-300 md:text-xl">
+            <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-600 md:text-xl">
               Three representative placeholder stories, shaped to feel like real delivery
               scenarios across ecommerce, SaaS, and financial operations.
             </p>
@@ -118,7 +118,7 @@ export default function CaseStudiesPage() {
                     </div>
 
                     <div className="mt-8 space-y-4">
-                      <h2 className="text-3xl font-black tracking-[-0.05em] text-zinc-950 md:text-4xl">
+                      <h2 className="font-display text-3xl font-bold tracking-[-0.05em] text-zinc-950 md:text-4xl">
                         {study.company}
                       </h2>
                       <p className="text-lg font-semibold text-zinc-800">{study.outcome}</p>
@@ -161,7 +161,7 @@ export default function CaseStudiesPage() {
                               </div>
                               <div className="h-2 overflow-hidden rounded-full bg-zinc-200">
                                 <div
-                                  className="h-full rounded-full bg-gradient-to-r from-blue-500 via-blue-400 to-amber-400"
+                                  className="h-full rounded-full bg-gradient-to-r from-blue-500 via-blue-400 to-teal-400"
                                   style={{ width: metric.width }}
                                 />
                               </div>
@@ -180,11 +180,11 @@ export default function CaseStudiesPage() {
 
       <section className="pb-20 md:pb-28">
         <div className="container">
-          <div className="rounded-[2rem] border border-zinc-200 bg-zinc-950 px-8 py-10 text-white shadow-[0_30px_90px_-48px_rgba(15,23,42,0.82)] md:px-12">
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-amber-300">
+          <div className="rounded-[2rem] border border-[#0B1220] bg-[#0B1220] px-8 py-10 text-white shadow-[0_30px_90px_-48px_rgba(11,18,32,0.82)] md:px-12">
+            <p className="font-mono text-xs font-semibold uppercase tracking-[0.28em] text-teal-200">
               Ready to create the real version?
             </p>
-            <h2 className="mt-5 max-w-3xl text-4xl font-black tracking-[-0.06em] text-balance md:text-5xl">
+            <h2 className="font-display mt-5 max-w-3xl text-4xl font-bold tracking-[-0.06em] text-balance md:text-5xl">
               Turn these placeholder stories into your next delivered client win.
             </h2>
             <p className="mt-5 max-w-2xl text-base leading-7 text-zinc-300">
@@ -195,7 +195,7 @@ export default function CaseStudiesPage() {
               <Button
                 asChild
                 size="lg"
-                className="rounded-full border border-amber-500/30 bg-amber-600 px-7 text-white shadow-[0_24px_50px_-24px_rgba(245,158,11,0.6)] transition-all duration-300 hover:-translate-y-1 hover:bg-amber-500"
+                className="rounded-full border border-blue-500/30 bg-blue-600 px-7 text-white shadow-[0_24px_50px_-24px_rgba(59,130,246,0.52)] transition-all duration-300 hover:-translate-y-1 hover:bg-blue-500"
               >
                 <Link href="/request-access">
                   Request Access

@@ -39,7 +39,16 @@ describe('LandingPage', () => {
 
     expect(screen.getByText(/635 tests/i)).toBeInTheDocument()
     expect(screen.getByText(/SOC2-ready/i)).toBeInTheDocument()
+    expect(screen.getByText(/operational confidence for revops agencies/i)).toBeInTheDocument()
     expect(screen.getAllByRole('link', { name: /request access/i }).length).toBeGreaterThan(0)
+  })
+
+  it('renders the hero delivery board proof module', () => {
+    render(<LandingPage />)
+
+    expect(screen.getByText(/live delivery board/i)).toBeInTheDocument()
+    expect(screen.getByText(/scope response/i)).toBeInTheDocument()
+    expect(screen.getByText(/handoff quality/i)).toBeInTheDocument()
   })
 
   it('renders the partner-to-delivery workflow', () => {

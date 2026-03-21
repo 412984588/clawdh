@@ -47,7 +47,7 @@ const demoSteps: DemoStep[] = [
     summary:
       'A partner captures the brief, data source, acceptance criteria, and expected delivery in a single structured intake.',
     outcome: 'The request becomes a scoping-ready job instead of an email thread.',
-    accent: 'from-sky-500/20 via-sky-400/10 to-transparent',
+    accent: 'from-blue-500/14 via-teal-400/8 to-transparent',
     detailTitle: 'Structured intake replaces messy back-and-forth',
     detailBody:
       'The partner flow turns an unclear cleanup request into a scoped ticket with context, files, and approval criteria already attached.',
@@ -80,7 +80,7 @@ const demoSteps: DemoStep[] = [
     summary:
       'Ops reviews the brief, locks scope, applies pricing, and moves the job into a predictable delivery lane.',
     outcome: 'Pricing, SLA, and scope are explicit before execution starts.',
-    accent: 'from-amber-500/20 via-amber-400/10 to-transparent',
+    accent: 'from-slate-400/18 via-blue-400/8 to-transparent',
     detailTitle: 'The admin view converts requests into executable work',
     detailBody:
       'Admins validate fit, identify the right pricing tier, and turn the intake into a delivery package with commercial clarity.',
@@ -113,7 +113,7 @@ const demoSteps: DemoStep[] = [
     summary:
       'The assigned operator works from a clear brief, processes the dataset, and records output against the agreed acceptance criteria.',
     outcome: 'Execution happens against the same spec the partner approved.',
-    accent: 'from-emerald-500/20 via-emerald-400/10 to-transparent',
+    accent: 'from-teal-500/16 via-blue-400/8 to-transparent',
     detailTitle: 'Execution is guided by a fixed delivery contract',
     detailBody:
       'Workers see what to clean, how to structure the output, and what proof is needed before the job can move to review.',
@@ -146,7 +146,7 @@ const demoSteps: DemoStep[] = [
     summary:
       'The partner reviews the delivered package, validates the outcome, and closes the job or requests a revision with context.',
     outcome: 'Acceptance is auditable and tied to the original delivery criteria.',
-    accent: 'from-violet-500/20 via-violet-400/10 to-transparent',
+    accent: 'from-slate-300/18 via-teal-400/8 to-transparent',
     detailTitle: 'Delivery review closes the loop with visible proof',
     detailBody:
       'The final handoff makes it easy to compare the delivered output against the approved scope and decide whether to accept or revise.',
@@ -174,9 +174,9 @@ const demoSteps: DemoStep[] = [
 ]
 
 const roleStyles = {
-  Partner: 'border-sky-500/20 bg-sky-500/10 text-sky-200',
-  Admin: 'border-amber-500/20 bg-amber-500/10 text-amber-200',
-  Worker: 'border-emerald-500/20 bg-emerald-500/10 text-emerald-200',
+  Partner: 'border-blue-200 bg-blue-50 text-blue-700',
+  Admin: 'border-slate-300 bg-slate-100 text-slate-700',
+  Worker: 'border-teal-200 bg-teal-50 text-teal-700',
 } as const
 
 const roleIcons = {
@@ -227,7 +227,7 @@ function MockDashboardPreview({ step }: { step: DemoStep }) {
               {panel.label}
             </p>
             <div className="mt-3 h-2 w-full rounded-full bg-zinc-200">
-              <div className="h-full w-2/3 rounded-full bg-gradient-to-r from-blue-500 to-amber-400" />
+              <div className="h-full w-2/3 rounded-full bg-gradient-to-r from-blue-500 to-teal-400" />
             </div>
             <p className="mt-3 text-sm leading-6 text-zinc-700">{panel.value}</p>
           </div>
@@ -239,20 +239,20 @@ function MockDashboardPreview({ step }: { step: DemoStep }) {
 
 export default function DemoPage() {
   return (
-    <div className="bg-white">
-      <section className="relative overflow-hidden bg-zinc-950 py-20 text-white md:py-28">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.24),transparent_30%),radial-gradient(circle_at_80%_20%,rgba(245,158,11,0.16),transparent_28%)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:120px_120px] opacity-20" />
+    <div className="bg-[#f8fafc]">
+      <section className="relative overflow-hidden border-b border-slate-200 bg-[#f8fafc] py-20 md:py-28">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.14),transparent_30%),radial-gradient(circle_at_80%_20%,rgba(20,184,166,0.1),transparent_24%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(148,163,184,0.11)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.11)_1px,transparent_1px)] bg-[size:120px_120px] opacity-25" />
 
         <div className="container relative">
           <div className="max-w-4xl">
-            <Badge className="rounded-full border border-blue-500/20 bg-white/10 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-200 hover:bg-white/10">
+            <Badge className="rounded-full border border-blue-200 bg-white px-4 py-2 font-mono text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-700 hover:bg-white">
               Interactive Product Demo
             </Badge>
-            <h1 className="mt-8 text-5xl font-black tracking-[-0.08em] text-balance md:text-7xl lg:leading-[0.96]">
+            <h1 className="font-display mt-8 text-5xl font-bold tracking-[-0.08em] text-balance text-slate-950 md:text-7xl lg:leading-[0.94]">
               Show the RelayOps workflow without opening the real dashboard.
             </h1>
-            <p className="mt-6 max-w-3xl text-lg leading-8 text-zinc-300 md:text-xl">
+            <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-600 md:text-xl">
               Walk prospects through the exact sequence from intake to approval using a lightweight,
               public-facing demo built from styled interface placeholders.
             </p>
@@ -265,20 +265,20 @@ export default function DemoPage() {
               return (
                 <div
                   key={step.value}
-                  className={`rounded-[1.75rem] border border-white/10 bg-gradient-to-br ${step.accent} px-5 py-5 shadow-[0_22px_60px_-40px_rgba(15,23,42,0.65)] backdrop-blur-sm`}
+                  className={`rounded-[1.75rem] border border-slate-200 bg-gradient-to-br ${step.accent} px-5 py-5 shadow-[0_22px_60px_-40px_rgba(15,23,42,0.18)]`}
                 >
                   <div className="flex items-center justify-between gap-3">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/10 text-white">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#0B1220] text-white shadow-[0_16px_34px_-20px_rgba(11,18,32,0.72)]">
                       <Icon className="h-5 w-5" />
                     </div>
-                    <span className="text-[11px] font-semibold uppercase tracking-[0.28em] text-zinc-300">
+                    <span className="text-[11px] font-semibold uppercase tracking-[0.28em] text-slate-500">
                       Step {index + 1}
                     </span>
                   </div>
-                  <p className="mt-5 text-lg font-bold tracking-[-0.03em] text-white">
+                  <p className="font-display mt-5 text-lg font-bold tracking-[-0.03em] text-slate-950">
                     {step.title}
                   </p>
-                  <p className="mt-2 text-sm leading-6 text-zinc-300">{step.summary}</p>
+                  <p className="mt-2 text-sm leading-6 text-slate-600">{step.summary}</p>
                 </div>
               )
             })}
@@ -289,12 +289,12 @@ export default function DemoPage() {
       <section className="py-16 md:py-24">
         <div className="container">
           <Tabs defaultValue={demoSteps[0].value} className="space-y-8">
-            <TabsList className="grid h-auto grid-cols-1 gap-2 rounded-[1.5rem] bg-zinc-100 p-2 md:grid-cols-4">
+            <TabsList className="grid h-auto grid-cols-1 gap-2 rounded-[1.5rem] bg-[#E8EEF7] p-2 md:grid-cols-4">
               {demoSteps.map((step) => (
                 <TabsTrigger
                   key={step.value}
                   value={step.value}
-                  className="min-h-[64px] rounded-[1.1rem] px-4 py-4 text-left data-[state=active]:shadow-[0_18px_48px_-34px_rgba(15,23,42,0.24)]"
+                  className="min-h-[64px] rounded-[1.1rem] border border-transparent px-4 py-4 text-left data-[state=active]:border-slate-200 data-[state=active]:bg-white data-[state=active]:shadow-[0_18px_48px_-34px_rgba(15,23,42,0.18)]"
                 >
                   <span className="flex flex-col gap-1">
                     <span className="text-[11px] font-semibold uppercase tracking-[0.24em] text-zinc-500">
@@ -324,7 +324,7 @@ export default function DemoPage() {
                         </div>
 
                         <div className="mt-8 space-y-4">
-                          <h2 className="text-3xl font-black tracking-[-0.05em] text-zinc-950 md:text-4xl">
+                          <h2 className="font-display text-3xl font-bold tracking-[-0.05em] text-zinc-950 md:text-4xl">
                             {step.detailTitle}
                           </h2>
                           <p className="text-base leading-7 text-zinc-700">{step.detailBody}</p>
@@ -372,11 +372,11 @@ export default function DemoPage() {
 
       <section className="pb-20 md:pb-28">
         <div className="container">
-          <div className="rounded-[2rem] border border-zinc-200 bg-zinc-950 px-8 py-10 text-white shadow-[0_30px_90px_-48px_rgba(15,23,42,0.82)] md:px-12">
+          <div className="rounded-[2rem] border border-[#0B1220] bg-[#0B1220] px-8 py-10 text-white shadow-[0_30px_90px_-48px_rgba(11,18,32,0.82)] md:px-12">
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-300">
               Turn the walkthrough into pipeline
             </p>
-            <h2 className="mt-5 max-w-3xl text-4xl font-black tracking-[-0.06em] text-balance md:text-5xl">
+            <h2 className="font-display mt-5 max-w-3xl text-4xl font-bold tracking-[-0.06em] text-balance md:text-5xl">
               Use the demo to explain the workflow, then open the partner application.
             </h2>
             <p className="mt-5 max-w-2xl text-base leading-7 text-zinc-300">
