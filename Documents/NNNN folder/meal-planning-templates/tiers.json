@@ -1,0 +1,33 @@
+{
+  "tiers": [
+    {
+      "id": "starter",
+      "price_usd": 14,
+      "zip_name": "meal-planning-templates-starter-v1.0.0.zip",
+      "templates": [
+        "01-weekly-meal-plan",
+        "02-grocery-list",
+        "03-meal-prep-guide",
+        "04-budget-meals",
+        "05-macro-tracker"
+      ]
+    },
+    {
+      "id": "pro",
+      "price_usd": 29,
+      "zip_name": "meal-planning-templates-pro-v1.0.0.zip",
+      "templates": [
+        "01-weekly-meal-plan",
+        "02-grocery-list",
+        "03-meal-prep-guide",
+        "04-budget-meals",
+        "05-macro-tracker",
+        "06-family-meals",
+        "07-30min-recipes",
+        "08-freezer-meals",
+        "09-seasonal-planner",
+        "10-pantry-inventory"
+      ]
+    }
+  ]
+}
