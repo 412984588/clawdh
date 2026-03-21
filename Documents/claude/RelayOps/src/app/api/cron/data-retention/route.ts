@@ -5,6 +5,7 @@ import { env } from '@/lib/config/env'
 import { timingSafeCompare } from '@/lib/utils/crypto'
 import { ALL_TERMINAL_STATUSES } from '@/lib/constants/ticket-statuses'
 import { logger } from '@/lib/utils/logger'
+import { triggerAlert } from '@/lib/utils/alerts'
 
 // Vercel Cron: 每天凌晨 2 点执行
 // 按保留规则删除过期附件记录
@@ -117,6 +118,13 @@ export async function GET(req: NextRequest) {
       })
       results.errors.push(storageError.message)
     }
+  }
+
+  // 结构化日志：cron 执行结果摘要
+  if (results.errors.length > 0) {
+    triggerAlert('cron_partial_failure', { cronJob: 'data-retention', ...results }, { context: 'cron-data-retention' })
+  } else {
+    triggerAlert('cron_completed', { cronJob: 'data-retention', ...results }, { context: 'cron-data-retention' })
   }
 
   // serverless 环境确保 Sentry 事件发送完毕

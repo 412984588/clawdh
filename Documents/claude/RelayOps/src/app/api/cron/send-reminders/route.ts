@@ -6,6 +6,7 @@ import * as templates from '@/lib/integrations/email/templates'
 import { env } from '@/lib/config/env'
 import { timingSafeCompare } from '@/lib/utils/crypto'
 import { logger } from '@/lib/utils/logger'
+import { triggerAlert } from '@/lib/utils/alerts'
 
 // Vercel Cron: 每 4 小时执行一次
 // 1. submitted_for_review 等待 24h / 72h → 向合作方发送审核提醒
@@ -295,6 +296,13 @@ export async function GET(req: NextRequest) {
       })
       results.errors.push(`sla reminder ${ticket.id}: ${message}`)
     }
+  }
+
+  // 结构化日志：cron 执行结果摘要
+  if (results.errors.length > 0) {
+    triggerAlert('cron_partial_failure', { cronJob: 'send-reminders', ...results }, { context: 'cron-send-reminders' })
+  } else {
+    triggerAlert('cron_completed', { cronJob: 'send-reminders', ...results }, { context: 'cron-send-reminders' })
   }
 
   // serverless 环境确保 Sentry 事件发送完毕

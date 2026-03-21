@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 // mock supabase middleware 和 admin client — 避免真实数据库调用
 vi.mock('@/lib/supabase/middleware', () => ({
   updateSession: vi.fn().mockResolvedValue({
-    supabaseResponse: { status: 200 },
+    supabaseResponse: { status: 200, headers: new Headers() },
     user: null,
   }),
 }))

@@ -18,6 +18,7 @@ describe('logger', () => {
   it('delegates info to console.info with context prefix', () => {
     const spy = vi.spyOn(console, 'info').mockImplementation(() => {})
     logger.info('hello', { context: 'test' })
+    // 开发环境：人类可读格式 [context] message
     expect(spy).toHaveBeenCalledWith('[test] hello', { context: 'test' })
   })
 
@@ -34,7 +35,7 @@ describe('logger', () => {
     expect(spy).toHaveBeenCalledWith('[webhook] caution', { context: 'webhook' })
     expect(Sentry.captureMessage).toHaveBeenCalledWith('caution', {
       level: 'warning',
-      extra: { context: 'webhook' },
+      extra: { context: 'webhook', traceId: undefined },
     })
   })
 
@@ -44,7 +45,7 @@ describe('logger', () => {
     expect(spy).toHaveBeenCalledWith('[payment] fail', { context: 'payment' })
     expect(Sentry.captureMessage).toHaveBeenCalledWith('fail', {
       level: 'error',
-      extra: { context: 'payment' },
+      extra: { context: 'payment', traceId: undefined },
     })
   })
 
@@ -53,7 +54,7 @@ describe('logger', () => {
     const err = new Error('db connection failed')
     logger.error('Database error', { context: 'db', error: err })
     expect(Sentry.captureException).toHaveBeenCalledWith(err, {
-      extra: { message: 'Database error', context: 'db', error: err },
+      extra: { message: 'Database error', context: 'db', error: err, traceId: undefined },
     })
     // captureMessage 不应被调用（走 captureException 分支）
     expect(Sentry.captureMessage).not.toHaveBeenCalled()
@@ -62,6 +63,24 @@ describe('logger', () => {
   it('uses "app" as default context when none provided', () => {
     const spy = vi.spyOn(console, 'info').mockImplementation(() => {})
     logger.info('no context')
-    expect(spy).toHaveBeenCalledWith('[app] no context', undefined)
+    expect(spy).toHaveBeenCalledWith('[app] no context')
+  })
+
+  it('includes traceId in output when provided', () => {
+    const spy = vi.spyOn(console, 'info').mockImplementation(() => {})
+    logger.info('traced', { context: 'test', traceId: 'abc-123' })
+    expect(spy).toHaveBeenCalledWith(
+      '[test] [abc-123] traced',
+      { context: 'test', traceId: 'abc-123' }
+    )
+  })
+
+  it('passes traceId to Sentry extra on warn', () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {})
+    logger.warn('traced warn', { context: 'test', traceId: 'trace-456' })
+    expect(Sentry.captureMessage).toHaveBeenCalledWith('traced warn', {
+      level: 'warning',
+      extra: { context: 'test', traceId: 'trace-456' },
+    })
   })
 })

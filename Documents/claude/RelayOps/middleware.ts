@@ -28,6 +28,10 @@ const ROLE_ROUTES: Record<string, string> = {
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname
 
+  // ── 请求追踪 ID（贯穿整个请求链路）──────────────────────────────────
+  const traceId = crypto.randomUUID()
+  request.headers.set('x-trace-id', traceId)
+
   // ── 限流检查（先于认证，fail-fast 减少资源消耗）──────────────────────
   const rateLimitConfig = getConfigForPath(pathname, request.method)
   if (rateLimitConfig) {
@@ -47,6 +51,7 @@ export async function middleware(request: NextRequest) {
             'X-RateLimit-Limit': String(rateLimitConfig.maxRequests),
             'X-RateLimit-Remaining': '0',
             'X-RateLimit-Reset': String(result.resetAt),
+            'x-trace-id': traceId,
           },
         }
       )
@@ -54,6 +59,9 @@ export async function middleware(request: NextRequest) {
   }
 
   const { supabaseResponse, user } = await updateSession(request)
+
+  // 在响应中附加 traceId（便于客户端/日志关联）
+  supabaseResponse.headers.set('x-trace-id', traceId)
 
   // Allow public routes
   if (PUBLIC_ROUTES.some((r) => pathname === r || pathname.startsWith(r + '/'))) {

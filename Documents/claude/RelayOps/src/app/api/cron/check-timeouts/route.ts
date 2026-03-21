@@ -7,6 +7,7 @@ import * as templates from '@/lib/integrations/email/templates'
 import { env } from '@/lib/config/env'
 import { timingSafeCompare } from '@/lib/utils/crypto'
 import { ALL_TERMINAL_STATUSES } from '@/lib/constants/ticket-statuses'
+import { triggerAlert } from '@/lib/utils/alerts'
 
 // Vercel Cron: 每小时执行一次
 // 1. invoiced 超过 7 天未付款 → expired（通过状态机引擎）+ 邮件通知
@@ -41,10 +42,11 @@ export async function GET(req: NextRequest) {
   const results = { expired: 0, overdue: 0, admin_closed: 0, emails_sent: 0, errors: [] as string[] }
 
   // 1. invoiced 工单超过 7 天未付款 → 通过引擎转移至 expired + 邮件通知
+  // 跳过正在支付重试中的工单（payment_retry_count > 0）
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
   const { data: invoicedTickets, error: invoicedTicketsError } = await supabase
     .from('tickets')
-    .select('id, title, organizations(name, users(email))')
+    .select('id, title, payment_retry_count, organizations(name, users(email))')
     .eq('status', 'invoiced')
     .lt('updated_at', sevenDaysAgo)
 
@@ -54,6 +56,11 @@ export async function GET(req: NextRequest) {
   }
 
   for (const ticket of invoicedTickets ?? []) {
+    // Skip tickets that are in payment retry
+    if (ticket.payment_retry_count && ticket.payment_retry_count > 0) {
+      continue
+    }
+
     try {
       const result = await transitionTicket(
         supabase,
@@ -158,6 +165,14 @@ export async function GET(req: NextRequest) {
       Sentry.captureException(e, { extra: { ticketId: ticket.id, phase: 'admin-close-transition' } })
       results.errors.push(String(e))
     }
+  }
+
+  // 结构化日志：cron 执行结果摘要
+  const hasErrors = results.errors.length > 0
+  if (hasErrors) {
+    triggerAlert('cron_partial_failure', { cronJob: 'check-timeouts', ...results }, { context: 'cron-check-timeouts' })
+  } else {
+    triggerAlert('cron_completed', { cronJob: 'check-timeouts', ...results }, { context: 'cron-check-timeouts' })
   }
 
   // serverless 环境确保 Sentry 事件发送完毕
