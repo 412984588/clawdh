@@ -48,7 +48,6 @@ export async function middleware(request: NextRequest) {
 
   // ── 请求追踪 ID（贯穿整个请求链路）──────────────────────────────────
   const traceId = crypto.randomUUID()
-  request.headers.set('x-trace-id', traceId)
 
   // ── 限流检查（先于认证，fail-fast 减少资源消耗）──────────────────────
   const rateLimitConfig = getConfigForPath(pathname, request.method)
