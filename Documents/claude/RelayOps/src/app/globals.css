@@ -10,8 +10,8 @@
     --card-foreground: 240 10% 3.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 3.9%;
-    /* RelayOps 品牌色 #3B82F6 */
-    --primary: 217 91% 60%;
+    /* RelayOps 品牌色加深，确保按钮文字满足 WCAG AA 对比度 */
+    --primary: 217 91% 48%;
     --primary-foreground: 0 0% 100%;
     --secondary: 214 100% 97%;
     --secondary-foreground: 221 83% 20%;
@@ -23,15 +23,15 @@
     --destructive-foreground: 0 0% 98%;
     --border: 214 32% 91%;
     --input: 214 32% 91%;
-    --ring: 217 91% 60%;
+    --ring: 217 91% 48%;
     --radius: 0.625rem;
-    --cta: 217 91% 60%;
+    --cta: 217 91% 48%;
     --cta-foreground: 0 0% 100%;
     --sidebar-bg: 240 10% 3.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-text: 240 5% 64.9%;
     --sidebar-text-active: 0 0% 100%;
-    --sidebar-item-active: 217 91% 60%;
+    --sidebar-item-active: 217 91% 48%;
   }
 
   .dark {
@@ -41,7 +41,7 @@
     --card-foreground: 0 0% 98%;
     --popover: 240 10% 3.9%;
     --popover-foreground: 0 0% 98%;
-    --primary: 217 91% 60%;
+    --primary: 217 91% 48%;
     --primary-foreground: 0 0% 100%;
     --secondary: 217 33% 17%;
     --secondary-foreground: 0 0% 98%;
@@ -53,10 +53,10 @@
     --destructive-foreground: 0 0% 98%;
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
-    --ring: 217 91% 60%;
-    --cta: 217 91% 60%;
+    --ring: 217 91% 48%;
+    --cta: 217 91% 48%;
     --cta-foreground: 0 0% 100%;
-    --sidebar-item-active: 217 91% 60%;
+    --sidebar-item-active: 217 91% 48%;
   }
 }
 

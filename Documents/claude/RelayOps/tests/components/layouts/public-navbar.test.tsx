@@ -38,6 +38,19 @@ vi.mock('@/i18n/navigation', () => ({
 import { PublicNavbar } from '@/components/layouts/public-navbar'
 
 describe('PublicNavbar', () => {
+  it('renders a skip link that targets the main content landmark', () => {
+    render(<PublicNavbar />)
+    expect(screen.getByRole('link', { name: /skip to main content/i })).toHaveAttribute(
+      'href',
+      '#main-content'
+    )
+  })
+
+  it('labels the primary navigation landmark', () => {
+    render(<PublicNavbar />)
+    expect(screen.getByRole('navigation', { name: /primary/i })).toBeInTheDocument()
+  })
+
   it('includes a pricing navigation link', () => {
     render(<PublicNavbar />)
     expect(screen.getByRole('link', { name: /pricing/i })).toHaveAttribute('href', '/pricing')

@@ -154,7 +154,7 @@ export default async function AdminDashboardPage() {
                   {revenue.momGrowthPercent >= 0 ? '+' : ''}{revenue.momGrowthPercent}%
                 </span>
               ) : (
-                <span className="text-2xl font-bold text-slate-400">—</span>
+                <span className="text-2xl font-bold text-slate-500">—</span>
               )}
             </CardContent>
           </Card>
@@ -173,7 +173,7 @@ export default async function AdminDashboardPage() {
                     className="w-full bg-blue-500 rounded-t transition-all"
                     style={{ height: `${Math.max((m.amount / maxRevenue) * 100, 2)}%` }}
                   />
-                  <span className="text-[10px] text-slate-400">{m.month.slice(5)}</span>
+                  <span className="text-[10px] text-slate-600">{m.month.slice(5)}</span>
                 </div>
               ))}
             </div>
@@ -235,7 +235,7 @@ export default async function AdminDashboardPage() {
       <div>
         <h2 className="text-sm font-semibold text-slate-700 mb-3">
           Ticket Distribution
-          <span className="text-xs font-normal text-slate-400 ml-2">
+          <span className="ml-2 text-xs font-normal text-slate-600">
             This month: {throughput.createdThisMonth} created / {throughput.completedThisMonth} completed
           </span>
         </h2>

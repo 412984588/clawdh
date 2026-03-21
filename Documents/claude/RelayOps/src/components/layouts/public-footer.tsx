@@ -66,7 +66,7 @@ export function PublicFooter() {
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className="inline-flex text-sm text-zinc-300 transition-colors hover:text-white"
+                      className="inline-flex rounded-sm text-sm text-zinc-300 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
                     >
                       {link.label}
                     </Link>

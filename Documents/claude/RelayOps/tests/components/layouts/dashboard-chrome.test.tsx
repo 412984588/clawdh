@@ -80,4 +80,16 @@ describe('DashboardChrome', () => {
     expect(sidebar).toHaveAttribute('data-collapsed', 'false')
     expect(screen.getByText('Overview')).toBeInTheDocument()
   })
+
+  it('gives the account menu trigger an accessible name', () => {
+    mockMatchMedia(true)
+
+    render(
+      <DashboardChrome role="admin" email="ops@relayops.com">
+        <div>Dashboard body</div>
+      </DashboardChrome>
+    )
+
+    expect(screen.getByRole('button', { name: /admin account menu/i })).toBeInTheDocument()
+  })
 })

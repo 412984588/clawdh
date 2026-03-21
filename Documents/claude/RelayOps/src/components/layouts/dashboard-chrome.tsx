@@ -112,7 +112,7 @@ function DashboardChromeFrame({ children, email, role }: DashboardChromeProps) {
                 onClick={() => setCollapsed(true)}
                 className="h-8 w-8 shrink-0 text-zinc-400 hover:bg-white/5 hover:text-white"
               >
-                <PanelLeftClose className="h-4 w-4" />
+                <PanelLeftClose className="h-4 w-4" aria-hidden="true" />
               </Button>
             )}
           </div>
@@ -127,7 +127,7 @@ function DashboardChromeFrame({ children, email, role }: DashboardChromeProps) {
               onClick={() => setCollapsed(false)}
               className="absolute right-2 top-3 h-8 w-8 text-zinc-400 hover:bg-white/5 hover:text-white"
             >
-              <PanelLeftOpen className="h-4 w-4" />
+              <PanelLeftOpen className="h-4 w-4" aria-hidden="true" />
             </Button>
           )}
         </div>

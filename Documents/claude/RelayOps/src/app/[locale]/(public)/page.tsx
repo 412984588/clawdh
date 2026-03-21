@@ -129,11 +129,11 @@ export default function LandingPage() {
                 <Button
                   asChild
                   size="lg"
-                  className="rounded-full border border-blue-400/50 bg-blue-500 px-7 text-white shadow-[0_24px_44px_-20px_rgba(59,130,246,0.72)] transition-all duration-300 hover:-translate-y-1 hover:bg-blue-400 hover:shadow-[0_34px_55px_-18px_rgba(59,130,246,0.82)]"
+                  className="rounded-full border border-blue-600/50 bg-blue-600 px-7 text-white shadow-[0_24px_44px_-20px_rgba(37,99,235,0.72)] transition-all duration-300 hover:-translate-y-1 hover:bg-blue-700 hover:shadow-[0_34px_55px_-18px_rgba(37,99,235,0.82)]"
                 >
                   <Link href="/request-access">
                     Request Access
-                    <ArrowRight className="h-4 w-4" />
+                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
                   </Link>
                 </Button>
                 <Button
@@ -143,7 +143,7 @@ export default function LandingPage() {
                 >
                   <Link href="/how-it-works">
                     See the workflow
-                    <ArrowRight className="h-4 w-4 opacity-70" />
+                    <ArrowRight className="h-4 w-4 opacity-70" aria-hidden="true" />
                   </Link>
                 </Button>
               </div>
@@ -326,7 +326,7 @@ export default function LandingPage() {
                     style={{ transitionDelay: `${index * 110}ms` }}
                   >
                     <div className="flex items-center justify-between gap-4">
-                      <span className="text-sm font-black tracking-[0.22em] text-blue-300">
+                      <span className="text-sm font-black tracking-[0.22em] text-blue-700">
                         {item.step}
                       </span>
                       <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-500 text-white shadow-[0_18px_38px_-22px_rgba(59,130,246,0.55)]">
@@ -417,7 +417,7 @@ export default function LandingPage() {
         <div className="container">
           <div
             data-reveal
-            className="rounded-[2.25rem] border border-blue-200 bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 px-8 py-10 text-center text-white opacity-0 translate-y-6 shadow-[0_30px_80px_-48px_rgba(59,130,246,0.55)] transition-all duration-700 ease-out motion-reduce:translate-y-0 motion-reduce:opacity-100 md:px-12 md:py-14"
+            className="rounded-[2.25rem] border border-blue-200 bg-gradient-to-br from-blue-700 via-blue-600 to-cyan-700 px-8 py-10 text-center text-white opacity-0 translate-y-6 shadow-[0_30px_80px_-48px_rgba(37,99,235,0.55)] transition-all duration-700 ease-out motion-reduce:translate-y-0 motion-reduce:opacity-100 md:px-12 md:py-14"
           >
             <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-blue-50">
               <Users className="h-3.5 w-3.5" />
@@ -438,7 +438,7 @@ export default function LandingPage() {
               >
                 <Link href="/request-access">
                   Request Access
-                  <ArrowRight className="h-4 w-4" />
+                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </Link>
               </Button>
               <Button
@@ -447,7 +447,7 @@ export default function LandingPage() {
                 className="rounded-full border border-white/25 bg-transparent px-7 text-white shadow-[0_18px_40px_-24px_rgba(24,24,27,0.45)] transition-all duration-300 hover:-translate-y-1 hover:border-white/40 hover:bg-white/10"
               >
                 <Link href="/pilot-sample">
-                  <Lock className="mr-2 h-4 w-4" />
+                  <Lock className="mr-2 h-4 w-4" aria-hidden="true" />
                   Preview a pilot deliverable
                 </Link>
               </Button>

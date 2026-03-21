@@ -49,7 +49,7 @@ export function Topbar({ email, role }: TopbarProps) {
     <header className="h-14 border-b border-zinc-200 bg-white/95 backdrop-blur-sm flex items-center justify-between px-6 shrink-0 sticky top-0 z-10">
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:rounded-md focus:bg-blue-600 focus:px-4 focus:py-2 focus:text-white"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:rounded-md focus:bg-zinc-950 focus:px-4 focus:py-2 focus:text-white"
       >
         跳至主要内容
       </a>
@@ -59,7 +59,11 @@ export function Topbar({ email, role }: TopbarProps) {
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="h-8 w-8 rounded-full p-0">
+          <Button
+            variant="ghost"
+            className="h-8 w-8 rounded-full p-0"
+            aria-label={`${roleLabel[role] ?? role} account menu`}
+          >
             <Avatar className="h-8 w-8">
               <AvatarFallback className="bg-blue-100 text-blue-700 text-xs">
                 {initials}
@@ -75,7 +79,7 @@ export function Topbar({ email, role }: TopbarProps) {
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild className="cursor-pointer">
             <Link href="/settings/profile">
-              <User className="mr-2 h-4 w-4" />
+              <User className="mr-2 h-4 w-4" aria-hidden="true" />
               Profile
             </Link>
           </DropdownMenuItem>
@@ -85,7 +89,7 @@ export function Topbar({ email, role }: TopbarProps) {
             className="cursor-pointer text-destructive focus:text-destructive"
             onClick={handleLogout}
           >
-            <LogOut className="mr-2 h-4 w-4" />
+            <LogOut className="mr-2 h-4 w-4" aria-hidden="true" />
             {isSigningOut ? 'Signing out...' : 'Sign out'}
           </DropdownMenuItem>
         </DropdownMenuContent>
