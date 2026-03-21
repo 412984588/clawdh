@@ -1,0 +1,125 @@
+"""
+Tests for TanStack Query Patterns Pack. TDD — RED first.
+"""
+
+import json
+import zipfile
+from pathlib import Path
+
+PRODUCT_DIR = Path(__file__).parent.parent
+TEMPLATES_DIR = PRODUCT_DIR / "templates"
+DIST_DIR = PRODUCT_DIR / "dist"
+
+TEMPLATE_DIRS = [
+    "01-basic-query",
+    "02-pagination",
+    "03-infinite-scroll",
+    "04-mutations",
+    "05-prefetching",
+    "06-real-time-polling",
+    "07-dependent-queries",
+    "08-parallel-queries",
+    "09-cache-invalidation",
+    "10-optimistic-updates",
+]
+
+STARTER_TEMPLATES = TEMPLATE_DIRS[:5]
+PRO_TEMPLATES = TEMPLATE_DIRS
+
+
+def test_readme_exists():
+    assert (PRODUCT_DIR / "README.md").exists()
+
+def test_changelog_exists():
+    assert (PRODUCT_DIR / "CHANGELOG.md").exists()
+
+def test_license_exists():
+    assert (PRODUCT_DIR / "LICENSE").exists()
+
+def test_tiers_json_exists():
+    assert (PRODUCT_DIR / "tiers.json").exists()
+
+def test_tiers_json_valid():
+    data = json.loads((PRODUCT_DIR / "tiers.json").read_text())
+    assert "tiers" in data
+    assert len(data["tiers"]) == 2
+
+def test_tiers_pricing():
+    data = json.loads((PRODUCT_DIR / "tiers.json").read_text())
+    by_id = {t["id"]: t for t in data["tiers"]}
+    assert by_id["starter"]["price_usd"] == 19
+    assert by_id["pro"]["price_usd"] == 39
+
+def test_all_template_dirs_exist():
+    for name in TEMPLATE_DIRS:
+        assert (TEMPLATES_DIR / name).is_dir(), f"Missing: {name}"
+
+def test_each_template_has_example_file():
+    for name in TEMPLATE_DIRS:
+        d = TEMPLATES_DIR / name
+        has_ts = (d / "example.ts").exists()
+        has_tsx = (d / "example.tsx").exists()
+        assert has_ts or has_tsx, f"{name}: missing example.ts or example.tsx"
+
+def test_each_template_has_readme():
+    for name in TEMPLATE_DIRS:
+        assert (TEMPLATES_DIR / name / "README.md").exists(), f"{name}: missing README.md"
+
+def test_example_imports_tanstack():
+    for name in TEMPLATE_DIRS:
+        d = TEMPLATES_DIR / name
+        path = d / "example.ts" if (d / "example.ts").exists() else d / "example.tsx"
+        content = path.read_text()
+        assert "@tanstack/react-query" in content, f"{name}: missing @tanstack/react-query import"
+
+def test_example_has_exports():
+    for name in TEMPLATE_DIRS:
+        d = TEMPLATES_DIR / name
+        path = d / "example.ts" if (d / "example.ts").exists() else d / "example.tsx"
+        content = path.read_text()
+        assert "export" in content, f"{name}: no exports"
+
+def test_example_not_empty():
+    for name in TEMPLATE_DIRS:
+        d = TEMPLATES_DIR / name
+        path = d / "example.ts" if (d / "example.ts").exists() else d / "example.tsx"
+        assert path.stat().st_size > 100, f"{name}: example file too small"
+
+def test_sales_dir_exists():
+    assert (PRODUCT_DIR / "sales").is_dir()
+
+def test_all_sales_files_exist():
+    for f in ["product-listing.md","gumroad-listing.md","lemon-squeezy-listing.md",
+              "itch-io-listing.md","faq.md","refund-policy.md","keywords.md"]:
+        assert (PRODUCT_DIR / "sales" / f).exists(), f"Missing: {f}"
+
+def test_sales_files_not_empty():
+    for f in ["product-listing.md","gumroad-listing.md","lemon-squeezy-listing.md",
+              "itch-io-listing.md","faq.md","refund-policy.md","keywords.md"]:
+        assert (PRODUCT_DIR / "sales" / f).stat().st_size > 50, f"{f} too small"
+
+def test_starter_zip_exists():
+    tiers = json.loads((PRODUCT_DIR / "tiers.json").read_text())
+    t = next(t for t in tiers["tiers"] if t["id"] == "starter")
+    assert (DIST_DIR / t["zip_name"]).exists()
+
+def test_pro_zip_exists():
+    tiers = json.loads((PRODUCT_DIR / "tiers.json").read_text())
+    t = next(t for t in tiers["tiers"] if t["id"] == "pro")
+    assert (DIST_DIR / t["zip_name"]).exists()
+
+def test_starter_zip_has_root_files():
+    tiers = json.loads((PRODUCT_DIR / "tiers.json").read_text())
+    t = next(t for t in tiers["tiers"] if t["id"] == "starter")
+    with zipfile.ZipFile(DIST_DIR / t["zip_name"]) as zf:
+        names = zf.namelist()
+    for f in ["README.md", "LICENSE", "CHANGELOG.md", "tiers.json"]:
+        assert f in names, f"starter ZIP missing {f}"
+
+def test_pro_zip_has_all_templates():
+    tiers = json.loads((PRODUCT_DIR / "tiers.json").read_text())
+    t = next(t for t in tiers["tiers"] if t["id"] == "pro")
+    with zipfile.ZipFile(DIST_DIR / t["zip_name"]) as zf:
+        names = zf.namelist()
+    for tpl in PRO_TEMPLATES:
+        assert any(n.startswith(f"templates/{tpl}/") for n in names), f"pro ZIP missing {tpl}"

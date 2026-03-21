@@ -1,0 +1,39 @@
+{
+  "product": "TanStack Query Patterns Pack",
+  "version": "1.0.0",
+  "tiers": [
+    {
+      "id": "starter",
+      "name": "Starter",
+      "price_usd": 19,
+      "template_count": 5,
+      "templates": [
+        "01-basic-query",
+        "02-pagination",
+        "03-infinite-scroll",
+        "04-mutations",
+        "05-prefetching"
+      ],
+      "zip_name": "tanstack-query-patterns-starter-v1.0.0.zip"
+    },
+    {
+      "id": "pro",
+      "name": "Pro",
+      "price_usd": 39,
+      "template_count": 10,
+      "templates": [
+        "01-basic-query",
+        "02-pagination",
+        "03-infinite-scroll",
+        "04-mutations",
+        "05-prefetching",
+        "06-real-time-polling",
+        "07-dependent-queries",
+        "08-parallel-queries",
+        "09-cache-invalidation",
+        "10-optimistic-updates"
+      ],
+      "zip_name": "tanstack-query-patterns-pro-v1.0.0.zip"
+    }
+  ]
+}
