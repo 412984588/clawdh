@@ -5,6 +5,7 @@ import { SYSTEM_ACTOR, transitionTicket } from '@/lib/state-machine/engine'
 import { createEmailProvider } from '@/lib/integrations/email/provider'
 import * as templates from '@/lib/integrations/email/templates'
 import { env } from '@/lib/config/env'
+import { timingSafeCompare } from '@/lib/utils/crypto'
 import { ALL_TERMINAL_STATUSES } from '@/lib/constants/ticket-statuses'
 
 // Vercel Cron: 每小时执行一次
@@ -30,8 +31,8 @@ function jsonWithStatus(
 }
 
 export async function GET(req: NextRequest) {
-  const secret = req.headers.get('authorization')?.replace('Bearer ', '')
-  if (!env.CRON_SECRET || secret !== env.CRON_SECRET) {
+  const secret = req.headers.get('authorization')?.replace('Bearer ', '') ?? ''
+  if (!env.CRON_SECRET || !timingSafeCompare(secret, env.CRON_SECRET)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

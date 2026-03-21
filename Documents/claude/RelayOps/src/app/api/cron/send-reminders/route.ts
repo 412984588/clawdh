@@ -4,6 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { createEmailProvider } from '@/lib/integrations/email/provider'
 import * as templates from '@/lib/integrations/email/templates'
 import { env } from '@/lib/config/env'
+import { timingSafeCompare } from '@/lib/utils/crypto'
 import { logger } from '@/lib/utils/logger'
 
 // Vercel Cron: 每 4 小时执行一次
@@ -48,8 +49,8 @@ function jsonWithStatus(
 }
 
 export async function GET(req: NextRequest) {
-  const secret = req.headers.get('authorization')?.replace('Bearer ', '')
-  if (!env.CRON_SECRET || secret !== env.CRON_SECRET) {
+  const secret = req.headers.get('authorization')?.replace('Bearer ', '') ?? ''
+  if (!env.CRON_SECRET || !timingSafeCompare(secret, env.CRON_SECRET)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
