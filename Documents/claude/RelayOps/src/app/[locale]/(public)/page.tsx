@@ -21,7 +21,7 @@ import {
 
 export const metadata = createPublicMetadata(publicPageDefinitions.landing)
 
-const trustSignals = ['2-day SLA', '635 tests', 'SOC2-ready', 'White-label delivery']
+const trustSignals = ['2-day SLA', '810+ tests', 'SOC2-ready', 'White-label delivery']
 
 const valueProps = [
   {
@@ -100,18 +100,18 @@ export default function LandingPage() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.34),transparent_34%),radial-gradient(circle_at_80%_20%,rgba(96,165,250,0.22),transparent_28%),linear-gradient(180deg,rgba(255,255,255,0.04),transparent)]" />
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:120px_120px] opacity-20" />
 
-        <div className="container relative py-20 md:py-28 lg:py-32">
-          <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
+        <div className="container relative py-16 sm:py-20 md:py-28 lg:py-32">
+          <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12">
             <div
               data-reveal
               className="opacity-0 translate-y-6 transition-all duration-700 ease-out motion-reduce:translate-y-0 motion-reduce:opacity-100"
             >
-              <div className="inline-flex items-center gap-2 rounded-full border border-blue-400/30 bg-blue-500/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] text-blue-100 shadow-[0_28px_80px_-48px_rgba(59,130,246,0.75)] backdrop-blur-sm">
+              <div className="inline-flex items-center gap-2 rounded-full border border-blue-400/30 bg-blue-500/10 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-blue-100 shadow-[0_28px_80px_-48px_rgba(59,130,246,0.75)] backdrop-blur-sm sm:px-4 sm:text-xs sm:tracking-[0.28em]">
                 <span className="h-2 w-2 rounded-full bg-emerald-400" />
                 Revenue ops fulfillment for agency teams
               </div>
 
-              <h1 className="mt-8 max-w-4xl text-5xl font-black tracking-[-0.08em] text-balance text-white md:text-7xl lg:text-[5.4rem] lg:leading-[0.94]">
+              <h1 className="mt-6 max-w-[11ch] text-[2.7rem] font-black leading-[0.93] tracking-[-0.07em] text-white sm:mt-8 sm:max-w-4xl sm:text-5xl md:text-7xl lg:text-[5.4rem] lg:leading-[0.94]">
                 Turn CRM cleanup into a{' '}
                 <span className="bg-gradient-to-r from-blue-300 via-white to-cyan-200 bg-clip-text text-transparent">
                   48-hour promise
@@ -119,17 +119,17 @@ export default function LandingPage() {
                 your agency can actually keep.
               </h1>
 
-              <p className="mt-6 max-w-2xl text-lg leading-8 text-zinc-300 md:text-xl">
+              <p className="mt-5 max-w-xl text-base leading-7 text-zinc-300 sm:mt-6 sm:max-w-2xl sm:text-lg sm:leading-8 md:text-xl">
                 RelayOps gives RevOps agencies a commercial-grade fulfillment layer for CRM data
                 cleanup, QA, and white-label delivery. You keep the client. We keep the work
                 scoped, reviewed, and moving.
               </p>
 
-              <div className="mt-8 flex flex-col gap-4 sm:flex-row">
+              <div className="mt-7 flex flex-col gap-3 sm:mt-8 sm:flex-row sm:gap-4">
                 <Button
                   asChild
                   size="lg"
-                  className="rounded-full border border-blue-600/50 bg-blue-600 px-7 text-white shadow-[0_24px_44px_-20px_rgba(37,99,235,0.72)] transition-all duration-300 hover:-translate-y-1 hover:bg-blue-700 hover:shadow-[0_34px_55px_-18px_rgba(37,99,235,0.82)]"
+                  className="w-full rounded-full border border-blue-600/50 bg-blue-600 px-7 text-white shadow-[0_24px_44px_-20px_rgba(37,99,235,0.72)] transition-all duration-300 hover:-translate-y-1 hover:bg-blue-700 hover:shadow-[0_34px_55px_-18px_rgba(37,99,235,0.82)] sm:w-auto"
                 >
                   <Link href="/request-access">
                     Request Access
@@ -139,7 +139,7 @@ export default function LandingPage() {
                 <Button
                   asChild
                   size="lg"
-                  className="rounded-full border border-white/15 bg-white/5 px-7 text-white shadow-[0_18px_40px_-24px_rgba(24,24,27,0.8)] transition-all duration-300 hover:-translate-y-1 hover:border-white/25 hover:bg-white/10 hover:shadow-[0_28px_44px_-22px_rgba(24,24,27,0.95)]"
+                  className="w-full rounded-full border border-white/15 bg-white/5 px-7 text-white shadow-[0_18px_40px_-24px_rgba(24,24,27,0.8)] transition-all duration-300 hover:-translate-y-1 hover:border-white/25 hover:bg-white/10 hover:shadow-[0_28px_44px_-22px_rgba(24,24,27,0.95)] sm:w-auto"
                 >
                   <Link href="/how-it-works">
                     See the workflow
@@ -148,11 +148,11 @@ export default function LandingPage() {
                 </Button>
               </div>
 
-              <div className="mt-8 flex flex-wrap gap-3 text-sm text-zinc-300">
+              <div className="mt-7 flex flex-wrap gap-2 text-sm text-zinc-300 sm:mt-8 sm:gap-3">
                 {trustSignals.map((item) => (
                   <div
                     key={item}
-                    className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 backdrop-blur-sm"
+                    className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-xs backdrop-blur-sm sm:px-4 sm:text-sm"
                   >
                     <CheckCircle className="h-4 w-4 text-blue-300" />
                     <span>{item}</span>
@@ -160,11 +160,11 @@ export default function LandingPage() {
                 ))}
               </div>
 
-              <div className="mt-10 grid gap-4 sm:grid-cols-3">
+              <div className="mt-8 grid gap-3 sm:mt-10 sm:gap-4 sm:grid-cols-3">
                 {assuranceRows.map((item) => (
                   <div
                     key={item}
-                    className="rounded-[1.5rem] border border-white/10 bg-white/5 px-5 py-5 text-sm leading-6 text-zinc-300 shadow-[0_24px_60px_-40px_rgba(15,23,42,0.85)] backdrop-blur-sm"
+                    className="rounded-[1.5rem] border border-white/10 bg-white/5 px-4 py-4 text-sm leading-6 text-zinc-300 shadow-[0_24px_60px_-40px_rgba(15,23,42,0.85)] backdrop-blur-sm sm:px-5 sm:py-5"
                   >
                     {item}
                   </div>
@@ -176,7 +176,7 @@ export default function LandingPage() {
               data-reveal
               className="opacity-0 translate-y-6 transition-all delay-150 duration-700 ease-out motion-reduce:translate-y-0 motion-reduce:opacity-100"
             >
-              <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/10 p-8 shadow-[0_40px_90px_-45px_rgba(59,130,246,0.45)] backdrop-blur-xl">
+              <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/10 p-5 shadow-[0_40px_90px_-45px_rgba(59,130,246,0.45)] backdrop-blur-xl sm:p-8">
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.22),transparent_42%)]" />
                 <div className="relative space-y-6">
                   <div className="flex items-center justify-between gap-4">
