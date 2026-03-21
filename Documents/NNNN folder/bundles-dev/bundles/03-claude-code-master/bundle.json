@@ -1,0 +1,45 @@
+{
+  "name": "Claude Code Master Bundle",
+  "version": "1.0.0",
+  "price_usd": 149,
+  "individual_value": 255,
+  "zip_name": "claude-code-master-bundle-v1.0.0.zip",
+  "tagline": "The complete Claude Code power-user toolkit. Skills, prompts, rescue, agents, and efficiency.",
+  "products": [
+    {
+      "name": "Claude Skills Vault",
+      "dir": "claude-skills-vault-dev",
+      "tier": "pro",
+      "individual_price": 39,
+      "folder_name": "01-claude-skills-vault"
+    },
+    {
+      "name": "Claude Code Prompts Pack",
+      "dir": "claude-code-prompts-dev",
+      "tier": "complete",
+      "individual_price": 59,
+      "folder_name": "02-claude-code-prompts-pack"
+    },
+    {
+      "name": "Claude Context Rescue Pack",
+      "dir": "claude-context-rescue-pack-dev",
+      "tier": "complete",
+      "individual_price": 59,
+      "folder_name": "03-claude-context-rescue-pack"
+    },
+    {
+      "name": "Effort-Optimized Skills Kit",
+      "dir": "effort-optimized-skills-kit-dev",
+      "tier": "pro",
+      "individual_price": 49,
+      "folder_name": "04-effort-optimized-skills-kit"
+    },
+    {
+      "name": "Agent Teams Workflow Pack",
+      "dir": "agent-teams-workflow-pack-dev",
+      "tier": "pro",
+      "individual_price": 49,
+      "folder_name": "05-agent-teams-workflow-pack"
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "name": "TypeScript Full Stack Bundle",
+  "version": "1.0.0",
+  "price_usd": 99,
+  "individual_value": 157,
+  "zip_name": "typescript-fullstack-bundle-v1.0.0.zip",
+  "tagline": "Type-safe from database to API to frontend. Every layer covered.",
+  "products": [
+    {
+      "name": "TypeScript Config Pack",
+      "dir": "typescript-config-pack-dev",
+      "tier": "complete",
+      "individual_price": 59,
+      "folder_name": "01-typescript-config-pack"
+    },
+    {
+      "name": "Zod Validation Schema Templates",
+      "dir": "zod-validation-schema-templates-dev",
+      "tier": "pro",
+      "individual_price": 39,
+      "folder_name": "02-zod-validation-schema-templates"
+    },
+    {
+      "name": "Database Schema Templates",
+      "dir": "database-schema-templates-dev",
+      "tier": "complete",
+      "individual_price": 59,
+      "folder_name": "03-database-schema-templates"
+    }
+  ]
+}

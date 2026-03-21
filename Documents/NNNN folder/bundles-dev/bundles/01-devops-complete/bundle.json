@@ -1,0 +1,45 @@
+{
+  "name": "DevOps Complete Bundle",
+  "version": "1.0.0",
+  "price_usd": 99,
+  "individual_value": 235,
+  "zip_name": "devops-complete-bundle-v1.0.0.zip",
+  "tagline": "Everything you need to automate, containerize, and standardize your dev workflow.",
+  "products": [
+    {
+      "name": "GitHub Actions Workflow Pack",
+      "dir": "github-actions-workflow-pack-dev",
+      "tier": "complete",
+      "individual_price": 59,
+      "folder_name": "01-github-actions-workflow-pack"
+    },
+    {
+      "name": "Docker Compose Stack Templates",
+      "dir": "docker-compose-stack-templates-dev",
+      "tier": "pro",
+      "individual_price": 39,
+      "folder_name": "02-docker-compose-stack-templates"
+    },
+    {
+      "name": "Docker Compose Collection",
+      "dir": "docker-compose-collection-dev",
+      "tier": "complete",
+      "individual_price": 59,
+      "folder_name": "03-docker-compose-collection"
+    },
+    {
+      "name": "Makefile Templates",
+      "dir": "makefile-templates-dev",
+      "tier": "pro",
+      "individual_price": 39,
+      "folder_name": "04-makefile-templates"
+    },
+    {
+      "name": "Pre-commit Hook Templates",
+      "dir": "precommit-hook-templates-dev",
+      "tier": "pro",
+      "individual_price": 39,
+      "folder_name": "05-precommit-hook-templates"
+    }
+  ]
+}
