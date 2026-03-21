@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import Script from 'next/script'
 import {
   ArrowRight,
   Clock,
@@ -12,10 +11,18 @@ import {
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import {
+  MotionProvider,
+  FadeIn,
+  SlideUp,
+  StaggerList,
+  StaggerItem,
+} from '@/components/ui/motion'
+import {
   buildPartnerServiceJsonLd,
   createPublicMetadata,
   publicPageDefinitions,
 } from '@/lib/seo'
+import { cn } from '@/lib/utils/cn'
 
 export const metadata = createPublicMetadata(publicPageDefinitions.forPartners)
 
@@ -164,28 +171,233 @@ const GOOD_FIT = [
 
 export default function ForPartnersPage() {
   return (
-    <div className="flex flex-col bg-[#f8fafc]">
-      <section className="relative overflow-hidden bg-[#0B1220] py-20 text-white md:py-28">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.24),transparent_30%),radial-gradient(circle_at_82%_18%,rgba(20,184,166,0.14),transparent_24%)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:120px_120px] opacity-20" />
+    <MotionProvider>
+      <div className="flex flex-col bg-[#f8fafc]">
+        <section className="relative overflow-hidden bg-[#0B1220] py-20 text-white md:py-28">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.24),transparent_30%),radial-gradient(circle_at_82%_18%,rgba(20,184,166,0.14),transparent_24%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:120px_120px] opacity-20" />
 
-        <div className="container relative">
-          <div className="grid items-center gap-12 lg:grid-cols-[1.08fr_0.92fr]">
-            <div
-              data-reveal
-              className="opacity-0 translate-y-6 transition-all duration-700 ease-out motion-reduce:translate-y-0 motion-reduce:opacity-100"
-            >
-              <Badge className="rounded-full border border-blue-500/20 bg-white/10 px-4 py-2 font-mono text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-200 hover:bg-white/10">
-                Partner Program
-              </Badge>
-              <h1 className="font-display mt-8 text-5xl font-bold tracking-[-0.08em] text-balance text-white md:text-7xl lg:leading-[0.94]">
-                White-Label CRM Cleanup for RevOps Agencies
-              </h1>
-              <p className="mt-6 max-w-2xl text-lg leading-8 text-zinc-300 md:text-xl">
-                Offer 2-day CRM import prep to your clients without hiring operators. RelayOps
-                handles the cleaning. You handle the relationship.
+          <div className="container relative">
+            <div className="grid items-center gap-12 lg:grid-cols-[1.08fr_0.92fr]">
+              <FadeIn>
+                <Badge className="rounded-full border border-blue-500/20 bg-white/10 px-4 py-2 font-mono text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-200 hover:bg-white/10">
+                  Partner Program
+                </Badge>
+                <h1 className="font-display mt-8 text-5xl font-bold tracking-[-0.08em] text-balance text-white md:text-7xl lg:leading-[0.94]">
+                  White-Label CRM Cleanup for RevOps Agencies
+                </h1>
+                <p className="mt-6 max-w-2xl text-lg leading-8 text-zinc-300 md:text-xl">
+                  Offer 2-day CRM import prep to your clients without hiring operators. RelayOps
+                  handles the cleaning. You handle the relationship.
+                </p>
+                <div className="mt-8 flex flex-col gap-4 sm:flex-row">
+                  <Button
+                    asChild
+                    size="lg"
+                    className="rounded-full border border-blue-500/30 bg-blue-600 px-7 text-white shadow-[0_24px_50px_-24px_rgba(59,130,246,0.52)] transition-all duration-300 hover:-translate-y-1 hover:bg-blue-500"
+                  >
+                    <Link href="/request-access">
+                      Apply for Partner Access
+                      <ArrowRight className="h-4 w-4" />
+                    </Link>
+                  </Button>
+                  <Button
+                    asChild
+                    size="lg"
+                    className="rounded-full border border-white/15 bg-white/5 px-7 text-white shadow-[0_18px_40px_-24px_rgba(24,24,27,0.8)] transition-all duration-300 hover:-translate-y-1 hover:border-white/25 hover:bg-white/10 hover:shadow-[0_28px_44px_-22px_rgba(24,24,27,0.95)]"
+                  >
+                    <Link href="/how-it-works">See How It Works</Link>
+                  </Button>
+                </div>
+              </FadeIn>
+
+              <SlideUp transition={{ delay: 0.15 }}>
+                <div className="rounded-[2rem] border border-white/10 bg-white/10 p-8 shadow-[0_40px_90px_-45px_rgba(59,130,246,0.35)] backdrop-blur-xl">
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    {[
+                      '2-Day SLA',
+                      'Resell at Any Margin',
+                      'Dedicated Partner Portal',
+                      'Fixed Scope, Fixed Price',
+                    ].map((item) => (
+                      <div
+                        key={item}
+                        className="rounded-3xl border border-white/10 bg-[#0B1220]/55 px-5 py-5 text-sm font-medium text-zinc-200"
+                      >
+                        {item}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-5 rounded-[1.75rem] border border-white/10 bg-gradient-to-br from-white/10 to-white/5 p-6">
+                    <p className="text-xs font-semibold uppercase tracking-[0.24em] text-blue-300">
+                      Transparent pricing tiers
+                    </p>
+                    <div className="mt-4 grid gap-4 sm:grid-cols-3">
+                      <div>
+                        <p className="text-xs uppercase tracking-[0.24em] text-zinc-500">Pilot</p>
+                        <p className="mt-2 text-3xl font-black tracking-[-0.05em] text-white">$149</p>
+                      </div>
+                      <div>
+                        <p className="text-xs uppercase tracking-[0.24em] text-zinc-500">Standard</p>
+                        <p className="mt-2 text-3xl font-black tracking-[-0.05em] text-white">$499</p>
+                      </div>
+                      <div>
+                        <p className="text-xs uppercase tracking-[0.24em] text-zinc-500">Custom</p>
+                        <p className="mt-2 text-3xl font-black tracking-[-0.05em] text-white">Quoted</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </SlideUp>
+            </div>
+          </div>
+        </section>
+
+        <section className="bg-white py-20 md:py-28">
+          <div className="container">
+            <FadeIn className="mx-auto max-w-2xl text-center">
+              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-700">
+                What you get as a partner
               </p>
-              <div className="mt-8 flex flex-col gap-4 sm:flex-row">
+              <h2 className="font-display mt-5 text-4xl font-bold tracking-[-0.06em] text-balance text-zinc-950 md:text-5xl">
+                What you get as a partner
+              </h2>
+            </FadeIn>
+            <StaggerList className="mt-14 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+              {BENEFITS.map((item) => {
+                const Icon = item.icon
+                return (
+                  <StaggerItem
+                    key={item.title}
+                    className={cn(
+                      `rounded-[2rem] border border-zinc-200 border-t-4 ${item.accent} bg-white px-6 py-7 text-zinc-950 shadow-[0_24px_60px_-42px_rgba(15,23,42,0.16)] transition-all duration-300 ease-out hover:-translate-y-1 hover:border-blue-200 hover:shadow-[0_30px_70px_-36px_rgba(59,130,246,0.18)]`
+                    )}
+                  >
+                    <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${item.iconBg}`}>
+                      <Icon className={`h-5 w-5 ${item.iconColor}`} />
+                    </div>
+                    <h3 className="font-display mt-6 text-2xl font-bold tracking-[-0.04em]">{item.title}</h3>
+                    <p className="mt-3 text-base leading-7 text-zinc-600">{item.description}</p>
+                  </StaggerItem>
+                )
+              })}
+            </StaggerList>
+          </div>
+        </section>
+
+        <section className="relative overflow-hidden bg-[#0B1220] py-20 text-white md:py-28">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.22),transparent_38%),radial-gradient(circle_at_82%_18%,rgba(20,184,166,0.12),transparent_24%)]" />
+          <div className="container relative">
+            <FadeIn className="mx-auto max-w-2xl text-center">
+              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-300">
+                Pricing
+              </p>
+              <h2 className="font-display mt-5 text-4xl font-bold tracking-[-0.06em] text-balance text-white md:text-5xl">
+                Transparent pricing tiers
+              </h2>
+              <p className="mt-5 text-lg leading-8 text-zinc-300">
+                These are your costs. Charge your clients whatever makes sense for your business.
+              </p>
+            </FadeIn>
+
+            <StaggerList className="mt-14 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+              {PRICING.map((plan) => (
+                <StaggerItem
+                  key={plan.tier}
+                  className={cn(
+                    "rounded-[2rem] border p-6 transition-all duration-300 ease-out hover:-translate-y-1",
+                    plan.highlight
+                      ? 'border-blue-500/40 bg-gradient-to-b from-blue-500/16 via-[#101827] to-[#0B1220] shadow-[0_30px_90px_-44px_rgba(59,130,246,0.5)] hover:shadow-[0_36px_110px_-38px_rgba(59,130,246,0.6)]'
+                      : 'border-white/10 bg-white/5 shadow-[0_24px_60px_-40px_rgba(15,23,42,0.82)] hover:bg-white/10 hover:shadow-[0_28px_70px_-34px_rgba(59,130,246,0.22)]'
+                  )}
+                >
+                  {plan.highlight ? (
+                    <Badge className="rounded-full border border-blue-500/20 bg-blue-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-blue-200 hover:bg-blue-500/10">
+                      Most common
+                    </Badge>
+                  ) : null}
+                  <div className="mt-4">
+                    <div className="text-xs font-semibold uppercase tracking-[0.28em] text-zinc-400">
+                      {plan.tier}
+                    </div>
+                    <div className="mt-3 flex items-end gap-2">
+                      {plan.unit ? (
+                        <span className="text-xs uppercase tracking-[0.22em] text-zinc-500">
+                          {plan.unit}
+                        </span>
+                      ) : null}
+                      <span className="text-5xl font-black tracking-[-0.06em] text-white">
+                        {plan.price}
+                      </span>
+                    </div>
+                  </div>
+                  <ul className="mt-6 space-y-3">
+                    {plan.features.map((feature) => (
+                      <li key={feature} className="flex items-start gap-3 text-sm leading-6 text-zinc-300">
+                        <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-teal-400" />
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <Button
+                    asChild
+                    size="lg"
+                    className={cn(
+                      "mt-8 w-full rounded-full transition-all duration-300",
+                      plan.highlight
+                        ? 'border border-blue-500/30 bg-blue-600 text-white shadow-[0_24px_50px_-24px_rgba(59,130,246,0.52)] hover:bg-blue-700'
+                        : 'border border-white/10 bg-white/5 text-white hover:bg-white/10'
+                    )}
+                  >
+                    <Link href={plan.href}>{plan.cta}</Link>
+                  </Button>
+                </StaggerItem>
+              ))}
+            </StaggerList>
+          </div>
+        </section>
+
+        <section className="bg-white py-20 md:py-28">
+          <div className="container">
+            <FadeIn className="mx-auto max-w-2xl text-center">
+              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-700">
+                Good fit
+              </p>
+              <h2 className="font-display mt-5 text-4xl font-bold tracking-[-0.06em] text-zinc-950 text-balance md:text-5xl">
+                Who makes a great partner
+              </h2>
+              <p className="mt-5 text-lg leading-8 text-zinc-600">
+                RelayOps is designed for agencies that handle CRM data regularly and want
+                reliable fulfillment without adding headcount.
+              </p>
+            </FadeIn>
+            <StaggerList className="mt-14 grid gap-5 md:grid-cols-2">
+              {GOOD_FIT.map((item) => (
+                <StaggerItem
+                  key={item.type}
+                  className="rounded-[2rem] border border-zinc-200 bg-white p-7 shadow-[0_18px_50px_-34px_rgba(15,23,42,0.18)] transition-all duration-300 ease-out hover:-translate-y-1 hover:border-blue-200 hover:shadow-[0_30px_70px_-36px_rgba(59,130,246,0.18)]"
+                >
+                  <p className="text-xs font-semibold uppercase tracking-[0.24em] text-blue-700">
+                    {item.type}
+                  </p>
+                  <p className="mt-4 text-base leading-7 text-zinc-600">{item.description}</p>
+                </StaggerItem>
+              ))}
+            </StaggerList>
+          </div>
+        </section>
+
+        <section className="relative overflow-hidden bg-[#0B1220] py-20 text-white md:py-24">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.22),transparent_36%),radial-gradient(circle_at_82%_18%,rgba(20,184,166,0.12),transparent_24%)]" />
+          <div className="container relative text-center">
+            <FadeIn className="mx-auto max-w-3xl">
+              <h2 className="font-display text-4xl font-bold tracking-[-0.06em] text-balance md:text-5xl">
+                Apply for Partner Access
+              </h2>
+              <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-zinc-300">
+                White-label CRM data cleanup fulfillment for RevOps agencies. Apply for partner access.
+              </p>
+              <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
                 <Button
                   asChild
                   size="lg"
@@ -199,271 +411,21 @@ export default function ForPartnersPage() {
                 <Button
                   asChild
                   size="lg"
-                  className="rounded-full border border-white/15 bg-white/5 px-7 text-white shadow-[0_18px_40px_-24px_rgba(24,24,27,0.8)] transition-all duration-300 hover:-translate-y-1 hover:border-white/25 hover:bg-white/10 hover:shadow-[0_28px_44px_-22px_rgba(24,24,27,0.95)]"
+                  className="rounded-full border border-white/15 bg-white/5 px-7 text-white transition-all duration-300 hover:-translate-y-1 hover:border-white/25 hover:bg-white/10"
                 >
-                  <Link href="/how-it-works">See How It Works</Link>
+                  <Link href="/pilot-sample">Start with a Pilot</Link>
                 </Button>
               </div>
-            </div>
-
-            <div
-              data-reveal
-              className="opacity-0 translate-y-6 transition-all delay-150 duration-700 ease-out motion-reduce:translate-y-0 motion-reduce:opacity-100"
-            >
-              <div className="rounded-[2rem] border border-white/10 bg-white/10 p-8 shadow-[0_40px_90px_-45px_rgba(59,130,246,0.35)] backdrop-blur-xl">
-                <div className="grid gap-4 sm:grid-cols-2">
-                  {[
-                    '2-Day SLA',
-                    'Resell at Any Margin',
-                    'Dedicated Partner Portal',
-                    'Fixed Scope, Fixed Price',
-                  ].map((item) => (
-                    <div
-                      key={item}
-                      className="rounded-3xl border border-white/10 bg-[#0B1220]/55 px-5 py-5 text-sm font-medium text-zinc-200"
-                    >
-                      {item}
-                    </div>
-                  ))}
-                </div>
-                <div className="mt-5 rounded-[1.75rem] border border-white/10 bg-gradient-to-br from-white/10 to-white/5 p-6">
-                  <p className="text-xs font-semibold uppercase tracking-[0.24em] text-blue-300">
-                    Transparent pricing tiers
-                  </p>
-                  <div className="mt-4 grid gap-4 sm:grid-cols-3">
-                    <div>
-                      <p className="text-xs uppercase tracking-[0.24em] text-zinc-500">Pilot</p>
-                      <p className="mt-2 text-3xl font-black tracking-[-0.05em] text-white">$149</p>
-                    </div>
-                    <div>
-                      <p className="text-xs uppercase tracking-[0.24em] text-zinc-500">Standard</p>
-                      <p className="mt-2 text-3xl font-black tracking-[-0.05em] text-white">$499</p>
-                    </div>
-                    <div>
-                      <p className="text-xs uppercase tracking-[0.24em] text-zinc-500">Custom</p>
-                      <p className="mt-2 text-3xl font-black tracking-[-0.05em] text-white">Quoted</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            </FadeIn>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section className="bg-white py-20 md:py-28">
-        <div className="container">
-          <div
-            data-reveal
-            className="mx-auto max-w-2xl text-center opacity-0 translate-y-6 transition-all duration-700 ease-out motion-reduce:translate-y-0 motion-reduce:opacity-100"
-          >
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-700">
-              What you get as a partner
-            </p>
-            <h2 className="font-display mt-5 text-4xl font-bold tracking-[-0.06em] text-balance text-zinc-950 md:text-5xl">
-              What you get as a partner
-            </h2>
-          </div>
-          <div className="mt-14 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-            {BENEFITS.map((item, index) => {
-              const Icon = item.icon
-              return (
-                <div
-                  key={item.title}
-                  data-reveal
-                  className={`rounded-[2rem] border border-zinc-200 border-t-4 ${item.accent} bg-white px-6 py-7 text-zinc-950 opacity-0 translate-y-6 shadow-[0_24px_60px_-42px_rgba(15,23,42,0.16)] transition-all duration-300 ease-out hover:-translate-y-1 hover:border-blue-200 hover:shadow-[0_30px_70px_-36px_rgba(59,130,246,0.18)] motion-reduce:translate-y-0 motion-reduce:opacity-100`}
-                  style={{ transitionDelay: `${index * 90}ms` }}
-                >
-                  <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${item.iconBg}`}>
-                    <Icon className={`h-5 w-5 ${item.iconColor}`} />
-                  </div>
-                  <h3 className="font-display mt-6 text-2xl font-bold tracking-[-0.04em]">{item.title}</h3>
-                  <p className="mt-3 text-base leading-7 text-zinc-600">{item.description}</p>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-      </section>
-
-      <section className="relative overflow-hidden bg-[#0B1220] py-20 text-white md:py-28">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.22),transparent_38%),radial-gradient(circle_at_82%_18%,rgba(20,184,166,0.12),transparent_24%)]" />
-        <div className="container relative">
-          <div
-            data-reveal
-            className="mx-auto max-w-2xl text-center opacity-0 translate-y-6 transition-all duration-700 ease-out motion-reduce:translate-y-0 motion-reduce:opacity-100"
-          >
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-300">
-              Pricing
-            </p>
-            <h2 className="font-display mt-5 text-4xl font-bold tracking-[-0.06em] text-balance text-white md:text-5xl">
-              Transparent pricing tiers
-            </h2>
-            <p className="mt-5 text-lg leading-8 text-zinc-300">
-              These are your costs. Charge your clients whatever makes sense for your business.
-            </p>
-          </div>
-
-          <div className="mt-14 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-            {PRICING.map((plan, index) => (
-              <div
-                key={plan.tier}
-                data-reveal
-                className={`rounded-[2rem] border p-6 opacity-0 translate-y-6 transition-all duration-300 ease-out motion-reduce:translate-y-0 motion-reduce:opacity-100 ${
-                  plan.highlight
-                    ? 'border-blue-500/40 bg-gradient-to-b from-blue-500/16 via-[#101827] to-[#0B1220] shadow-[0_30px_90px_-44px_rgba(59,130,246,0.5)] hover:-translate-y-1 hover:shadow-[0_36px_110px_-38px_rgba(59,130,246,0.6)]'
-                    : 'border-white/10 bg-white/5 shadow-[0_24px_60px_-40px_rgba(15,23,42,0.82)] hover:-translate-y-1 hover:bg-white/10 hover:shadow-[0_28px_70px_-34px_rgba(59,130,246,0.22)]'
-                }`}
-                style={{ transitionDelay: `${index * 90}ms` }}
-              >
-                {plan.highlight ? (
-                  <Badge className="rounded-full border border-blue-500/20 bg-blue-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-blue-200 hover:bg-blue-500/10">
-                    Most common
-                  </Badge>
-                ) : null}
-                <div className="mt-4">
-                  <div className="text-xs font-semibold uppercase tracking-[0.28em] text-zinc-400">
-                    {plan.tier}
-                  </div>
-                  <div className="mt-3 flex items-end gap-2">
-                    {plan.unit ? (
-                      <span className="text-xs uppercase tracking-[0.22em] text-zinc-500">
-                        {plan.unit}
-                      </span>
-                    ) : null}
-                    <span className="text-5xl font-black tracking-[-0.06em] text-white">
-                      {plan.price}
-                    </span>
-                  </div>
-                </div>
-                <ul className="mt-6 space-y-3">
-                  {plan.features.map((feature) => (
-                    <li key={feature} className="flex items-start gap-3 text-sm leading-6 text-zinc-300">
-                      <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-teal-400" />
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-                <Button
-                  asChild
-                  size="lg"
-                  className={`mt-8 w-full rounded-full ${
-                    plan.highlight
-                      ? 'border border-blue-500/30 bg-blue-600 text-white shadow-[0_24px_50px_-24px_rgba(59,130,246,0.52)] transition-all duration-300 hover:-translate-y-1 hover:bg-blue-500'
-                      : 'border border-white/10 bg-white/5 text-white transition-all duration-300 hover:-translate-y-1 hover:bg-white/10'
-                  }`}
-                >
-                  <Link href={plan.href}>{plan.cta}</Link>
-                </Button>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-white py-20 md:py-28">
-        <div className="container">
-          <div
-            data-reveal
-            className="mx-auto max-w-2xl text-center opacity-0 translate-y-6 transition-all duration-700 ease-out motion-reduce:translate-y-0 motion-reduce:opacity-100"
-          >
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-700">
-              Good fit
-            </p>
-            <h2 className="font-display mt-5 text-4xl font-bold tracking-[-0.06em] text-zinc-950 text-balance md:text-5xl">
-              Who makes a great partner
-            </h2>
-            <p className="mt-5 text-lg leading-8 text-zinc-600">
-              RelayOps is designed for agencies that handle CRM data regularly and want
-              reliable fulfillment without adding headcount.
-            </p>
-          </div>
-          <div className="mt-14 grid gap-5 md:grid-cols-2">
-            {GOOD_FIT.map((item, index) => (
-              <div
-                key={item.type}
-                data-reveal
-                className="rounded-[2rem] border border-zinc-200 bg-white p-7 opacity-0 translate-y-6 shadow-[0_18px_50px_-34px_rgba(15,23,42,0.18)] transition-all duration-300 ease-out hover:-translate-y-1 hover:border-blue-200 hover:shadow-[0_30px_70px_-36px_rgba(59,130,246,0.18)] motion-reduce:translate-y-0 motion-reduce:opacity-100"
-                style={{ transitionDelay: `${index * 100}ms` }}
-              >
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-blue-700">
-                  {item.type}
-                </p>
-                <p className="mt-4 text-base leading-7 text-zinc-600">{item.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="relative overflow-hidden bg-[#0B1220] py-20 text-white md:py-24">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.22),transparent_36%),radial-gradient(circle_at_82%_18%,rgba(20,184,166,0.12),transparent_24%)]" />
-        <div className="container relative text-center">
-          <div
-            data-reveal
-            className="mx-auto max-w-3xl opacity-0 translate-y-6 transition-all duration-700 ease-out motion-reduce:translate-y-0 motion-reduce:opacity-100"
-          >
-            <h2 className="font-display text-4xl font-bold tracking-[-0.06em] text-balance md:text-5xl">
-              Apply for Partner Access
-            </h2>
-            <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-zinc-300">
-              White-label CRM data cleanup fulfillment for RevOps agencies. Apply for partner access.
-            </p>
-            <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
-              <Button
-                asChild
-                size="lg"
-                className="rounded-full border border-blue-500/30 bg-blue-600 px-7 text-white shadow-[0_24px_50px_-24px_rgba(59,130,246,0.52)] transition-all duration-300 hover:-translate-y-1 hover:bg-blue-500"
-              >
-                <Link href="/request-access">
-                  Apply for Partner Access
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              </Button>
-              <Button
-                asChild
-                size="lg"
-                className="rounded-full border border-white/15 bg-white/5 px-7 text-white transition-all duration-300 hover:-translate-y-1 hover:border-white/25 hover:bg-white/10"
-              >
-                <Link href="/pilot-sample">Start with a Pilot</Link>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <Script id="relayops-service-schema" type="application/ld+json">
-        {JSON.stringify(buildPartnerServiceJsonLd())}
-      </Script>
-
-      <Script id="relayops-partners-motion" strategy="afterInteractive">{`
-        (() => {
-          const revealTargets = document.querySelectorAll('[data-reveal]:not([data-reveal-ready])');
-          revealTargets.forEach((element) => {
-            element.setAttribute('data-reveal-ready', 'true');
-          });
-
-          const show = (element) => {
-            element.classList.add('opacity-100', 'translate-y-0');
-            element.classList.remove('opacity-0', 'translate-y-6');
-          };
-
-          if ('IntersectionObserver' in window) {
-            const revealObserver = new IntersectionObserver((entries) => {
-              entries.forEach((entry) => {
-                if (entry.isIntersecting) {
-                  show(entry.target);
-                  revealObserver.unobserve(entry.target);
-                }
-              });
-            }, { threshold: 0.18, rootMargin: '0px 0px -8% 0px' });
-
-            revealTargets.forEach((element) => revealObserver.observe(element));
-          } else {
-            revealTargets.forEach(show);
-          }
-        })();
-      `}</Script>
-    </div>
+        <script
+          id="relayops-service-schema"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(buildPartnerServiceJsonLd()) }}
+        />
+      </div>
+    </MotionProvider>
   )
 }

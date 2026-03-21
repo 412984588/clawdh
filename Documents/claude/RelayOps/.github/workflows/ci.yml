@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  ci:
+    name: Typecheck / Lint / Test / Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Lint
+        run: pnpm lint --max-warnings 0
+
+      - name: Test with coverage
+        run: pnpm test -- --coverage
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://test.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: test-anon-key-minimum-length
+          SUPABASE_SERVICE_ROLE_KEY: test-service-role-key-minimum
+          INTEGRATION_MODE: mock
+          NEXT_PUBLIC_APP_URL: http://localhost:3000
+          EMAIL_FROM: test@relayops.com
+
+      - name: Build
+        run: pnpm build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://test.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: test-anon-key-minimum-length
+          SUPABASE_SERVICE_ROLE_KEY: test-service-role-key-minimum
+          INTEGRATION_MODE: mock
+          NEXT_PUBLIC_APP_URL: http://localhost:3000
+          EMAIL_FROM: test@relayops.com
+          SKIP_ENV_VALIDATION: true

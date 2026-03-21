@@ -1,0 +1,50 @@
+{
+  "_roadmapMeta": {
+    "updatedAt": 1774109186512
+  },
+  "roadmap": {
+    "objective": "RelayOps 上架准备（Phase 2）",
+    "tasks": [
+      {
+        "id": 23,
+        "number": "R-01",
+        "pinned": true,
+        "sortOrder": 23,
+        "status": "done",
+        "title": "[上架准备] 跨 member 测试冲突修复（pnpm test 全绿）"
+      },
+      {
+        "id": 24,
+        "number": "R-02",
+        "pinned": true,
+        "sortOrder": 24,
+        "status": "done",
+        "title": "[上架准备] pnpm build 类型冲突修复（全量编译通过）"
+      },
+      {
+        "id": 25,
+        "number": "R-03",
+        "pinned": false,
+        "sortOrder": 25,
+        "status": "done",
+        "title": "[上架准备] Placeholder 替换（定价/案例/演示/营销数字）"
+      },
+      {
+        "id": 26,
+        "number": "R-04",
+        "pinned": false,
+        "sortOrder": 26,
+        "status": "done",
+        "title": "[上架准备] Sentry DSN + Mixpanel Token 环境变量配置"
+      },
+      {
+        "id": 27,
+        "number": "R-05",
+        "pinned": false,
+        "sortOrder": 27,
+        "status": "done",
+        "title": "[上架准备] E2E 回归 + 负载测试 smoke 验证"
+      }
+    ]
+  }
+}

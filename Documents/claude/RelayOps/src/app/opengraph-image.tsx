@@ -84,7 +84,7 @@ export default function opengraphImage(): ImageResponse {
             flexWrap: 'wrap',
           }}
         >
-          {['2-day SLA', '635 tests', 'SOC2-ready', 'White-label delivery'].map((item) => (
+          {['2-day SLA', '810+ tests', 'SOC2-ready', 'White-label delivery'].map((item) => (
             <div
               key={item}
               style={{

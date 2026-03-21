@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { transitionTicket } from '@/lib/state-machine/engine'
 import { createMockSupabase, ok, err } from '../helpers/mock-supabase'
 
@@ -27,17 +27,38 @@ describe('transitionTicket', () => {
   it('returns error for invalid transition', async () => {
     const supabase = createMockSupabase()
     // Ticket is in 'completed' — no valid transitions from completed
-    supabase.from.mockReturnValueOnce(ok({ id: ticketId, status: 'completed' }))
+    const fetchChain = ok({ id: ticketId, status: 'completed' })
+    const eventChain = ok(null)
+    supabase.from
+      .mockReturnValueOnce(fetchChain)
+      .mockReturnValueOnce(eventChain)
 
     const result = await transitionTicket(supabase as any, ticketId, 'draft', actor)
     expect(result.success).toBe(false)
     expect(result.error).toMatch(/Cannot transition/)
+    expect(eventChain.insert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        ticket_id: ticketId,
+        actor_user_id: actor.id,
+        actor_role: actor.role,
+        event_type: 'status_change_rejected',
+        payload_json: expect.objectContaining({
+          from: 'completed',
+          to: 'draft',
+          reason: 'invalid_transition',
+        }),
+      })
+    )
   })
 
   it('returns error when role guard rejects the transition', async () => {
     const supabase = createMockSupabase()
     // queued → assigned is valid but admin-only; use 'partner' role to trigger guard
-    supabase.from.mockReturnValueOnce(ok({ id: ticketId, status: 'queued' }))
+    const fetchChain = ok({ id: ticketId, status: 'queued' })
+    const eventChain = ok(null)
+    supabase.from
+      .mockReturnValueOnce(fetchChain)
+      .mockReturnValueOnce(eventChain)
 
     const result = await transitionTicket(
       supabase as any,
@@ -47,6 +68,19 @@ describe('transitionTicket', () => {
     )
     expect(result.success).toBe(false)
     expect(result.error).toMatch(/cannot transition/)
+    expect(eventChain.insert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        ticket_id: ticketId,
+        actor_user_id: 'user-2',
+        actor_role: 'partner',
+        event_type: 'status_change_rejected',
+        payload_json: expect.objectContaining({
+          from: 'queued',
+          to: 'assigned',
+          reason: 'guard_rejected',
+        }),
+      })
+    )
   })
 
   it('returns error when DB update fails', async () => {
@@ -61,8 +95,7 @@ describe('transitionTicket', () => {
     expect(result.error).toBe('Failed to update ticket status')
   })
 
-  it('succeeds even when event insert fails (non-fatal)', async () => {
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+  it('returns success even when event insert fails (audit degraded to warn)', async () => {
     const supabase = createMockSupabase()
     supabase.from
       .mockReturnValueOnce(ok({ id: ticketId, status: 'assigned' })) // fetch
@@ -70,9 +103,9 @@ describe('transitionTicket', () => {
       .mockReturnValueOnce(err('event table unavailable'))             // event insert fails
 
     const result = await transitionTicket(supabase as any, ticketId, 'in_progress', actor)
+    // 审计事件写入失败降级为 warn，状态转移本身成功，workflow 不卡死
     expect(result.success).toBe(true)
-    expect(consoleSpy).toHaveBeenCalled()
-    consoleSpy.mockRestore()
+    expect(result.error).toBeUndefined()
   })
 
   it('returns success on a fully valid transition', async () => {

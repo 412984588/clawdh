@@ -19,7 +19,15 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import {
+  MotionProvider,
+  FadeIn,
+  SlideUp,
+  StaggerList,
+  StaggerItem,
+} from '@/components/ui/motion'
 import { createPublicMetadata, publicPageDefinitions } from '@/lib/seo'
+import { cn } from '@/lib/utils/cn'
 
 export const metadata = createPublicMetadata(publicPageDefinitions.pricing)
 
@@ -34,7 +42,6 @@ type Tier = {
   features: Array<{ label: string; included: boolean }>
 }
 
-// NOTE: Prices are indicative and subject to owner confirmation before launch
 const tiers: Tier[] = [
   {
     name: 'Starter',
@@ -168,255 +175,268 @@ function FeatureList({ features }: { features: Tier['features'] }) {
 
 export default function PricingPage() {
   return (
-    <div className="bg-[#f8fafc]">
-      <section className="relative overflow-hidden border-b border-slate-200 bg-[#f8fafc] py-20 md:py-28">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.14),transparent_30%),radial-gradient(circle_at_82%_18%,rgba(20,184,166,0.1),transparent_24%)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(148,163,184,0.11)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.11)_1px,transparent_1px)] bg-[size:120px_120px] opacity-25" />
+    <MotionProvider>
+      <div className="bg-[#f8fafc]">
+        <section className="relative overflow-hidden border-b border-slate-200 bg-[#f8fafc] py-20 md:py-28">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.14),transparent_30%),radial-gradient(circle_at_82%_18%,rgba(20,184,166,0.1),transparent_24%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(148,163,184,0.11)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.11)_1px,transparent_1px)] bg-[size:120px_120px] opacity-25" />
 
-        <div className="container relative">
-          <div className="max-w-4xl">
-            <Badge className="rounded-full border border-blue-200 bg-white px-4 py-2 font-mono text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-700 hover:bg-white">
-              Pricing Strategy
-            </Badge>
-            <h1 className="font-display mt-6 max-w-[11ch] text-[2.85rem] font-bold leading-[0.93] tracking-[-0.08em] text-slate-950 sm:mt-8 sm:max-w-4xl sm:text-5xl md:text-7xl lg:leading-[0.94]">
-              Placeholder pricing built to explain positioning before final commercial terms.
-            </h1>
-            <p className="mt-5 max-w-3xl text-base leading-7 text-slate-600 sm:mt-6 sm:text-lg sm:leading-8 md:text-xl">
-              RelayOps is positioned as a structured operating model, not generic task labor. The
-              page shows how the offer scales from a small team entry point to enterprise support.
-            </p>
+          <div className="container relative">
+            <FadeIn className="max-w-4xl">
+              <Badge className="rounded-full border border-blue-200 bg-white px-4 py-2 font-mono text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-700 hover:bg-white">
+                Pricing Strategy
+              </Badge>
+              <h1 className="font-display mt-6 max-w-[11ch] text-[2.85rem] font-bold leading-[0.93] tracking-[-0.08em] text-slate-950 sm:mt-8 sm:max-w-4xl sm:text-5xl md:text-7xl lg:leading-[0.94]">
+                Placeholder pricing built to explain positioning before final commercial terms.
+              </h1>
+              <p className="mt-5 max-w-3xl text-base leading-7 text-slate-600 sm:mt-6 sm:text-lg sm:leading-8 md:text-xl">
+                RelayOps is positioned as a structured operating model, not generic task labor. The
+                page shows how the offer scales from a small team entry point to enterprise support.
+              </p>
+            </FadeIn>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section className="py-16 md:py-24">
-        <div className="container">
-          <div className="mx-auto max-w-3xl text-center">
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-700">
-              Pricing tiers
-            </p>
-            <h2 className="font-display mt-5 text-3xl font-bold tracking-[-0.06em] text-zinc-950 text-balance sm:text-4xl md:text-5xl">
-              Three ways to package the RelayOps operating model
-            </h2>
-          </div>
+        <section className="py-16 md:py-24">
+          <div className="container">
+            <FadeIn className="mx-auto max-w-3xl text-center">
+              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-700">
+                Pricing tiers
+              </p>
+              <h2 className="font-display mt-5 text-3xl font-bold tracking-[-0.06em] text-zinc-950 text-balance sm:text-4xl md:text-5xl">
+                Three ways to package the RelayOps operating model
+              </h2>
+            </FadeIn>
 
-          <div className="mt-14 grid gap-6 lg:grid-cols-3">
-            {tiers.map((tier) => {
-              const Icon = tier.icon
+            <StaggerList className="mt-14 grid gap-6 lg:grid-cols-3">
+              {tiers.map((tier) => {
+                const Icon = tier.icon
 
-              return (
-                <Card
-                  key={tier.name}
-                  className={`rounded-[2rem] border-zinc-200 shadow-[0_24px_70px_-42px_rgba(15,23,42,0.18)] ${
-                    tier.featured
-                      ? 'relative border-blue-500/40 bg-[#0B1220] text-white shadow-[0_34px_90px_-40px_rgba(59,130,246,0.35)]'
-                      : 'bg-white'
-                  }`}
-                >
-                  <CardHeader className="p-8">
-                    <div className="flex items-center justify-between gap-4">
-                      <div
-                        className={`flex h-12 w-12 items-center justify-center rounded-2xl ${
-                          tier.featured ? 'bg-white/10 text-blue-200' : 'bg-blue-500/10 text-blue-600'
-                        }`}
-                      >
-                        <Icon className="h-5 w-5" />
-                      </div>
-                      {tier.featured ? (
-                        <Badge className="rounded-full border border-blue-400/20 bg-blue-500/15 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-blue-200">
-                          Recommended
-                        </Badge>
-                      ) : null}
-                    </div>
-                    <CardTitle
-                      className={`font-display text-3xl font-bold tracking-[-0.05em] ${
-                        tier.featured ? 'text-white' : 'text-zinc-950'
-                      }`}
-                    >
-                      {tier.name}
-                    </CardTitle>
-                    <CardDescription
-                      className={`text-base leading-7 ${
-                        tier.featured ? 'text-zinc-300' : 'text-zinc-600'
-                      }`}
-                    >
-                      {tier.summary}
-                    </CardDescription>
-                  </CardHeader>
-
-                  <CardContent className="space-y-8 p-8 pt-0">
-                    <div className="space-y-2">
-                      <p
-                        className={`font-display text-4xl font-bold tracking-[-0.06em] ${
-                          tier.featured ? 'text-white' : 'text-zinc-950'
-                        }`}
-                      >
-                        {tier.price}
-                      </p>
-                      <p className={tier.featured ? 'text-sm text-zinc-400' : 'text-sm text-zinc-500'}>
-                        {tier.billing}
-                      </p>
-                    </div>
-
-                    <FeatureList features={tier.features} />
-
-                    <Button
-                      asChild
-                      size="lg"
-                      className={`w-full rounded-full ${
+                return (
+                  <StaggerItem
+                    key={tier.name}
+                    className="h-full"
+                  >
+                    <Card
+                      className={cn(
+                        "h-full rounded-[2rem] border-zinc-200 shadow-[0_24px_70px_-42px_rgba(15,23,42,0.18)] transition-all duration-300 hover:-translate-y-1",
                         tier.featured
-                          ? 'border border-blue-400/30 bg-blue-500 text-white hover:bg-blue-400'
-                          : 'border border-zinc-200 bg-white text-zinc-950 hover:bg-zinc-100'
-                      }`}
+                          ? 'relative border-blue-500/40 bg-[#0B1220] text-white shadow-[0_34px_90px_-40px_rgba(59,130,246,0.35)] hover:shadow-[0_44px_110px_-38px_rgba(59,130,246,0.45)]'
+                          : 'bg-white hover:border-blue-200 hover:shadow-[0_30px_80px_-36px_rgba(59,130,246,0.16)]'
+                      )}
                     >
-                      <Link href="/request-access">
-                        {tier.ctaLabel}
-                        <ArrowRight className="h-4 w-4" />
-                      </Link>
-                    </Button>
+                      <CardHeader className="p-8">
+                        <div className="flex items-center justify-between gap-4">
+                          <div
+                            className={cn(
+                              "flex h-12 w-12 items-center justify-center rounded-2xl",
+                              tier.featured ? 'bg-white/10 text-blue-200' : 'bg-blue-500/10 text-blue-600'
+                            )}
+                          >
+                            <Icon className="h-5 w-5" />
+                          </div>
+                          {tier.featured ? (
+                            <Badge className="rounded-full border border-blue-400/20 bg-blue-500/15 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-blue-200">
+                              Recommended
+                            </Badge>
+                          ) : null}
+                        </div>
+                        <CardTitle
+                          className={cn(
+                            "font-display mt-4 text-3xl font-bold tracking-[-0.05em]",
+                            tier.featured ? 'text-white' : 'text-zinc-950'
+                          )}
+                        >
+                          {tier.name}
+                        </CardTitle>
+                        <CardDescription
+                          className={cn(
+                            "text-base leading-7",
+                            tier.featured ? 'text-zinc-300' : 'text-zinc-600'
+                          )}
+                        >
+                          {tier.summary}
+                        </CardDescription>
+                      </CardHeader>
+
+                      <CardContent className="space-y-8 p-8 pt-0">
+                        <div className="space-y-2">
+                          <p
+                            className={cn(
+                              "font-display text-4xl font-bold tracking-[-0.06em]",
+                              tier.featured ? 'text-white' : 'text-zinc-950'
+                            )}
+                          >
+                            {tier.price}
+                          </p>
+                          <p className={tier.featured ? 'text-sm text-zinc-400' : 'text-sm text-zinc-500'}>
+                            {tier.billing}
+                          </p>
+                        </div>
+
+                        <FeatureList features={tier.features} />
+
+                        <Button
+                          asChild
+                          size="lg"
+                          className={cn(
+                            "w-full rounded-full transition-all duration-300",
+                            tier.featured
+                              ? 'border border-blue-400/30 bg-blue-600 text-white hover:bg-blue-700 shadow-[0_18px_38px_-20px_rgba(59,130,246,0.5)]'
+                              : 'border border-zinc-200 bg-white text-zinc-950 hover:bg-zinc-50 shadow-[0_14px_30px_-24px_rgba(15,23,42,0.12)]'
+                          )}
+                        >
+                          <Link href="/request-access">
+                            {tier.ctaLabel}
+                            <ArrowRight className="ml-2 h-4 w-4" />
+                          </Link>
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  </StaggerItem>
+                )
+              })}
+            </StaggerList>
+          </div>
+        </section>
+
+        <section className="bg-zinc-50 py-16 md:py-24">
+          <div className="container">
+            <FadeIn className="mx-auto max-w-3xl text-center">
+              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-700">
+                Frequently Asked Questions
+              </p>
+              <h2 className="font-display mt-5 text-3xl font-bold tracking-[-0.06em] text-zinc-950 text-balance sm:text-4xl md:text-5xl">
+                Frequently Asked Questions
+              </h2>
+            </FadeIn>
+
+            <StaggerList className="mx-auto mt-14 grid max-w-5xl gap-5 md:grid-cols-2">
+              {faqs.map((item) => (
+                <StaggerItem key={item.question}>
+                  <Card
+                    className="h-full rounded-[2rem] border-zinc-200 bg-white shadow-[0_18px_50px_-34px_rgba(15,23,42,0.14)] transition-all duration-300 hover:border-blue-200 hover:shadow-[0_24px_60px_-30px_rgba(59,130,246,0.1)]"
+                  >
+                    <CardHeader className="p-7">
+                      <div className="flex items-start gap-3">
+                        <BadgeCheck className="mt-1 h-5 w-5 flex-none text-blue-600" />
+                        <div>
+                          <CardTitle className="text-xl font-bold tracking-[-0.03em] text-zinc-950">
+                            {item.question}
+                          </CardTitle>
+                          <CardDescription className="mt-4 text-base leading-7 text-zinc-600">
+                            {item.answer}
+                          </CardDescription>
+                        </div>
+                      </div>
+                    </CardHeader>
+                  </Card>
+                </StaggerItem>
+              ))}
+            </StaggerList>
+          </div>
+        </section>
+
+        <section className="py-16 md:py-24">
+          <div className="container">
+            <FadeIn className="mx-auto max-w-3xl text-center">
+              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-700">
+                Competitive positioning
+              </p>
+              <h2 className="font-display mt-5 text-3xl font-bold tracking-[-0.06em] text-zinc-950 text-balance sm:text-4xl md:text-5xl">
+                How RelayOps stacks up against the alternatives
+              </h2>
+            </FadeIn>
+
+            <SlideUp className="mt-14 space-y-4 md:hidden">
+              {comparisonRows.map((row) => (
+                <Card
+                  key={row.dimension}
+                  className="rounded-[1.75rem] border-zinc-200 bg-white shadow-[0_18px_50px_-34px_rgba(15,23,42,0.14)]"
+                >
+                  <CardHeader className="px-5 pb-4 pt-5">
+                    <CardTitle className="text-xl font-black tracking-[-0.04em] text-zinc-950">
+                      {row.dimension}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4 px-5 pb-5 pt-0">
+                    <div className="rounded-2xl border border-blue-100 bg-blue-50/60 p-4">
+                      <p className="text-xs font-semibold uppercase tracking-[0.24em] text-blue-700">
+                        RelayOps
+                      </p>
+                      <p className="mt-2 text-sm leading-6 text-zinc-700">{row.relayops}</p>
+                    </div>
+                    <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-4">
+                      <p className="text-xs font-semibold uppercase tracking-[0.24em] text-zinc-500">
+                        Self-built team
+                      </p>
+                      <p className="mt-2 text-sm leading-6 text-zinc-700">{row.selfBuilt}</p>
+                    </div>
+                    <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-4">
+                      <p className="text-xs font-semibold uppercase tracking-[0.24em] text-zinc-500">
+                        Traditional outsourcing
+                      </p>
+                      <p className="mt-2 text-sm leading-6 text-zinc-700">{row.outsourcing}</p>
+                    </div>
                   </CardContent>
                 </Card>
-              )
-            })}
-          </div>
-        </div>
-      </section>
+              ))}
+            </SlideUp>
 
-      <section className="bg-zinc-50 py-16 md:py-24">
-        <div className="container">
-          <div className="mx-auto max-w-3xl text-center">
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-700">
-              Frequently Asked Questions
-            </p>
-            <h2 className="font-display mt-5 text-3xl font-bold tracking-[-0.06em] text-zinc-950 text-balance sm:text-4xl md:text-5xl">
-              Frequently Asked Questions
-            </h2>
-          </div>
-
-          <div className="mx-auto mt-14 grid max-w-5xl gap-5 md:grid-cols-2">
-            {faqs.map((item) => (
-              <Card
-                key={item.question}
-                className="rounded-[2rem] border-zinc-200 bg-white shadow-[0_18px_50px_-34px_rgba(15,23,42,0.14)]"
-              >
-                <CardHeader className="p-7">
-                  <div className="flex items-start gap-3">
-                    <BadgeCheck className="mt-1 h-5 w-5 flex-none text-blue-600" />
-                    <div>
-                      <CardTitle className="text-xl font-bold tracking-[-0.03em] text-zinc-950">
-                        {item.question}
-                      </CardTitle>
-                      <CardDescription className="mt-4 text-base leading-7 text-zinc-600">
-                        {item.answer}
-                      </CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="py-16 md:py-24">
-        <div className="container">
-          <div className="mx-auto max-w-3xl text-center">
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-700">
-              Competitive positioning
-            </p>
-            <h2 className="font-display mt-5 text-3xl font-bold tracking-[-0.06em] text-zinc-950 text-balance sm:text-4xl md:text-5xl">
-              How RelayOps stacks up against the alternatives
-            </h2>
-          </div>
-
-          <div className="mt-14 space-y-4 md:hidden">
-            {comparisonRows.map((row) => (
-              <Card
-                key={row.dimension}
-                className="rounded-[1.75rem] border-zinc-200 bg-white shadow-[0_18px_50px_-34px_rgba(15,23,42,0.14)]"
-              >
-                <CardHeader className="px-5 pb-4 pt-5">
-                  <CardTitle className="text-xl font-black tracking-[-0.04em] text-zinc-950">
-                    {row.dimension}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4 px-5 pb-5 pt-0">
-                  <div className="rounded-2xl border border-blue-100 bg-blue-50/60 p-4">
-                    <p className="text-xs font-semibold uppercase tracking-[0.24em] text-blue-700">
-                      RelayOps
-                    </p>
-                    <p className="mt-2 text-sm leading-6 text-zinc-700">{row.relayops}</p>
-                  </div>
-                  <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-4">
-                    <p className="text-xs font-semibold uppercase tracking-[0.24em] text-zinc-500">
-                      Self-built team
-                    </p>
-                    <p className="mt-2 text-sm leading-6 text-zinc-700">{row.selfBuilt}</p>
-                  </div>
-                  <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-4">
-                    <p className="text-xs font-semibold uppercase tracking-[0.24em] text-zinc-500">
-                      Traditional outsourcing
-                    </p>
-                    <p className="mt-2 text-sm leading-6 text-zinc-700">{row.outsourcing}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          <div className="mt-14 hidden overflow-hidden rounded-[2rem] border border-zinc-200 bg-white shadow-[0_24px_70px_-42px_rgba(15,23,42,0.18)] md:block">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-zinc-50">
-                  <TableHead className="w-40">Dimension</TableHead>
-                  <TableHead>RelayOps</TableHead>
-                  <TableHead>Self-built team</TableHead>
-                  <TableHead>Traditional outsourcing</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {comparisonRows.map((row) => (
-                  <TableRow key={row.dimension}>
-                    <TableCell className="font-semibold text-zinc-950">{row.dimension}</TableCell>
-                    <TableCell className="text-zinc-700">{row.relayops}</TableCell>
-                    <TableCell className="text-zinc-700">{row.selfBuilt}</TableCell>
-                    <TableCell className="text-zinc-700">{row.outsourcing}</TableCell>
+            <SlideUp className="mt-14 hidden overflow-hidden rounded-[2rem] border border-zinc-200 bg-white shadow-[0_24px_70px_-42px_rgba(15,23,42,0.18)] md:block">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-zinc-50">
+                    <TableHead className="w-40">Dimension</TableHead>
+                    <TableHead>RelayOps</TableHead>
+                    <TableHead>Self-built team</TableHead>
+                    <TableHead>Traditional outsourcing</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {comparisonRows.map((row) => (
+                    <TableRow key={row.dimension}>
+                      <TableCell className="font-semibold text-zinc-950">{row.dimension}</TableCell>
+                      <TableCell className="text-zinc-700">{row.relayops}</TableCell>
+                      <TableCell className="text-zinc-700">{row.selfBuilt}</TableCell>
+                      <TableCell className="text-zinc-700">{row.outsourcing}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </SlideUp>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section className="pb-20 md:pb-28">
-        <div className="container">
-          <div className="rounded-[2rem] border border-[#0B1220] bg-[#0B1220] px-6 py-8 text-white shadow-[0_30px_90px_-48px_rgba(11,18,32,0.82)] sm:px-8 sm:py-10 md:px-12">
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-300">
-              Ready to price the real version?
-            </p>
-            <h2 className="font-display mt-5 max-w-3xl text-3xl font-bold tracking-[-0.06em] text-balance sm:text-4xl md:text-5xl">
-              Use the placeholder model to frame value, then move the buyer into a real access conversation.
-            </h2>
-            <p className="mt-5 max-w-2xl text-base leading-7 text-zinc-300">
-              The pricing page establishes commercial positioning without locking in final numbers
-              before the market story is ready.
-            </p>
-            <div className="mt-8">
-              <Button
-                asChild
-                size="lg"
-                className="rounded-full border border-blue-500/30 bg-blue-600 px-7 text-white shadow-[0_24px_50px_-24px_rgba(59,130,246,0.6)] transition-all duration-300 hover:-translate-y-1 hover:bg-blue-500"
-              >
-                <Link href="/request-access">
-                  Request Access
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
+        <section className="pb-20 md:pb-28">
+          <div className="container">
+            <FadeIn className="rounded-[2rem] border border-[#0B1220] bg-[#0B1220] px-6 py-8 text-white shadow-[0_30px_90px_-48px_rgba(11,18,32,0.82)] sm:px-8 sm:py-10 md:px-12">
+              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-300">
+                Ready to price the real version?
+              </p>
+              <h2 className="font-display mt-5 max-w-3xl text-3xl font-bold tracking-[-0.06em] text-balance sm:text-4xl md:text-5xl">
+                Use the placeholder model to frame value, then move the buyer into a real access conversation.
+              </h2>
+              <p className="mt-5 max-w-2xl text-base leading-7 text-zinc-300">
+                The pricing page establishes commercial positioning without locking in final numbers
+                before the market story is ready.
+              </p>
+              <div className="mt-8">
+                <Button
+                  asChild
+                  size="lg"
+                  className="rounded-full border border-blue-500/30 bg-blue-600 px-7 text-white shadow-[0_24px_50px_-24px_rgba(59,130,246,0.6)] transition-all duration-300 hover:-translate-y-1 hover:bg-blue-500"
+                >
+                  <Link href="/request-access">
+                    Request Access
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
+            </FadeIn>
           </div>
-        </div>
-      </section>
-    </div>
+        </section>
+      </div>
+    </MotionProvider>
   )
 }

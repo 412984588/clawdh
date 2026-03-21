@@ -22,7 +22,7 @@ Object.defineProperty(globalThis, 'ResizeObserver', {
   value: ResizeObserverMock,
 })
 
-// IntersectionObserver mock — framer-motion inView + RevealObserver 需要
+// IntersectionObserver mock — framer-motion inView 需要
 class IntersectionObserverMock {
   observe() {}
   unobserve() {}

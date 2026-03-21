@@ -14,7 +14,15 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import {
+  MotionProvider,
+  FadeIn,
+  SlideUp,
+  StaggerList,
+  StaggerItem,
+} from '@/components/ui/motion'
 import { createPublicMetadata, publicPageDefinitions } from '@/lib/seo'
+import { cn } from '@/lib/utils/cn'
 
 export const metadata = createPublicMetadata(publicPageDefinitions.demo)
 
@@ -239,165 +247,174 @@ function MockDashboardPreview({ step }: { step: DemoStep }) {
 
 export default function DemoPage() {
   return (
-    <div className="bg-[#f8fafc]">
-      <section className="relative overflow-hidden border-b border-slate-200 bg-[#f8fafc] py-20 md:py-28">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.14),transparent_30%),radial-gradient(circle_at_80%_20%,rgba(20,184,166,0.1),transparent_24%)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(148,163,184,0.11)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.11)_1px,transparent_1px)] bg-[size:120px_120px] opacity-25" />
+    <MotionProvider>
+      <div className="bg-[#f8fafc]">
+        <section className="relative overflow-hidden border-b border-slate-200 bg-[#f8fafc] py-20 md:py-28">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.14),transparent_30%),radial-gradient(circle_at_80%_20%,rgba(20,184,166,0.1),transparent_24%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(148,163,184,0.11)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.11)_1px,transparent_1px)] bg-[size:120px_120px] opacity-25" />
 
-        <div className="container relative">
-          <div className="max-w-4xl">
-            <Badge className="rounded-full border border-blue-200 bg-white px-4 py-2 font-mono text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-700 hover:bg-white">
-              Interactive Product Demo
-            </Badge>
-            <h1 className="font-display mt-8 text-5xl font-bold tracking-[-0.08em] text-balance text-slate-950 md:text-7xl lg:leading-[0.94]">
-              Show the RelayOps workflow without opening the real dashboard.
-            </h1>
-            <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-600 md:text-xl">
-              Walk prospects through the exact sequence from intake to approval using a lightweight,
-              public-facing demo built from styled interface placeholders.
-            </p>
-          </div>
+          <div className="container relative">
+            <FadeIn className="max-w-4xl">
+              <Badge className="rounded-full border border-blue-200 bg-white px-4 py-2 font-mono text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-700 hover:bg-white">
+                Interactive Product Demo
+              </Badge>
+              <h1 className="font-display mt-8 text-5xl font-bold tracking-[-0.08em] text-balance text-slate-950 md:text-7xl lg:leading-[0.94]">
+                Show the RelayOps workflow without opening the real dashboard.
+              </h1>
+              <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-600 md:text-xl">
+                Walk prospects through the exact sequence from intake to approval using a lightweight,
+                public-facing demo built from styled interface placeholders.
+              </p>
+            </FadeIn>
 
-          <div className="mt-12 grid gap-4 md:grid-cols-4">
-            {demoSteps.map((step, index) => {
-              const Icon = step.icon
+            <StaggerList className="mt-12 grid gap-4 md:grid-cols-4">
+              {demoSteps.map((step, index) => {
+                const Icon = step.icon
 
-              return (
-                <div
-                  key={step.value}
-                  className={`rounded-[1.75rem] border border-slate-200 bg-gradient-to-br ${step.accent} px-5 py-5 shadow-[0_22px_60px_-40px_rgba(15,23,42,0.18)]`}
-                >
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#0B1220] text-white shadow-[0_16px_34px_-20px_rgba(11,18,32,0.72)]">
-                      <Icon className="h-5 w-5" />
-                    </div>
-                    <span className="text-[11px] font-semibold uppercase tracking-[0.28em] text-slate-500">
-                      Step {index + 1}
-                    </span>
-                  </div>
-                  <p className="font-display mt-5 text-lg font-bold tracking-[-0.03em] text-slate-950">
-                    {step.title}
-                  </p>
-                  <p className="mt-2 text-sm leading-6 text-slate-600">{step.summary}</p>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-      </section>
-
-      <section className="py-16 md:py-24">
-        <div className="container">
-          <Tabs defaultValue={demoSteps[0].value} className="space-y-8">
-            <TabsList className="grid h-auto grid-cols-1 gap-2 rounded-[1.5rem] bg-[#E8EEF7] p-2 md:grid-cols-4">
-              {demoSteps.map((step) => (
-                <TabsTrigger
-                  key={step.value}
-                  value={step.value}
-                  className="min-h-[64px] rounded-[1.1rem] border border-transparent px-4 py-4 text-left data-[state=active]:border-slate-200 data-[state=active]:bg-white data-[state=active]:shadow-[0_18px_48px_-34px_rgba(15,23,42,0.18)]"
-                >
-                  <span className="flex flex-col gap-1">
-                    <span className="text-[11px] font-semibold uppercase tracking-[0.24em] text-zinc-500">
-                      {step.role}
-                    </span>
-                    <span className="text-sm font-semibold text-zinc-950">{step.title}</span>
-                  </span>
-                </TabsTrigger>
-              ))}
-            </TabsList>
-
-            {demoSteps.map((step) => {
-              const RoleIcon = roleIcons[step.role]
-
-              return (
-                <TabsContent key={step.value} value={step.value}>
-                  <Card className="overflow-hidden rounded-[2rem] border-zinc-200 shadow-[0_24px_70px_-42px_rgba(15,23,42,0.18)]">
-                    <div className="grid gap-0 lg:grid-cols-[0.88fr_1.12fr]">
-                      <div className={`bg-gradient-to-br ${step.accent} p-8 md:p-10`}>
-                        <div className="flex items-center gap-3">
-                          <Badge
-                            className={`rounded-full border px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em] ${roleStyles[step.role]}`}
-                          >
-                            <RoleIcon className="mr-2 h-3.5 w-3.5" />
-                            {step.role}
-                          </Badge>
-                        </div>
-
-                        <div className="mt-8 space-y-4">
-                          <h2 className="font-display text-3xl font-bold tracking-[-0.05em] text-zinc-950 md:text-4xl">
-                            {step.detailTitle}
-                          </h2>
-                          <p className="text-base leading-7 text-zinc-700">{step.detailBody}</p>
-                          <p className="text-lg font-semibold text-zinc-900">{step.outcome}</p>
-                        </div>
-
-                        <div className="mt-8 rounded-[1.5rem] border border-zinc-200 bg-white/80 p-5">
-                          <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-zinc-500">
-                            What happens in this step
-                          </p>
-                          <ul className="mt-4 space-y-3">
-                            {step.bullets.map((bullet) => (
-                              <li key={bullet} className="flex gap-3 text-sm leading-6 text-zinc-700">
-                                <FileStack className="mt-0.5 h-4 w-4 flex-none text-zinc-500" />
-                                <span>{bullet}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
+                return (
+                  <StaggerItem
+                    key={step.value}
+                    className={cn(
+                      `rounded-[1.75rem] border border-slate-200 bg-gradient-to-br ${step.accent} px-5 py-5 shadow-[0_22px_60px_-40px_rgba(15,23,42,0.18)] transition-all duration-300 hover:-translate-y-1`
+                    )}
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#0B1220] text-white shadow-[0_16px_34px_-20px_rgba(11,18,32,0.72)]">
+                        <Icon className="h-5 w-5" />
                       </div>
-
-                      <CardContent className="p-8 md:p-10">
-                        <CardHeader className="p-0">
-                          <CardTitle className="text-xl font-bold tracking-[-0.04em] text-zinc-950">
-                            Mock dashboard preview
-                          </CardTitle>
-                          <CardDescription className="text-base leading-7 text-zinc-600">
-                            A CSS-only interface placeholder that mirrors the information a buyer
-                            needs to understand at this stage of the workflow.
-                          </CardDescription>
-                        </CardHeader>
-
-                        <div className="mt-8">
-                          <MockDashboardPreview step={step} />
-                        </div>
-                      </CardContent>
+                      <span className="text-[11px] font-semibold uppercase tracking-[0.28em] text-slate-500">
+                        Step {index + 1}
+                      </span>
                     </div>
-                  </Card>
-                </TabsContent>
-              )
-            })}
-          </Tabs>
-        </div>
-      </section>
-
-      <section className="pb-20 md:pb-28">
-        <div className="container">
-          <div className="rounded-[2rem] border border-[#0B1220] bg-[#0B1220] px-8 py-10 text-white shadow-[0_30px_90px_-48px_rgba(11,18,32,0.82)] md:px-12">
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-300">
-              Turn the walkthrough into pipeline
-            </p>
-            <h2 className="font-display mt-5 max-w-3xl text-4xl font-bold tracking-[-0.06em] text-balance md:text-5xl">
-              Use the demo to explain the workflow, then open the partner application.
-            </h2>
-            <p className="mt-5 max-w-2xl text-base leading-7 text-zinc-300">
-              The public demo gives prospects enough operational clarity to understand the model
-              before they ever touch the live product.
-            </p>
-            <div className="mt-8">
-              <Button
-                asChild
-                size="lg"
-                className="rounded-full border border-blue-500/30 bg-blue-600 px-7 text-white shadow-[0_24px_50px_-24px_rgba(59,130,246,0.6)] transition-all duration-300 hover:-translate-y-1 hover:bg-blue-500"
-              >
-                <Link href="/request-access">
-                  Request Access
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
+                    <p className="font-display mt-5 text-lg font-bold tracking-[-0.03em] text-slate-950">
+                      {step.title}
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-slate-600">{step.summary}</p>
+                  </StaggerItem>
+                )
+              })}
+            </StaggerList>
           </div>
-        </div>
-      </section>
-    </div>
+        </section>
+
+        <section className="py-16 md:py-24">
+          <div className="container">
+            <Tabs defaultValue={demoSteps[0].value} className="space-y-8">
+              <FadeIn>
+                <TabsList className="grid h-auto grid-cols-1 gap-2 rounded-[1.5rem] bg-[#E8EEF7] p-2 md:grid-cols-4">
+                  {demoSteps.map((step) => (
+                    <TabsTrigger
+                      key={step.value}
+                      value={step.value}
+                      className="min-h-[64px] rounded-[1.1rem] border border-transparent px-4 py-4 text-left data-[state=active]:border-slate-200 data-[state=active]:bg-white data-[state=active]:shadow-[0_18px_48px_-34px_rgba(15,23,42,0.18)] transition-all duration-300"
+                    >
+                      <span className="flex flex-col gap-1">
+                        <span className="text-[11px] font-semibold uppercase tracking-[0.24em] text-zinc-500">
+                          {step.role}
+                        </span>
+                        <span className="text-sm font-semibold text-zinc-950">{step.title}</span>
+                      </span>
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+              </FadeIn>
+
+              {demoSteps.map((step) => {
+                const RoleIcon = roleIcons[step.role]
+
+                return (
+                  <TabsContent key={step.value} value={step.value} className="focus-visible:outline-none">
+                    <SlideUp className="overflow-hidden rounded-[2rem] border border-zinc-200 bg-white shadow-[0_24px_70px_-42px_rgba(15,23,42,0.18)]">
+                      <div className="grid gap-0 lg:grid-cols-[0.88fr_1.12fr]">
+                        <div className={`bg-gradient-to-br ${step.accent} p-8 md:p-10`}>
+                          <div className="flex items-center gap-3">
+                            <Badge
+                              className={cn(
+                                `rounded-full border px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em]`,
+                                roleStyles[step.role]
+                              )}
+                            >
+                              <RoleIcon className="mr-2 h-3.5 w-3.5" />
+                              {step.role}
+                            </Badge>
+                          </div>
+
+                          <div className="mt-8 space-y-4">
+                            <h2 className="font-display text-3xl font-bold tracking-[-0.05em] text-zinc-950 md:text-4xl">
+                              {step.detailTitle}
+                            </h2>
+                            <p className="text-base leading-7 text-zinc-700">{step.detailBody}</p>
+                            <p className="text-lg font-semibold text-zinc-900">{step.outcome}</p>
+                          </div>
+
+                          <div className="mt-8 rounded-[1.5rem] border border-zinc-200 bg-white/80 p-5">
+                            <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-zinc-500">
+                              What happens in this step
+                            </p>
+                            <ul className="mt-4 space-y-3">
+                              {step.bullets.map((bullet) => (
+                                <li key={bullet} className="flex gap-3 text-sm leading-6 text-zinc-700">
+                                  <FileStack className="mt-0.5 h-4 w-4 flex-none text-zinc-500" />
+                                  <span>{bullet}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+
+                        <CardContent className="p-8 md:p-10">
+                          <CardHeader className="p-0">
+                            <CardTitle className="text-xl font-bold tracking-[-0.04em] text-zinc-950">
+                              Mock dashboard preview
+                            </CardTitle>
+                            <CardDescription className="text-base leading-7 text-zinc-600">
+                              A CSS-only interface placeholder that mirrors the information a buyer
+                              needs to understand at this stage of the workflow.
+                            </CardDescription>
+                          </CardHeader>
+
+                          <div className="mt-8">
+                            <MockDashboardPreview step={step} />
+                          </div>
+                        </CardContent>
+                      </div>
+                    </SlideUp>
+                  </TabsContent>
+                )
+              })}
+            </Tabs>
+          </div>
+        </section>
+
+        <section className="pb-20 md:pb-28">
+          <div className="container">
+            <FadeIn className="rounded-[2rem] border border-[#0B1220] bg-[#0B1220] px-8 py-10 text-white shadow-[0_30px_90px_-48px_rgba(11,18,32,0.82)] md:px-12">
+              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-300">
+                Turn the walkthrough into pipeline
+              </p>
+              <h2 className="font-display mt-5 text-4xl font-bold tracking-[-0.06em] text-balance md:text-5xl">
+                Use the demo to explain the workflow, then open the partner application.
+              </h2>
+              <p className="mt-5 max-w-2xl text-base leading-7 text-zinc-300">
+                The public demo gives prospects enough operational clarity to understand the model
+                before they ever touch the live product.
+              </p>
+              <div className="mt-8">
+                <Button
+                  asChild
+                  size="lg"
+                  className="rounded-full border border-blue-500/30 bg-blue-600 px-7 text-white shadow-[0_24px_50px_-24px_rgba(59,130,246,0.6)] transition-all duration-300 hover:-translate-y-1 hover:bg-blue-700"
+                >
+                  <Link href="/request-access">
+                    Request Access
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
+            </FadeIn>
+          </div>
+        </section>
+      </div>
+    </MotionProvider>
   )
 }

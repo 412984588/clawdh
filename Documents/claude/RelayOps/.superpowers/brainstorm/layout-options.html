@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Homepage Layout Options — RelayOps</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #f4f4f5;
+    color: #18181b;
+    padding: 32px 24px;
+  }
+  h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.04em; margin-bottom: 6px; }
+  .subtitle { font-size: 14px; color: #71717a; margin-bottom: 40px; }
+  h2 { font-size: 16px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 4px; }
+  .section-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; color: #a16207; margin-bottom: 32px; padding: 4px 10px; background: #fef3c7; border-radius: 4px; display: inline-block; }
+  .option-wrapper { margin-bottom: 56px; }
+  .option-header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 16px; }
+  .badge { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; padding: 3px 9px; border-radius: 99px; }
+  .badge-current { background: #e4e4e7; color: #71717a; }
+  .badge-option { background: #b45309; color: #fff; }
+  .badge-option2 { background: #059669; color: #fff; }
+  .verdict { font-size: 12px; color: #71717a; }
+
+  /* ── MOCKUP FRAME ── */
+  .mockup { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.08); border: 2px solid transparent; cursor: pointer; transition: border-color 0.2s, box-shadow 0.2s; }
+  .mockup:hover { border-color: #b45309; box-shadow: 0 8px 32px rgba(180,83,9,0.12); }
+  .mockup.selected { border-color: #b45309; box-shadow: 0 8px 32px rgba(180,83,9,0.2); }
+  .mockup.selected::after { content: '✓ 选中'; position: absolute; top: 12px; right: 12px; background: #b45309; color: #fff; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 99px; }
+  .mockup-wrap { position: relative; }
+
+  /* ──── SECTION A: Built for agencies ──── */
+  /* CURRENT: 3-col equal */
+  .dark-section { background: #18181b; padding: 40px 32px; }
+  .section-title { font-size: 28px; font-weight: 900; letter-spacing: -0.05em; color: #fff; text-align: center; margin-bottom: 28px; line-height: 1.15; }
+  .section-title.left { text-align: left; }
+  .tag { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.24em; color: #fcd34d; text-align: center; margin-bottom: 12px; display: block; }
+  .tag.left { text-align: left; }
+
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .grid-1-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .grid-list { display: flex; flex-direction: column; gap: 0; }
+
+  .card-dark {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-top: 3px solid #f59e0b;
+    border-radius: 16px;
+    padding: 20px;
+  }
+  .card-dark.featured {
+    background: rgba(255,255,255,0.09);
+    border-top-color: #10b981;
+  }
+  .card-dark.span2 {
+    background: rgba(180,83,9,0.12);
+    border-top: 3px solid #f59e0b;
+    border: 1px solid rgba(245,158,11,0.2);
+    border-top: 3px solid #f59e0b;
+    padding: 28px;
+  }
+  .icon-box {
+    width: 36px; height: 36px;
+    background: rgba(245,158,11,0.15);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 12px;
+    font-size: 16px;
+  }
+  .icon-box.green { background: rgba(16,185,129,0.15); }
+  .card-title { font-size: 15px; font-weight: 800; letter-spacing: -0.03em; color: #fff; margin-bottom: 6px; }
+  .card-desc { font-size: 12px; line-height: 1.6; color: #a1a1aa; }
+  .card-desc-large { font-size: 13px; line-height: 1.65; color: #d4d4d8; }
+
+  /* Horizontal list card style */
+  .list-row {
+    display: flex; align-items: flex-start; gap: 16px;
+    padding: 20px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+  .list-row:first-child { padding-top: 0; }
+  .list-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .list-number {
+    font-size: 32px; font-weight: 900; letter-spacing: -0.06em;
+    color: rgba(245,158,11,0.25);
+    line-height: 1;
+    flex-shrink: 0;
+    width: 40px;
+    margin-top: -2px;
+  }
+  .list-body { flex: 1; }
+  .list-title { font-size: 16px; font-weight: 800; letter-spacing: -0.03em; color: #fff; margin-bottom: 4px; }
+  .list-desc { font-size: 12px; line-height: 1.6; color: #a1a1aa; }
+
+  /* ──── SECTION B: Three job types ──── */
+  .light-section { background: #fff; padding: 40px 32px; }
+  .section-title-dark { font-size: 26px; font-weight: 900; letter-spacing: -0.05em; color: #09090b; text-align: center; margin-bottom: 28px; line-height: 1.15; }
+  .section-title-dark.left { text-align: left; }
+  .tag-amber { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.24em; color: #b45309; text-align: center; margin-bottom: 12px; display: block; }
+  .tag-amber.left { text-align: left; }
+
+  .card-light {
+    background: #fff;
+    border: 1px solid #e4e4e7;
+    border-top: 3px solid #f59e0b;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+  }
+  .icon-box-light {
+    width: 36px; height: 36px;
+    background: #fef3c7;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 12px;
+    font-size: 16px;
+  }
+  .card-title-dark { font-size: 14px; font-weight: 800; letter-spacing: -0.02em; color: #09090b; margin-bottom: 10px; }
+  .checklist { list-style: none; }
+  .checklist li { font-size: 11px; line-height: 1.6; color: #52525b; padding: 3px 0; padding-left: 18px; position: relative; }
+  .checklist li::before { content: '✓'; position: absolute; left: 0; color: #10b981; font-weight: 800; }
+
+  /* Tall feature layout */
+  .feature-table { width: 100%; border-collapse: collapse; }
+  .feature-table th { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.18em; color: #71717a; padding: 10px 14px; text-align: left; border-bottom: 2px solid #e4e4e7; }
+  .feature-table td { font-size: 12px; padding: 11px 14px; border-bottom: 1px solid #f4f4f5; color: #3f3f46; vertical-align: top; }
+  .feature-table tr:last-child td { border-bottom: none; }
+  .feature-table .type-col { font-weight: 700; color: #09090b; font-size: 13px; }
+  .check { color: #10b981; font-weight: 800; }
+
+  /* Diagonal / offset layout */
+  .offset-grid { display: grid; grid-template-columns: 1.4fr 0.8fr 0.8fr; gap: 12px; align-items: start; }
+  .card-feature-large {
+    background: #fff;
+    border: 1px solid #e4e4e7;
+    border-top: 4px solid #b45309;
+    border-radius: 16px;
+    padding: 28px 24px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  }
+  .card-feature-sm {
+    background: #fafafa;
+    border: 1px solid #e4e4e7;
+    border-top: 3px solid #d4d4d8;
+    border-radius: 14px;
+    padding: 18px;
+  }
+  .card-feature-sm.highlight {
+    border-top-color: #f59e0b;
+    background: #fffbeb;
+  }
+  .card-big-title { font-size: 18px; font-weight: 900; letter-spacing: -0.04em; color: #09090b; margin-bottom: 8px; }
+  .card-eyebrow { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.18em; color: #b45309; margin-bottom: 8px; }
+  .card-sm-title { font-size: 13px; font-weight: 700; letter-spacing: -0.02em; color: #09090b; margin-bottom: 6px; }
+
+  .divider { height: 1px; background: #e4e4e7; margin: 56px 0; }
+
+  @media (max-width: 640px) {
+    .grid-3, .grid-1-2, .offset-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<h1>Homepage 布局重设计</h1>
+<p class="subtitle">两个三列卡片区块 — 目前是对称 AI 模板感，下面是三种替代方案</p>
+
+<!-- ════════════════════════════════════════════
+     SECTION 1: "Built for agencies…" (dark bg)
+     ════════════════════════════════════════════ -->
+<p class="section-label">Section 1 — "Built for agencies that can't afford surprises"（深色背景）</p>
+
+<!-- CURRENT -->
+<div class="option-wrapper">
+  <div class="option-header">
+    <h2>现状</h2>
+    <span class="badge badge-current">当前</span>
+    <span class="verdict">3 等宽卡片 + 居中标题 = 典型 AI 模板</span>
+  </div>
+  <div class="mockup-wrap">
+    <div class="mockup">
+      <div class="dark-section">
+        <span class="tag">Why Us</span>
+        <div class="section-title">Built for agencies that can't afford surprises</div>
+        <div class="grid-3">
+          <div class="card-dark">
+            <div class="icon-box">⏱</div>
+            <div class="card-title">2-Day SLA</div>
+            <div class="card-desc">Standard jobs turn around in 2 business days. Fixed scope and fixed price before any work begins — no surprises.</div>
+          </div>
+          <div class="card-dark">
+            <div class="icon-box">🛡</div>
+            <div class="card-title">ISO-Grade Data Handling</div>
+            <div class="card-desc">Files stored encrypted with signed URLs. Your data is never used to train AI models. Automatic deletion.</div>
+          </div>
+          <div class="card-dark featured">
+            <div class="icon-box green">🏷</div>
+            <div class="card-title">White-Label Ready</div>
+            <div class="card-desc">Your clients never see RelayOps. Resell at any margin. Deliverables come unbranded. You own the relationship.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OPTION A: 1+2 split with featured hero -->
+<div class="option-wrapper">
+  <div class="option-header">
+    <h2>方案 A — 主角 + 配角布局</h2>
+    <span class="badge badge-option">推荐</span>
+    <span class="verdict">左边大卡片突出最强卖点，右边两小卡辅助 — 破对称</span>
+  </div>
+  <div class="mockup-wrap">
+    <div class="mockup" onclick="this.classList.toggle('selected')">
+      <div class="dark-section">
+        <span class="tag left">Why Us</span>
+        <div class="section-title left">Built for agencies that<br>can't afford surprises</div>
+        <div class="grid-1-2" style="grid-template-columns: 1.3fr 1fr; align-items: start;">
+          <div class="card-dark span2" style="height: 100%;">
+            <div class="icon-box" style="width:44px;height:44px;font-size:20px;">⏱</div>
+            <div class="card-title" style="font-size:20px; margin-top:8px;">2-Day SLA</div>
+            <div class="card-desc-large" style="margin-top:10px;">Standard jobs turn around in 2 business days. Fixed scope and fixed price before any work begins — no surprises, no scope creep, no renegotiations.</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <div class="card-dark" style="flex:1;">
+              <div class="icon-box">🛡</div>
+              <div class="card-title">ISO-Grade Data Handling</div>
+              <div class="card-desc">Encrypted storage, signed URLs, never used for AI training.</div>
+            </div>
+            <div class="card-dark featured" style="flex:1;">
+              <div class="icon-box green">🏷</div>
+              <div class="card-title">White-Label Ready</div>
+              <div class="card-desc">Your clients never see RelayOps. Resell at any margin.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OPTION B: horizontal list -->
+<div class="option-wrapper">
+  <div class="option-header">
+    <h2>方案 B — 横向列表</h2>
+    <span class="badge" style="background:#6366f1;color:#fff;">可选</span>
+    <span class="verdict">数字编号 + 单行排列 — 像一份清单而非卡片网格</span>
+  </div>
+  <div class="mockup-wrap">
+    <div class="mockup" onclick="this.classList.toggle('selected')">
+      <div class="dark-section">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:32px;">
+          <div style="max-width:260px; flex-shrink:0;">
+            <span class="tag left">Why Us</span>
+            <div class="section-title left" style="font-size:22px;">Built for agencies that can't afford surprises</div>
+          </div>
+          <div class="grid-list" style="flex:1;">
+            <div class="list-row">
+              <div class="list-number">01</div>
+              <div class="list-body">
+                <div class="list-title">2-Day SLA</div>
+                <div class="list-desc">Fixed scope, fixed price, delivered in 2 business days. No surprises.</div>
+              </div>
+            </div>
+            <div class="list-row">
+              <div class="list-number">02</div>
+              <div class="list-body">
+                <div class="list-title">ISO-Grade Data Handling</div>
+                <div class="list-desc">Encrypted storage, signed URLs, automatic deletion. Never used to train AI.</div>
+              </div>
+            </div>
+            <div class="list-row">
+              <div class="list-number">03</div>
+              <div class="list-body">
+                <div class="list-title">White-Label Ready</div>
+                <div class="list-desc">Clients never see RelayOps. Resell at any margin. Deliverables unbranded.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════════════════
+     SECTION 2: "Three job types" (light bg)
+     ════════════════════════════════════════════ -->
+<p class="section-label">Section 2 — "Three job types, all import-ready"（白色背景）</p>
+
+<!-- CURRENT -->
+<div class="option-wrapper">
+  <div class="option-header">
+    <h2>现状</h2>
+    <span class="badge badge-current">当前</span>
+    <span class="verdict">3 等宽服务卡片 + 居中标题 — 同样模式</span>
+  </div>
+  <div class="mockup-wrap">
+    <div class="mockup">
+      <div class="light-section">
+        <span class="tag-amber">Services</span>
+        <div class="section-title-dark">Three job types, all import-ready</div>
+        <div class="grid-3">
+          <div class="card-light">
+            <div class="icon-box-light">🗄</div>
+            <div class="card-title-dark">Data Cleanup & Import Prep</div>
+            <ul class="checklist">
+              <li>Deduplication</li>
+              <li>Field normalization</li>
+              <li>Format standardization</li>
+              <li>HubSpot import template mapping</li>
+            </ul>
+          </div>
+          <div class="card-light">
+            <div class="icon-box-light">📊</div>
+            <div class="card-title-dark">Data Normalization & Report Prep</div>
+            <ul class="checklist">
+              <li>Consistent value encoding</li>
+              <li>Date/number formatting</li>
+              <li>Enum harmonization</li>
+              <li>Report-ready output</li>
+            </ul>
+          </div>
+          <div class="card-light">
+            <div class="icon-box-light">⚡</div>
+            <div class="card-title-dark">CRM Import Failure Diagnosis</div>
+            <ul class="checklist">
+              <li>Error log review</li>
+              <li>Column mapping fix</li>
+              <li>Required-field audit</li>
+              <li>Re-import guidance</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OPTION C: asymmetric offset (主打 + 两小) -->
+<div class="option-wrapper">
+  <div class="option-header">
+    <h2>方案 C — 主服务突出 + 两个次服务</h2>
+    <span class="badge badge-option">推荐</span>
+    <span class="verdict">最常用服务（Data Cleanup）占主角，左对齐标题</span>
+  </div>
+  <div class="mockup-wrap">
+    <div class="mockup" onclick="this.classList.toggle('selected')">
+      <div class="light-section">
+        <span class="tag-amber left">Services</span>
+        <div class="section-title-dark left">Three job types,<br>all import-ready</div>
+        <div class="offset-grid">
+          <div class="card-feature-large">
+            <div class="card-eyebrow">Most requested</div>
+            <div class="icon-box-light" style="width:44px;height:44px;font-size:20px;">🗄</div>
+            <div class="card-big-title" style="margin-top:10px;">Data Cleanup & Import Prep</div>
+            <ul class="checklist" style="margin-top:12px;">
+              <li style="font-size:12px;">Deduplication</li>
+              <li style="font-size:12px;">Field normalization</li>
+              <li style="font-size:12px;">Format standardization</li>
+              <li style="font-size:12px;">HubSpot import template mapping</li>
+            </ul>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div class="card-feature-sm highlight">
+              <div class="icon-box-light" style="margin-bottom:8px;font-size:14px;">📊</div>
+              <div class="card-sm-title">Data Normalization & Report Prep</div>
+              <ul class="checklist" style="margin-top:6px;">
+                <li>Consistent value encoding</li>
+                <li>Date/number formatting</li>
+                <li>Enum harmonization</li>
+              </ul>
+            </div>
+            <div class="card-feature-sm">
+              <div class="icon-box-light" style="margin-bottom:8px;font-size:14px;">⚡</div>
+              <div class="card-sm-title">CRM Import Failure Diagnosis</div>
+              <ul class="checklist" style="margin-top:6px;">
+                <li>Error log review</li>
+                <li>Column mapping fix</li>
+                <li>Re-import guidance</li>
+              </ul>
+            </div>
+          </div>
+          <!-- third column: feature list summary -->
+          <div style="display:flex;flex-direction:column;gap:0;padding: 0 8px;">
+            <div style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.18em; color:#a1a1aa; margin-bottom:14px;">All jobs include</div>
+            <div style="font-size:12px; color:#52525b; padding: 10px 0; border-bottom:1px solid #f4f4f5;">48-hour turnaround SLA</div>
+            <div style="font-size:12px; color:#52525b; padding: 10px 0; border-bottom:1px solid #f4f4f5;">Fixed price upfront</div>
+            <div style="font-size:12px; color:#52525b; padding: 10px 0; border-bottom:1px solid #f4f4f5;">HubSpot-ready output</div>
+            <div style="font-size:12px; color:#52525b; padding: 10px 0; border-bottom:1px solid #f4f4f5;">White-label delivery</div>
+            <div style="font-size:12px; color:#52525b; padding: 10px 0;">Encrypted file handling</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OPTION D: table/comparison -->
+<div class="option-wrapper">
+  <div class="option-header">
+    <h2>方案 D — 比较表格</h2>
+    <span class="badge" style="background:#6366f1;color:#fff;">可选</span>
+    <span class="verdict">适合 B2B 买家快速扫描，信息密度高但不花哨</span>
+  </div>
+  <div class="mockup-wrap">
+    <div class="mockup" onclick="this.classList.toggle('selected')">
+      <div class="light-section">
+        <span class="tag-amber left">Services</span>
+        <div class="section-title-dark left">Three job types, all import-ready</div>
+        <table class="feature-table">
+          <thead>
+            <tr>
+              <th>Service</th>
+              <th>What we do</th>
+              <th>Output</th>
+              <th>Turnaround</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="type-col">Data Cleanup & Import Prep</td>
+              <td>Deduplication, field normalization, format standardization</td>
+              <td>HubSpot-ready CSV/XLSX</td>
+              <td><span class="check">✓</span> 2 days</td>
+            </tr>
+            <tr>
+              <td class="type-col">Data Normalization & Report Prep</td>
+              <td>Enum harmonization, date/number formatting, value encoding</td>
+              <td>Report-ready dataset</td>
+              <td><span class="check">✓</span> 2 days</td>
+            </tr>
+            <tr>
+              <td class="type-col">CRM Import Failure Diagnosis</td>
+              <td>Error log review, column mapping, required-field audit</td>
+              <td>Fixed file + re-import guide</td>
+              <td><span class="check">✓</span> 2 days</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="height:40px;"></div>
+
+<script>
+// Simple click-to-select
+document.querySelectorAll('.mockup[onclick]').forEach(el => {
+  el.addEventListener('click', function() {
+    this.classList.toggle('selected');
+  });
+});
+</script>
+
+</body>
+</html>
