@@ -1,20 +1,24 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-
-const navLinks = [
-  { href: '/demo', label: 'Demo' },
-  { href: '/case-studies', label: 'Case Studies' },
-  { href: '/how-it-works', label: 'How It Works' },
-  { href: '/for-partners', label: 'For Partners' },
-  { href: '/security', label: 'Security' },
-]
+import { LocaleSwitcher } from '@/components/ui/locale-switcher'
+import { Link } from '@/i18n/navigation'
 
 export function PublicNavbar() {
+  const t = useTranslations('common.nav')
   const [scrolled, setScrolled] = useState(false)
+
+  const navLinks = [
+    { href: '/pricing' as const, label: 'Pricing' },
+    { href: '/demo' as const, label: t('demo') },
+    { href: '/case-studies' as const, label: t('caseStudies') },
+    { href: '/how-it-works' as const, label: t('howItWorks') },
+    { href: '/for-partners' as const, label: t('forPartners') },
+    { href: '/security' as const, label: t('security') },
+  ]
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10)
@@ -29,7 +33,7 @@ export function PublicNavbar() {
         href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:rounded-md focus:bg-blue-600 focus:px-4 focus:py-2 focus:text-white"
       >
-        跳至主要内容
+        {t('skipToContent')}
       </a>
       <header
         className={`animate-slide-down sticky top-0 z-50 border-b transition-all duration-300 ${
@@ -67,13 +71,14 @@ export function PublicNavbar() {
           </div>
 
           <div className="flex items-center gap-2">
+            <LocaleSwitcher />
             <Button
               asChild
               variant="ghost"
               size="sm"
               className="min-h-[44px] rounded-full px-4 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-950"
             >
-              <Link href="/login">Sign In</Link>
+              <Link href="/login">{t('login')}</Link>
             </Button>
             <Button
               asChild
@@ -81,7 +86,7 @@ export function PublicNavbar() {
               className="min-h-[44px] rounded-full border border-blue-500/40 bg-blue-500 px-5 text-white shadow-sm shadow-[0_18px_38px_-20px_rgba(59,130,246,0.55)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-blue-400 hover:shadow-[0_0_0_1px_rgba(59,130,246,0.18),0_22px_44px_-18px_rgba(59,130,246,0.72)]"
             >
               <Link href="/request-access">
-                Request Access
+                {t('requestAccess')}
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>

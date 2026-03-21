@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import LandingPage from '@/app/(public)/page'
+import LandingPage from '@/app/[locale]/(public)/page'
 
 vi.mock('next/link', () => ({
   default: ({

@@ -1,0 +1,204 @@
+{
+  "common": {
+    "nav": {
+      "demo": "演示",
+      "caseStudies": "案例研究",
+      "howItWorks": "工作流程",
+      "forPartners": "合作伙伴",
+      "security": "安全",
+      "requestAccess": "申请访问",
+      "login": "登录",
+      "skipToContent": "跳至主要内容"
+    },
+    "cta": {
+      "requestAccess": "申请访问",
+      "applyPartnerAccess": "申请合作伙伴权限",
+      "seeWorkflow": "查看工作流程",
+      "seeHowItWorks": "了解运作方式",
+      "startWithPilot": "从试点开始",
+      "previewPilot": "预览试点交付物",
+      "getStarted": "准备好开始了吗？",
+      "getStartedDescription": "申请合作伙伴权限，2 个工作日内完成门户设置。"
+    },
+    "locale": {
+      "en": "EN",
+      "zh": "中文",
+      "switchLanguage": "切换语言"
+    }
+  },
+  "landing": {
+    "badge": "面向代理团队的营收运营交付服务",
+    "hero": {
+      "title": "将 CRM 数据清洗变成您的代理机构真正能兑现的 {highlight}。",
+      "highlight": "48 小时承诺",
+      "description": "RelayOps 为 RevOps 代理机构提供商业级的 CRM 数据清洗、质检和白标交付服务。您保留客户关系，我们负责确保工作范围明确、经过审核、持续推进。"
+    },
+    "trustSignals": {
+      "sla": "2 天 SLA",
+      "tests": "635 项测试",
+      "soc2": "SOC2 就绪",
+      "whiteLabel": "白标交付"
+    },
+    "assurance": {
+      "scopeLocked": "生产开始前锁定工作范围",
+      "qaReview": "交付到您的门户前完成质检审核",
+      "secureData": "专为代理交付团队设计的安全数据处理"
+    },
+    "controlRoom": {
+      "title": "交付控制中心",
+      "subtitle": "您的客户团队做出的承诺，就是我们优化的操作系统。",
+      "liveSla": "实时 SLA 路径",
+      "scopeResponse": "范围响应",
+      "scopeValue": "4 小时",
+      "scopeDescription": "管理员审核在工人接手之前锁定需求简报。",
+      "deliveryStandard": "交付标准",
+      "deliveryValue": "2 天",
+      "deliveryDescription": "为承诺速度且无返工的代理机构打造的可审核交付物。",
+      "controlTitle": "保持可控的环节",
+      "items": {
+        "scopeLocked": "执行前锁定范围",
+        "workerReviewed": "工人产出根据验收标准审核",
+        "deliveryNotes": "交付说明已准备好供合作伙伴交接",
+        "noBranding": "无面向客户的 RelayOps 品牌标识"
+      },
+      "included": "已包含"
+    },
+    "value": {
+      "label": "客户价值",
+      "title": "旨在提升代理机构利润率，无需增加更多项目管理开销。",
+      "description": "RelayOps 出售的是确定性，而非通用的数据清洗劳动力。交付系统的每个环节都旨在帮助您的团队更快报价、更干净交付、保护利润率。",
+      "props": {
+        "whiteLabel": {
+          "title": "默认白标",
+          "description": "以您的代理机构名义交付干净的 CRM 数据导入。RelayOps 保持不可见，您保留客户关系和利润空间。"
+        },
+        "sla": {
+          "title": "可以销售的 48 小时承诺",
+          "description": "范围锁定、质检和交付围绕 2 天 SLA 设计，让您的团队不再将 CSV 清洗当作计划外的工作。"
+        },
+        "margin": {
+          "title": "每个需求简报的可预测利润",
+          "description": "固定范围的需求收集和管理员审核，防止数据准备工作演变为伪装成运营的开放式咨询。"
+        },
+        "qa": {
+          "title": "客户交接前的质检",
+          "description": "每个交付物在到达您的门户之前都经过审核，您的项目经理不需要做最终的清理工作。"
+        }
+      }
+    },
+    "workflow": {
+      "label": "工作流程",
+      "title": "从合作伙伴到交付，每个阶段都有清晰的交接。",
+      "description": "首页应该展示运营控制能力，而不仅仅是劳动力。这个流程让商业故事一目了然。",
+      "steps": {
+        "intake": { "title": "合作伙伴提交", "description": "您的团队通过固定的提交流程发送需求简报、源文件和成功标准，确保没有模糊的内容进入生产环节。" },
+        "scope": { "title": "管理员范围锁定", "description": "RelayOps 确定工单范围、确认约束条件，并在工作开始前锁定交付目标。" },
+        "qa": { "title": "工人质检", "description": "工人执行清洗工作，管理员质检根据批准的范围检查映射、格式和交付说明。" },
+        "delivery": { "title": "交付就绪", "description": "您收到可审核的交付物，包含白标输出、修订说明和返回客户的清晰交付路径。" }
+      }
+    },
+    "proof": {
+      "label": "社会证明",
+      "title": "商业化的证据，而非空洞的愿景。",
+      "description": "这个板块旨在回答买家的真实问题：RelayOps 能否让我的交付承诺比内部保留数据清洗工作更安全？",
+      "metrics": {
+        "tickets": { "value": "1,240+", "label": "已处理工单" },
+        "delivery": { "value": "46h", "label": "平均交付时间" },
+        "satisfaction": { "value": "98%", "label": "合作伙伴满意度" }
+      },
+      "testimonialLabel": "合作伙伴评价",
+      "testimonialNote": "准备好替换真实推荐信的占位区块。",
+      "testimonialSlot": "推荐信插槽",
+      "testimonialQuote": "\"RelayOps 让我们能够承诺快速的 CRM 交付，而不用让高级运营人员再花一周时间清理电子表格。\"",
+      "testimonialDisclaimer": "上线前的占位推荐信。获得批准后替换为真实合作伙伴证明，模块结构、层级和指标区块已就绪。"
+    },
+    "finalCta": {
+      "badge": "2 分钟内申请访问",
+      "title": "为您的代理机构提供一个销售确定性而非清洗工时的交付引擎。",
+      "description": "如果首页完成了它的工作，下一步应该显而易见：打开申请，锁定匹配度，开始更有信心地报价。"
+    }
+  },
+  "howItWorks": {
+    "badge": "流程",
+    "hero": {
+      "title": "从需求简报到干净数据，5 个步骤",
+      "description": "每个任务遵循相同的结构化流程——开始前确定范围，关闭前完成审核。"
+    },
+    "timeline": {
+      "label": "时间线",
+      "title": "从需求简报到干净的、可导入 CRM 数据的五步流程。"
+    },
+    "steps": {
+      "step1": {
+        "step": "第 1 步",
+        "title": "提交需求简报",
+        "duration": "需要 5-10 分钟",
+        "description": "在您的合作伙伴门户中填写结构化工单。告诉我们您有什么（文件数量、行数、源系统），哪里有问题（重复项、格式错误、导入失败），以及完成的标准是什么（目标系统、验收标准）。",
+        "deliverable": "4 个工作小时内开始范围审核。"
+      },
+      "step2": {
+        "step": "第 2 步",
+        "title": "管理员确定范围",
+        "duration": "当天",
+        "description": "RelayOps 管理员审核您的简报，对工作进行分类（清洗、标准化或诊断），并分配定价层级。标准任务按固定费率报价，复杂任务单独报价。工作开始前您会看到范围和价格。",
+        "deliverable": "您将通过 Stripe 收到固定价格发票。"
+      },
+      "step3": {
+        "step": "第 3 步",
+        "title": "批准发票",
+        "duration": "您准备好时",
+        "description": "通过合作伙伴门户支付发票。确认付款后，任务进入队列。不付款就不开始——这保护了双方并使管道可预测。",
+        "deliverable": "任务状态变为已排队。"
+      },
+      "step4": {
+        "step": "第 4 步",
+        "title": "我们处理数据",
+        "duration": "2 个工作日（标准）",
+        "description": "您的数据集通过我们的 AI 辅助工作流处理，严格在范围内的验收标准下工作——不做未记录的更改，不碰范围外的列。您的数据永远不会用于训练 AI 模型。所有处理在我们的安全环境中进行，使用加密文件存储。",
+        "deliverable": "已完成的交付物上传，附带交付摘要供审核。"
+      },
+      "step5": {
+        "step": "第 5 步",
+        "title": "您审核并接受",
+        "duration": "72 小时审核窗口",
+        "description": "下载交付物并根据验收标准检查。如果符合简报要求：批准，任务关闭。如果有问题：提交一次修订请求并附具体说明。如果确实存在不足：打开争议供管理员审核。",
+        "deliverable": "已批准的交付物，准备交付给您的客户。"
+      }
+    },
+    "pricing": {
+      "label": "定价层级",
+      "title": "定价层级",
+      "description": "所有价格按任务计费。为月度流量可预测的合作伙伴提供批量协议。"
+    },
+    "faq": {
+      "label": "常见问题",
+      "title": "常见问题"
+    }
+  },
+  "forPartners": {
+    "badge": "合作伙伴计划",
+    "hero": {
+      "title": "面向 RevOps 代理机构的白标 CRM 数据清洗",
+      "description": "无需雇佣运营人员，即可为客户提供 2 天 CRM 导入准备服务。RelayOps 负责清洗，您负责客户关系。"
+    },
+    "benefits": {
+      "label": "合作伙伴权益",
+      "title": "作为合作伙伴您将获得"
+    },
+    "pricing": {
+      "label": "定价",
+      "title": "透明的定价层级",
+      "description": "这是您的成本。按照适合您业务的方式向客户收费。",
+      "mostCommon": "最受欢迎"
+    },
+    "goodFit": {
+      "label": "适合对象",
+      "title": "谁是理想的合作伙伴",
+      "description": "RelayOps 专为定期处理 CRM 数据且希望获得可靠交付服务而无需增加人员的代理机构设计。"
+    },
+    "finalCta": {
+      "title": "申请合作伙伴权限",
+      "description": "面向 RevOps 代理机构的白标 CRM 数据清洗交付服务。立即申请合作伙伴权限。"
+    }
+  }
+}

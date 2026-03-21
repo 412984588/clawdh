@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
-import ForPartnersPage from '../../src/app/(public)/for-partners/page'
-import LandingPage from '../../src/app/(public)/page'
+import ForPartnersPage from '../../src/app/[locale]/(public)/for-partners/page'
+import LandingPage from '../../src/app/[locale]/(public)/page'
 import opengraphImage, { contentType, size } from '../../src/app/opengraph-image'
 import robots from '../../src/app/robots'
 import sitemap from '../../src/app/sitemap'
@@ -9,9 +9,11 @@ import {
   absoluteUrl,
   createPublicMetadata,
   publicPageDefinitions,
+  publicSitemapPaths,
   rootMetadata,
   rootViewport,
 } from '@/lib/seo'
+import { routing } from '@/i18n/routing'
 
 type PublicPage = (typeof publicPageDefinitions)[keyof typeof publicPageDefinitions]
 
@@ -48,6 +50,7 @@ describe('site seo configuration', () => {
     publicPageDefinitions.landing,
     publicPageDefinitions.home,
     publicPageDefinitions.demo,
+    publicPageDefinitions.pricing,
     publicPageDefinitions.caseStudies,
     publicPageDefinitions.howItWorks,
     publicPageDefinitions.forPartners,
@@ -103,20 +106,27 @@ describe('site seo configuration', () => {
   })
 
   it('generates a sitemap for every public marketing route', () => {
-    expect(sitemap()).toEqual([
-      { url: 'http://localhost:3000/' },
-      { url: 'http://localhost:3000/home' },
-      { url: 'http://localhost:3000/demo' },
-      { url: 'http://localhost:3000/case-studies' },
-      { url: 'http://localhost:3000/how-it-works' },
-      { url: 'http://localhost:3000/for-partners' },
-      { url: 'http://localhost:3000/request-access' },
-      { url: 'http://localhost:3000/pilot-sample' },
-      { url: 'http://localhost:3000/security' },
-      { url: 'http://localhost:3000/privacy' },
-      { url: 'http://localhost:3000/terms' },
-      { url: 'http://localhost:3000/refund-policy' },
-    ])
+    const expected = publicSitemapPaths.flatMap((path) => {
+      const alternates = Object.fromEntries(
+        routing.locales.map((locale) => {
+          const prefix = locale === routing.defaultLocale ? '' : `/${locale}`
+          return [locale, absoluteUrl(`${prefix}${path}`)]
+        }),
+      )
+
+      return routing.locales.map((locale) => {
+        const prefix = locale === routing.defaultLocale ? '' : `/${locale}`
+
+        return {
+          url: absoluteUrl(`${prefix}${path}`),
+          alternates: {
+            languages: alternates,
+          },
+        }
+      })
+    })
+
+    expect(sitemap()).toEqual(expected)
   })
 
   it('publishes robots rules that block dashboard urls and point to the sitemap', () => {

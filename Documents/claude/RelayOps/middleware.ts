@@ -1,11 +1,16 @@
 import { type NextRequest, NextResponse } from 'next/server'
+import createIntlMiddleware from 'next-intl/middleware'
 import { updateSession } from '@/lib/supabase/middleware'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { MemoryStore, checkRateLimit } from '@/lib/middleware/rate-limit'
 import { getConfigForPath } from '@/lib/middleware/rate-limit-config'
+import { routing } from '@/i18n/routing'
 
 // 模块级实例 — 同一 Edge Runtime 实例内共享
 const rateLimitStore = new MemoryStore()
+
+// next-intl 国际化中间件（仅公开路由使用）
+const intlMiddleware = createIntlMiddleware(routing)
 
 const PUBLIC_ROUTES = [
   '/',
@@ -17,12 +22,25 @@ const PUBLIC_ROUTES = [
   '/terms',
   '/privacy',
   '/refund-policy',
+  '/case-studies',
+  '/demo',
+  '/home',
+  '/pricing',
 ]
 const AUTH_ROUTES = ['/login']
 const ROLE_ROUTES: Record<string, string> = {
   admin: '/admin',
   partner: '/partner',
   worker_internal: '/worker',
+}
+
+// 判断路径是否为公开路由（含 /zh 前缀）
+function isPublicPath(pathname: string): boolean {
+  // 去掉 locale 前缀后判断
+  const pathWithoutLocale = pathname.replace(/^\/(zh)/, '') || '/'
+  return PUBLIC_ROUTES.some(
+    (r) => pathWithoutLocale === r || pathWithoutLocale.startsWith(r + '/')
+  )
 }
 
 export async function middleware(request: NextRequest) {
@@ -58,15 +76,16 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  const { supabaseResponse, user } = await updateSession(request)
-
-  // 在响应中附加 traceId（便于客户端/日志关联）
-  supabaseResponse.headers.set('x-trace-id', traceId)
-
-  // Allow public routes
-  if (PUBLIC_ROUTES.some((r) => pathname === r || pathname.startsWith(r + '/'))) {
-    return supabaseResponse
+  // ── 公开路由：交给 next-intl 处理国际化路由 ──────────────────────────
+  if (isPublicPath(pathname)) {
+    const response = intlMiddleware(request)
+    response.headers.set('x-trace-id', traceId)
+    return response
   }
+
+  // ── 非公开路由：原有的 supabase + 认证逻辑 ──────────────────────────
+  const { supabaseResponse, user } = await updateSession(request)
+  supabaseResponse.headers.set('x-trace-id', traceId)
 
   // Allow auth routes (but redirect if already logged in)
   if (AUTH_ROUTES.some((r) => pathname === r || pathname.startsWith(r + '/'))) {

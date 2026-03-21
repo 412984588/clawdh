@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import DemoPage from '../../../src/app/(public)/demo/page'
+import DemoPage from '../../../src/app/[locale]/(public)/demo/page'
 
 vi.mock('next/link', () => ({
   default: ({

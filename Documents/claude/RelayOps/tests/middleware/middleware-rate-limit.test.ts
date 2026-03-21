@@ -12,6 +12,18 @@ vi.mock('@/lib/supabase/admin', () => ({
   createAdminClient: vi.fn(),
 }))
 
+// mock next-intl middleware — 返回标准 NextResponse
+vi.mock('next-intl/middleware', () => ({
+  default: () => {
+    const { NextResponse } = require('next/server')
+    return () => NextResponse.next()
+  },
+}))
+
+vi.mock('@/i18n/routing', () => ({
+  routing: { locales: ['en', 'zh'], defaultLocale: 'en', localePrefix: 'as-needed' },
+}))
+
 // mock rate-limit 模块，控制限流行为
 const mockCheckRateLimit = vi.fn()
 const mockGetConfigForPath = vi.fn()

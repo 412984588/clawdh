@@ -2,6 +2,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import type { NextConfig } from 'next'
 import bundleAnalyzer from '@next/bundle-analyzer'
+import createNextIntlPlugin from 'next-intl/plugin'
 import { withSentryConfig } from '@sentry/nextjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -71,7 +72,9 @@ const nextConfig: NextConfig = {
   },
 }
 
-// Sentry 包裹 — 不上传 source maps（需 auth token），保留 console 输出
-export default withSentryConfig(withBundleAnalyzer(nextConfig), {
+const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts')
+
+// 包裹顺序：next-intl → bundleAnalyzer → Sentry
+export default withSentryConfig(withBundleAnalyzer(withNextIntl(nextConfig)), {
   silent: true,
 })
