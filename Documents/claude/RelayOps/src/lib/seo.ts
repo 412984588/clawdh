@@ -45,6 +45,13 @@ export const publicPageDefinitions = {
       'White-label HubSpot and CRM import prep for RevOps agencies with a 2-business-day turnaround.',
     keywords: ['crm import prep', 'hubspot import prep'],
   },
+  caseStudies: {
+    path: '/case-studies',
+    title: 'Case Studies',
+    description:
+      'Placeholder customer stories showing how RelayOps supports ecommerce, SaaS, and financial operations teams with high-stakes data delivery.',
+    keywords: ['customer stories', 'data migration case studies', 'crm cleanup results'],
+  },
   howItWorks: {
     path: '/how-it-works',
     title: 'How It Works',
@@ -104,6 +111,7 @@ export const publicPageDefinitions = {
 export const publicSitemapPaths = [
   publicPageDefinitions.landing.path,
   publicPageDefinitions.home.path,
+  publicPageDefinitions.caseStudies.path,
   publicPageDefinitions.howItWorks.path,
   publicPageDefinitions.forPartners.path,
   publicPageDefinitions.requestAccess.path,
