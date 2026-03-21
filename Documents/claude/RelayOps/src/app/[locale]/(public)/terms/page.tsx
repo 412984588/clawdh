@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { createPublicMetadata, publicPageDefinitions } from '@/lib/seo'
 
 export const metadata = createPublicMetadata(publicPageDefinitions.terms)
@@ -62,9 +63,9 @@ export default function TermsPage() {
             <p>
               Refund eligibility depends on job status at the time of the request. For full
               details, see our{' '}
-              <a href="/refund-policy" className="text-blue-600 hover:underline">
+              <Link href="/refund-policy" className="text-blue-600 hover:underline">
                 Refund Policy
-              </a>
+              </Link>
               . In summary:
             </p>
             <ul className="list-disc pl-5 space-y-1">
@@ -86,9 +87,9 @@ export default function TermsPage() {
               All data submitted to RelayOps is processed solely for the purpose of
               completing the requested job. Files are stored encrypted and deleted according
               to the published{' '}
-              <a href="/security" className="text-blue-600 hover:underline">
+              <Link href="/security" className="text-blue-600 hover:underline">
                 retention schedule
-              </a>
+              </Link>
               .
             </p>
             <p>

@@ -4,7 +4,7 @@ import { ExternalLink } from 'lucide-react'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { requireRole } from '@/lib/utils/get-session-user'
 import { getLedgerEntriesForOrg } from '@/lib/services/ledger.service'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import {
   Table,

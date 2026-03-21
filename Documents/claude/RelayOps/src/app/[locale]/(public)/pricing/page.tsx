@@ -5,7 +5,6 @@ import {
   Building2,
   Check,
   CircleDollarSign,
-  ShieldCheck,
   Sparkles,
   X,
 } from 'lucide-react'

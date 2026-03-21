@@ -13,8 +13,6 @@ import {
   rootMetadata,
   rootViewport,
 } from '@/lib/seo'
-import { routing } from '@/i18n/routing'
-
 type PublicPage = (typeof publicPageDefinitions)[keyof typeof publicPageDefinitions]
 
 function readJsonLdScript(id: string): Record<string, unknown> {

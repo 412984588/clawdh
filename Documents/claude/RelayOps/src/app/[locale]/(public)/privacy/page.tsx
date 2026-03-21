@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { createPublicMetadata, publicPageDefinitions } from '@/lib/seo'
 
 export const metadata = createPublicMetadata(publicPageDefinitions.privacy)
@@ -63,9 +64,9 @@ export default function PrivacyPage() {
             <p>
               Job data (files uploaded as part of tickets) is retained according to the
               schedule documented on the{' '}
-              <a href="/security" className="text-blue-600 hover:underline">
+              <Link href="/security" className="text-blue-600 hover:underline">
                 Security page
-              </a>
+              </Link>
               : 7 days for unpaid tickets, 14 days for pilot jobs, 30 days for completed
               jobs, and 90 days for disputed jobs. Files are automatically deleted at the
               end of the applicable window.
@@ -133,9 +134,9 @@ export default function PrivacyPage() {
               We implement reasonable technical and organizational measures to protect
               personal information. However, no internet transmission is completely secure.
               For details on our specific security practices, see the{' '}
-              <a href="/security" className="text-blue-600 hover:underline">
+              <Link href="/security" className="text-blue-600 hover:underline">
                 Security page
-              </a>
+              </Link>
               .
             </p>
           </section>

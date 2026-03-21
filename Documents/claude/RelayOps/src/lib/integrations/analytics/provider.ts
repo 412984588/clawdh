@@ -8,10 +8,12 @@ export interface AnalyticsProvider {
 // Mock 模式：console.log 输出事件（开发/测试环境）
 class ConsoleAnalyticsProvider implements AnalyticsProvider {
   track(event: string, properties?: Record<string, unknown>): void {
+    // eslint-disable-next-line no-console
     console.log('[ANALYTICS MOCK] track', { event, properties })
   }
 
   identify(userId: string, traits?: Record<string, unknown>): void {
+    // eslint-disable-next-line no-console
     console.log('[ANALYTICS MOCK] identify', { userId, traits })
   }
 }
