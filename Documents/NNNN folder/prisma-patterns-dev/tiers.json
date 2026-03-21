@@ -1,0 +1,35 @@
+{
+  "product": "Prisma Patterns",
+  "version": "1.0.0",
+  "tiers": [
+    {
+      "id": "starter",
+      "price_usd": 19,
+      "zip_name": "prisma-patterns-starter-v1.0.0.zip",
+      "templates": [
+        "01-basic-crud",
+        "02-relations",
+        "03-migrations",
+        "04-filtering-sorting",
+        "05-transactions"
+      ]
+    },
+    {
+      "id": "pro",
+      "price_usd": 39,
+      "zip_name": "prisma-patterns-pro-v1.0.0.zip",
+      "templates": [
+        "01-basic-crud",
+        "02-relations",
+        "03-migrations",
+        "04-filtering-sorting",
+        "05-transactions",
+        "06-soft-delete",
+        "07-pagination",
+        "08-raw-queries",
+        "09-middleware",
+        "10-testing"
+      ]
+    }
+  ]
+}
