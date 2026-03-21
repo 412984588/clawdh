@@ -1,0 +1,32 @@
+{
+  "name": "AI Developer Starter Pack",
+  "version": "1.0.0",
+  "price_usd": 59,
+  "individual_value": 107,
+  "zip_name": "ai-developer-starter-pack-v1.0.0.zip",
+  "tagline": "Python scripts, prompts, and Cursor rules to start building with AI immediately.",
+  "products": [
+    {
+      "name": "Python AI Scripts",
+      "dir": "python-ai-scripts-dev",
+      "tier": "pro",
+      "individual_price": 29,
+      "folder_name": "01-python-ai-scripts",
+      "zip_path": "python-ai-scripts-dev/dist/python-ai-scripts-pro-v1.0.0.zip"
+    },
+    {
+      "name": "Claude Code Prompts Pack",
+      "dir": "claude-code-prompts-dev",
+      "tier": "pro",
+      "individual_price": 39,
+      "folder_name": "02-claude-code-prompts"
+    },
+    {
+      "name": "Cursor Rules Pack",
+      "dir": "cursor-rules-pack-dev",
+      "tier": "pro",
+      "individual_price": 39,
+      "folder_name": "03-cursor-rules-pack"
+    }
+  ]
+}

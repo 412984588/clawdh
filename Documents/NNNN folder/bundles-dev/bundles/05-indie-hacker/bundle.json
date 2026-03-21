@@ -1,0 +1,31 @@
+{
+  "name": "Indie Hacker Bundle",
+  "version": "1.0.0",
+  "price_usd": 99,
+  "individual_value": 167,
+  "zip_name": "indie-hacker-bundle-v1.0.0.zip",
+  "tagline": "Everything to launch, sell, and scale your indie product.",
+  "products": [
+    {
+      "name": "Agency Blueprint",
+      "dir": "agency-blueprint-dev",
+      "tier": "pro",
+      "individual_price": 79,
+      "folder_name": "01-agency-blueprint"
+    },
+    {
+      "name": "Claude Code Project Kits",
+      "dir": "claude-code-project-kits-dev",
+      "tier": "complete",
+      "individual_price": 49,
+      "folder_name": "02-claude-code-project-kits"
+    },
+    {
+      "name": "Conference Prep Kit",
+      "dir": "conference-prep-kit-dev",
+      "tier": "pro",
+      "individual_price": 39,
+      "folder_name": "03-conference-prep-kit"
+    }
+  ]
+}

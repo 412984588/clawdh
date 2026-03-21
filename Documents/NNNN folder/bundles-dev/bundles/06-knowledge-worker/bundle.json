@@ -1,0 +1,32 @@
+{
+  "name": "Knowledge Worker Bundle",
+  "version": "1.0.0",
+  "price_usd": 79,
+  "individual_value": 127,
+  "zip_name": "knowledge-worker-bundle-v1.0.0.zip",
+  "tagline": "AI-powered Obsidian vault, smart prompts, and reusable skills — your second brain gets an upgrade.",
+  "products": [
+    {
+      "name": "Obsidian AI Vault",
+      "dir": "obsidian-ai-vault-dev",
+      "tier": "pro",
+      "individual_price": 49,
+      "folder_name": "01-obsidian-ai-vault",
+      "zip_path": "obsidian-ai-vault-dev/dist/vaults/pro.zip"
+    },
+    {
+      "name": "Claude Code Prompts Pack",
+      "dir": "claude-code-prompts-dev",
+      "tier": "pro",
+      "individual_price": 39,
+      "folder_name": "02-claude-code-prompts"
+    },
+    {
+      "name": "Claude Skills Vault",
+      "dir": "claude-skills-vault-dev",
+      "tier": "pro",
+      "individual_price": 39,
+      "folder_name": "03-claude-skills-vault"
+    }
+  ]
+}

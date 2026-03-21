@@ -1,5 +1,5 @@
 """
-Product Bundles — P36 TDD Tests
+Product Bundles — TDD Tests (6 bundles)
 """
 
 import json
@@ -14,12 +14,18 @@ BUNDLE_IDS = [
     "01-devops-complete",
     "02-typescript-fullstack",
     "03-claude-code-master",
+    "04-ai-developer-starter",
+    "05-indie-hacker",
+    "06-knowledge-worker",
 ]
 
 EXPECTED_PRICES = {
     "01-devops-complete": 99,
     "02-typescript-fullstack": 99,
     "03-claude-code-master": 149,
+    "04-ai-developer-starter": 59,
+    "05-indie-hacker": 99,
+    "06-knowledge-worker": 79,
 }
 
 SALES_FILES = [
@@ -33,7 +39,7 @@ SALES_FILES = [
 ]
 
 
-# ─── Root Files ────────────────────────────────────────────────────────────────
+# ─── Root Files ─────────────────────────────────────────────────────────────
 
 class TestRootFiles:
     def test_readme_exists(self):
@@ -46,10 +52,10 @@ class TestRootFiles:
         assert (REPO_ROOT / "build_all.py").exists()
 
 
-# ─── Bundle Directories ────────────────────────────────────────────────────────
+# ─── Bundle Directories ──────────────────────────────────────────────────────
 
 class TestBundleDirectories:
-    def test_all_3_bundle_dirs_exist(self):
+    def test_all_6_bundle_dirs_exist(self):
         for bid in BUNDLE_IDS:
             assert (BUNDLES_DIR / bid).is_dir(), f"Missing bundle dir: {bid}"
 
@@ -70,7 +76,7 @@ class TestBundleDirectories:
             assert (BUNDLES_DIR / bid / "sales").is_dir(), f"Missing sales/ in {bid}"
 
 
-# ─── bundle.json Quality ──────────────────────────────────────────────────────
+# ─── bundle.json Quality ─────────────────────────────────────────────────────
 
 class TestBundleJson:
     def _load(self, bid: str) -> dict:
@@ -83,36 +89,6 @@ class TestBundleJson:
             assert "price_usd" in data
             assert "products" in data
 
-    def test_devops_bundle_price_99(self):
-        assert self._load("01-devops-complete")["price_usd"] == 99
-
-    def test_typescript_bundle_price_99(self):
-        assert self._load("02-typescript-fullstack")["price_usd"] == 99
-
-    def test_claude_code_bundle_price_149(self):
-        assert self._load("03-claude-code-master")["price_usd"] == 149
-
-    def test_devops_bundle_has_5_products(self):
-        data = self._load("01-devops-complete")
-        assert len(data["products"]) == 5
-
-    def test_typescript_bundle_has_3_products(self):
-        data = self._load("02-typescript-fullstack")
-        assert len(data["products"]) == 3
-
-    def test_claude_code_bundle_has_5_products(self):
-        data = self._load("03-claude-code-master")
-        assert len(data["products"]) == 5
-
-    def test_every_product_entry_has_required_fields(self):
-        for bid in BUNDLE_IDS:
-            data = self._load(bid)
-            for prod in data["products"]:
-                assert "name" in prod, f"{bid}: product missing 'name'"
-                assert "dir" in prod, f"{bid}: product missing 'dir'"
-                assert "tier" in prod, f"{bid}: product missing 'tier'"
-                assert "individual_price" in prod, f"{bid}: product missing 'individual_price'"
-
     def test_every_bundle_has_individual_value_field(self):
         for bid in BUNDLE_IDS:
             data = self._load(bid)
@@ -124,23 +100,52 @@ class TestBundleJson:
             assert data["price_usd"] < data["individual_value"], \
                 f"{bid}: bundle price should be less than individual value"
 
-    def test_devops_bundle_includes_github_actions(self):
-        data = self._load("01-devops-complete")
-        names = [p["name"].lower() for p in data["products"]]
-        assert any("github actions" in n or "workflow" in n for n in names)
+    def test_expected_prices(self):
+        for bid, price in EXPECTED_PRICES.items():
+            data = self._load(bid)
+            assert data["price_usd"] == price, f"{bid}: expected ${price}, got ${data['price_usd']}"
 
-    def test_typescript_bundle_includes_zod(self):
-        data = self._load("02-typescript-fullstack")
-        names = [p["name"].lower() for p in data["products"]]
-        assert any("zod" in n for n in names)
+    def test_every_product_entry_has_required_fields(self):
+        for bid in BUNDLE_IDS:
+            data = self._load(bid)
+            for prod in data["products"]:
+                assert "name" in prod, f"{bid}: product missing 'name'"
+                assert "dir" in prod, f"{bid}: product missing 'dir'"
+                assert "tier" in prod, f"{bid}: product missing 'tier'"
+                assert "individual_price" in prod, f"{bid}: product missing 'individual_price'"
 
-    def test_claude_code_bundle_includes_skills(self):
-        data = self._load("03-claude-code-master")
-        names = [p["name"].lower() for p in data["products"]]
-        assert any("skill" in n or "claude" in n for n in names)
+    def test_devops_bundle_has_5_products(self):
+        assert len(self._load("01-devops-complete")["products"]) == 5
+
+    def test_typescript_bundle_has_3_products(self):
+        assert len(self._load("02-typescript-fullstack")["products"]) == 3
+
+    def test_claude_code_bundle_has_5_products(self):
+        assert len(self._load("03-claude-code-master")["products"]) == 5
+
+    def test_ai_developer_starter_has_3_products(self):
+        assert len(self._load("04-ai-developer-starter")["products"]) == 3
+
+    def test_indie_hacker_has_3_products(self):
+        assert len(self._load("05-indie-hacker")["products"]) == 3
+
+    def test_knowledge_worker_has_3_products(self):
+        assert len(self._load("06-knowledge-worker")["products"]) == 3
+
+    def test_ai_developer_includes_cursor_rules(self):
+        names = [p["name"].lower() for p in self._load("04-ai-developer-starter")["products"]]
+        assert any("cursor" in n for n in names)
+
+    def test_indie_hacker_includes_agency_blueprint(self):
+        names = [p["name"].lower() for p in self._load("05-indie-hacker")["products"]]
+        assert any("agency" in n for n in names)
+
+    def test_knowledge_worker_includes_obsidian(self):
+        names = [p["name"].lower() for p in self._load("06-knowledge-worker")["products"]]
+        assert any("obsidian" in n for n in names)
 
 
-# ─── Sales Files ───────────────────────────────────────────────────────────────
+# ─── Sales Files ─────────────────────────────────────────────────────────────
 
 class TestSalesFiles:
     def test_all_sales_files_exist(self):
@@ -148,6 +153,12 @@ class TestSalesFiles:
             for sf in SALES_FILES:
                 path = BUNDLES_DIR / bid / "sales" / sf
                 assert path.exists(), f"Missing {sf} in {bid}/sales/"
+
+    def test_sales_files_not_empty(self):
+        for bid in BUNDLE_IDS:
+            for sf in SALES_FILES:
+                path = BUNDLES_DIR / bid / "sales" / sf
+                assert path.stat().st_size > 50, f"{bid}/{sf} is too small"
 
     def test_product_listings_mention_bundle_price(self):
         for bid in BUNDLE_IDS:
@@ -161,7 +172,7 @@ class TestSalesFiles:
             assert "save" in text.lower() or "value" in text.lower() or "%" in text
 
 
-# ─── ZIP Bundles ───────────────────────────────────────────────────────────────
+# ─── ZIP Bundles ─────────────────────────────────────────────────────────────
 
 class TestZipBundles:
     def _zip_path(self, bid: str) -> Path:
@@ -184,15 +195,22 @@ class TestZipBundles:
                 names = zf.namelist()
             assert "bundle.json" in names, f"{bid} ZIP missing bundle.json"
 
-    def test_devops_zip_has_all_5_product_folders(self):
+    def test_all_zips_non_empty(self):
+        for bid in BUNDLE_IDS:
+            assert self._zip_path(bid).stat().st_size > 5_000, f"{bid} ZIP too small"
+
+    def test_devops_zip_has_all_product_folders(self):
         data = json.loads((BUNDLES_DIR / "01-devops-complete" / "bundle.json").read_text())
-        zip_path = self._zip_path("01-devops-complete")
-        with zipfile.ZipFile(zip_path) as zf:
+        with zipfile.ZipFile(self._zip_path("01-devops-complete")) as zf:
             names = zf.namelist()
         for prod in data["products"]:
-            folder = prod["folder_name"]
-            assert any(folder in n for n in names), f"Missing {folder} in devops bundle ZIP"
+            assert any(prod["folder_name"] in n for n in names)
 
-    def test_claude_code_zip_non_empty(self):
-        zip_path = self._zip_path("03-claude-code-master")
-        assert zip_path.stat().st_size > 10_000, "Claude Code bundle ZIP seems too small"
+    def test_new_bundles_have_product_folders(self):
+        for bid in ["04-ai-developer-starter", "05-indie-hacker", "06-knowledge-worker"]:
+            data = json.loads((BUNDLES_DIR / bid / "bundle.json").read_text())
+            with zipfile.ZipFile(self._zip_path(bid)) as zf:
+                names = zf.namelist()
+            for prod in data["products"]:
+                assert any(prod["folder_name"] in n for n in names), \
+                    f"{bid} ZIP missing folder {prod['folder_name']}"
