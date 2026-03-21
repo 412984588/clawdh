@@ -52,6 +52,13 @@ export const publicPageDefinitions = {
       'Walk through the RelayOps workflow from partner intake to pricing, fulfillment, and delivery approval in one interactive product demo.',
     keywords: ['product demo', 'crm workflow demo', 'revops demo'],
   },
+  pricing: {
+    path: '/pricing',
+    title: 'Pricing',
+    description:
+      'Explore RelayOps placeholder pricing tiers for teams evaluating structured CRM cleanup operations, scalable delivery, and enterprise support.',
+    keywords: ['pricing', 'crm operations pricing', 'revops outsourcing pricing'],
+  },
   caseStudies: {
     path: '/case-studies',
     title: 'Case Studies',
@@ -119,6 +126,7 @@ export const publicSitemapPaths = [
   publicPageDefinitions.landing.path,
   publicPageDefinitions.home.path,
   publicPageDefinitions.demo.path,
+  publicPageDefinitions.pricing.path,
   publicPageDefinitions.caseStudies.path,
   publicPageDefinitions.howItWorks.path,
   publicPageDefinitions.forPartners.path,
