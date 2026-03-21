@@ -1,0 +1,37 @@
+{
+  "product": "Express API Patterns",
+  "version": "1.0.0",
+  "tiers": [
+    {
+      "id": "starter",
+      "name": "Starter",
+      "price_usd": 19,
+      "zip_name": "express-api-patterns-starter-v1.0.0.zip",
+      "templates": [
+        "01-basic-routing",
+        "02-error-handling",
+        "03-validation-middleware",
+        "04-auth-jwt",
+        "05-rate-limiting"
+      ]
+    },
+    {
+      "id": "pro",
+      "name": "Pro",
+      "price_usd": 39,
+      "zip_name": "express-api-patterns-pro-v1.0.0.zip",
+      "templates": [
+        "01-basic-routing",
+        "02-error-handling",
+        "03-validation-middleware",
+        "04-auth-jwt",
+        "05-rate-limiting",
+        "06-file-upload",
+        "07-request-logging",
+        "08-cors-security",
+        "09-database-patterns",
+        "10-api-versioning"
+      ]
+    }
+  ]
+}
