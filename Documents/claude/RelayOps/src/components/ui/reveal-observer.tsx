@@ -4,6 +4,9 @@ import { useEffect } from 'react'
 
 export function RevealObserver() {
   useEffect(() => {
+    // 标记 JS 已加载 — CSS 兜底规则依赖此 class 来启用 opacity-0 隐藏
+    document.body.classList.add('js-ready')
+
     // Initialize scroll reveal targets
     const revealTargets = document.querySelectorAll('[data-reveal]:not([data-reveal-ready])')
     revealTargets.forEach((element) => {

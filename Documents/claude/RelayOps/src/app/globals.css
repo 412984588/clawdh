@@ -148,4 +148,18 @@
   .bg-hero-glow {
     background: radial-gradient(ellipse at top, rgba(59, 130, 246, 0.14) 0%, transparent 70%);
   }
+
+  /*
+   * 渐进增强兜底：RevealObserver 加载前，opacity-0 元素默认可见
+   * JS 加载后 body.js-ready 被设置，此时才允许 opacity-0 隐藏
+   * 没有 JS 时内容始终可见
+   */
+  .opacity-0.translate-y-6 {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+  }
+  body.js-ready .opacity-0.translate-y-6 {
+    opacity: 0 !important;
+    transform: translateY(1.5rem) !important;
+  }
 }
