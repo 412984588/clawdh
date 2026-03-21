@@ -1,0 +1,37 @@
+{
+  "product": "TypeScript Utility Types",
+  "version": "1.0.0",
+  "tiers": [
+    {
+      "id": "starter",
+      "name": "Starter",
+      "price_usd": 19,
+      "zip_name": "typescript-utility-types-starter-v1.0.0.zip",
+      "templates": [
+        "01-conditional-types",
+        "02-mapped-types",
+        "03-template-literal-types",
+        "04-infer-keyword",
+        "05-distributive-types"
+      ]
+    },
+    {
+      "id": "pro",
+      "name": "Pro",
+      "price_usd": 39,
+      "zip_name": "typescript-utility-types-pro-v1.0.0.zip",
+      "templates": [
+        "01-conditional-types",
+        "02-mapped-types",
+        "03-template-literal-types",
+        "04-infer-keyword",
+        "05-distributive-types",
+        "06-recursive-types",
+        "07-branded-types",
+        "08-builder-pattern",
+        "09-discriminated-unions",
+        "10-type-guards"
+      ]
+    }
+  ]
+}
