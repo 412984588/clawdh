@@ -98,6 +98,8 @@ export const useWebSocketStore = create<WebSocketState & WebSocketActions>()(
   )
 );
 
-export const selectLatestMessageByType = (type: string) => (s: WebSocketState) =>
-  s.messages.filter((m) => m.type === type).at(-1);
+export const selectLatestMessageByType = (type: string) => (s: WebSocketState) => {
+  const filtered = s.messages.filter((m) => m.type === type);
+  return filtered[filtered.length - 1];
+};
 export const selectIsConnected = (s: WebSocketState) => s.status === "connected";

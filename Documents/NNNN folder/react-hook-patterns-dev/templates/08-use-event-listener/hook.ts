@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 
-type EventMap = WindowEventMap & DocumentEventMap & HTMLElementEventMap;
+// Structural ref type — compatible with React.RefObject across all React versions
+type ElementRef = { readonly current: HTMLElement | null };
 
 /**
  * Attach an event listener with automatic cleanup.
@@ -26,14 +27,14 @@ export function useEventListener<K extends keyof WindowEventMap>(
 export function useEventListener<K extends keyof HTMLElementEventMap>(
   eventName: K,
   handler: (event: HTMLElementEventMap[K]) => void,
-  element: React.RefObject<HTMLElement | null>,
+  element: ElementRef,
   options?: boolean | AddEventListenerOptions
 ): void;
 
 export function useEventListener(
   eventName: string,
   handler: (event: Event) => void,
-  element?: React.RefObject<HTMLElement | null> | null,
+  element?: ElementRef | null,
   options?: boolean | AddEventListenerOptions
 ): void {
   // Store handler in ref so the effect doesn't need to re-run when it changes
@@ -68,25 +69,24 @@ export function useEventListener(
 export function useKeyboardShortcut(
   combo: { key: string; ctrl?: boolean; meta?: boolean; shift?: boolean; alt?: boolean },
   handler: () => void,
-  options?: { element?: React.RefObject<HTMLElement | null>; preventDefault?: boolean }
+  options?: { element?: ElementRef; preventDefault?: boolean }
 ): void {
-  useEventListener(
-    "keydown",
-    (event) => {
-      const keyMatch = event.key === combo.key;
-      const ctrlMatch = combo.ctrl ? event.ctrlKey : true;
-      const metaMatch = combo.meta ? event.metaKey : true;
-      const shiftMatch = combo.shift ? event.shiftKey : true;
-      const altMatch = combo.alt ? event.altKey : true;
+  const keyboardHandler = (event: KeyboardEvent) => {
+    const keyMatch = event.key === combo.key;
+    const ctrlMatch = combo.ctrl ? event.ctrlKey : true;
+    const metaMatch = combo.meta ? event.metaKey : true;
+    const shiftMatch = combo.shift ? event.shiftKey : true;
+    const altMatch = combo.alt ? event.altKey : true;
 
-      if (keyMatch && ctrlMatch && metaMatch && shiftMatch && altMatch) {
-        if (options?.preventDefault) event.preventDefault();
-        handler();
-      }
-    },
-    options?.element
-  );
+    if (keyMatch && ctrlMatch && metaMatch && shiftMatch && altMatch) {
+      if (options?.preventDefault) event.preventDefault();
+      handler();
+    }
+  };
+
+  if (options?.element) {
+    useEventListener("keydown", keyboardHandler, options.element);
+  } else {
+    useEventListener("keydown", keyboardHandler);
+  }
 }
-
-// Type import for React ref
-import type React from "react";

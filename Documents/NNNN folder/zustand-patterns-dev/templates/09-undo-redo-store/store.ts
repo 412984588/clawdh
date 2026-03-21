@@ -13,29 +13,32 @@ interface TemporalState<T> {
 }
 
 function createTemporalStore<T>(
-  creator: StateCreator<T>,
+  creator: StateCreator<T, [["zustand/devtools", never]]>,
   name: string
 ) {
   return create<T & TemporalState<T>>()(
     devtools(
       (set, get, api) => {
         let isTimeTraveling = false;
+        // Use loose typing for the internal set calls to avoid Zustand v5 strictness
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const rawSet = set as (...args: any[]) => void;
 
         const wrappedSet: typeof set = (updater, replace, actionName) => {
-          if (isTimeTraveling) return set(updater as Parameters<typeof set>[0], replace as boolean, actionName);
+          if (isTimeTraveling) { rawSet(updater, replace, actionName); return; }
 
           const prevState = get();
-          set(updater as Parameters<typeof set>[0], replace as boolean, actionName);
+          rawSet(updater, replace, actionName);
           const nextState = get();
 
           if (prevState !== nextState) {
-            set((s) => ({
+            rawSet((s: T & TemporalState<T>) => ({
               ...(s as object),
-              history: [...(s as TemporalState<T>).history, prevState],
+              history: [...s.history, prevState],
               future: [],
               canUndo: true,
               canRedo: false,
-            }) as T & TemporalState<T>, false, `${name}/${actionName as string}/snapshot`);
+            }), false, `${name}/${String(actionName)}/snapshot`);
           }
         };
 
@@ -49,39 +52,39 @@ function createTemporalStore<T>(
           canRedo: false,
 
           undo: () => {
-            const { history } = get() as TemporalState<T>;
-            if (!history.length) return;
-            const prev = history[history.length - 1];
+            const state = get() as unknown as TemporalState<T>;
+            if (!state.history.length) return;
+            const prev = state.history[state.history.length - 1];
             const current = get();
             isTimeTraveling = true;
-            set((s) => ({
+            rawSet((s: T & TemporalState<T>) => ({
               ...prev,
-              history: (s as TemporalState<T>).history.slice(0, -1),
-              future: [(current as unknown as T), ...(s as TemporalState<T>).future],
-              canUndo: (s as TemporalState<T>).history.length > 1,
+              history: s.history.slice(0, -1),
+              future: [current as unknown as T, ...s.future],
+              canUndo: s.history.length > 1,
               canRedo: true,
-            }) as T & TemporalState<T>, false, `${name}/undo`);
+            }), false, `${name}/undo`);
             isTimeTraveling = false;
           },
 
           redo: () => {
-            const { future } = get() as TemporalState<T>;
-            if (!future.length) return;
-            const next = future[0];
+            const state = get() as unknown as TemporalState<T>;
+            if (!state.future.length) return;
+            const next = state.future[0];
             const current = get();
             isTimeTraveling = true;
-            set((s) => ({
+            rawSet((s: T & TemporalState<T>) => ({
               ...next,
-              history: [...(s as TemporalState<T>).history, (current as unknown as T)],
-              future: (s as TemporalState<T>).future.slice(1),
+              history: [...s.history, current as unknown as T],
+              future: s.future.slice(1),
               canUndo: true,
-              canRedo: (s as TemporalState<T>).future.length > 1,
-            }) as T & TemporalState<T>, false, `${name}/redo`);
+              canRedo: s.future.length > 1,
+            }), false, `${name}/redo`);
             isTimeTraveling = false;
           },
 
           clearHistory: () =>
-            set({ history: [], future: [], canUndo: false, canRedo: false } as Partial<T & TemporalState<T>>, false, `${name}/clearHistory`),
+            rawSet({ history: [], future: [], canUndo: false, canRedo: false }, false, `${name}/clearHistory`),
         };
       },
       { name }
