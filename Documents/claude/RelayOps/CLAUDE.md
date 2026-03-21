@@ -7,6 +7,8 @@ pnpm test                    # vitest（全量）
 pnpm test -- src/lib/xxx     # 单文件/目录
 pnpm dev                     # Next.js dev server
 pnpm build                   # 生产构建
+pnpm typecheck               # TypeScript 检查（依赖最新 .next/types）
+pnpm validate                # typecheck + lint + test
 pnpm lint                    # ESLint
 pnpm test:e2e                # Playwright（需先 npx supabase start + pnpm dev）
 npx supabase start           # 本地 Supabase（Docker）
@@ -16,17 +18,22 @@ npx supabase db reset        # 重置数据库 + 跑迁移 + seed
 ## Architecture
 
 ```
-React Pages → Server Actions → Workflows → Services + State Machine → Supabase
+App Router + Middleware → Server Actions / Route Handlers →
+Workflows + Services + State Machine → Supabase / Stripe / Email
 ```
 
 | 层 | 路径 | 职责 |
 |---|---|---|
+| **App Router** | `src/app/` | locale 公开站点、角色仪表盘、API route handlers |
+| **Middleware / Auth** | `middleware.ts`, `src/lib/supabase/` | locale 路由、session 刷新、限流、角色重定向 |
 | **Server Actions** | `src/lib/actions/` | 鉴权 → 调 workflow → revalidatePath |
+| **Route Handlers** | `src/app/api/` | Stripe webhook + cron（timeouts/reminders/retention/payment-retry） |
 | **Workflows** | `src/lib/workflows/` | 多步原子业务逻辑（创建工单+通知+日志） |
 | **Services** | `src/lib/services/` | 单表 CRUD，返回 `{ data, error }` 元组 |
 | **State Machine** | `src/lib/state-machine/` | 状态转换 + guards + engine |
-| **Integrations** | `src/lib/integrations/` | 外部服务（Stripe/Resend/Lark），mock/live 双模式 |
+| **Integrations** | `src/lib/integrations/` | 外部服务（Stripe/Resend/analytics），mock/live 双模式 |
 | **Validations** | `src/lib/validations/` | Zod schemas，所有输入校验 |
+| **SEO / i18n / Observability** | `src/lib/seo.ts`, `src/i18n/`, `src/instrumentation.ts` | SEO 元数据、locale 路由、Sentry 启动 |
 
 ## Key Invariants
 
@@ -47,6 +54,12 @@ React Pages → Server Actions → Workflows → Services + State Machine → Su
 2. `getUserRecord(id)` — 从 DB 取角色和组织（admin client）
 
 只做第一步会漏掉角色校验。永远不要只靠 session 判断权限
+
+### Public 路由与 locale
+
+- 公开站点在 `src/app/[locale]/(public)`，`/` 只是入口并重定向到默认 locale
+- `middleware.ts` 只对公开路由走 `next-intl`，dashboard / API 保持非 locale 路径
+- 导航组件统一通过 `src/i18n/navigation.ts` 生成 locale-aware link
 
 ### Workflow 原子性
 
@@ -111,3 +124,4 @@ stripe trigger invoice.payment_failed
 - 首次 `npx supabase start` 拉 ~1GB Docker 镜像，后续秒启
 - Stripe SDK 版本要和代码中 `apiVersion` 对齐，否则类型报错
 - `tests/setup.ts` 已设 `process.env.TZ = 'UTC'`，新增日期测试无需再设
+- `pnpm typecheck` 依赖 `.next/types`；干净 worktree 或路由重命名后若提示缺文件，先跑一次 `pnpm build`

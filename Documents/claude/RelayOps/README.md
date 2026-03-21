@@ -10,6 +10,18 @@ Partner reviews → Approved → Completed
 
 ---
 
+## Current Features
+
+- Locale-aware public site (`/en`, `/zh`) with home, pricing, demo, case studies, request access, security, and legal pages, plus sitemap/robots/Open Graph metadata.
+- Role-gated admin, partner, and worker dashboards backed by Supabase Auth middleware redirects.
+- Partner intake wizard, ticket list/detail views, attachment handling, comments, review/revision, and dispute actions.
+- Admin operations for scoping and invoicing, ticket oversight, partner approvals, disputes, analytics, ledger review, KYC review, and payout batches.
+- Worker assignment detail, delivery upload flow, earnings view, and KYC status handling.
+- Stripe invoicing + webhook handling, immutable ledger tracking, Resend email notifications, and cron jobs for timeouts, reminders, data retention, and payment retry.
+- Accessibility, rate limiting, Sentry/Mixpanel hooks, and a shared blue-first design system with motion primitives.
+
+---
+
 ## Quick Start (Local Dev)
 
 ### Prerequisites
@@ -68,7 +80,7 @@ After startup, copy the `ANON_KEY` and `SERVICE_ROLE_KEY` printed to the console
 npx supabase db reset
 ```
 
-This applies all 15 migration files and loads `supabase/seed.sql` with 5 demo users, 2 organisations, and 5 tickets across the full status lifecycle.
+This applies all 18 migration files and loads `supabase/seed.sql` with 5 demo users, 2 organisations, 5 lifecycle tickets, worker profiles, comments, and ledger seed data.
 
 ### 6. Start the Next.js dev server
 
@@ -76,7 +88,7 @@ This applies all 15 migration files and loads `supabase/seed.sql` with 5 demo us
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000](http://localhost:3000) (the root route redirects to `/en`).
 
 ---
 
@@ -246,6 +258,9 @@ Migrations live in `supabase/migrations/` and run in order:
 | `00013_write_rls_policies.sql` | Add explicit write policies for authenticated users |
 | `00014_tighten_worker_rls.sql` | Tighten worker-facing access patterns |
 | `00015_storage_ticket_prefix_policies.sql` | Restrict storage access by ticket prefix + role ownership |
+| `00016_complete_rls_policies.sql` | Complete partner ticket insert + forbid direct user ledger inserts |
+| `00017_payment_retry_fields.sql` | Add retry tracking fields and indexes for invoiced payment retries |
+| `00018_worker_kyc_fields.sql` | Add worker KYC fields plus private `kyc-documents` storage policies |
 
 ### Storage and worker identity notes
 
@@ -317,13 +332,17 @@ pnpm test              # run all tests once
 pnpm test:watch        # watch mode
 ```
 
-Current: **421 tests, 41 files, all passing**.
+Latest verification (2026-03-21): **827 tests across 98 files passing**.
 
 Coverage thresholds: lines 90% / functions 90% / branches 80% / statements 90%.
 
 ```bash
+pnpm build                # refreshes generated .next/types and runs Next.js checks
+pnpm typecheck            # strict TS validation
 pnpm test -- --coverage   # generate coverage report → coverage/
 ```
+
+On a clean checkout or after route changes, run `pnpm build` once before `pnpm typecheck` so `.next/types` is regenerated.
 
 ### End-to-end tests (Playwright)
 
@@ -348,32 +367,40 @@ pnpm test:e2e:ui
 ```
 src/
   app/
-    (public)/          — Marketing pages (home, how-it-works, for-partners…)
+    [locale]/(public)/ — Localized marketing pages (home, pricing, demo, case studies…)
     (auth)/login       — Login page
     (dashboard)/
-      admin/           — Admin portal (tickets, metrics, ledger, disputes…)
-      partner/         — Partner portal (tickets, billing)
-      worker/          — Worker portal (assignments)
+      admin/           — Admin portal (overview, tickets, partners, ledger, KYC, disputes…)
+      partner/         — Partner portal (dashboard, tickets, billing)
+      worker/          — Worker portal (dashboard, assignments, earnings)
     api/
       webhooks/stripe/ — Stripe payment webhook
-      cron/            — Scheduled jobs (reminders, timeouts, data retention)
+      cron/            — Scheduled jobs (timeouts, reminders, data retention, payment retry)
   lib/
+    actions/           — Server actions for auth, tickets, partner/admin/worker flows
     state-machine/     — Ticket status transitions + role guards
-    workflows/         — Business workflow functions (8 workflows)
-    integrations/      — Stripe, email, storage adapters
+    workflows/         — Business workflow functions (9 workflows)
+    services/          — Analytics, ledger, notifications, ticket/payment services
+    integrations/      — Stripe, email, analytics adapters
     supabase/          — Client factory (browser, server, admin, middleware)
+    i18n/              — Locale routing/navigation helpers
     types/             — Shared TypeScript types
 supabase/
-  migrations/          — 10 SQL migration files
+  migrations/          — 18 SQL migration files
   seed.sql             — Demo data
 tests/
+  actions/             — Server action tests
   workflows/           — Workflow unit tests
-  engine/              — State machine tests
-  integrations/        — Stripe, email, storage tests
+  state-machine/       — State machine tests
+  integrations/        — Stripe, email, analytics, storage tests
+  components/          — React component tests
   e2e/                 — Playwright end-to-end tests
 docs/
-  demo-script.md       — Step-by-step walkthrough for live demo
+  demo-script.md       — Step-by-step walkthrough for the full internal demo
   demo-checklist.md    — Pre-demo self-check list
+  OBSERVABILITY.md     — Logging, alerting, and Sentry guidance
+  DEPLOYMENT.md        — Production deployment runbook
+  DESIGN_SYSTEM.md     — Shared UI system and color rules
 ```
 
 ---

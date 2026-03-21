@@ -1,0 +1,55 @@
+# RelayOps Session Summary
+
+Updated: 2026-03-21 15:09
+
+## Current Snapshot
+
+- Stack: Next.js 15 App Router, React 19, TypeScript 5, Supabase/PostgreSQL, Stripe, Resend, next-intl, Sentry, Mixpanel.
+- Data model: 18 SQL migrations, seeded local demo with 5 auth users, 2 organisations, 5 lifecycle tickets, worker profiles, comments, and ledger entries.
+- Public surface: locale-aware marketing routes under `/[locale]` for home, pricing, demo, case studies, request access, security, and legal pages, plus sitemap, robots, and Open Graph generation.
+- Admin surface: dashboard, tickets/detail, partners, ledger, disputes, metrics, KYC review, payout batches, and lightweight reviews/settings shells.
+- Partner surface: dashboard, intake wizard, ticket list/detail, comments, billing, approval/revision loop, and dispute actions.
+- Worker surface: dashboard, assignments/detail, submission upload/detail, earnings, and KYC status handling.
+- Automation: Stripe webhook plus cron routes for timeouts, reminders, data retention, and payment retry.
+
+## Major Work Shipped
+
+### Foundations
+- Core schema, enums, RLS policies, storage rules, Supabase browser/server/admin clients, auth middleware, shared UI primitives, and AppError hierarchy are in place.
+- Ticket lifecycle logic is centralized in the state machine and enforced through workflows/actions instead of direct status mutations.
+
+### Workflow and Billing
+- Ticket submission, scoping/invoicing, payment handling, worker assignment, work submission, partner review, dispute resolution, and ledger tracking are implemented.
+- Stripe invoice creation, webhook processing, retry bookkeeping, and partner-visible billing history are wired end to end.
+
+### Admin and Operations
+- Admin can review partner applications, monitor analytics, inspect ledger activity, resolve disputes, review worker KYC submissions, and create payout batches.
+- Cron routes cover SLA/timeouts, reminder delivery, retention cleanup, and payment retry follow-up.
+
+### Public Site and UX
+- Localized public pages now include pricing, demo, case studies, request access, security/legal pages, and SEO metadata.
+- Recent polish added the blue-first design system, motion primitives for dashboard surfaces, and accessibility improvements for navigation, forms, and toasts.
+
+### Test Coverage
+- Vitest covers actions, services, workflows, state machine, middleware, integrations, components, SEO, i18n, security, and cron route handlers.
+- Playwright specs cover public/admin/partner/worker flows plus accessibility, forms, and error handling scenarios.
+
+## Verification Snapshot
+
+- `pnpm build` ✅
+- `pnpm typecheck` ✅
+- `pnpm test` ✅ — 827 tests across 98 files
+
+Note: on a fresh checkout or after route renames, run `pnpm build` once before `pnpm typecheck` so `.next/types` is regenerated.
+
+## Known Gaps / Follow-ups
+
+- `src/app/(dashboard)/admin/workers/page.tsx` is still a placeholder management surface.
+- Build succeeds, but Sentry currently emits configuration warnings about the missing `onRequestError` hook and the deprecated `sentry.client.config.ts` setup.
+- Keep docs synced with the locale-aware public routes and the current 18-migration schema baseline.
+
+## Documentation Sync In This Session
+
+- `README.md` updated for the real feature set, migration count, route structure, and latest verification numbers.
+- `CLAUDE.md` updated for the current App Router architecture, middleware/i18n/observability layers, and the `.next/types` typecheck gotcha.
+- `docs/` review completed: `ACCESSIBILITY`, `BACKUP_STRATEGY`, `DEPLOYMENT`, `DESIGN_SYSTEM`, `DISASTER_RECOVERY`, `OBSERVABILITY`, `demo-checklist`, `demo-script`, and `demo-script-v2` already matched the current product behavior, so no content changes were needed there.
