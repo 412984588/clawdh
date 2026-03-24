@@ -1,0 +1,192 @@
+{
+    "hooks": {
+        "UserPromptSubmit": [
+            {
+                "matcher": "*",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "~/.claude/hooks/skill-activation-prompt.sh",
+                        "timeout": 10
+                    }
+                ],
+                "description": "🎯 Skill 激活提示"
+            }
+        ],
+        "SessionStart": [
+            {
+                "matcher": "*",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "~/.claude/hooks/memory-persistence/session-start.sh"
+                    }
+                ],
+                "description": "Memory Persistence: 自动加载 claude-progress.txt（兼容旧项目）"
+            }
+        ],
+        "PreCompact": [
+            {
+                "matcher": "*",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "~/.claude/hooks/memory-persistence/pre-compact.sh"
+                    }
+                ],
+                "description": "Memory Persistence: 压缩前保存状态"
+            }
+        ],
+        "Stop": [
+            {
+                "matcher": "*",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "~/.claude/hooks/memory-persistence/session-end.sh"
+                    }
+                ],
+                "description": "Memory Persistence: 会话结束提醒"
+            },
+            {
+                "matcher": "*",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "~/.claude/hooks/openclaw-dispatch-hook.sh"
+                    }
+                ],
+                "description": "OpenClaw zero-poll bridge"
+            },
+            {
+                "matcher": "*",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "~/.claude/hooks/memos-autosave.sh",
+                        "timeout": 5
+                    }
+                ],
+                "description": "🧠 MemOS 记忆共享（Claude↔openclaw）"
+            },
+            {
+                "matcher": "*",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "~/.claude/hooks/quality-gates.sh"
+                    }
+                ],
+                "description": "🚦 结束前质量门禁（含任务完成度检查）"
+            }
+        ],
+        "PreToolUse": [
+            {
+                "matcher": "Write|Edit|MultiEdit",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "bash -c 'if [ -n \"${PAPERCLIP_RUN_ID:-}\" ]; then exit 0; fi; FILE=\"$1\"; EXT=\"${FILE##*.}\"; case \"$EXT\" in py) python3 -m py_compile \"$FILE\" 2>/dev/null && echo \"✅ Python语法OK\" || echo \"⚠️ Python语法问题\" ;; json) python3 -c \"import json,sys; json.load(open(sys.argv[1]))\" \"$FILE\" 2>/dev/null && echo \"✅ JSON OK\" || echo \"❌ JSON错误\" ;; sh|bash) bash -n \"$FILE\" 2>/dev/null && echo \"✅ Shell OK\" || echo \"❌ Shell错误\" ;; *) ;; esac; if grep -i -E \"(password|secret|api_key|token|private_key)\\s*[=:]\\s*[^$]\" \"$FILE\" 2>/dev/null | grep -v -E \"(process\\.env|\\$\\{|getenv|os\\.environ)\" > /dev/null 2>&1; then echo \"⚠️ 可能的硬编码凭证\"; fi; BASENAME=\"$(basename \"$FILE\")\"; CRITICAL=\".gitignore package.json tsconfig.json vite.config docker-compose.yml Dockerfile\"; if echo \"$CRITICAL\" | grep -w \"$BASENAME\" > /dev/null 2>&1; then BDIR=\"$(dirname \"$FILE\")/.backups\"; mkdir -p \"$BDIR\"; [ -f \"$FILE\" ] && cp \"$FILE\" \"$BDIR/$BASENAME.$(date +%H%M%S).bak\" && echo \"💾 备份: $BASENAME\"; fi' -- \"$FILE\""
+                    }
+                ],
+                "description": "🛡️ 保存前：语法+安全+备份（三合一）"
+            },
+            {
+                "matcher": "Bash",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "~/.claude/hooks/git-safety.sh \"$COMMAND\""
+                    }
+                ],
+                "description": "🔒 Git 安全规范"
+            },
+            {
+                "matcher": "Write|Edit|MultiEdit",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "~/.claude/hooks/scope-lock.sh \"$FILE\""
+                    }
+                ],
+                "description": "🔒 范围锁定，防膨胀"
+            },
+            {
+                "matcher": "Bash",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "~/.claude/hooks/pre-tool-use-guard.sh"
+                    }
+                ],
+                "description": "🛡️ 高危命令拦截"
+            },
+            {
+                "matcher": "Write|Edit|MultiEdit",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "~/.claude/hooks/tdd-enforce.sh",
+                        "timeout": 5
+                    }
+                ],
+                "description": "🧪 TDD 强制"
+            },
+            {
+                "matcher": "Write|Edit|MultiEdit",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "~/.claude/hooks/architecture-guard.sh \"$FILE\""
+                    }
+                ],
+                "description": "🏗️ 架构边界检查"
+            }
+        ],
+        "PostToolUse": [
+            {
+                "matcher": "Write|Edit|MultiEdit",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "~/.claude/hooks/auto-test.sh \"$FILE\""
+                    }
+                ],
+                "description": "🧪 代码改完自动跑测试"
+            },
+            {
+                "matcher": "Write|Edit|MultiEdit",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "~/.claude/hooks/auto-format.sh",
+                        "timeout": 10
+                    }
+                ],
+                "description": "✨ 自动格式化"
+            },
+            {
+                "matcher": "Bash",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "~/.claude/hooks/ci-notify.sh"
+                    }
+                ],
+                "description": "🔄 CI通知"
+            }
+        ],
+        "SessionEnd": [
+            {
+                "matcher": "*",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "~/.claude/hooks/openclaw-dispatch-hook.sh"
+                    }
+                ],
+                "description": "OpenClaw zero-poll bridge"
+            }
+        ]
+    }
+}
