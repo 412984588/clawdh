@@ -42,11 +42,15 @@ function parseStateMd(content) {
   // 从 STATE.md 提取关键信息
   const result = {};
 
-  // 提取当前阶段
+  // 提取当前阶段 — 写成嵌套 phase 对象（与 SKILL.md 规范一致）
   const phaseMatch = content.match(/##\s*Current.*?Phase[^\n]*\n.*?(\d+)[^\n]*/i) ||
                      content.match(/Phase[:\s]+(\d+)/i) ||
                      content.match(/阶段[：:\s]+(\d+)/i);
-  if (phaseMatch) result.phase_num = parseInt(phaseMatch[1]);
+  if (phaseMatch) {
+    const current = parseInt(phaseMatch[1]);
+    // 保留已有的 phase 对象，只更新 current
+    result.phase = { ...(result.phase || {}), current };
+  }
 
   // 提取状态
   const statusMatch = content.match(/Status[:\s]+([^\n]+)/i) ||
@@ -91,14 +95,25 @@ process.stdin.on('end', () => {
   clearTimeout(stdinTimeout);
   try {
     const data = JSON.parse(input);
-    const toolName = data.tool_name || data.tool;
     const toolInput = data.tool_input || data.input || {};
 
     // 获取被写入的文件路径
     const filePath = toolInput.file_path || toolInput.path || '';
     if (!filePath) process.exit(0);
 
-    const cwd = data.cwd || path.dirname(filePath);
+    // B9 fix: 从 filePath 向上找项目根目录（含 .planning/ 的那层），而不是直接用 dirname
+    let cwd = data.cwd;
+    if (!cwd) {
+      // 向上遍历，找到包含 .planning/ 的目录
+      let dir = path.dirname(filePath);
+      for (let i = 0; i < 5; i++) {
+        if (fs.existsSync(path.join(dir, '.planning'))) { cwd = dir; break; }
+        const parent = path.dirname(dir);
+        if (parent === dir) break;
+        dir = parent;
+      }
+      cwd = cwd || path.dirname(filePath);
+    }
     const slug = slugify(path.basename(cwd));
 
     const isStateMd = filePath.includes('.planning') && filePath.endsWith('STATE.md');

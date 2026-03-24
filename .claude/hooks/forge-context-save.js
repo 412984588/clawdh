@@ -26,12 +26,10 @@ function tryGitCommit(cwd, message) {
     // 检查是否有未提交的改动
     const status = execSync('git status --porcelain', { cwd, encoding: 'utf8', timeout: 5000 });
     if (status.trim()) {
-      execSync(`git add -A && git commit -m "${message}"`, {
-        cwd,
-        encoding: 'utf8',
-        timeout: 10000,
-        shell: true
-      });
+      // B4 fix: 用数组参数避免 shell 注入，不拼接字符串命令
+      execSync('git add -A', { cwd, timeout: 5000 });
+      const { execFileSync } = require('child_process');
+      execFileSync('git', ['commit', '-m', message], { cwd, timeout: 10000 });
       return true;
     }
     return false;
@@ -144,7 +142,8 @@ process.stdin.on('end', () => {
     if (metrics.timestamp && (now - metrics.timestamp) > STALE_SECONDS) process.exit(0);
 
     const remaining = metrics.remaining_percentage;
-    const usedPct = metrics.used_pct;
+    // B6 fix: used_pct 可能不存在，fallback 计算
+    const usedPct = metrics.used_pct != null ? metrics.used_pct : (100 - remaining);
     if (remaining > WARNING_THRESHOLD) process.exit(0);
 
     // 防抖
@@ -192,7 +191,9 @@ process.stdin.on('end', () => {
       const committed = tryGitCommit(cwd, 'chore(forge): context warning — checkpoint [forge-hook]');
       if (committed) actions.push('✅ 已自动提交代码检查点');
 
+      // B5 fix: warning 阶段也要通知用户快照已写入
       writeForgeSnapshot(cwd, slug, 'warning', remaining);
+      actions.push(`✅ 已保存上下文快照到 ~/.forge/projects/${slug}/`);
     }
 
     const actionStr = actions.length > 0 ? '\n' + actions.join('\n') : '';

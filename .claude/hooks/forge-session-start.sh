@@ -32,9 +32,18 @@ for state_file in "$FORGE_DIR"/*/state.json; do
   fi
 
   SLUG=$(basename "$(dirname "$state_file")")
-  PHASE=$(python3 -c "import json,sys; d=json.load(open(sys.argv[1])); print(d.get('phase_num','?'))" "$state_file" 2>/dev/null || echo "?")
-  LAST=$(python3 -c "import json,sys; d=json.load(open(sys.argv[1])); print(d.get('last_activity','')[:10])" "$state_file" 2>/dev/null || echo "")
-  NEXT=$(python3 -c "import json,sys; d=json.load(open(sys.argv[1])); print(d.get('next_action','')[:40])" "$state_file" 2>/dev/null || echo "")
+  # 支持嵌套 phase.current 和旧式 phase_num 两种格式
+  PHASE=$(python3 -c "
+import json,sys
+d=json.load(open(sys.argv[1]))
+p = d.get('phase',{})
+if isinstance(p, dict):
+    print(p.get('current','?'))
+else:
+    print(d.get('phase_num','?'))
+" "$state_file" 2>/dev/null || echo "?")
+  LAST=$(python3 -c "import json,sys; d=json.load(open(sys.argv[1])); print(str(d.get('last_activity',''))[:10])" "$state_file" 2>/dev/null || echo "")
+  NEXT=$(python3 -c "import json,sys; d=json.load(open(sys.argv[1])); print(str(d.get('next_action',''))[:40])" "$state_file" 2>/dev/null || echo "")
 
   DETAIL="  • ${SLUG}"
   [ "$PHASE" != "?" ] && DETAIL="${DETAIL}（第 ${PHASE} 阶段）"

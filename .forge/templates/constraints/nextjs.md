@@ -25,7 +25,7 @@ prisma/           # Prisma schema 和 migrations
   "test": "npx vitest run",
   "lint": "npx next lint && npx tsc --noEmit",
   "format": "npx prettier --write .",
-  "arch_check": "node .claude/arch-check.js",
+  "arch_check": "npx tsc --noEmit && npx next lint",
   "dev": "npm run dev",
   "build": "npm run build"
 }

@@ -45,7 +45,7 @@ triggers:
 从参数提取项目名/slug。
 读取 ~/.forge/projects/{slug}/state.json：
   - 如有 .planning/HANDOFF.json → 调用 Skill("gsd:resume-work")
-  - 否则读 state.json 的 phase_num → 调用 Skill("gsd:autonomous", "--from", phase_num)
+  - 否则读 state.json 的 phase.current（嵌套格式）→ 调用 Skill("gsd:autonomous", "--from", phase.current)
 
 输出：「正在从第 N 阶段恢复项目 {名称}...」
 跳到对应的 STEP。
@@ -302,13 +302,12 @@ GSD 项目创建完成后，立即写入 `.planning/config.json`：
 
 ### 3c. 生成 CI 配置（如果是 GitHub 仓库）
 
-检查是否已有 `.github/workflows/`。如果没有，询问用户：
-「是否要添加自动测试（代码提交时自动检查）？推荐选是」
-
-如用户同意，生成基础 `.github/workflows/ci.yml`，包含：
+检查是否已有 `.github/workflows/`。如果没有，**直接生成**基础 `.github/workflows/ci.yml`，包含：
 - 触发：push 到 main/master
 - 步骤：安装依赖 → lint → 测试
 - 技术栈对应的运行环境
+
+不要询问用户 — Forge 全自动原则，CI 是标配。
 
 ---
 
