@@ -176,9 +176,7 @@ class DiagnosticsEngine:
 
     def check_external_apis(self) -> dict:
         """
-        测试外部 API 可用性（GLM, Kimi）
-
-        注意：这是简化实现，实际需要测试具体的 API 端点
+        测试外部 API 可用性（通过测试常见域名）
 
         Returns:
             dict: {
@@ -186,9 +184,26 @@ class DiagnosticsEngine:
                     'kimi': bool,  # Kimi API 是否可用
                 }
         """
-        # 简化实现：假设外部 API 都可用
-        # 实际生产环境应该：
-        # 1. 从配置文件读取 API 端点
-        # 2. 使用 curl 测试每个端点
-        # 3. 根据响应判断可用性
-        return {"glm": True, "kimi": True}
+        # 常见 API 域名
+        api_domains = {
+            "glm": "open.bigmodel.cn",
+            "kimi": "api.moonshot.cn",
+            "google": "generativelanguage.googleapis.com",
+        }
+
+        results = {}
+        for name, domain in api_domains.items():
+            try:
+                # 使用 ping 或 nc 测试域名连通性（不涉及 API Key）
+                # 这里使用 nc -z -w 5 <domain> 443 检查 HTTPS 端口
+                result = subprocess.run(
+                    ["nc", "-z", "-w", "5", domain, "443"],
+                    capture_output=True,
+                    timeout=10,
+                )
+                results[name] = result.returncode == 0
+            except Exception:
+                results[name] = False
+
+        # 兜底：如果 glm 和 kimi 都不可达，可能是网络问题
+        return results

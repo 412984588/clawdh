@@ -13,6 +13,7 @@ OpenClaw 自主服务监控代理 - 主监控脚本
 import subprocess
 import sys
 import os
+import time
 from datetime import datetime
 from openclaw_diagnostics import DiagnosticsEngine
 from openclaw_recovery import RecoveryEngine
@@ -24,9 +25,8 @@ class OpenClawMonitor:
 
     def __init__(self):
         """初始化监控代理"""
-        self.openclaw_cli = (
-            "../../moltbot/extensions/memory-lancedb/node_modules/.bin/openclaw"
-        )
+        # 寻找 openclaw CLI 路径
+        self.openclaw_cli = self._find_openclaw_cli()
         self.diagnostics = DiagnosticsEngine(self.openclaw_cli)
         self.recovery = RecoveryEngine(self.openclaw_cli)
         self.learning = LearningEngine()
@@ -34,6 +34,41 @@ class OpenClawMonitor:
 
         # 确保日志目录存在
         os.makedirs("logs", exist_ok=True)
+
+    def _find_openclaw_cli(self) -> str:
+        """寻找 openclaw CLI 路径"""
+        # 优先级 1: 环境变量
+        env_path = os.environ.get("OPENCLAW_CLI_PATH")
+        if env_path and os.path.exists(env_path):
+            return env_path
+
+        # 优先级 2: 常见相对路径
+        relative_paths = [
+            "../../moltbot/extensions/memory-lancedb/node_modules/.bin/openclaw",
+            "../node_modules/.bin/openclaw",
+            "./node_modules/.bin/openclaw",
+        ]
+
+        # 获取脚本所在目录，确保相对路径基准正确
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+
+        for rel_path in relative_paths:
+            abs_path = os.path.normpath(os.path.join(script_dir, rel_path))
+            if os.path.exists(abs_path):
+                return abs_path
+
+        # 优先级 3: 系统 PATH
+        try:
+            result = subprocess.run(
+                ["which", "openclaw"], capture_output=True, text=True
+            )
+            if result.returncode == 0:
+                return result.stdout.strip()
+        except:
+            pass
+
+        # 默认兜底（原始路径）
+        return "../../moltbot/extensions/memory-lancedb/node_modules/.bin/openclaw"
 
     def check_process_status(self) -> bool:
         """
@@ -43,6 +78,23 @@ class OpenClawMonitor:
             bool: True 如果进程运行，False 否则
         """
         try:
+            # 优先使用 pgrep，更精确且不容易产生误报（排除 grep 进程）
+            try:
+                result = subprocess.run(
+                    ["pgrep", "-f", "openclaw"],
+                    capture_output=True,
+                    text=True,
+                    timeout=10,
+                )
+                if result.returncode == 0:
+                    return True
+                elif result.returncode == 1:
+                    # 1 表示没有匹配的进程
+                    return False
+            except FileNotFoundError:
+                # pgrep 不存在，降级到 ps aux + grep
+                pass
+
             result = subprocess.run(
                 ["ps", "aux"], capture_output=True, text=True, timeout=30
             )
