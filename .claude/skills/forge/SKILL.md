@@ -48,7 +48,11 @@ triggers:
   - 否则读 state.json 的 phase.current（嵌套格式）→ 调用 Skill("gsd:autonomous", "--from", phase.current)
 
 输出：「正在从第 N 阶段恢复项目 {名称}...」
-跳到对应的 STEP。
+
+**注意 phase 编号 ≠ STEP 编号**：
+- STEP 0–6 是 Forge 固定的流程步骤
+- phase.current 是 ROADMAP 里的开发阶段序号（1, 2, 3...）
+- 恢复时应跳到 **STEP 4 的第 phase.current 次循环迭代**，而不是跳到 STEP N
 ```
 
 ---
@@ -320,7 +324,7 @@ GSD 项目创建完成后，立即写入 `.planning/config.json`：
 
 ### 每个阶段的执行流程
 
-更新 state.json：`{"status": "active", "phase": {"current": N, "name": "..."}}`
+更新 state.json（深度合并，保留 total 等已有字段）：`{"status": "active", "phase": {"current": N, "total": M, "name": "..."}}`
 
 输出进度：「🔨 第 N/M 阶段：{阶段名} — 开始...」
 
@@ -425,7 +429,7 @@ GSD 自动运行测试验证。
 
 更新 state.json 状态：
 ```json
-{"phase": {"current": N, "completed": true}, "last_activity": "..."}
+{"phase": {"current": N, "total": M, "name": "阶段名", "completed": true}, "last_activity": "..."}
 ```
 
 输出进度报告（中文）：

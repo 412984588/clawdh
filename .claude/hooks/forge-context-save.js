@@ -170,6 +170,11 @@ process.stdin.on('end', () => {
     // 获取项目 slug
     const slug = slugify(path.basename(cwd));
     const isGsdActive = fs.existsSync(path.join(cwd, '.planning', 'STATE.md'));
+    // Bug-3 fix: 非 Forge 项目不创建幽灵 state.json
+    // 只有 GSD 活跃（有 .planning/STATE.md）或已有 state.json 的项目才写快照
+    const forgeStatePath = require('path').join(os.homedir(), '.forge', 'projects', slug, 'state.json');
+    const isForgeProject = isGsdActive || fs.existsSync(forgeStatePath);
+    if (!isForgeProject) process.exit(0);
 
     let actions = [];
 

@@ -45,11 +45,12 @@ else:
   LAST=$(python3 -c "import json,sys; d=json.load(open(sys.argv[1])); print(str(d.get('last_activity',''))[:10])" "$state_file" 2>/dev/null || echo "")
   NEXT=$(python3 -c "import json,sys; d=json.load(open(sys.argv[1])); print(str(d.get('next_action',''))[:40])" "$state_file" 2>/dev/null || echo "")
 
+  NL=$'\n'
   DETAIL="  • ${SLUG}"
   [ "$PHASE" != "?" ] && DETAIL="${DETAIL}（第 ${PHASE} 阶段）"
   [ -n "$LAST" ] && DETAIL="${DETAIL} — 最后活动：${LAST}"
-  [ -n "$NEXT" ] && DETAIL="${DETAIL}\n    下一步：${NEXT}"
-  DETAIL="${DETAIL}\n    恢复命令：/forge resume ${SLUG}"
+  [ -n "$NEXT" ] && DETAIL="${DETAIL}${NL}    下一步：${NEXT}"
+  DETAIL="${DETAIL}${NL}    恢复命令：/forge resume ${SLUG}"
 
   ACTIVE_PROJECTS+=("$SLUG")
   DETAILS+=("$DETAIL")
@@ -63,11 +64,12 @@ fi
 COUNT=${#ACTIVE_PROJECTS[@]}
 
 # 构建消息
-MSG="🔨 Forge 检测到 ${COUNT} 个进行中的项目：\n\n"
+NL=$'\n'
+MSG="🔨 Forge 检测到 ${COUNT} 个进行中的项目：${NL}${NL}"
 for detail in "${DETAILS[@]}"; do
-  MSG="${MSG}${detail}\n\n"
+  MSG="${MSG}${detail}${NL}${NL}"
 done
-MSG="${MSG}如需继续，输入对应的 /forge resume 命令。\n如需查看所有项目状态，输入 /forge:status"
+MSG="${MSG}如需继续，输入对应的 /forge resume 命令。${NL}如需查看所有项目状态，输入 /forge:status"
 
 # 输出 JSON（SessionStart hook 格式）
 python3 -c "

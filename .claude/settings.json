@@ -6,7 +6,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"/Users/zhimingdeng/.claude/hooks/gsd-check-update.js\""
+            "command": "node \"/Users/zhimingdeng/.claude/hooks/gsd-check-update.js\"",
+            "timeout": 15
           }
         ]
       },
@@ -32,7 +33,7 @@
         ]
       },
       {
-        "matcher": "Write|Edit",
+        "matcher": "Write|Edit|MultiEdit",
         "hooks": [
           {
             "type": "command",

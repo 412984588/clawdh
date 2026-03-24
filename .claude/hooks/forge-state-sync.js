@@ -42,14 +42,12 @@ function parseStateMd(content) {
   // 从 STATE.md 提取关键信息
   const result = {};
 
-  // 提取当前阶段 — 写成嵌套 phase 对象（与 SKILL.md 规范一致）
+  // 提取当前阶段 — 只记录 current 数字，深度合并在调用方完成
   const phaseMatch = content.match(/##\s*Current.*?Phase[^\n]*\n.*?(\d+)[^\n]*/i) ||
                      content.match(/Phase[:\s]+(\d+)/i) ||
                      content.match(/阶段[：:\s]+(\d+)/i);
   if (phaseMatch) {
-    const current = parseInt(phaseMatch[1]);
-    // 保留已有的 phase 对象，只更新 current
-    result.phase = { ...(result.phase || {}), current };
+    result._phase_current = parseInt(phaseMatch[1]);
   }
 
   // 提取状态
@@ -134,7 +132,12 @@ process.stdin.on('end', () => {
 
     if (isStateMd) {
       const parsed = parseStateMd(content);
-      Object.assign(state, parsed);
+      // Bug-1 fix: 先 assign 其他字段，再深度合并 phase（保留 total/name/completed）
+      const { _phase_current, ...rest } = parsed;
+      Object.assign(state, rest);
+      if (_phase_current !== undefined) {
+        state.phase = { ...(state.phase || {}), current: _phase_current };
+      }
       if (!state.status || state.status === 'active') {
         state.status = 'active';
       }
