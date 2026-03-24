@@ -208,6 +208,8 @@ GSD 将自动：
 - 创建 `.planning/ROADMAP.md`
 - 进行必要的技术调研
 
+**ROADMAP.md 生成后**，读取其中的阶段总数（count phases），立即更新 `~/.forge/projects/{slug}/state.json` 的 `phase.total` 字段，使 status 显示从 "N/?" 变为 "N/M"。
+
 **GSD 在 --auto 模式下仍会问配置问题（granularity/agents）。一律用以下预设回答，不要问用户：**
 - 粒度？→ Standard（平衡）
 - 并行？→ Parallel（推荐）
@@ -265,7 +267,7 @@ GSD 项目创建完成后，立即写入 `.planning/config.json`：
   "project_name": "{项目名}",
   "tech_stack": "{检测到的技术栈}",
   "status": "active",
-  "phase": { "current": 1, "total": null, "name": "初始化" },
+  "phase": { "current": 1, "total": null, "name": "初始化" },  // total 将在 GSD 生成 ROADMAP.md 后自动更新
   "created_at": "{ISO时间}",
   "last_activity": "{ISO时间}",
   "resume_command": "/forge resume {slug}"
@@ -297,7 +299,8 @@ GSD 项目创建完成后，立即写入 `.planning/config.json`：
     "lint": "{Lint命令}",
     "format": "{格式化命令}",
     "dev": "{启动命令}",
-    "build": "{构建命令}"
+    "build": "{构建命令}",
+    "arch_check": "{根据技术栈填入，见 ~/.forge/templates/constraints/{stack}.md}"
   },
   "is_web_project": true/false,
   "deploy_platform": "{部署平台}"

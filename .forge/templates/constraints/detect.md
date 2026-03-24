@@ -12,8 +12,7 @@
    - `fastapi` → fastapi
    - `django` → django（兜底 generic-web）
    - `flask` → flask（兜底 generic-web）
-4. **无任何标志** → WebSearch 调研最适合技术栈
-5. **兜底默认** → nextjs（最适合非程序员的全栈方案）
+4. **无任何标志** → 默认 Next.js（最适合非程序员的全栈方案，不调用 WebSearch）
 
 ## 检测脚本（Forge Step 3 中执行）
 
