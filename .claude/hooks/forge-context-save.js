@@ -1,24 +1,60 @@
 #!/usr/bin/env node
-// forge-context-save.js - v1.0.0
+// forge-context-save.js - v1.1.0
 // PostToolUse hook: 主动保存上下文，而不只是提醒
 //
 // 改进自 gsd-context-monitor.js：
 // - 35% 剩余: 自动 git commit 保存工作进度
 // - 25% 剩余: 额外写 HANDOFF.json + ~/.forge 快照
 // - 两个阈值都注入中文 additionalContext
+//
+// v1.1.0 修复：
+// - 从 ~/.forge/config.json 读取 context_thresholds（而不是硬编码）
+// - 碰撞安全 slug（同名不同路径时用 hash 后缀，与 forge-state-sync.js 一致）
 
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+const crypto = require('crypto');
 const { execSync } = require('child_process');
 
-const WARNING_THRESHOLD = 35;
-const CRITICAL_THRESHOLD = 25;
+// 从 ~/.forge/config.json 读取阈值配置，fallback 到硬编码默认值
+function loadForgeConfig() {
+  const configPath = path.join(os.homedir(), '.forge', 'config.json');
+  try {
+    const raw = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+    return {
+      WARNING_THRESHOLD: raw.context_thresholds?.warning ?? 35,
+      CRITICAL_THRESHOLD: raw.context_thresholds?.critical ?? 25,
+      DEBOUNCE_CALLS: raw.context_thresholds?.debounce_calls ?? 5,
+    };
+  } catch (e) {
+    return { WARNING_THRESHOLD: 35, CRITICAL_THRESHOLD: 25, DEBOUNCE_CALLS: 5 };
+  }
+}
+
+const { WARNING_THRESHOLD, CRITICAL_THRESHOLD, DEBOUNCE_CALLS } = loadForgeConfig();
 const STALE_SECONDS = 60;
-const DEBOUNCE_CALLS = 5;
 
 function slugify(p) {
   return p.replace(/[^a-zA-Z0-9\u4e00-\u9fff]+/g, '-').replace(/^-|-$/g, '').slice(0, 40);
+}
+
+// 碰撞安全的项目 slug（与 forge-state-sync.js 保持一致）
+function resolveSlug(cwd) {
+  const normalizedCwd = path.resolve(cwd);
+  const baseName = slugify(path.basename(normalizedCwd));
+  const existingPath = path.join(os.homedir(), '.forge', 'projects', baseName, 'state.json');
+
+  if (fs.existsSync(existingPath)) {
+    try {
+      const existing = JSON.parse(fs.readFileSync(existingPath, 'utf8'));
+      if (existing.project_path && path.resolve(existing.project_path) !== normalizedCwd) {
+        const hash = crypto.createHash('md5').update(normalizedCwd).digest('hex').slice(0, 8);
+        return `${baseName}-${hash}`;
+      }
+    } catch (e) {}
+  }
+  return baseName;
 }
 
 function tryGitCommit(cwd, message) {
@@ -167,8 +203,8 @@ process.stdin.on('end', () => {
     warnData.lastLevel = currentLevel;
     fs.writeFileSync(warnPath, JSON.stringify(warnData));
 
-    // 获取项目 slug
-    const slug = slugify(path.basename(cwd));
+    // 获取项目 slug（碰撞安全）
+    const slug = resolveSlug(cwd);
     const isGsdActive = fs.existsSync(path.join(cwd, '.planning', 'STATE.md'));
     // Bug-3 fix: 非 Forge 项目不创建幽灵 state.json
     // 只有 GSD 活跃（有 .planning/STATE.md）或已有 state.json 的项目才写快照
