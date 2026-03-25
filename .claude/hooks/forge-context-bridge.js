@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// forge-context-bridge.js - v2.0.0
+// forge-context-bridge.js - v2.1.0
 // PostToolUse hook: 事件归约层
 //
 // 修复（相比 v1.x）：
@@ -244,9 +244,17 @@ function inferAndUpdate(draft, toolName, toolInput, toolResponse) {
 
 function spawnDetachedWorker(workerPath) {
   try {
-    // F20: 检查 worker 是否已在运行（锁存在 → 跳过生成，防止无限 spawn）
+    // F20: 检查 worker 是否已在运行（锁存在 → 跳过，防止无限 spawn）
+    // C3 fix: 同时检查 stale lock（>20min），防止 worker 崩溃后永久堵塞 git 队列
     const workerLockDir = path.join(os.homedir(), '.forge', 'runtime', 'git', 'worker.lock');
-    if (fs.existsSync(workerLockDir)) return;
+    if (fs.existsSync(workerLockDir)) {
+      try {
+        const lockAge = Date.now() - fs.statSync(workerLockDir).mtimeMs;
+        if (lockAge < 20 * 60 * 1000) return;  // 新鲜锁 → worker 仍在运行，跳过
+        // stale 锁（>20min）→ worker 已死，清除后继续 spawn
+        fs.rmSync(workerLockDir, { recursive: true });
+      } catch (_) { return; }  // 无法读取锁状态 → 保守跳过
+    }
     const child = spawn('node', [workerPath], {
       detached: true, stdio: 'ignore',
     });

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// forge-quality-pipeline.js - v2.0.0
+// forge-quality-pipeline.js - v2.1.0
 // PostToolUse hook（Skill|Agent|Task）: 质量门 FSM
 //
 // 修复（相比 v1.x）：
@@ -181,8 +181,10 @@ process.stdin.on('end', async () => {
     try {
       await shared.mutateBridge(cwd, (draft) => {
         if (draft._schema_version !== 2) return;
-        // 注入最新安全风险（若有，在持锁状态下写入，保证原子一致性）
-        if (externalRisk && draft.change) draft.change.securityRisk = externalRisk;
+        // 注入最新安全风险（H4 fix：epoch 守卫，并发写入更新了 changeEpoch 时跳过过期 risk）
+        if (externalRisk && draft.change && draft.change.changeEpoch === changeEpoch) {
+          draft.change.securityRisk = externalRisk;
+        }
         // 用最新 bridge 数据重新决策（持锁状态，无 TOCTOU 竞态窗口）
         const candidate = nextGateToInject(draft);
         if (!candidate) return;

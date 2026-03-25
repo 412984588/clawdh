@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// forge-session-start.js - v2.0.0
+// forge-session-start.js - v2.1.0
 // SessionStart hook: 检测进行中的 Forge 项目 + 孤儿候选标记 + 限时清理
 //
 // 修复（相比 v1.x）：
@@ -146,6 +146,17 @@ function main() {
 function budgetedCleanup() {
   const start  = Date.now();
   const MAX_MS = 1500;
+
+  // C3 fix: 清理 stale worker.lock（>20min），防止 worker 崩溃后永久堵塞 git 队列
+  try {
+    const workerLock = path.join(os.homedir(), '.forge', 'runtime', 'git', 'worker.lock');
+    if (fs.existsSync(workerLock)) {
+      const lockAge = Date.now() - fs.statSync(workerLock).mtimeMs;
+      if (lockAge > 20 * 60 * 1000) fs.rmSync(workerLock, { recursive: true });
+    }
+  } catch (_) {}
+
+  if (Date.now() - start > MAX_MS) return;
 
   // 清理 ~/.forge/runtime/bridges/ 下的 stale lock 目录（>20min）
   try {

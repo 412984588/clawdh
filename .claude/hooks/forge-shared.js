@@ -1,9 +1,10 @@
 #!/usr/bin/env node
-// forge-shared.js - v1.2.0
+// forge-shared.js - v1.3.0
 // 所有 Forge hooks 的共享存储层
 //
 // 修复：
 // - P1#5  safeReadJson：区分"不存在"和"JSON损坏"，损坏不覆写
+// - H1:   safeReadJson：ENOENT 视为"不存在"而非"损坏"（atomic rename 竞态保护）
 // - P1#7  getTmpDir + sanitizeSessionId：消除 /tmp 路径预测和穿越风险
 // - P2#14 logHookError：统一 JSONL 错误日志，不再静默 catch
 // - 并发安全：advisory lock（mkdir-based）+ 原子写（PID+ts tmp+rename）
@@ -128,6 +129,9 @@ function safeReadJson(p, fallback) {
   try {
     return { exists: true, data: JSON.parse(fs.readFileSync(p, 'utf8')), corrupt: false };
   } catch (e) {
+    // H1 fix: ENOENT = existsSync 与 readFileSync 之间的 atomic rename 竞态（非损坏）
+    // 返回 fallback 而非 corrupt:true，避免冻结 mutateBridge/mutateForgeState
+    if (e.code === 'ENOENT') return { exists: false, data: fallback, corrupt: false };
     logHookError('safeReadJson', e, { path: p });
     return { exists: true, data: null, corrupt: true };
   }

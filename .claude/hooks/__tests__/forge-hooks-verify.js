@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// forge-hooks-verify.js — Forge v2.0 hooks 验证脚本（55 场景）
+// forge-hooks-verify.js — Forge v2.0 hooks 验证脚本（60 场景）
 // 纯 Node.js，无外部依赖
 // 运行：node forge-hooks-verify.js
 
@@ -570,18 +570,17 @@ test('6-3 forge-state-sync 使用 shared.resolveProjectRoot（F19）', () => {
   assert(!syncSrc.includes('for (let i = 0; i < 6'), 'F19：不应再有 i < 6 的深度限制');
 });
 
-test('6-4 events.jsonl 轮转 + worker spawn 限制（F20）', () => {
+test('6-4 events.jsonl 轮转 + worker spawn 限制（F20/C3）', () => {
   const sharedSrc = fs.readFileSync(path.join(HOOKS_DIR, 'forge-shared.js'), 'utf8');
   assert(sharedSrc.includes('MAX_EVENTS_BYTES'), 'F20：events.jsonl 应有大小上限');
   assert(sharedSrc.includes('EVENTS_FILE + \'.1\''), 'F20：events.jsonl 应有轮转逻辑');
 
   const bridgeSrc = fs.readFileSync(path.join(HOOKS_DIR, 'forge-context-bridge.js'), 'utf8');
   assert(bridgeSrc.includes('worker.lock'), 'F20：spawnDetachedWorker 应检查 worker.lock');
-  // 确认是 return（跳过生成）而非忽略
-  const lockCheckIdx = bridgeSrc.indexOf('worker.lock');
-  const returnIdx    = bridgeSrc.indexOf('return;', lockCheckIdx);
-  assert(returnIdx > lockCheckIdx && returnIdx - lockCheckIdx < 150,
-    'F20：检测到 worker.lock 后应立即 return 跳过 spawn');
+  // C3 fix：新逻辑 = 新鲜锁 return，stale 锁（>20min）清除后 spawn
+  assert(bridgeSrc.includes('20 * 60 * 1000'), 'C3：应检查 stale 阈值 20min');
+  assert(bridgeSrc.includes('return;'), 'C3：新鲜锁应 return 跳过 spawn');
+  assert(bridgeSrc.includes('rmSync(workerLockDir'), 'C3：stale 锁应清除后允许 spawn');
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -873,6 +872,67 @@ test('11-2 sanitizeSessionId 全面防护路径穿越与注入', () => {
   for (const id of invalid) {
     assert(!shared.sanitizeSessionId(id), `非法 ID 应返回 null/falsy：${JSON.stringify(id)}`);
   }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 组 12：Codex 发现修复验证（5 个场景，对应 C3 / H1 / H4）
+// ─────────────────────────────────────────────────────────────────────────────
+console.log('\n【组 12】Codex 发现修复验证（C3/H1/H4）');
+
+test('12-1 H1 safeReadJson：ENOENT 返回 fallback 而非 corrupt（原子 rename 竞态保护）', () => {
+  const shared = require(path.join(HOOKS_DIR, 'forge-shared.js'));
+  const tmpDir = mkTmpDir();
+  const p = path.join(tmpDir, 'data.json');
+  // 正常不存在 → exists:false
+  const r1 = shared.safeReadJson(p, 'default');
+  assert(!r1.exists, 'safeReadJson：文件不存在应返回 exists:false');
+  assertEqual(r1.data, 'default', 'safeReadJson：不存在应返回 fallback');
+  assert(!r1.corrupt, 'safeReadJson：不存在不应标记 corrupt');
+  // 损坏 JSON → corrupt:true
+  fs.writeFileSync(p, '{ broken json <<<');
+  const r2 = shared.safeReadJson(p, null);
+  assert(r2.corrupt, 'safeReadJson：损坏 JSON 应标记 corrupt:true');
+  // H1 fix 源码验证：ENOENT 分支存在
+  const src = fs.readFileSync(path.join(HOOKS_DIR, 'forge-shared.js'), 'utf8');
+  assert(src.includes("e.code === 'ENOENT'"), 'safeReadJson 应处理 ENOENT 竞态（H1 fix）');
+  fs.rmSync(tmpDir, { recursive: true });
+});
+
+test('12-2 H4 externalRisk 注入有 changeEpoch 守卫（pipeline.js 源码验证）', () => {
+  const src = fs.readFileSync(path.join(HOOKS_DIR, 'forge-quality-pipeline.js'), 'utf8');
+  // H4 fix: 注入时必须 epoch 匹配
+  assert(
+    src.includes('draft.change.changeEpoch === changeEpoch'),
+    'pipeline.js 注入 externalRisk 前应验证 changeEpoch 匹配（H4 fix）'
+  );
+});
+
+test('12-3 C3 spawnDetachedWorker 有 stale lock 清理（bridge.js 源码验证）', () => {
+  const src = fs.readFileSync(path.join(HOOKS_DIR, 'forge-context-bridge.js'), 'utf8');
+  assert(src.includes('20 * 60 * 1000'), 'spawnDetachedWorker 应检查 20min stale 阈值（C3 fix）');
+  assert(src.includes('rmSync(workerLockDir'), 'spawnDetachedWorker 应清除 stale worker.lock（C3 fix）');
+});
+
+test('12-4 C3 budgetedCleanup 有 worker.lock 清理（session-start.js 源码验证）', () => {
+  const src = fs.readFileSync(path.join(HOOKS_DIR, 'forge-session-start.js'), 'utf8');
+  assert(src.includes('worker.lock'), 'budgetedCleanup 应清理 stale worker.lock（C3 fix）');
+  assert(
+    src.match(/rmSync.*worker.*lock/s) || src.includes("rmSync(workerLock"),
+    'budgetedCleanup 应调用 rmSync 清除 stale worker.lock'
+  );
+});
+
+await testAsync('12-5 H1 safeReadJson：正常文件可读回，writeJsonAtomic rename 后仍可读', async () => {
+  const shared = require(path.join(HOOKS_DIR, 'forge-shared.js'));
+  const tmpDir = mkTmpDir();
+  const p = path.join(tmpDir, 'state.json');
+  // 原子写 + 立即读
+  shared.writeJsonAtomic(p, { phase: 3, status: 'active' });
+  const { data, corrupt, exists } = shared.safeReadJson(p, null);
+  assert(exists, '原子写后文件应存在');
+  assert(!corrupt, '正常文件不应标记 corrupt');
+  assertEqual(data?.phase, 3, 'safeReadJson 应读回 phase=3');
+  fs.rmSync(tmpDir, { recursive: true });
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
