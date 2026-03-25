@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// forge-quality-pipeline.js - v2.1.0
+// forge-quality-pipeline.js - v2.2.0
 // PostToolUse hook（Skill|Agent|Task）: 质量门 FSM
 //
 // 修复（相比 v1.x）：
@@ -75,6 +75,8 @@ function allCoreGatesPassed(bridge) {
 function isLastPhase(bridge) {
   const { current, total } = bridge.phase || {};
   if (!current || !total) return false;
+  // D10 fix: 防止 frontmatter 写入 Infinity 导致永远判定为最终阶段
+  if (!Number.isFinite(current) || !Number.isFinite(total)) return false;
   return current >= total;
 }
 

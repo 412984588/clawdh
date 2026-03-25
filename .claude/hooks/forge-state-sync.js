@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// forge-state-sync.js - v2.2.0
+// forge-state-sync.js - v2.3.0
 // PostToolUse hook (Write|Edit): 同步 GSD 状态到 Forge State Hub
 //
 // 监控：
@@ -150,7 +150,9 @@ function applyParsed(state, parsed) {
   }
   if (_is_complete) {
     state.status = 'completed';
-  } else if (!state.status || state.status === 'active') {
+  } else {
+    // D7 fix: 一旦 _is_complete=false，强制回 active，防止一次 transient "completed" parse
+    // 永久隐藏仍在进行中的项目（forge-session-start 会跳过 completed 项目）
     state.status = 'active';
   }
 }

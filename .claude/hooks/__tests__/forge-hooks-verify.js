@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// forge-hooks-verify.js — Forge v2.0 hooks 验证脚本（64 场景）
+// forge-hooks-verify.js — Forge v2.0 hooks 验证脚本（68 场景）
 // 纯 Node.js，无外部依赖
 // 运行：node forge-hooks-verify.js
 
@@ -974,6 +974,43 @@ test('13-5: C5 defaultBridge web 检测用 resolveProjectRoot', () => {
   const defaultBridgeBody = src.slice(src.indexOf('function defaultBridge('), src.indexOf('function spawnDetachedWorker'));
   assert(defaultBridgeBody.includes('resolveProjectRoot(cwd)'), 'C5：defaultBridge 应用 resolveProjectRoot(cwd) 检测 web 项目');
   assert(defaultBridgeBody.includes('forge-project.json'), 'C5：defaultBridge 仍应检查 forge-project.json');
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 组 14: Codex 第二轮对抗测试修复验证（D4/D7/D10）
+// ─────────────────────────────────────────────────────────────────────────────
+
+test('14-1: D4 project.cwd 用 resolveProjectRoot（defaultBridge）', () => {
+  const src = fs.readFileSync(path.join(HOOKS_DIR, 'forge-context-bridge.js'), 'utf8');
+  // defaultBridge 返回值中 project.cwd 应用 resolveProjectRoot，不是裸 path.resolve(cwd)
+  const defaultBridgeBody = src.slice(src.indexOf('function defaultBridge('), src.indexOf('function spawnDetachedWorker'));
+  assert(defaultBridgeBody.includes('resolveProjectRoot(cwd)'), 'D4：defaultBridge project.cwd 应用 resolveProjectRoot');
+  // 确认裸 path.resolve(cwd) 已不在 project: { cwd 行
+  assert(!defaultBridgeBody.includes('cwd: path.resolve(cwd)'), 'D4：defaultBridge 不应再用裸 path.resolve(cwd)');
+});
+
+test('14-2: D4 project.cwd 用 resolveProjectRoot（主处理器覆写）', () => {
+  const src = fs.readFileSync(path.join(HOOKS_DIR, 'forge-context-bridge.js'), 'utf8');
+  // 主处理器中 draft.project.cwd 赋值不再用 path.resolve(cwd)
+  assert(!src.includes('draft.project.cwd  = path.resolve(cwd)'), 'D4：主处理器不应用裸 path.resolve(cwd)');
+  assert(src.includes('draft.project.cwd  = shared.resolveProjectRoot(cwd)'), 'D4：主处理器应用 shared.resolveProjectRoot(cwd)');
+});
+
+test('14-3: D7 applyParsed 允许从 completed 恢复为 active', () => {
+  const src = fs.readFileSync(path.join(HOOKS_DIR, 'forge-state-sync.js'), 'utf8');
+  // 提取 applyParsed 函数体（从 function 声明到闭合 }）
+  const startIdx = src.indexOf('function applyParsed(');
+  const endIdx   = src.indexOf('\n}\n', startIdx) + 3;
+  const applyBody = src.slice(startIdx, endIdx);
+  assert(applyBody.includes("state.status = 'active'"), 'D7：applyParsed 应在 !_is_complete 时将状态设为 active');
+  // 确认不再有 "else if (!state.status || state.status === 'active')" 这种限制条件
+  assert(!applyBody.includes("state.status === 'active'"), 'D7：applyParsed 不应有限制 active 才能被赋值的 else if');
+});
+
+test('14-4: D10 isLastPhase 有 Number.isFinite 守卫', () => {
+  const src = fs.readFileSync(path.join(HOOKS_DIR, 'forge-quality-pipeline.js'), 'utf8');
+  const isLastBody = src.slice(src.indexOf('function isLastPhase('), src.indexOf('\n}\n', src.indexOf('function isLastPhase(')));
+  assert(isLastBody.includes('Number.isFinite'), 'D10：isLastPhase 应有 Number.isFinite 守卫，防止 Infinity 误触发 ship 门');
 });
 
 // ─────────────────────────────────────────────────────────────────────────────

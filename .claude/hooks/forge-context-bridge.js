@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// forge-context-bridge.js - v2.2.0
+// forge-context-bridge.js - v2.3.0
 // PostToolUse hook: 事件归约层
 //
 // 修复（相比 v1.x）：
@@ -76,7 +76,8 @@ function defaultBridge(cwd, slug) {
   } catch (_) {}
 
   return {
-    project: { cwd: path.resolve(cwd), slug, isWeb, flowType },
+    // D4 fix: 用 resolveProjectRoot 统一 project.cwd（不再存裸 cwd）
+    project: { cwd: shared.resolveProjectRoot(cwd), slug, isWeb, flowType },
     phase:   { current: phaseNum, total: phaseTotal, phaseEpoch: 0 },
     change: {
       changeEpoch:      0,
@@ -402,7 +403,8 @@ process.stdin.on('end', async () => {
       // 确保必要字段存在（防御性初始化）
       if (!draft.project) Object.assign(draft, defaultBridge(cwd, slug));
       draft.project.slug = slug;
-      draft.project.cwd  = path.resolve(cwd);
+      // D4 fix: 和 defaultBridge 保持一致，project.cwd 用 resolveProjectRoot
+      draft.project.cwd  = shared.resolveProjectRoot(cwd);
       inferAndUpdate(draft, toolName, toolInput, toolResponse);
     });
 
