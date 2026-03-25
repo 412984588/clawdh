@@ -577,14 +577,23 @@ test('4-2 safeGitAdd：路径穿越被阻止（F07）', () => {
   assert(workerSrc.includes('startsWith(cwd +'), 'F07：应验证 resolved 路径在 cwd 内');
 });
 
-test('4-3 processJob：git reset HEAD 在 safeGitAdd 前执行（F03）', () => {
+test('4-3 processJob：选择性清除非 touchedFiles 预暂存文件（HIGH fix F03）', () => {
+  // HIGH fix：原来用 git reset HEAD 清空全部暂存区（破坏用户自己的暂存），
+  // 现在改为：只清除不属于 touchedFiles 的预暂存文件，并在提交后恢复
   const workerSrc = fs.readFileSync(path.join(HOOKS_DIR, 'forge-git-worker.js'), 'utf8');
-  const resetIdx = workerSrc.indexOf("'reset', 'HEAD'");
-  // lastIndexOf 找调用位置（函数定义在前，processJob 调用在后）
-  const addIdx   = workerSrc.lastIndexOf('safeGitAdd(cwd');
-  assert(resetIdx > 0, 'F03：应有 git reset HEAD');
+  // 应使用 git restore --staged 选择性清除，而非 git reset HEAD 全量清除
+  assert(workerSrc.includes("'restore', '--staged'"), 'F03 HIGH fix：应用 git restore --staged 选择性清除预暂存');
+  // 应有 preStagedToRestore 变量记录需要恢复的文件
+  assert(workerSrc.includes('preStagedToRestore'), 'F03 HIGH fix：应有 preStagedToRestore 保存恢复列表');
+  // 应在 safeGitAdd 之前调用 restore --staged
+  const restoreIdx = workerSrc.indexOf("'restore', '--staged'");
+  const addIdx     = workerSrc.lastIndexOf('safeGitAdd(cwd');
+  assert(restoreIdx > 0, 'F03 HIGH fix：应有 git restore --staged 调用');
   assert(addIdx > 0, 'F03：应有 safeGitAdd(cwd 调用');
-  assert(resetIdx < addIdx, 'F03：git reset 应在 safeGitAdd 之前');
+  assert(restoreIdx < addIdx, 'F03 HIGH fix：restore --staged 应在 safeGitAdd 之前');
+  // 提交后应恢复用户暂存文件（git add 恢复）
+  const restoreAfterIdx = workerSrc.lastIndexOf("'add', '--', ...preStagedToRestore");
+  assert(restoreAfterIdx > addIdx, 'F03 HIGH fix：提交后应恢复用户暂存文件');
 });
 
 test('4-4 队列 rename-then-process（F11）', () => {

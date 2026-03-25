@@ -126,10 +126,28 @@ function processJob(job) {
     execFileSync('git', ['rev-parse', '--git-dir'], { cwd, timeout: 2000 });
   } catch (_) { return; }  // 非 git 目录，跳过
 
-  // F03：先清空暂存区，防止用户预暂存的文件（含 secrets）被一并提交
-  try { execFileSync('git', ['reset', 'HEAD'], { cwd, timeout: 3000 }); } catch (_) {}
+  // F03（HIGH fix）：只清除不属于 touchedFiles 的预暂存文件，保留用户自己的暂存
+  // 原 git reset HEAD 会清除全部暂存区，包括用户有意暂存的合法文件（甚至含 secrets）
+  let preStagedToRestore = [];
+  try {
+    const staged = execFileSync('git', ['diff', '--name-only', '--cached'],
+      { cwd, encoding: 'utf8', timeout: 3000 });
+    const allStaged = staged.trim().split('\n').filter(Boolean);
+    const touchedRel = (touchedFiles || []).map(f => {
+      try { return path.relative(cwd, f); } catch (_) { return null; }
+    }).filter(Boolean);
+    preStagedToRestore = allStaged.filter(f => !touchedRel.includes(f));
+    if (preStagedToRestore.length > 0) {
+      execFileSync('git', ['restore', '--staged', '--', ...preStagedToRestore],
+        { cwd, timeout: 3000 });
+    }
+  } catch (_) {}
   const added    = safeGitAdd(cwd, touchedFiles);
   const committed = added && tryGitCommit(cwd);
+  // 恢复用户原有的暂存文件（无论是否成功提交，都不能丢失用户的工作）
+  if (preStagedToRestore.length > 0) {
+    try { execFileSync('git', ['add', '--', ...preStagedToRestore], { cwd, timeout: 3000 }); } catch (_) {}
+  }
   if (committed) {
     writeSnapshot(cwd, slug, reason || 'checkpoint');
     shared.logHookEvent('forge-git-worker', 'checkpoint_committed', { cwd, slug, reason });
@@ -152,7 +170,6 @@ async function main() {
       try { fs.renameSync(QUEUE_PATH, processingPath); } catch (_) { return; }
 
       const content = fs.readFileSync(processingPath, 'utf8');
-      try { fs.unlinkSync(processingPath); } catch (_) {}
       const lines = content.trim().split('\n').filter(Boolean);
 
       // 处理每个 job
@@ -164,6 +181,9 @@ async function main() {
           shared.logHookError('forge-git-worker/parseJob', e, { line: line.slice(0, 100) });
         }
       }
+      // HIGH fix：处理完后再删除 .processing 文件，防止崩溃丢失所有 job
+      // 原代码在读取内容后立即删除，崩溃时未处理的 job 会全部丢失
+      try { fs.unlinkSync(processingPath); } catch (_) {}
     }, { waitMs: 3000, staleMs: 30000 });
   } catch (e) {
     // lock 超时 → 另一个 worker 正在运行，直接退出

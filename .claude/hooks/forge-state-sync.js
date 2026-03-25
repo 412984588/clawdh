@@ -205,6 +205,9 @@ process.stdin.on('end', async () => {
 
     // 只处理 .planning/ 文件或 progress.txt
     if (!isInPlanning && !isProgressTxt) process.exit(0);
+    // HIGH fix: progress.txt 只在已知 Forge 项目中处理，防止将任意仓库（只要写了 PROGRESS.md）
+    // 误注册为 Forge 项目，产生垃圾 state.json
+    if (isProgressTxt && !isInPlanning && !shared.isForgeProject(realCwd)) process.exit(0);
 
     if (!fs.existsSync(realFilePath)) process.exit(0);
 
