@@ -40,7 +40,7 @@ function main() {
   let entries;
   try {
     entries = fs.readdirSync(forgeDir);
-  } catch (e) {
+  } catch (_) {
     output(null);
     return;
   }

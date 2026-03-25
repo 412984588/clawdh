@@ -68,8 +68,8 @@ process.stdin.on('end', async () => {
     const toolResp = data.tool_response || data.tool_result || {};
 
     // 只处理失败的 Bash 命令
-    const exitCode = toolResp?.exit_code ?? toolResp?.exitCode ??
-                     toolResp?.returncode ?? (toolResp?.isError ? 1 : 0);
+    // DUP-4: 退出码解析统一用 shared.parseExitCode
+    const exitCode = shared.parseExitCode(toolResp);
     if (exitCode === 0) process.exit(0);
 
     const cmd  = (data.tool_input || {}).command || '';

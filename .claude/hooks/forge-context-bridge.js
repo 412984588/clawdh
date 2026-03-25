@@ -251,8 +251,8 @@ function inferAndUpdate(draft, toolName, toolInput, toolResponse) {
   // ── Bash 命令 ─────────────────────────────────────────────────────────────
   if (toolName === 'Bash') {
     const cmd  = toolInput?.command || '';
-    const exit = toolResponse?.exit_code ?? toolResponse?.exitCode ??
-                 toolResponse?.returncode ?? (toolResponse?.isError ? 1 : 0);
+    // DUP-4: 退出码解析统一用 shared.parseExitCode
+    const exit = shared.parseExitCode(toolResponse);
     draft.audit.lastToolName = 'Bash';
     if (exit === 0 && TEST_CMD.test(cmd)) {
       markGatePassed(draft, 'tests');

@@ -371,6 +371,14 @@ async function appendJsonlQueue(queuePath, job) {
   }, { waitMs: 3000 });
 }
 
+// ─── 工具函数 ─────────────────────────────────────────────────────────────────
+
+// DUP-4: 退出码解析，统一处理各平台/框架的字段名差异
+// auto-fix.js 和 context-bridge.js 曾各自内联此逻辑
+function parseExitCode(resp) {
+  return resp?.exit_code ?? resp?.exitCode ?? resp?.returncode ?? (resp?.isError ? 1 : 0);
+}
+
 // ─── 导出 ──────────────────────────────────────────────────────────────────────
 
 exports.slugify             = slugify;
@@ -399,3 +407,4 @@ exports._normReal     = _normReal;      // DUP-3: git-worker/state-sync 共享
 exports.TEST_PATTERN  = TEST_PATTERN;   // DUP-1: auto-fix/context-bridge 共享
 exports.BUILD_PATTERN = BUILD_PATTERN;  // DUP-1
 exports.LINT_PATTERN  = LINT_PATTERN;   // DUP-1
+exports.parseExitCode = parseExitCode;  // DUP-4: auto-fix/context-bridge 共享
