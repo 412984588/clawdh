@@ -54,10 +54,10 @@ function defaultBridge(cwd, slug) {
   // 从 forge state.json 读取已有信息
   let isWeb = false, flowType = 'new', phaseNum = 1, phaseTotal = null;
   try {
-    const { data } = shared.safeReadJson(
+    const { data, corrupt } = shared.safeReadJson(
       path.join(os.homedir(), '.forge', 'projects', slug, 'state.json'), {}
     );
-    if (data && !data.corrupt) {
+    if (data && !corrupt) {  // F08：使用 safeReadJson 返回的 corrupt 标志
       flowType   = data.flow_type || 'new';
       phaseNum   = data.phase?.current || 1;
       phaseTotal = data.phase?.total   || null;
@@ -222,19 +222,20 @@ function inferAndUpdate(draft, toolName, toolInput, toolResponse) {
 
   // ── Agent / Task ──────────────────────────────────────────────────────────
   if (toolName === 'Agent' || toolName === 'Task') {
-    const st = toolInput?.subagent_type || '';
+    const st      = toolInput?.subagent_type || '';
+    const isError = toolResponse?.isError === true;  // F02：失败的 Agent 不能标记门通过
     draft.audit.lastToolName = toolName + ':' + st;
-    if (st === 'gsd-executor')               markGatePassed(draft, 'tests');    // verifier 已内嵌
-    if (st === 'superpowers:code-reviewer')  markGatePassed(draft, 'code_review');
-    if (st === 'gsd-verifier')               markGatePassed(draft, 'tests');
+    if (!isError && st === 'gsd-executor')               markGatePassed(draft, 'tests');    // verifier 已内嵌
+    if (!isError && st === 'superpowers:code-reviewer')  markGatePassed(draft, 'code_review');
+    if (!isError && st === 'gsd-verifier')               markGatePassed(draft, 'tests');
   }
 
   // 同步 phase/isWeb（从 forge state.json 保持一致）
   try {
-    const { data } = shared.safeReadJson(
+    const { data, corrupt } = shared.safeReadJson(
       path.join(os.homedir(), '.forge', 'projects', draft.project.slug, 'state.json'), null
     );
-    if (data && !data.corrupt) {
+    if (data && !corrupt) {  // F08：使用 safeReadJson 返回的 corrupt 标志
       if (data.phase?.current) draft.phase.current = data.phase.current;
       if (data.phase?.total)   draft.phase.total   = data.phase.total;
       if (data.flow_type)      draft.project.flowType = data.flow_type;
@@ -275,10 +276,13 @@ function writeHandoff(cwd, slug) {
 }
 
 function checkContextWarning(cwd, slug, sessionId, bridge) {
+  // F06：先 sanitize sessionId，防止路径穿越攻击
+  const safeId = shared.sanitizeSessionId(sessionId);
+  if (!safeId) return null;
   // P3#19：metrics 验证（remaining 必须是 0-100 的合法数字）
-  const metricsPath = path.join(shared.getTmpDir(), `claude-ctx-${sessionId}.json`);
+  const metricsPath = path.join(shared.getTmpDir(), `claude-ctx-${safeId}.json`);
   // 兼容旧路径 /tmp
-  const legacyPath  = path.join(os.tmpdir(), `claude-ctx-${sessionId}.json`);
+  const legacyPath  = path.join(os.tmpdir(), `claude-ctx-${safeId}.json`);
   const mPath       = fs.existsSync(metricsPath) ? metricsPath :
                       fs.existsSync(legacyPath)  ? legacyPath  : null;
   if (!mPath) return null;
@@ -294,9 +298,7 @@ function checkContextWarning(cwd, slug, sessionId, bridge) {
   if (metrics.timestamp && (now - metrics.timestamp) > STALE_SECONDS) return null;
   if (remaining > WARNING_THRESHOLD) return null;
 
-  // 防抖
-  const safeId  = shared.sanitizeSessionId(sessionId);
-  if (!safeId) return null;
+  // 防抖（safeId 已在函数顶部 F06 处声明）
   const warnKey = path.join(shared.getTmpDir(), `forge-ctx-${safeId}-warned.json`);
   let wd = { callsSinceWarn: 0, lastLevel: null };
   try { wd = JSON.parse(fs.readFileSync(warnKey, 'utf8')); } catch (_) {}

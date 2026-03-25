@@ -127,8 +127,15 @@ async function withAdvisoryLock(lockDir, fn, opts = {}) {
           continue;  // 清除后立即重试
         }
       } catch (_) {
-        // 无法读 pid 文件 → 尝试清除并重试
-        try { fs.rmSync(lockDir, { recursive: true }); } catch (_2) {}
+        // F04 fix：无法读 pid → 锁可能刚创建还未写完，先检查锁龄再决定是否清除
+        let lockAge;
+        try { lockAge = Date.now() - fs.statSync(lockDir).mtimeMs; } catch (_2) { lockAge = 99999; }
+        if (lockAge > 2000) {
+          // 超过 2s 仍无 pid → 确为孤儿锁，安全清除
+          try { fs.rmSync(lockDir, { recursive: true }); } catch (_2) {}
+        }
+        if (Date.now() >= deadline) throw new Error(`Advisory lock timeout: ${lockDir}`);
+        await sleep(retryMs);
         continue;
       }
       if (Date.now() >= deadline) throw new Error(`Advisory lock timeout: ${lockDir}`);

@@ -46,8 +46,8 @@ function evaluateSecurityRisk(cwd, touchedFiles) {
       files:    touchedFiles,
     };
   } catch (_) {
-    // git 失败（非 git 项目等）→ 安全降级：不触发安全门
-    return { required: false, reasons: [], files: [] };
+    // F10 fix：git 失败时无法判断风险，保守策略触发安全门而非静默放行
+    return { required: true, reasons: ['git_error'], files: touchedFiles.slice(0, 20) };
   }
 }
 
@@ -183,13 +183,21 @@ process.stdin.on('end', async () => {
     const next = nextGateToInject(bridge);
     if (!next) process.exit(0);
 
-    // 标记为 leased（P2#11：有超时限制，不会永久死锁）
+    // 标记为 leased（F09 fix：lease 失败时阻断注入，防止重复触发）
     const leaseUntil = new Date(Date.now() + LEASE_TTL_MS).toISOString();
-    await shared.mutateBridge(cwd, (draft) => {
-      if (!draft.gates?.[next.name]) return;
-      draft.gates[next.name].status    = 'leased';
-      draft.gates[next.name].leaseUntil = leaseUntil;
-    }).catch(e => shared.logHookError('forge-quality-pipeline/lease', e, { gate: next.name }));
+    let leased = false;
+    try {
+      await shared.mutateBridge(cwd, (draft) => {
+        if (!draft.gates?.[next.name]) return;
+        draft.gates[next.name].status    = 'leased';
+        draft.gates[next.name].leaseUntil = leaseUntil;
+      });
+      leased = true;
+    } catch (e) {
+      shared.logHookError('forge-quality-pipeline/lease', e, { gate: next.name });
+    }
+
+    if (!leased) process.exit(0);
 
     // 注入质量命令到对话上下文
     process.stdout.write(JSON.stringify({

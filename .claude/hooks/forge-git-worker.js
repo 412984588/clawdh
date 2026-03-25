@@ -53,8 +53,13 @@ function safeGitAdd(cwd, touchedFiles) {
   // 过滤掉危险文件
   const safeFiles = (touchedFiles || [])
     .filter(f => f && !isDenied(f))
-    .map(f => path.isAbsolute(f) ? path.relative(cwd, f) : f)
-    .filter(f => f && !f.startsWith('..'));  // 排除项目目录外的路径
+    .map(f => path.isAbsolute(f) ? path.relative(cwd, f) : path.normalize(f))
+    .filter(f => {
+      if (!f) return false;
+      // F07：标准化后验证不逃逸项目根（防止 sub/../../.github/ 绕过 startsWith 检查）
+      const resolved = path.resolve(cwd, f);
+      return resolved === cwd || resolved.startsWith(cwd + path.sep);
+    });
 
   if (safeFiles.length === 0) {
     // 没有安全文件可 add → 检查是否有任何已跟踪文件修改
@@ -121,6 +126,8 @@ function processJob(job) {
     execFileSync('git', ['rev-parse', '--git-dir'], { cwd, timeout: 2000 });
   } catch (_) { return; }  // 非 git 目录，跳过
 
+  // F03：先清空暂存区，防止用户预暂存的文件（含 secrets）被一并提交
+  try { execFileSync('git', ['reset', 'HEAD'], { cwd, timeout: 3000 }); } catch (_) {}
   const added    = safeGitAdd(cwd, touchedFiles);
   const committed = added && tryGitCommit(cwd);
   if (committed) {
