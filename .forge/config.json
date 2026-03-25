@@ -1,6 +1,12 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Forge 全自动工作流引擎 — GSD + gstack 融合编排器",
+  "_notes": {
+    "context_thresholds": "由 forge-context-save.js 在启动时读取（v1.1 已实现）",
+    "auto_merge": "由 SKILL.md STEP 5c land-and-deploy 流程级消费，非代码级",
+    "pipeline": "由 SKILL.md STEP 4 流程级消费，非代码级",
+    "gsd_preset": "由 SKILL.md STEP 2c 写入 .planning/config.json，非直接读取"
+  },
   "context_thresholds": {
     "warning": 35,
     "critical": 25,
