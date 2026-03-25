@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// forge-state-sync.js - v2.1.0
+// forge-state-sync.js - v2.2.0
 // PostToolUse hook (Write|Edit): 同步 GSD 状态到 Forge State Hub
 //
 // 监控：
@@ -50,10 +50,11 @@ function parseStateMd(content) {
   if (yamlPhase != null && !Number.isNaN(Number(yamlPhase))) {
     result._phase_current = Number(yamlPhase);
   } else {
-    const phaseMatch = content.match(/##\s*Current.*?Phase[^\n]*\n.*?(\d+)[^\n]*/i) ||
-                       content.match(/\*\*Phase\*\*[:\s]+(\d+)/i) ||
-                       content.match(/Phase[:\s]+(\d+)/i) ||
-                       content.match(/阶段[：:\s]+(\d+)/i);
+    // C4 fix: (\d+\.?\d*) 支持小数阶段（如 "Phase 5.1"），原 (\d+) 截断小数部分
+    const phaseMatch = content.match(/##\s*Current.*?Phase[^\n]*\n.*?(\d+\.?\d*)[^\n]*/i) ||
+                       content.match(/\*\*Phase\*\*[:\s]+(\d+\.?\d*)/i) ||
+                       content.match(/Phase[:\s]+(\d+\.?\d*)/i) ||
+                       content.match(/阶段[：:\s]+(\d+\.?\d*)/i);
     if (phaseMatch) result._phase_current = Number(phaseMatch[1]);  // F14：Number 兼容小数阶段
   }
 

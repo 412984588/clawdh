@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// forge-context-bridge.js - v2.1.0
+// forge-context-bridge.js - v2.2.0
 // PostToolUse hook: 事件归约层
 //
 // 修复（相比 v1.x）：
@@ -56,18 +56,19 @@ function defaultBridge(cwd, slug) {
     }
   } catch (_) {}
 
-  // 检测 Web 项目
+  // 检测 Web 项目（C5 fix：用 resolveProjectRoot 统一 worktree/子目录身份）
   try {
-    const fp = path.join(cwd, '.claude', 'forge-project.json');
+    const root = shared.resolveProjectRoot(cwd);
+    const fp = path.join(root, '.claude', 'forge-project.json');
     if (fs.existsSync(fp)) {
       isWeb = JSON.parse(fs.readFileSync(fp, 'utf8')).is_web_project ?? false;
     } else {
-      const hasNext = fs.existsSync(path.join(cwd, 'next.config.js')) ||
-                      fs.existsSync(path.join(cwd, 'next.config.ts'));
+      const hasNext = fs.existsSync(path.join(root, 'next.config.js')) ||
+                      fs.existsSync(path.join(root, 'next.config.ts'));
       if (hasNext) {
         isWeb = true;
-      } else if (fs.existsSync(path.join(cwd, 'package.json'))) {
-        const pkg  = JSON.parse(fs.readFileSync(path.join(cwd, 'package.json'), 'utf8'));
+      } else if (fs.existsSync(path.join(root, 'package.json'))) {
+        const pkg  = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
         const deps = { ...pkg.dependencies, ...pkg.devDependencies };
         isWeb = !!(deps.next || deps.react || deps.vue || deps.nuxt || deps.svelte);
       }
@@ -135,6 +136,9 @@ const TEST_CMD = /\b(npm test|npm run test|pnpm test|pnpm run test|jest|vitest|p
 // ─── 事件归约（inferAndUpdate）────────────────────────────────────────────────
 
 function inferAndUpdate(draft, toolName, toolInput, toolResponse) {
+  // C1 fix: 快照当前状态，用于末尾脏检查（跳过无意义的 audit.updatedAt 更新）
+  const _draftBefore = JSON.stringify(draft);
+
   // ── Write / Edit / MultiEdit ──────────────────────────────────────────────
   if (toolName === 'Write' || toolName === 'Edit' || toolName === 'MultiEdit') {
     const fp = toolInput?.file_path || toolInput?.path || '';
@@ -237,7 +241,10 @@ function inferAndUpdate(draft, toolName, toolInput, toolResponse) {
     } catch (_) {}
   }
 
-  draft.audit.updatedAt = new Date().toISOString();
+  // C1 fix: 只在有真实变更时更新 audit.updatedAt（在函数开头已捕获 _draftBefore）
+  if (typeof _draftBefore === 'string' && _draftBefore !== JSON.stringify(draft)) {
+    draft.audit.updatedAt = new Date().toISOString();
+  }
 }
 
 // ─── 上下文保存（入队 git，不内联执行）────────────────────────────────────────
@@ -403,9 +410,10 @@ process.stdin.on('end', async () => {
     const safeId = shared.sanitizeSessionId(sessionId);
     if (!safeId || !bridge) process.exit(0);
 
-    // 检查是否被 .planning/config.json 禁用
+    // 检查是否被 .planning/config.json 禁用（C5 fix：用 resolveProjectRoot 统一路径）
     try {
-      const { data: cfg } = shared.safeReadJson(path.join(cwd, '.planning', 'config.json'), {});
+      const cfgRoot = shared.resolveProjectRoot(cwd);
+      const { data: cfg } = shared.safeReadJson(path.join(cfgRoot, '.planning', 'config.json'), {});
       if (cfg?.hooks?.context_warnings === false) process.exit(0);
     } catch (_) {}
 

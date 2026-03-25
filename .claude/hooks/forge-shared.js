@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// forge-shared.js - v1.3.0
+// forge-shared.js - v1.4.0
 // 所有 Forge hooks 的共享存储层
 //
 // 修复：
@@ -237,9 +237,13 @@ async function mutateBridge(cwd, mutator) {
       logHookError('mutateBridge', new Error('Bridge file corrupt, skipping mutation'), { path: bp });
       return { bridge: null };
     }
-    const draft = data || {};
+    const draft      = data || {};
+    const beforeJson = JSON.stringify(draft);
     await Promise.resolve(mutator(draft));
-    writeJsonAtomic(bp, draft);
+    // C1 fix: 脏检查 — 无变更时跳过 writeJsonAtomic，消除无意义 disk 写入
+    if (JSON.stringify(draft) !== beforeJson) {
+      writeJsonAtomic(bp, draft);
+    }
     return { bridge: draft };
   });
 }

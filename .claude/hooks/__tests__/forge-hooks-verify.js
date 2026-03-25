@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// forge-hooks-verify.js — Forge v2.0 hooks 验证脚本（60 场景）
+// forge-hooks-verify.js — Forge v2.0 hooks 验证脚本（64 场景）
 // 纯 Node.js，无外部依赖
 // 运行：node forge-hooks-verify.js
 
@@ -933,6 +933,47 @@ await testAsync('12-5 H1 safeReadJson：正常文件可读回，writeJsonAtomic 
   assert(!corrupt, '正常文件不应标记 corrupt');
   assertEqual(data?.phase, 3, 'safeReadJson 应读回 phase=3');
   fs.rmSync(tmpDir, { recursive: true });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 组 13: 中优先级修复验证（C1/C4/C5）
+// ─────────────────────────────────────────────────────────────────────────────
+
+test('13-1: C4 state-sync 小数阶段 regex — Phase 5.1 应解析为 5.1', () => {
+  const src = fs.readFileSync(path.join(HOOKS_DIR, 'forge-state-sync.js'), 'utf8');
+  // 四条 prose 匹配正则都应包含小数支持
+  const patterns = src.match(/content\.match\(\/.*?\/i\)/g) || [];
+  const decimalPatterns = patterns.filter(p => p.includes('\\d+\\.?\\d*'));
+  assert(decimalPatterns.length >= 4, `C4：4 条 prose 正则应支持小数阶段，实际找到 ${decimalPatterns.length} 条`);
+});
+
+test('13-2: C4 state-sync 旧 (\\d+) 模式已消除', () => {
+  const src = fs.readFileSync(path.join(HOOKS_DIR, 'forge-state-sync.js'), 'utf8');
+  // 检查 prose 匹配中不再有裸 (\d+) 不含小数扩展
+  // 方式：prose 4 条正则中每条都要有 \.?\\d*
+  const phaseSection = src.slice(src.indexOf('phaseMatch'), src.indexOf('if (phaseMatch)'));
+  assert(!phaseSection.includes('(\\d+)/i'), 'C4：prose 正则中裸 (\\d+)/i 应已替换为 (\\d+\\.?\\d*)/i');
+});
+
+test('13-3: C1 mutateBridge 含脏检查逻辑', () => {
+  const src = fs.readFileSync(path.join(HOOKS_DIR, 'forge-shared.js'), 'utf8');
+  assert(src.includes('beforeJson'), 'C1：mutateBridge 应捕获 beforeJson 快照');
+  assert(src.includes('JSON.stringify(draft) !== beforeJson'), 'C1：mutateBridge 应做脏检查跳过写入');
+});
+
+test('13-4: C1 inferAndUpdate 含 _draftBefore 快照', () => {
+  const src = fs.readFileSync(path.join(HOOKS_DIR, 'forge-context-bridge.js'), 'utf8');
+  assert(src.includes('_draftBefore = JSON.stringify(draft)'), 'C1：inferAndUpdate 应在开头快照 _draftBefore');
+  assert(src.includes('_draftBefore !== JSON.stringify(draft)'), 'C1：inferAndUpdate 应在结尾做脏检查');
+});
+
+test('13-5: C5 defaultBridge web 检测用 resolveProjectRoot', () => {
+  const src = fs.readFileSync(path.join(HOOKS_DIR, 'forge-context-bridge.js'), 'utf8');
+  // 确认 .claude/forge-project.json 路径来自 root（resolveProjectRoot 结果），而非裸 cwd
+  // 方式：从 defaultBridge 函数体中查找 resolveProjectRoot + forge-project.json 同时出现
+  const defaultBridgeBody = src.slice(src.indexOf('function defaultBridge('), src.indexOf('function spawnDetachedWorker'));
+  assert(defaultBridgeBody.includes('resolveProjectRoot(cwd)'), 'C5：defaultBridge 应用 resolveProjectRoot(cwd) 检测 web 项目');
+  assert(defaultBridgeBody.includes('forge-project.json'), 'C5：defaultBridge 仍应检查 forge-project.json');
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
