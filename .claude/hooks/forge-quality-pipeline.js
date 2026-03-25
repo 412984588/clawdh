@@ -126,6 +126,20 @@ function nextGateToInject(bridge) {
       requires: () => allCoreGatesPassed(bridge) && isLastPhase(bridge),
       msg:      () => `⚡ FORGE 质量门：所有阶段完成，全部质量门通过！\n最后步骤：创建 PR 并准备部署。\n请调用 Skill("ship") 执行 gstack /ship（全量测试 + 版本 + PR）。\n${PREAMBLE_SKIP}`,
     },
+    // P2 fix: 升级告警门 — 有任何质量门被 failCount>=3 封锁时注入人工介入提示
+    // 防止流水线卡死后无声停止，用 10min lease 避免每次 PostToolUse 都重复注入
+    {
+      name:     'escalation',
+      requires: () => gateDefs.slice(0, -1).some(
+        def => def.requires() && (g[def.name]?.failCount || 0) >= 3
+      ),
+      msg: () => {
+        const blocked = gateDefs.slice(0, -1)
+          .filter(def => def.requires() && (g[def.name]?.failCount || 0) >= 3)
+          .map(d => d.name);
+        return `⚠️ FORGE 质量门卡死：以下质量门连续失败 3 次，自动重试已停止：\n${blocked.map(n => `• ${n}`).join('\n')}\n请手动运行对应质量检查命令后重试，或运行 /forge:status 查看详情。\n${PREAMBLE_SKIP}`;
+      },
+    },
   ];
 
   for (const def of gateDefs) {
@@ -195,7 +209,10 @@ process.stdin.on('end', async () => {
         // 用最新 bridge 数据重新决策（持锁状态，无 TOCTOU 竞态窗口）
         const candidate = nextGateToInject(draft);
         if (!candidate) return;
-        if (!draft.gates?.[candidate.name]) return;
+        // P2 fix: 门不存在时（如 escalation 首次出现于旧 bridge）自动初始化，不再直接 return
+        if (!draft.gates[candidate.name]) {
+          draft.gates[candidate.name] = { status: 'idle', epoch: null, leaseUntil: null, failCount: 0 };
+        }
         draft.gates[candidate.name].status    = 'leased';
         draft.gates[candidate.name].leaseUntil = new Date(Date.now() + LEASE_TTL_MS).toISOString();
         nextToInject = candidate;

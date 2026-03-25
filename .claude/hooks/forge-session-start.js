@@ -158,6 +158,25 @@ function budgetedCleanup() {
 
   if (Date.now() - start > MAX_MS) return;
 
+  // P2 fix: 恢复崩溃遗留的 .processing 文件（worker 崩溃后 jobs 永远不会被处理）
+  // 超过 20 分钟的 .processing → worker 已挂，追加回 queue.jsonl 重新入队
+  try {
+    const gitDir        = path.join(os.homedir(), '.forge', 'runtime', 'git');
+    const processingPath = path.join(gitDir, 'queue.jsonl.processing');
+    if (fs.existsSync(processingPath)) {
+      const age = Date.now() - fs.statSync(processingPath).mtimeMs;
+      if (age > 20 * 60 * 1000) {
+        const content   = fs.readFileSync(processingPath, 'utf8');
+        const queuePath = path.join(gitDir, 'queue.jsonl');
+        // 追加到 queue.jsonl（末尾补换行防止行粘连）
+        fs.appendFileSync(queuePath, content.endsWith('\n') ? content : content + '\n');
+        fs.unlinkSync(processingPath);
+      }
+    }
+  } catch (_) {}
+
+  if (Date.now() - start > MAX_MS) return;
+
   // 清理 ~/.forge/runtime/bridges/ 下的 stale lock 目录（>20min）
   try {
     const bridgesDir = path.join(os.homedir(), '.forge', 'runtime', 'bridges');

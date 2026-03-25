@@ -76,7 +76,9 @@ function resolveSlug(cwd) {
     try {
       const existing = JSON.parse(fs.readFileSync(simpleStatePath, 'utf8'));
       // 属于本项目 → 保留 simple slug（向后兼容）
-      if (!existing.project_path || path.resolve(existing.project_path) === root) {
+      // M6 fix: 同时比较 realpathSync 版本，处理 state.json 存的是 /var/... 而 root 是 /private/var/... 的情形
+      const resolvedExisting = path.resolve(existing.project_path || '');
+      if (!existing.project_path || resolvedExisting === root || _normReal(resolvedExisting) === root) {
         return baseName;
       }
       // 属于不同项目 → 使用 hashed slug

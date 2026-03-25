@@ -95,6 +95,7 @@ function defaultBridge(cwd, slug) {
       security:    emptyGate(),
       benchmark:   emptyGate(),
       ship:        emptyGate(),
+      escalation:  emptyGate(),  // P2 fix: 质量门全卡死时的人工介入告警门
     },
     context: { warningLevel: null, lastSaveAt: null },
     audit:   { lastToolName: null, updatedAt: null },
@@ -175,9 +176,12 @@ function inferAndUpdate(draft, toolName, toolInput, toolResponse) {
     } else if (!isInPlanning && !isInClaude && fp !== '') {
       // 源码变更 → changeEpoch++，下游门全部失效
       draft.change.changeEpoch++;
+      // M5 fix: touchedFiles 存入时规范化路径（消除 /var→/private/var symlink 身份分裂）
+      // safeGitAdd 依赖 path.relative 边界检查，若 cwd 已 realpathSync 而 fp 未规范化，会被误判为越界
+      const canonFp = (() => { try { return fs.realpathSync(absFp); } catch (_) { return absFp; } })();
       // 去重追踪被修改的文件（最多保留 50 个）
-      if (!draft.change.touchedFiles.includes(fp)) {
-        draft.change.touchedFiles.push(fp);
+      if (!draft.change.touchedFiles.includes(canonFp)) {
+        draft.change.touchedFiles.push(canonFp);
         if (draft.change.touchedFiles.length > 50) draft.change.touchedFiles.shift();
       }
       // 新文件加入后重置安全风险，让 pipeline 用最新 touchedFiles 重新评估（P2#4）

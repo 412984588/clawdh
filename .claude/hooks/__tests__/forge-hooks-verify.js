@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// forge-hooks-verify.js — Forge v2.0 hooks 验证脚本（77 场景）
+// forge-hooks-verify.js — Forge v2.0 hooks 验证脚本（112 场景）
 // 纯 Node.js，无外部依赖
 // 运行：node forge-hooks-verify.js
 
@@ -1913,6 +1913,94 @@ test('21-9: L2 forge-context-bridge.js — inferAndUpdate 使用 path.relative �
   assert(
     inferBody.includes('path.relative') || inferBody.includes('isInPlanning'),
     'L2：inferAndUpdate 应使用 path.relative 或 isInPlanning'
+  );
+});
+
+// ─── Group 22：Codex P2 修复验证 ──────────────────────────────────────────────
+console.log('\n── Group 22: Codex P2 修复验证 ──');
+
+// 22-1: .processing 崩溃恢复 — session-start 清理含 processing 文件恢复逻辑
+test('22-1: P2 forge-session-start.js — budgetedCleanup 含 .processing 崩溃恢复', () => {
+  const sessionSrc = fs.readFileSync(path.join(HOOKS_DIR, 'forge-session-start.js'), 'utf8');
+  assert(
+    sessionSrc.includes('.processing'),
+    'P2：forge-session-start.js 应含 .processing 文件检测'
+  );
+  assert(
+    sessionSrc.includes('appendFileSync') || sessionSrc.includes('appendFile'),
+    'P2：.processing 恢复应将内容追加回 queue.jsonl'
+  );
+  assert(
+    sessionSrc.includes('fs.unlinkSync') || sessionSrc.includes('unlink'),
+    'P2：恢复后应删除 .processing 文件'
+  );
+});
+
+// 22-2: escalation 门存在于 defaultBridge
+test('22-2: P2 forge-context-bridge.js — defaultBridge 含 escalation 门', () => {
+  const bridgeSrc = fs.readFileSync(path.join(HOOKS_DIR, 'forge-context-bridge.js'), 'utf8');
+  assert(
+    bridgeSrc.includes("escalation:"),
+    'P2：defaultBridge 的 gates 对象应包含 escalation 门'
+  );
+});
+
+// 22-3: escalation 门注入逻辑存在于 forge-quality-pipeline.js
+test('22-3: P2 forge-quality-pipeline.js — nextGateToInject 含 escalation 门定义', () => {
+  const pipelineSrc = fs.readFileSync(path.join(HOOKS_DIR, 'forge-quality-pipeline.js'), 'utf8');
+  assert(
+    pipelineSrc.includes("name:     'escalation'") || pipelineSrc.includes("name: 'escalation'"),
+    'P2：nextGateToInject 应包含 escalation 门定义'
+  );
+  assert(
+    pipelineSrc.includes('卡死') || pipelineSrc.includes('人工介入'),
+    'P2：escalation 注入消息应包含人工介入提示'
+  );
+});
+
+// 22-4: 门不存在时自动初始化（不再直接 return）
+test('22-4: P2 forge-quality-pipeline.js — 门不存在时自动初始化而非 return', () => {
+  const pipelineSrc = fs.readFileSync(path.join(HOOKS_DIR, 'forge-quality-pipeline.js'), 'utf8');
+  // 原来是 if (!draft.gates?.[candidate.name]) return;
+  // 现在应该是初始化而非 return
+  assert(
+    !pipelineSrc.includes('if (!draft.gates?.[candidate.name]) return;'),
+    'P2：不应再使用 if (!draft.gates?.[candidate.name]) return 直接退出'
+  );
+  assert(
+    pipelineSrc.includes("draft.gates[candidate.name] = {"),
+    'P2：门不存在时应自动初始化'
+  );
+});
+
+// ─── Group 23：M5/M6 遗留修复验证 ─────────────────────────────────────────────
+console.log('\n── Group 23: M5/M6 遗留修复验证 ──');
+
+// 23-1: M5 — touchedFiles 存入时规范化路径（realpathSync）
+test('23-1: M5 forge-context-bridge.js — touchedFiles 存入时 realpathSync 规范化', () => {
+  const bridgeSrc = fs.readFileSync(path.join(HOOKS_DIR, 'forge-context-bridge.js'), 'utf8');
+  assert(
+    bridgeSrc.includes('canonFp') || bridgeSrc.includes('realpathSync'),
+    'M5：touchedFiles 存入时应有规范化路径处理'
+  );
+  // 确保 touchedFiles.push 推的是 canonFp 而非原始 fp
+  assert(
+    bridgeSrc.includes('touchedFiles.push(canonFp)') ||
+    (bridgeSrc.includes('canonFp') && bridgeSrc.includes('touchedFiles')),
+    'M5：touchedFiles.push 应使用规范化后的 canonFp'
+  );
+});
+
+// 23-2: M6 — resolveSlug 的 project_path 比较使用 realpathSync
+test('23-2: M6 forge-shared.js resolveSlug — project_path 比较含 _normReal', () => {
+  const sharedSrc = fs.readFileSync(path.join(HOOKS_DIR, 'forge-shared.js'), 'utf8');
+  // 找到 resolveSlug 函数体
+  const slugStart = sharedSrc.indexOf('function resolveSlug');
+  const slugEnd   = sharedSrc.indexOf('\n}', slugStart) + 2;
+  const slugBody  = sharedSrc.slice(slugStart, slugEnd);
+  assert(
+    slugBody.includes('_normReal') || slugBody.includes('realpathSync'),
+    'M6：resolveSlug 的 project_path 比较应使用 _normReal 或 realpathSync'
   );
 });
 
