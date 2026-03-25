@@ -84,7 +84,9 @@ function isLastPhase(bridge) {
 function isLeaseExpired(gate) {
   if (gate.status !== 'leased') return false;
   if (!gate.leaseUntil)        return true;
-  return Date.parse(gate.leaseUntil) <= Date.now();
+  const parsed = Date.parse(gate.leaseUntil);
+  // LOW fix: Date.parse 返回 NaN 时（leaseUntil 损坏）视为已过期，保守地重新触发
+  return isNaN(parsed) || parsed <= Date.now();
 }
 
 // ─── 质量 FSM：选择下一个要注入的门（P2#11 lease 超时机制）─────────────────
@@ -123,7 +125,12 @@ function nextGateToInject(bridge) {
     },
     {
       name:     'ship',
-      requires: () => allCoreGatesPassed(bridge) && isLastPhase(bridge),
+      requires: () => {
+        if (!allCoreGatesPassed(bridge) || !isLastPhase(bridge)) return false;
+        // N2 fix: 任意前置门永久失败（failCount>=3）时禁止 ship，由 escalation 优先接管
+        // 原代码 allCoreGatesPassed 不检查 security/benchmark，导致 ship 可在安全门卡死时触发
+        return !gateDefs.slice(0, -2).some(def => (g[def.name]?.failCount || 0) >= 3);
+      },
       msg:      () => `⚡ FORGE 质量门：所有阶段完成，全部质量门通过！\n最后步骤：创建 PR 并准备部署。\n请调用 Skill("ship") 执行 gstack /ship（全量测试 + 版本 + PR）。\n${PREAMBLE_SKIP}`,
     },
     // P2 fix: 升级告警门 — 有任何质量门被 failCount>=3 封锁时注入人工介入提示

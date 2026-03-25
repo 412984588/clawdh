@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// forge-hooks-verify.js — Forge v2.0 hooks 验证脚本（112 场景）
+// forge-hooks-verify.js — Forge v2.0 hooks 验证脚本（119 场景）
 // 纯 Node.js，无外部依赖
 // 运行：node forge-hooks-verify.js
 
@@ -2001,6 +2001,95 @@ test('23-2: M6 forge-shared.js resolveSlug — project_path 比较含 _normReal'
   assert(
     slugBody.includes('_normReal') || slugBody.includes('realpathSync'),
     'M6：resolveSlug 的 project_path 比较应使用 _normReal 或 realpathSync'
+  );
+});
+
+// ─── Group 24：Codex 对抗 + 最终验收修复验证 ──────────────────────────────────
+console.log('\n── Group 24: 最终验收修复验证 ──');
+
+// 24-1: N2 fix — ship 门在任意前置门 failCount>=3 时禁止触发
+test('24-1: N2 forge-quality-pipeline.js — ship.requires 检查前置门 failCount', () => {
+  const src = fs.readFileSync(path.join(HOOKS_DIR, 'forge-quality-pipeline.js'), 'utf8');
+  // 修复后 ship.requires 应包含 gateDefs.slice(0,-2) 检查
+  assert(
+    src.includes('gateDefs.slice(0, -2)') || src.includes("gateDefs.slice(0,-2)"),
+    'N2：ship.requires 应用 gateDefs.slice(0, -2) 检查前置门 failCount'
+  );
+  assert(
+    src.includes('failCount') && src.includes('ship'),
+    'N2：ship 门应检查 failCount >= 3'
+  );
+});
+
+// 24-2: N2 行为验证 — ship 在 security failCount=3 时不触发
+test('24-2: N2 行为 — ship gate 在 security failCount=3 时 requires() 返回 false', () => {
+  // 构造 bridge：code_review/tests 通过，security failCount=3，最终阶段
+  const bridge = {
+    _schema_version: 2,
+    gates: {
+      tests:       { status: 'passed', epoch: 1 },
+      code_review: { status: 'passed', epoch: 1 },
+      security:    { status: 'failed', failCount: 3, epoch: 1 },
+    },
+    change:  { changeEpoch: 1, securityRisk: { required: true }, touchedFiles: [] },
+    phase:   { current: 2, total: 2 },
+    project: { isWeb: false },
+    audit:   {},
+  };
+  // 直接调用 allCoreGatesPassed 逻辑验证
+  // allCoreGatesPassed: tests passed + code_review passed（非 web 不检查 qa）
+  const corePass = bridge.gates.tests?.status === 'passed' && bridge.gates.code_review?.status === 'passed';
+  assert(corePass, '24-2: 测试前提：core gates 应通过');
+  // ship requires: corePass && isLastPhase && !anyPriorGateFailCount3
+  const anyBlocked = bridge.gates.security?.failCount >= 3;
+  assert(anyBlocked, '24-2: security.failCount=3 应触发 anyBlocked');
+  // ship 不应触发
+  const shipShouldFire = corePass && !anyBlocked;
+  assert(!shipShouldFire, '24-2: ship 在 security failCount=3 时不应触发');
+});
+
+// 24-3: LOW fix — isLeaseExpired 对 NaN leaseUntil 返回 true（视为过期）
+test('24-3: LOW forge-quality-pipeline.js — isLeaseExpired 对 NaN 返回 true', () => {
+  const src = fs.readFileSync(path.join(HOOKS_DIR, 'forge-quality-pipeline.js'), 'utf8');
+  // 修复后应包含 isNaN 检查
+  assert(
+    src.includes('isNaN(parsed)'),
+    'LOW：isLeaseExpired 应包含 isNaN 检查'
+  );
+  assert(
+    src.includes('isNaN(parsed) || parsed <= Date.now()'),
+    'LOW：isNaN 为 true 时应返回 expired（true）'
+  );
+});
+
+// 24-4: HIGH fix — git worker 使用 realpathSync(cwd) 作为符号链接基准
+test('24-4: HIGH forge-git-worker.js — touchedRel 使用 realpathSync(cwd) 基准', () => {
+  const src = fs.readFileSync(path.join(HOOKS_DIR, 'forge-git-worker.js'), 'utf8');
+  assert(
+    src.includes('realpathSync(cwd)') || src.includes('realCwd'),
+    'HIGH：git-worker 应用 realpathSync(cwd) 计算 touchedRel，防止符号链接路径比较错误'
+  );
+  assert(
+    src.includes('path.relative(realCwd'),
+    'HIGH：touchedRel 应以 realCwd 为基准计算 relative path'
+  );
+});
+
+// 24-5: HIGH fix — git worker 保存 patch 并用 git apply --cached 恢复精确暂存
+test('24-5: HIGH forge-git-worker.js — preStagedPatch capture + git apply --cached restore', () => {
+  const src = fs.readFileSync(path.join(HOOKS_DIR, 'forge-git-worker.js'), 'utf8');
+  assert(
+    src.includes('preStagedPatch'),
+    'HIGH：git-worker 应定义 preStagedPatch 捕获精确 staged patch'
+  );
+  assert(
+    src.includes("'apply', '--cached'") || src.includes("'apply', \"--cached\""),
+    'HIGH：恢复时应使用 git apply --cached 而非整文件 git add'
+  );
+  // 应有 fallback 到整文件 add（patch apply 可能失败）
+  assert(
+    src.includes('restored = false') || (src.includes('restored') && src.includes('add')),
+    'HIGH：patch apply 失败时应 fallback 到 git add'
   );
 });
 

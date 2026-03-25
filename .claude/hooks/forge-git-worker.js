@@ -135,24 +135,44 @@ function processJob(job) {
   // F03（HIGH fix）：只清除不属于 touchedFiles 的预暂存文件，保留用户自己的暂存
   // 原 git reset HEAD 会清除全部暂存区，包括用户有意暂存的合法文件（甚至含 secrets）
   let preStagedToRestore = [];
+  let preStagedPatch     = '';  // HIGH fix: 保留精确 patch，防止 git add 破坏 partial staging
   try {
     const staged = execFileSync('git', ['diff', '--name-only', '--cached'],
       { cwd, encoding: 'utf8', timeout: 3000 });
     const allStaged = staged.trim().split('\n').filter(Boolean);
+    // HIGH fix (symlink): 用 realpathSync(cwd) 作为基准，防止 touchedFiles 已 canonicalize 但 cwd 含符号链接
+    const realCwd = (() => { try { return fs.realpathSync(cwd); } catch (_) { return cwd; } })();
     const touchedRel = (touchedFiles || []).map(f => {
-      try { return path.relative(cwd, f); } catch (_) { return null; }
+      try { return path.relative(realCwd, f); } catch (_) { return null; }
     }).filter(Boolean);
     preStagedToRestore = allStaged.filter(f => !touchedRel.includes(f));
     if (preStagedToRestore.length > 0) {
+      // 先保存精确 patch（防止 partial hunk 在恢复时被整文件 add 覆盖）
+      try {
+        preStagedPatch = execFileSync(
+          'git', ['diff', '--cached', '--', ...preStagedToRestore],
+          { cwd, encoding: 'utf8', timeout: 3000 }
+        );
+      } catch (_) { preStagedPatch = ''; }
       execFileSync('git', ['restore', '--staged', '--', ...preStagedToRestore],
         { cwd, timeout: 3000 });
     }
   } catch (_) {}
   const added    = safeGitAdd(cwd, touchedFiles);
   const committed = added && tryGitCommit(cwd);
-  // 恢复用户原有的暂存文件（无论是否成功提交，都不能丢失用户的工作）
+  // 恢复用户原有的暂存文件：优先用 patch apply（保留 partial hunk），否则 fallback 整文件 add
   if (preStagedToRestore.length > 0) {
-    try { execFileSync('git', ['add', '--', ...preStagedToRestore], { cwd, timeout: 3000 }); } catch (_) {}
+    let restored = false;
+    if (preStagedPatch.trim()) {
+      try {
+        execFileSync('git', ['apply', '--cached', '--whitespace=nowarn'],
+          { cwd, input: preStagedPatch, encoding: 'utf8', timeout: 5000 });
+        restored = true;
+      } catch (_) { /* patch apply 失败，fallback 到整文件 add */ }
+    }
+    if (!restored) {
+      try { execFileSync('git', ['add', '--', ...preStagedToRestore], { cwd, timeout: 3000 }); } catch (_) {}
+    }
   }
   if (committed) {
     writeSnapshot(cwd, slug, reason || 'checkpoint');
