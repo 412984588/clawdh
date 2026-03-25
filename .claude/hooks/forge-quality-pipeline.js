@@ -54,7 +54,9 @@ function evaluateSecurityRisk(cwd, touchedFiles) {
 // ─── Forge 项目检测（P3#16）──────────────────────────────────────────────────
 
 function isForgeProject(cwd) {
-  if (fs.existsSync(path.join(cwd, '.planning', 'STATE.md'))) return true;
+  // F17: 先解析到 repo root，防止 worktree/子目录 miss .planning/
+  const root = shared.resolveProjectRoot(cwd);
+  if (fs.existsSync(path.join(root, '.planning', 'STATE.md'))) return true;
   const slug = shared.resolveSlug(cwd);
   return fs.existsSync(path.join(os.homedir(), '.forge', 'projects', slug, 'state.json'));
 }

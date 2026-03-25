@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// forge-state-sync.js - v2.0.0
+// forge-state-sync.js - v2.1.0
 // PostToolUse hook (Write|Edit): 同步 GSD 状态到 Forge State Hub
 //
 // 监控：
@@ -10,6 +10,7 @@
 // 修复（相比 v1.x）：
 // - P3#18：路径判断改用 path.relative（不再用 includes('.planning') 字符串匹配）
 // - 共享 shared.js：读写改用 safeReadJson / writeJsonAtomic（不覆写损坏文件）
+// - F17/F19：改用 shared.resolveProjectRoot（git root → 最多12层向上），替换本地 findProjectRoot
 
 'use strict';
 
@@ -153,17 +154,12 @@ function applyParsed(state, parsed) {
   }
 }
 
-// ─── 查找项目根目录（向上寻找包含 .planning/ 的目录）────────────────────────
+// ─── 查找项目根目录 ───────────────────────────────────────────────────────────
+// F17/F19: 改用 shared.resolveProjectRoot（git rev-parse → 向上12层 → fallback）
+// 保留此 wrapper 以保持原调用兼容性
 
 function findProjectRoot(filePath) {
-  let dir = path.dirname(filePath);
-  for (let i = 0; i < 6; i++) {
-    if (fs.existsSync(path.join(dir, '.planning'))) return dir;
-    const parent = path.dirname(dir);
-    if (parent === dir) break;
-    dir = parent;
-  }
-  return path.dirname(filePath);
+  return shared.resolveProjectRoot(path.dirname(filePath));
 }
 
 // ─── 主流程 ───────────────────────────────────────────────────────────────────

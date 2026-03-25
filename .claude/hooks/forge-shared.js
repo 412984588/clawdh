@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// forge-shared.js - v1.0.0
+// forge-shared.js - v1.1.0
 // 所有 Forge hooks 的共享存储层
 //
 // 修复：
@@ -7,6 +7,9 @@
 // - P1#7  getTmpDir + sanitizeSessionId：消除 /tmp 路径预测和穿越风险
 // - P2#14 logHookError：统一 JSONL 错误日志，不再静默 catch
 // - 并发安全：advisory lock（mkdir-based）+ 原子写（PID+ts tmp+rename）
+// - F17:  resolveProjectRoot：统一 worktree/子目录 → git repo root，消除身份分裂
+// - F18:  resolveSlug：新项目用 hashed slug，保证首次创建无竞态碰撞
+// - F20:  logHookEvent：events.jsonl 加 5MB 轮转
 
 'use strict';
 
@@ -14,6 +17,7 @@ const fs     = require('fs');
 const os     = require('os');
 const path   = require('path');
 const crypto = require('crypto');
+const { execFileSync } = require('child_process');
 
 // ─── 路径 / slug ───────────────────────────────────────────────────────────────
 
@@ -21,26 +25,70 @@ function slugify(p) {
   return p.replace(/[^a-zA-Z0-9\u4e00-\u9fff]+/g, '-').replace(/^-|-$/g, '').slice(0, 40);
 }
 
-function resolveSlug(cwd) {
-  const normalizedCwd = path.resolve(cwd);
-  const baseName      = slugify(path.basename(normalizedCwd));
-  const existingPath  = path.join(os.homedir(), '.forge', 'projects', baseName, 'state.json');
-  if (fs.existsSync(existingPath)) {
-    try {
-      const existing = JSON.parse(fs.readFileSync(existingPath, 'utf8'));
-      if (existing.project_path && path.resolve(existing.project_path) !== normalizedCwd) {
-        const hash = crypto.createHash('md5').update(normalizedCwd).digest('hex').slice(0, 8);
-        return `${baseName}-${hash}`;
-      }
-    } catch (_) {}
+// F17: 统一 CWD → Git repo root（解决 worktree/子目录产生不同身份的问题）
+// 优先 git rev-parse，其次走 .planning/ 向上查找，最后 fallback 原 cwd
+function resolveProjectRoot(cwd) {
+  const resolved = path.resolve(cwd);
+  // 1. git rev-parse --show-toplevel（最可靠：worktrees 也返回主 repo root）
+  try {
+    const root = execFileSync(
+      'git', ['rev-parse', '--show-toplevel'],
+      { cwd: resolved, encoding: 'utf8', timeout: 2000 }
+    ).trim();
+    if (root && fs.existsSync(root)) return root;
+  } catch (_) {}
+  // 2. 走 .planning/ 向上查找（最多 12 层，F19 同步修复）
+  let dir = resolved;
+  for (let i = 0; i < 12; i++) {
+    if (fs.existsSync(path.join(dir, '.planning'))) return dir;
+    const parent = path.dirname(dir);
+    if (parent === dir) break;
+    dir = parent;
   }
-  return baseName;
+  // 3. fallback
+  return resolved;
+}
+
+// F18: resolveSlug 保证全局唯一
+// - 已有 state.json → 向后兼容（simple or hashed，哪个存在用哪个）
+// - 全新项目 → 用 hashed slug 避免首次创建时的竞态碰撞
+function resolveSlug(cwd) {
+  const root     = resolveProjectRoot(cwd);  // F17: 统一到 repo root
+  const baseName = slugify(path.basename(root));
+  const hash     = crypto.createHash('md5').update(root).digest('hex').slice(0, 8);
+  const hashedSlug = `${baseName}-${hash}`;
+
+  // 1. hashed slug 已有记录 → 该项目已明确使用 hashed slug
+  if (fs.existsSync(path.join(os.homedir(), '.forge', 'projects', hashedSlug, 'state.json'))) {
+    return hashedSlug;
+  }
+
+  // 2. simple slug 的 state.json 存在
+  const simpleStatePath = path.join(os.homedir(), '.forge', 'projects', baseName, 'state.json');
+  if (fs.existsSync(simpleStatePath)) {
+    try {
+      const existing = JSON.parse(fs.readFileSync(simpleStatePath, 'utf8'));
+      // 属于本项目 → 保留 simple slug（向后兼容）
+      if (!existing.project_path || path.resolve(existing.project_path) === root) {
+        return baseName;
+      }
+      // 属于不同项目 → 使用 hashed slug
+      return hashedSlug;
+    } catch (_) {
+      return hashedSlug;  // 读取出错 → 保守使用 hashed slug
+    }
+  }
+
+  // 3. 新项目：F18 fix — 使用 hashed slug 保证全局唯一，消除初始化竞态碰撞
+  return hashedSlug;
 }
 
 // bridge 路径：从 /tmp 迁移到 ~/.forge/runtime/bridges/（P1#7：消除 /tmp 预测风险）
+// F17: 使用 resolveProjectRoot 确保 worktree 和主 repo 共享同一 bridge
 function getBridgePath(cwd) {
-  const h   = crypto.createHash('md5').update(path.resolve(cwd)).digest('hex').slice(0, 12);
-  const dir = path.join(os.homedir(), '.forge', 'runtime', 'bridges', h);
+  const root = resolveProjectRoot(cwd);  // F17
+  const h    = crypto.createHash('md5').update(root).digest('hex').slice(0, 12);
+  const dir  = path.join(os.homedir(), '.forge', 'runtime', 'bridges', h);
   fs.mkdirSync(dir, { recursive: true });
   return path.join(dir, 'bridge.json');
 }
@@ -230,15 +278,21 @@ function logHookError(hook, error, context) {
   }
 }
 
+const EVENTS_FILE      = path.join(LOG_DIR, 'events.jsonl');
+const MAX_EVENTS_BYTES = 5 * 1024 * 1024;  // 5MB 后轮转（F20）
+
 function logHookEvent(hook, event, data) {
   try {
     fs.mkdirSync(LOG_DIR, { recursive: true });
-    const auditFile = path.join(LOG_DIR, 'events.jsonl');
+    // F20: events.jsonl 轮转（超过 5MB 改名为 .1）
+    if (fs.existsSync(EVENTS_FILE) && fs.statSync(EVENTS_FILE).size > MAX_EVENTS_BYTES) {
+      try { fs.renameSync(EVENTS_FILE, EVENTS_FILE + '.1'); } catch (_) {}
+    }
     const entry = JSON.stringify({
       ts: new Date().toISOString(),
       hook, event, data: data || {},
     });
-    fs.appendFileSync(auditFile, entry + '\n');
+    fs.appendFileSync(EVENTS_FILE, entry + '\n');
   } catch (_) {}
 }
 
@@ -262,9 +316,10 @@ async function appendJsonlQueue(queuePath, job) {
 
 // ─── 导出 ──────────────────────────────────────────────────────────────────────
 
-exports.slugify           = slugify;
-exports.resolveSlug       = resolveSlug;
-exports.getBridgePath     = getBridgePath;
+exports.slugify             = slugify;
+exports.resolveProjectRoot  = resolveProjectRoot;  // F17: 新增导出
+exports.resolveSlug         = resolveSlug;
+exports.getBridgePath       = getBridgePath;
 exports.getTmpDir         = getTmpDir;
 exports.sanitizeSessionId = sanitizeSessionId;
 

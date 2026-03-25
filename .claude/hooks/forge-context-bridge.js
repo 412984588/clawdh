@@ -39,8 +39,10 @@ const STALE_SECONDS = 60;
 // ─── Forge 项目检测（P3#16：非 Forge 项目提前退出）────────────────────────────
 
 function isForgeProject(cwd) {
-  if (fs.existsSync(path.join(cwd, '.planning', 'STATE.md'))) return true;
-  const slug = shared.resolveSlug(cwd);
+  // F17: 先解析到 repo root，防止 worktree/子目录 miss .planning/
+  const root = shared.resolveProjectRoot(cwd);
+  if (fs.existsSync(path.join(root, '.planning', 'STATE.md'))) return true;
+  const slug = shared.resolveSlug(cwd);  // resolveSlug 内部已调用 resolveProjectRoot
   return fs.existsSync(path.join(os.homedir(), '.forge', 'projects', slug, 'state.json'));
 }
 
@@ -249,6 +251,9 @@ function inferAndUpdate(draft, toolName, toolInput, toolResponse) {
 
 function spawnDetachedWorker(workerPath) {
   try {
+    // F20: 检查 worker 是否已在运行（锁存在 → 跳过生成，防止无限 spawn）
+    const workerLockDir = path.join(os.homedir(), '.forge', 'runtime', 'git', 'worker.lock');
+    if (fs.existsSync(workerLockDir)) return;
     const child = spawn('node', [workerPath], {
       detached: true, stdio: 'ignore',
     });

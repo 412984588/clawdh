@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// forge-hooks-verify.js — Forge v2.0 hooks 验证脚本（28 场景）
+// forge-hooks-verify.js — Forge v2.0 hooks 验证脚本（35 场景）
 // 纯 Node.js，无外部依赖
 // 运行：node forge-hooks-verify.js
 
@@ -530,6 +530,58 @@ test('5-4 bridge.js 不含 context.warningLevel 写入（F01 清理确认）', (
   assert(warningLevelSetLines.length === 0,
     `bridge.js 不应向 warningLevel 写入非 null 值，发现：${warningLevelSetLines.join('; ')}`
   );
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 组 6：Tier 3 修复（F17 / F18 / F19 / F20）— 4 个场景
+// ─────────────────────────────────────────────────────────────────────────────
+console.log('\n【组 6】Tier 3 修复验证（F17-F20）');
+
+test('6-1 resolveProjectRoot 已导出（F17）', () => {
+  const sharedPath = path.join(HOOKS_DIR, 'forge-shared.js');
+  const src = fs.readFileSync(sharedPath, 'utf8');
+  assert(src.includes('resolveProjectRoot'), 'F17：forge-shared.js 应包含 resolveProjectRoot');
+  assert(src.includes('exports.resolveProjectRoot'), 'F17：resolveProjectRoot 应被导出');
+  // 验证用 git rev-parse 作为第一优先级
+  assert(src.includes('rev-parse'), 'F17：resolveProjectRoot 应优先用 git rev-parse');
+});
+
+test('6-2 resolveSlug 新项目使用 hashed slug（F18）', () => {
+  // 在临时目录中调用 resolveSlug，没有任何 state.json → 应返回 hashed slug（含 "-"）
+  const shared = require(path.join(HOOKS_DIR, 'forge-shared.js'));
+  const tmpDir  = fs.mkdtempSync(path.join(os.tmpdir(), 'forge-f18-'));
+  try {
+    const slug = shared.resolveSlug(tmpDir);
+    // hashed slug 格式：baseName-8位hex（含 "-" 分隔符且总长度 > baseName 长度）
+    const baseName = path.basename(tmpDir).replace(/[^a-zA-Z0-9\u4e00-\u9fff]+/g, '-').replace(/^-|-$/g, '').slice(0, 40);
+    assert(slug.includes('-'), `F18：新项目 slug 应含 "-"（实际: ${slug}）`);
+    assert(slug.startsWith(baseName) || slug.length > baseName.length,
+      `F18：slug 应基于目录名（baseName: ${baseName}, slug: ${slug}）`);
+  } finally {
+    fs.rmdirSync(tmpDir);
+  }
+});
+
+test('6-3 forge-state-sync 使用 shared.resolveProjectRoot（F19）', () => {
+  const syncSrc = fs.readFileSync(path.join(HOOKS_DIR, 'forge-state-sync.js'), 'utf8');
+  // 验证用 shared.resolveProjectRoot 替代本地深度为 6 的 findProjectRoot
+  assert(syncSrc.includes('shared.resolveProjectRoot'), 'F19：state-sync 应调用 shared.resolveProjectRoot');
+  // 旧的本地实现（i < 6 硬编码深度）应已被移除
+  assert(!syncSrc.includes('for (let i = 0; i < 6'), 'F19：不应再有 i < 6 的深度限制');
+});
+
+test('6-4 events.jsonl 轮转 + worker spawn 限制（F20）', () => {
+  const sharedSrc = fs.readFileSync(path.join(HOOKS_DIR, 'forge-shared.js'), 'utf8');
+  assert(sharedSrc.includes('MAX_EVENTS_BYTES'), 'F20：events.jsonl 应有大小上限');
+  assert(sharedSrc.includes('EVENTS_FILE + \'.1\''), 'F20：events.jsonl 应有轮转逻辑');
+
+  const bridgeSrc = fs.readFileSync(path.join(HOOKS_DIR, 'forge-context-bridge.js'), 'utf8');
+  assert(bridgeSrc.includes('worker.lock'), 'F20：spawnDetachedWorker 应检查 worker.lock');
+  // 确认是 return（跳过生成）而非忽略
+  const lockCheckIdx = bridgeSrc.indexOf('worker.lock');
+  const returnIdx    = bridgeSrc.indexOf('return;', lockCheckIdx);
+  assert(returnIdx > lockCheckIdx && returnIdx - lockCheckIdx < 150,
+    'F20：检测到 worker.lock 后应立即 return 跳过 spawn');
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
