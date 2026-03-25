@@ -138,6 +138,9 @@ function nextGateToInject(bridge) {
     // leased 且未过期 → 跳过（等待完成）
     if (gate.status === 'leased' && !isLeaseExpired(gate)) continue;
 
+    // M2 fix: 失败次数 >= 3 → 跳过，防止无限重试卡住整个流水线
+    if (gate.status === 'failed' && (gate.failCount || 0) >= 3) continue;
+
     // 其他情况（idle/required/failed/expired lease/epoch 不匹配）→ 需要注入
     return { name: def.name, message: def.msg(bridge) };
   }
@@ -174,7 +177,9 @@ process.stdin.on('end', async () => {
     let externalRisk = null;
     if (touchedFiles.length > 0) {
       const risk = evaluateSecurityRisk(cwd, touchedFiles, cachedEpoch, changeEpoch);
-      if (risk !== null && risk.required) externalRisk = risk;
+      // L1 fix: 无论 required=true/false，都存回缓存，确保 evaluatedAtEpoch 被写入
+      // 原代码只在 required=true 时赋值，导致安全结果每次重跑 git diff
+      if (risk !== null) externalRisk = risk;
     }
 
     // F13 fix：安全风险更新 + 门决策 + lease 写入合并到一次 mutateBridge（消除 TOCTOU 竞态）

@@ -150,9 +150,9 @@ function applyParsed(state, parsed) {
   }
   if (_is_complete) {
     state.status = 'completed';
-  } else {
-    // D7 fix: 一旦 _is_complete=false，强制回 active，防止一次 transient "completed" parse
-    // 永久隐藏仍在进行中的项目（forge-session-start 会跳过 completed 项目）
+  } else if (!state.status || state.status === 'completed') {
+    // D7 fix 修正: 只在状态为 completed 或未设置时恢复 active
+    // 不覆盖 adopted/paused/blocked 等合法中间状态（原 D7 无条件强制 active 的副作用）
     state.status = 'active';
   }
 }

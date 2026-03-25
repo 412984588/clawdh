@@ -79,7 +79,10 @@ function safeGitAdd(cwd, touchedFiles) {
       ...safeFiles,
     ], { cwd, timeout: 5000 });
     return true;
-  } catch (_) { return false; }
+  } catch (e) {
+    shared.logHookError('forge-git-worker/gitAdd', e, { cwd });
+    return false;
+  }
 }
 
 function tryGitCommit(cwd) {
@@ -93,7 +96,10 @@ function tryGitCommit(cwd) {
       'commit', '--no-verify', '-m', COMMIT_MSG,
     ], { cwd, timeout: 10000 });
     return true;
-  } catch (_) { return false; }
+  } catch (e) {
+    shared.logHookError('forge-git-worker/gitCommit', e, { cwd });
+    return false;
+  }
 }
 
 // ─── 快照写入 ─────────────────────────────────────────────────────────────────
@@ -151,6 +157,8 @@ function processJob(job) {
   if (committed) {
     writeSnapshot(cwd, slug, reason || 'checkpoint');
     shared.logHookEvent('forge-git-worker', 'checkpoint_committed', { cwd, slug, reason });
+  } else {
+    shared.logHookEvent('forge-git-worker', 'checkpoint_skipped', { cwd, slug, reason, added });
   }
 }
 

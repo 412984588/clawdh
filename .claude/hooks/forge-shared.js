@@ -28,6 +28,12 @@ function slugify(p) {
 
 // F17: 统一 CWD → Git repo root（解决 worktree/子目录产生不同身份的问题）
 // 优先 git rev-parse，其次走 .planning/ 向上查找，最后 fallback 原 cwd
+// M6 fix: 内联 realpathSync 归一化，消除 macOS /var→/private/var symlink 导致的身份分裂
+// 所有 hook（bridge/pipeline/auto-fix）现在都经此函数，无需各自调用 realpathSync
+function _normReal(p) {
+  try { return fs.realpathSync(p); } catch (_) { return p; }
+}
+
 function resolveProjectRoot(cwd) {
   const resolved = path.resolve(cwd);
   // 1. git rev-parse --show-toplevel（最可靠：worktrees 也返回主 repo root）
@@ -36,18 +42,18 @@ function resolveProjectRoot(cwd) {
       'git', ['rev-parse', '--show-toplevel'],
       { cwd: resolved, encoding: 'utf8', timeout: 2000 }
     ).trim();
-    if (root && fs.existsSync(root)) return root;
+    if (root && fs.existsSync(root)) return _normReal(root);
   } catch (_) {}
   // 2. 走 .planning/ 向上查找（最多 12 层，F19 同步修复）
   let dir = resolved;
   for (let i = 0; i < 12; i++) {
-    if (fs.existsSync(path.join(dir, '.planning'))) return dir;
+    if (fs.existsSync(path.join(dir, '.planning'))) return _normReal(dir);
     const parent = path.dirname(dir);
     if (parent === dir) break;
     dir = parent;
   }
   // 3. fallback
-  return resolved;
+  return _normReal(resolved);
 }
 
 // F18: resolveSlug 保证全局唯一

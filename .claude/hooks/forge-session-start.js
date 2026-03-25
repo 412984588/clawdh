@@ -206,7 +206,14 @@ function budgetedCleanup() {
         if (Date.now() - start > MAX_MS) return;
         const bridgeFile = path.join(bridgesDir, d, 'bridge.json');
         if (!fs.existsSync(bridgeFile)) {
-          try { fs.rmSync(path.join(bridgesDir, d), { recursive: true }); } catch (_) {}
+          const dirPath = path.join(bridgesDir, d);
+          try {
+            // M5 fix: 只删超过 5 分钟的空目录，防止与 mutateBridge 的 mkdirSync→writeJsonAtomic 窗口竞争
+            const dirAge = Date.now() - fs.statSync(dirPath).mtimeMs;
+            if (dirAge > 5 * 60 * 1000) {
+              fs.rmSync(dirPath, { recursive: true });
+            }
+          } catch (_) {}
         }
       }
     }

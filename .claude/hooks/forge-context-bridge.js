@@ -39,7 +39,8 @@ const STALE_SECONDS = 60;
 // ─── Bridge 默认结构（v2.0 新 schema）────────────────────────────────────────
 
 function emptyGate() {
-  return { status: 'idle', epoch: null, leaseUntil: null };
+  // Bug2 fix: failCount 纳入初始值，resetGate/resetAllGates 均清零
+  return { status: 'idle', epoch: null, leaseUntil: null, failCount: 0 };
 }
 
 function defaultBridge(cwd, slug) {
@@ -131,6 +132,14 @@ function markGatePassed(draft, name) {
   draft.gates[name].leaseUntil = null;
 }
 
+// M2 fix: Skill/Agent 失败时标记质量门为 failed，避免 lease 卡住 10 分钟 + 无限重试
+function markGateFailed(draft, name) {
+  if (!draft.gates?.[name]) return;
+  draft.gates[name].status    = 'failed';
+  draft.gates[name].leaseUntil = null;
+  draft.gates[name].failCount  = (draft.gates[name].failCount || 0) + 1;
+}
+
 // 测试命令匹配（OPT-10：补充 pnpm/cargo-nextest 模式）
 const TEST_CMD = /\b(npm test|npm run test|pnpm test|pnpm run test|jest|vitest|pytest|py\.test|go test|cargo test|cargo nextest|yarn test|bun test)\b/;
 
@@ -144,17 +153,26 @@ function inferAndUpdate(draft, toolName, toolInput, toolResponse) {
   if (toolName === 'Write' || toolName === 'Edit' || toolName === 'MultiEdit') {
     const fp = toolInput?.file_path || toolInput?.path || '';
 
-    if (/\/PLAN\.md$/.test(fp) && fp.includes('.planning')) {
+    // L2 fix: 使用 path.relative 做路径判断，替代 string includes（防止 my.planning.notes/ 误匹配）
+    // Bug4 fix: fp 可能是相对路径，须先 resolve 成绝对路径再做 path.relative
+    // 否则 path.relative('/repo', 'src/app.ts') 会得到 '../../src/app.ts' 等错误结果
+    const projectCwd = draft.project?.cwd || '';
+    const absFp = projectCwd && !path.isAbsolute(fp) ? path.resolve(projectCwd, fp) : fp;
+    const rel = projectCwd ? path.relative(projectCwd, absFp) : absFp;
+    const isInPlanning = rel.startsWith('.planning' + path.sep) && !rel.startsWith('..');
+    const isInClaude   = rel.startsWith('.claude'   + path.sep) && !rel.startsWith('..');
+
+    if (isInPlanning && path.basename(fp) === 'PLAN.md') {
       // PLAN.md 写入 → plan_review 进入 required
       draft.gates.plan_review.status = 'required';
       draft.change.planWrittenAt     = new Date().toISOString();
 
-    } else if (/\/SUMMARY\.md$/.test(fp) && fp.includes('.planning')) {
+    } else if (isInPlanning && path.basename(fp) === 'SUMMARY.md') {
       // SUMMARY.md 写入 → tests 进入 required
       draft.gates.tests.status      = 'required';
       draft.change.summaryWrittenAt = new Date().toISOString();
 
-    } else if (!fp.includes('/.planning/') && !fp.includes('/.claude/') && fp !== '') {
+    } else if (!isInPlanning && !isInClaude && fp !== '') {
       // 源码变更 → changeEpoch++，下游门全部失效
       draft.change.changeEpoch++;
       // 去重追踪被修改的文件（最多保留 50 个）
@@ -171,6 +189,8 @@ function inferAndUpdate(draft, toolName, toolInput, toolResponse) {
           draft.gates[g].status    = 'idle';
           draft.gates[g].epoch     = null;
           draft.gates[g].leaseUntil = null;
+          // Bug2 fix: epoch 切换时同步清零 failCount，防止旧失败次数跨 epoch 积累导致永久锁死
+          draft.gates[g].failCount  = 0;
         }
       }
     }
@@ -204,6 +224,20 @@ function inferAndUpdate(draft, toolName, toolInput, toolResponse) {
       else if (/\bcso\b/.test(skill))                      markGatePassed(draft, 'security');
       else if (/\bbenchmark\b/.test(skill))                markGatePassed(draft, 'benchmark');
       else if (/\bship\b/.test(skill))                     markGatePassed(draft, 'ship');
+    } else {
+      // M2 fix: Skill 失败时将 leased 门标记为 failed，防止 TTL 卡住 + 无限重试
+      // Bug3 fix: 只在门实际处于 leased 状态时才标记 failed，防止 plan-eng-review 等
+      // 误消耗 code_review 的 failCount（两者名字都含 "review" 但对应不同的门）
+      // markGateFailed 内部有 gate 存在性检查，此处额外加 leased 状态守卫
+      function _failIfLeased(name) {
+        if (draft.gates?.[name]?.status === 'leased') markGateFailed(draft, name);
+      }
+      if (/autoplan/.test(skill))                          _failIfLeased('plan_review');
+      else if (/\breview\b/.test(skill) && !/qa-review/.test(skill)) _failIfLeased('code_review');
+      else if (/\bqa\b/.test(skill))                       _failIfLeased('qa');
+      else if (/\bcso\b/.test(skill))                      _failIfLeased('security');
+      else if (/\bbenchmark\b/.test(skill))                _failIfLeased('benchmark');
+      else if (/\bship\b/.test(skill))                     _failIfLeased('ship');
     }
   }
 
@@ -330,11 +364,15 @@ function checkContextWarning(cwd, slug, sessionId, bridge) {
   const usedPct = metrics.used_pct != null ? metrics.used_pct : (100 - remaining);
   const acts    = [];
 
+  // M3 fix: queue job 的 cwd 用 repo root，防止子目录 session 导致 safeGitAdd 路径边界误判
+  // 提升到 if/else 前，确保 warning 分支也能使用（Bug1 fix: 原在 if 块内导致 warning 分支 ReferenceError）
+  const rootCwd = shared.resolveProjectRoot(cwd);
+
   if (isCritical) {
     // 入队 git checkpoint（P2#15：不内联同步执行）
     const qPath = shared.getGitQueuePath();
     shared.appendJsonlQueue(qPath, {
-      cwd, slug, reason: 'context_critical',
+      cwd: rootCwd, slug, reason: 'context_critical',
       touchedFiles: bridge.change?.touchedFiles || [],
     }).then(() => {
       const workerPath = path.join(__dirname, 'forge-git-worker.js');
@@ -363,7 +401,7 @@ function checkContextWarning(cwd, slug, sessionId, bridge) {
     // 入队 warning checkpoint
     const qPath = shared.getGitQueuePath();
     shared.appendJsonlQueue(qPath, {
-      cwd, slug, reason: 'context_warning',
+      cwd: rootCwd, slug, reason: 'context_warning',
       touchedFiles: bridge.change?.touchedFiles || [],
     }).then(() => {
       const workerPath = path.join(__dirname, 'forge-git-worker.js');

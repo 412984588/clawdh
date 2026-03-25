@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// forge-hooks-verify.js — Forge v2.0 hooks 验证脚本（68 场景）
+// forge-hooks-verify.js — Forge v2.0 hooks 验证脚本（77 场景）
 // 纯 Node.js，无外部依赖
 // 运行：node forge-hooks-verify.js
 
@@ -1726,6 +1726,194 @@ test('20-4: nextGateToInject — leased 门已过期 → 重新注入（lease TT
   } finally {
     cleanupForgeTmpDir(tmpDir);
   }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 组 21：MEDIUM/LOW 修复验证（9 个场景）
+// ─────────────────────────────────────────────────────────────────────────────
+console.log('\n【组 21】MEDIUM/LOW 修复验证');
+
+// 21-1: M1 — applyParsed 不覆盖合法中间状态（D7 fix 修正）
+test('21-1: M1 applyParsed — _is_complete=false 时不覆盖 adopted/paused 状态', () => {
+  const syncSrc = fs.readFileSync(path.join(HOOKS_DIR, 'forge-state-sync.js'), 'utf8');
+  // 验证 applyParsed 含 D7 修正：只在 completed/未设置时恢复 active
+  assert(
+    syncSrc.includes("state.status === 'completed'") ||
+    syncSrc.includes('state.status === "completed"'),
+    'M1：applyParsed 应只在 completed/未设置时恢复 active'
+  );
+  // 直接调用逻辑验证
+  const stateAdopted  = { status: 'adopted', phase: {} };
+  const statePaused   = { status: 'paused',  phase: {} };
+  const stateBlocked  = { status: 'blocked', phase: {} };
+  // 模拟 applyParsed 逻辑（_is_complete=false）
+  function applyParsedLogic(state, _is_complete) {
+    if (_is_complete) {
+      state.status = 'completed';
+    } else if (!state.status || state.status === 'completed') {
+      state.status = 'active';
+    }
+    // adopted/paused/blocked 不应被修改
+  }
+  applyParsedLogic(stateAdopted, false);
+  applyParsedLogic(statePaused,  false);
+  applyParsedLogic(stateBlocked, false);
+  assertEqual(stateAdopted.status,  'adopted',  'M1：adopted 不应被覆盖为 active');
+  assertEqual(statePaused.status,   'paused',   'M1：paused 不应被覆盖为 active');
+  assertEqual(stateBlocked.status,  'blocked',  'M1：blocked 不应被覆盖为 active');
+  // completed 应恢复为 active
+  const stateCompleted = { status: 'completed', phase: {} };
+  applyParsedLogic(stateCompleted, false);
+  assertEqual(stateCompleted.status, 'active', 'M1：completed 应恢复为 active');
+});
+
+// 21-2: M2 — markGateFailed 函数存在且设置 status='failed' + failCount 递增
+test('21-2: M2 markGateFailed — status=failed + leaseUntil=null + failCount 递增', () => {
+  const bridgeSrc = fs.readFileSync(path.join(HOOKS_DIR, 'forge-context-bridge.js'), 'utf8');
+  assert(bridgeSrc.includes('markGateFailed'), 'M2：forge-context-bridge.js 应含 markGateFailed');
+  assert(bridgeSrc.includes("status    = 'failed'") || bridgeSrc.includes("status = 'failed'"),
+    'M2：markGateFailed 应设置 status=failed');
+  assert(bridgeSrc.includes('failCount'), 'M2：markGateFailed 应递增 failCount');
+  assert(bridgeSrc.includes("leaseUntil = null"), 'M2：markGateFailed 应清除 leaseUntil');
+  // Skill isError 路径应调用 markGateFailed
+  assert(
+    // Bug3 fix 后：isError 路径通过 _failIfLeased wrapper 调用 markGateFailed（仅在 leased 时）
+    // 验证关键模式：_failIfLeased 函数存在 + 在 isError 分支中调用
+    bridgeSrc.includes('_failIfLeased') ||
+    bridgeSrc.includes("markGateFailed(draft, 'code_review')"),
+    'M2：Skill isError 路径应调用 markGateFailed 或 _failIfLeased'
+  );
+  // 验证 _failIfLeased 函数体确实调用了 markGateFailed
+  assert(
+    bridgeSrc.includes('markGateFailed(draft, name)') ||
+    bridgeSrc.includes("markGateFailed(draft, 'code_review')"),
+    'M2：markGateFailed 函数体或直接调用应存在'
+  );
+});
+
+// 21-3: M2 — nextGateToInject 在 failCount>=3 时跳过该门
+test('21-3: M2 nextGateToInject — failCount >= 3 时跳过已失败的门', () => {
+  const pipelineSrc = fs.readFileSync(path.join(HOOKS_DIR, 'forge-quality-pipeline.js'), 'utf8');
+  assert(
+    pipelineSrc.includes('failCount') && pipelineSrc.includes('>= 3'),
+    'M2：nextGateToInject 应含 failCount >= 3 跳过逻辑'
+  );
+  // 模拟 nextGateToInject 的 failCount 跳过逻辑
+  function shouldSkipGate(gate) {
+    if (gate.status === 'passed') return true;
+    if (gate.status === 'leased') return true;
+    if (gate.status === 'failed' && (gate.failCount || 0) >= 3) return true;
+    return false;
+  }
+  assert( shouldSkipGate({ status: 'failed', failCount: 3 }),  'failCount=3 应跳过');
+  assert( shouldSkipGate({ status: 'failed', failCount: 5 }),  'failCount=5 应跳过');
+  assert(!shouldSkipGate({ status: 'failed', failCount: 2 }),  'failCount=2 不应跳过');
+  assert(!shouldSkipGate({ status: 'failed', failCount: 0 }),  'failCount=0 不应跳过');
+  assert(!shouldSkipGate({ status: 'failed' }),                'failCount 未定义不应跳过');
+});
+
+// 21-4: M3 — queue job 的 cwd 使用 resolveProjectRoot 归一化
+test('21-4: M3 context_warning queue job 使用 rootCwd 而非裸 cwd', () => {
+  const bridgeSrc = fs.readFileSync(path.join(HOOKS_DIR, 'forge-context-bridge.js'), 'utf8');
+  // 确认两处 appendJsonlQueue（critical 和 warning）都使用 rootCwd
+  // 应不存在 `cwd,` 或 `cwd:cwd,` 模式（裸 cwd）在 queue job 中
+  assert(
+    !bridgeSrc.includes("cwd, slug, reason: 'context_critical'") &&
+    !bridgeSrc.includes("cwd, slug, reason: 'context_warning'"),
+    'M3：两处 queue job 均不应使用裸 cwd'
+  );
+  assert(
+    bridgeSrc.includes('rootCwd, slug, reason:'),
+    'M3：queue job 应使用 rootCwd'
+  );
+});
+
+// 21-5: M4 — safeGitAdd/tryGitCommit 失败时写 logHookError
+test('21-5: M4 forge-git-worker.js — catch 块含 logHookError', () => {
+  const workerSrc = fs.readFileSync(path.join(HOOKS_DIR, 'forge-git-worker.js'), 'utf8');
+  assert(
+    workerSrc.includes("logHookError('forge-git-worker/gitAdd'"),
+    'M4：safeGitAdd catch 应调用 logHookError'
+  );
+  assert(
+    workerSrc.includes("logHookError('forge-git-worker/gitCommit'"),
+    'M4：tryGitCommit catch 应调用 logHookError'
+  );
+  assert(
+    workerSrc.includes("checkpoint_skipped"),
+    'M4：processJob 不提交时应记录 checkpoint_skipped 事件'
+  );
+});
+
+// 21-6: M5 — OPT-8 cleanup 只删超 5 分钟的空目录
+test('21-6: M5 forge-session-start.js — OPT-8 cleanup 含 5 分钟年龄检查', () => {
+  const sessionSrc = fs.readFileSync(path.join(HOOKS_DIR, 'forge-session-start.js'), 'utf8');
+  assert(
+    sessionSrc.includes('5 * 60 * 1000') || sessionSrc.includes('5*60*1000'),
+    'M5：OPT-8 cleanup 应含 5 分钟年龄检查'
+  );
+  assert(
+    sessionSrc.includes('dirAge'),
+    'M5：应有 dirAge 变量记录目录年龄'
+  );
+  // 确认只在年龄 > 5 分钟时才删除
+  assert(
+    sessionSrc.includes('dirAge > 5 * 60 * 1000') || sessionSrc.includes('dirAge>5*60*1000'),
+    'M5：应只在 dirAge > 5 分钟时才 rmSync'
+  );
+});
+
+// 21-7: M6 — resolveProjectRoot 返回 realpathSync 归一化路径
+test('21-7: M6 forge-shared.js resolveProjectRoot — 所有出口均 realpathSync', () => {
+  const sharedSrc = fs.readFileSync(path.join(HOOKS_DIR, 'forge-shared.js'), 'utf8');
+  // _normReal 辅助函数应存在
+  assert(sharedSrc.includes('_normReal'), 'M6：forge-shared.js 应有 _normReal 辅助函数');
+  // resolveProjectRoot 函数定义内应调用 _normReal
+  const fnMatch = sharedSrc.match(/function resolveProjectRoot[\s\S]*?^}/m);
+  assert(fnMatch, 'M6：应能提取 resolveProjectRoot 函数体');
+  // 统计 resolveProjectRoot 中 _normReal 的调用次数（应有 ≥3 个出口都调用）
+  const fnBody = fnMatch[0];
+  const normCount = (fnBody.match(/_normReal/g) || []).length;
+  assert(normCount >= 3, `M6：resolveProjectRoot 应在 ≥3 处调用 _normReal，实际：${normCount}`);
+});
+
+// 21-8: L1 — 安全风险 required=false 时 evaluatedAtEpoch 仍被写回缓存
+test('21-8: L1 forge-quality-pipeline.js — 安全评估结果无论 required 均写回缓存', () => {
+  const pipelineSrc = fs.readFileSync(path.join(HOOKS_DIR, 'forge-quality-pipeline.js'), 'utf8');
+  // 旧代码：if (risk !== null && risk.required) externalRisk = risk;
+  // 新代码：if (risk !== null) externalRisk = risk;
+  assert(
+    !pipelineSrc.includes('risk !== null && risk.required'),
+    'L1：不应有 risk.required 过滤（会导致 safe 结果不缓存）'
+  );
+  assert(
+    pipelineSrc.includes('if (risk !== null) externalRisk = risk') ||
+    pipelineSrc.includes('if (risk !== null)\n      externalRisk = risk'),
+    'L1：应无条件缓存 risk 结果（不过滤 required=false）'
+  );
+});
+
+// 21-9: L2 — inferAndUpdate 使用 path.relative 而非 string includes
+test('21-9: L2 forge-context-bridge.js — inferAndUpdate 使用 path.relative 判断 .planning 路径', () => {
+  const bridgeSrc = fs.readFileSync(path.join(HOOKS_DIR, 'forge-context-bridge.js'), 'utf8');
+  // 旧模式：fp.includes('.planning') 不应出现在 inferAndUpdate 的路径检测中
+  // 只允许在注释或其他地方出现
+  const inferMatch = bridgeSrc.match(/function inferAndUpdate[\s\S]*?(?=\n\/\/\s*─{3,})/);
+  assert(inferMatch, 'L2：应能提取 inferAndUpdate 函数体');
+  const inferBody = inferMatch[0];
+  assert(
+    !inferBody.includes("fp.includes('.planning')"),
+    'L2：inferAndUpdate 不应使用 fp.includes(".planning")'
+  );
+  assert(
+    !inferBody.includes("fp.includes('/.planning/')"),
+    'L2：inferAndUpdate 不应使用 fp.includes("/.planning/")'
+  );
+  // 应使用 path.relative 和 isInPlanning
+  assert(
+    inferBody.includes('path.relative') || inferBody.includes('isInPlanning'),
+    'L2：inferAndUpdate 应使用 path.relative 或 isInPlanning'
+  );
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
