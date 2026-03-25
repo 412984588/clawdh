@@ -13,7 +13,7 @@
 ## Hooks 注册
 
 **Active hooks（settings.json）**：
-- SessionStart: `gsd-check-update.js`, `forge-session-start.sh`
+- SessionStart: `gsd-check-update.js`, `forge-session-start.js`
 - PostToolUse: `forge-context-save.js`, `forge-state-sync.js`
 - PreToolUse: `gsd-prompt-guard.js`, `git-safety.sh`, `pre-tool-use-guard.sh`
 

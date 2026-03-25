@@ -15,7 +15,7 @@
 | 恢复中断的项目 | `/forge resume <项目名>` |
 | 查看所有项目状态 | `/forge:status` |
 
-进门先看 `~/.forge/projects/` 检测进行中的项目（forge-session-start.sh 自动注入）
+进门先看 `~/.forge/projects/` 检测进行中的项目（forge-session-start.js 自动注入）
 
 **Forge 全自动流程**：PRD → GSD 规划 → gstack /autoplan 审查 → GSD 执行 → gstack /review → gstack /qa → gstack /ship → gstack /land-and-deploy
 
