@@ -23,12 +23,32 @@
     ],
     "PostToolUse": [
       {
-        "matcher": "Bash|Edit|Write|MultiEdit|Agent|Task",
+        "matcher": "Bash|Edit|Write|MultiEdit|Agent|Task|Skill",
         "hooks": [
           {
             "type": "command",
-            "command": "node \"/Users/zhimingdeng/.claude/hooks/forge-context-save.js\"",
+            "command": "node \"/Users/zhimingdeng/.claude/hooks/forge-context-bridge.js\"",
             "timeout": 15
+          }
+        ]
+      },
+      {
+        "matcher": "Skill|Agent|Task|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"/Users/zhimingdeng/.claude/hooks/forge-quality-pipeline.js\"",
+            "timeout": 15
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"/Users/zhimingdeng/.claude/hooks/forge-auto-fix.js\"",
+            "timeout": 10
           }
         ]
       },
@@ -39,6 +59,16 @@
             "type": "command",
             "command": "node \"/Users/zhimingdeng/.claude/hooks/forge-state-sync.js\"",
             "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"/Users/zhimingdeng/.claude/hooks/forge-git-checkpoint.js\"",
+            "timeout": 8
           }
         ]
       }

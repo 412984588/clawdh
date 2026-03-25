@@ -1,0 +1,169 @@
+#!/usr/bin/env node
+// forge-git-worker.js - v1.0.0
+// 独立异步进程：处理 git checkpoint 队列
+//
+// 修复（P1#6, P2#15）：
+// - P1#6：不再 git add -A，只 add 白名单文件（排除 .env/*secret*/*.pem/*.key）
+// - P2#15：独立进程，不阻塞 hook 响应
+//
+// 运行机制：
+// 1. 获取单例锁（~/.forge/runtime/git/worker.lock）
+// 2. 读取 queue.jsonl，处理每个 job
+// 3. 对每个 job：安全 git add → commit → 写 snapshot
+// 4. 清空队列（已处理的 job）
+// 5. 释放锁
+
+'use strict';
+
+const fs   = require('fs');
+const os   = require('os');
+const path = require('path');
+const { execFileSync } = require('child_process');
+
+const shared = require('./forge-shared');
+
+// ─── 常量 ─────────────────────────────────────────────────────────────────────
+
+const RUNTIME_DIR  = path.join(os.homedir(), '.forge', 'runtime', 'git');
+const QUEUE_PATH   = path.join(RUNTIME_DIR, 'queue.jsonl');
+const LOCK_DIR     = path.join(RUNTIME_DIR, 'worker.lock');
+const COMMIT_MSG   = 'chore(forge): auto checkpoint [forge-hook]';
+
+// 禁止 add 的文件模式（P1#6：安全 add）
+// 使用 basename 匹配 + 扩展名匹配，无需 minimatch 依赖
+const DENY_BASENAMES = ['.env'];
+const DENY_PREFIXES  = ['.env.'];
+const DENY_SUFFIXES  = ['.pem', '.key', '.p12', '.pfx'];
+const DENY_PATTERNS  = [/secret/i, /credential/i, /password/i, /private[_-]?key/i];
+
+function isDenied(filePath) {
+  const base = path.basename(filePath);
+  if (DENY_BASENAMES.includes(base))           return true;
+  if (DENY_PREFIXES.some(p => base.startsWith(p))) return true;
+  if (DENY_SUFFIXES.some(s => base.endsWith(s)))   return true;
+  if (DENY_PATTERNS.some(r => r.test(base)))        return true;
+  // 禁止 node_modules / dist / .git 内部文件（匹配路径开头或中间）
+  if (/(^|[/\\])(node_modules|dist|\.git)([/\\]|$)/.test(filePath)) return true;
+  return false;
+}
+
+// ─── 安全 git add（P1#6）──────────────────────────────────────────────────────
+
+function safeGitAdd(cwd, touchedFiles) {
+  // 过滤掉危险文件
+  const safeFiles = (touchedFiles || [])
+    .filter(f => f && !isDenied(f))
+    .map(f => path.isAbsolute(f) ? path.relative(cwd, f) : f)
+    .filter(f => f && !f.startsWith('..'));  // 排除项目目录外的路径
+
+  if (safeFiles.length === 0) {
+    // 没有安全文件可 add → 检查是否有任何已跟踪文件修改
+    try {
+      const status = execFileSync('git', ['status', '--porcelain'], { cwd, encoding: 'utf8', timeout: 3000 });
+      if (!status.trim()) return false;  // 工作区干净
+      // 只 add 已跟踪的修改（--update 不会添加未跟踪文件，但可能包含危险文件）
+      // 这里选择不 add，安全优先
+      return false;
+    } catch (_) { return false; }
+  }
+
+  try {
+    execFileSync('git', [
+      '-c', 'core.hooksPath=/dev/null',
+      'add', '--',
+      ...safeFiles,
+    ], { cwd, timeout: 5000 });
+    return true;
+  } catch (_) { return false; }
+}
+
+function tryGitCommit(cwd) {
+  try {
+    // 检查是否有已暂存的变更
+    const staged = execFileSync('git', ['diff', '--cached', '--name-only'], { cwd, encoding: 'utf8', timeout: 3000 });
+    if (!staged.trim()) return false;
+
+    execFileSync('git', [
+      '-c', 'core.hooksPath=/dev/null',
+      'commit', '--no-verify', '-m', COMMIT_MSG,
+    ], { cwd, timeout: 10000 });
+    return true;
+  } catch (_) { return false; }
+}
+
+// ─── 快照写入 ─────────────────────────────────────────────────────────────────
+
+function writeSnapshot(cwd, slug, reason) {
+  try {
+    const snapsDir = path.join(os.homedir(), '.forge', 'projects', slug, 'snapshots');
+    fs.mkdirSync(snapsDir, { recursive: true });
+    const ts = Date.now();
+    shared.writeJsonAtomic(path.join(snapsDir, `${ts}.json`), {
+      timestamp:      new Date().toISOString(),
+      project_path:   cwd,
+      reason,
+      resume_command: `/forge resume ${slug}`,
+      committed_by:   'forge-git-worker',
+    });
+  } catch (e) {
+    shared.logHookError('forge-git-worker/snapshot', e, { cwd, slug });
+  }
+}
+
+// ─── 处理单个 job ─────────────────────────────────────────────────────────────
+
+function processJob(job) {
+  const { cwd, slug, touchedFiles, reason } = job;
+  if (!cwd || !fs.existsSync(cwd)) return;
+
+  try {
+    // 确认是 git 仓库
+    execFileSync('git', ['rev-parse', '--git-dir'], { cwd, timeout: 2000 });
+  } catch (_) { return; }  // 非 git 目录，跳过
+
+  const added    = safeGitAdd(cwd, touchedFiles);
+  const committed = added && tryGitCommit(cwd);
+  if (committed) {
+    writeSnapshot(cwd, slug, reason || 'checkpoint');
+    shared.logHookEvent('forge-git-worker', 'checkpoint_committed', { cwd, slug, reason });
+  }
+}
+
+// ─── 主流程 ───────────────────────────────────────────────────────────────────
+
+async function main() {
+  // 确保 runtime/git 目录存在
+  fs.mkdirSync(RUNTIME_DIR, { recursive: true });
+
+  // 获取单例锁（确保同时只有一个 worker 在跑）
+  try {
+    await shared.withAdvisoryLock(LOCK_DIR, async () => {
+      if (!fs.existsSync(QUEUE_PATH)) return;
+
+      // 读取队列
+      const lines = fs.readFileSync(QUEUE_PATH, 'utf8').trim().split('\n').filter(Boolean);
+      if (lines.length === 0) return;
+
+      // 清空队列（先清空，再处理，失败的 job 不重入）
+      fs.writeFileSync(QUEUE_PATH, '');
+
+      // 处理每个 job
+      for (const line of lines) {
+        try {
+          const job = JSON.parse(line);
+          processJob(job);
+        } catch (e) {
+          shared.logHookError('forge-git-worker/parseJob', e, { line: line.slice(0, 100) });
+        }
+      }
+    }, { waitMs: 3000, staleMs: 30000 });
+  } catch (e) {
+    // lock 超时 → 另一个 worker 正在运行，直接退出
+    shared.logHookError('forge-git-worker/lock', e);
+  }
+}
+
+main().catch(e => {
+  shared.logHookError('forge-git-worker/main', e);
+  process.exit(1);
+});

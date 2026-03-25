@@ -1,11 +1,11 @@
 #!/usr/bin/env node
-// forge-session-start.js - v1.1.0
-// SessionStart hook: 检测进行中的 Forge 项目 + 自动移动孤儿状态
+// forge-session-start.js - v2.0.0
+// SessionStart hook: 检测进行中的 Forge 项目 + 孤儿候选标记 + 限时清理
 //
-// 相比 v1.0 (shell 版) 的改进：
-// - 纯 Node.js，与其他 hooks 技术栈统一，无 python3 依赖
-// - 孤儿检测：project_path 不存在 且 last_activity > 24h → 移到 .orphaned/
-// - 双格式兼容：status "completed" 和旧格式 "complete" 都跳过
+// 修复（相比 v1.x）：
+// - P2#13 + P3#20：orphan candidate 模式 — 路径不存在时不再自动移动，
+//   仅标记为候选并显示警告，由用户手动决定（/forge orphan archive <slug>）
+// - P3#17：budgetedCleanup — 限时清理 stale lock/tmp（最多 1.5s，不阻塞会话启动）
 
 'use strict';
 
@@ -26,11 +26,11 @@ function main() {
     return;
   }
 
-  const orphanedDir = path.join(forgeDir, '.orphaned');
   const now = Date.now();
-  const ORPHAN_AGE_MS = 24 * 60 * 60 * 1000; // 24 小时
+  const ORPHAN_AGE_MS = 24 * 60 * 60 * 1000;  // 24 小时
 
-  const activeProjects = [];
+  const activeProjects      = [];
+  const orphanCandidates    = [];
 
   let entries;
   try {
@@ -60,22 +60,19 @@ function main() {
     if (status === 'complete' || status === 'completed') continue;
 
     // 孤儿检测：project_path 不存在 且 last_activity 超过 24 小时
-    const projectPath = state.project_path;
+    const projectPath  = state.project_path;
     const lastActivity = state.last_activity ? new Date(state.last_activity).getTime() : 0;
-    const isStale = now - lastActivity > ORPHAN_AGE_MS;
+    const isStale      = now - lastActivity > ORPHAN_AGE_MS;
 
     if (projectPath && !fs.existsSync(projectPath) && isStale) {
-      // 移到 .orphaned/
-      try {
-        if (!fs.existsSync(orphanedDir)) {
-          fs.mkdirSync(orphanedDir, { recursive: true });
-        }
-        const srcDir = path.join(forgeDir, slug);
-        const destDir = path.join(orphanedDir, slug);
-        fs.renameSync(srcDir, destDir);
-      } catch (e) {
-        // 移动失败则忽略，不影响其他项目显示
-      }
+      // P2#13 + P3#20：不再 renameSync 自动移动
+      // 仅标记为候选，附带警告，让用户手动决定
+      orphanCandidates.push({
+        slug,
+        name:     state.project_name || slug,
+        lastDate: state.last_activity ? String(state.last_activity).slice(0, 10) : '',
+        path:     projectPath,
+      });
       continue;
     }
 
@@ -87,36 +84,135 @@ function main() {
       phase = state.phase_num;
     }
 
-    const lastDate = state.last_activity ? String(state.last_activity).slice(0, 10) : '';
-    const name = state.project_name || slug;
+    const lastDate  = state.last_activity ? String(state.last_activity).slice(0, 10) : '';
+    const name      = state.project_name || slug;
+    const flowType  = state.flow_type || 'new';
 
-    activeProjects.push({ slug, name, phase, lastDate });
+    activeProjects.push({ slug, name, phase, lastDate, flowType, status });
   }
 
-  if (activeProjects.length === 0) {
+  // 限时清理 stale 文件（P3#17，最多 1.5s）
+  budgetedCleanup();
+
+  if (activeProjects.length === 0 && orphanCandidates.length === 0) {
     output(null);
     return;
   }
 
-  const lines = [`🔨 Forge 检测到 ${activeProjects.length} 个进行中的项目：`, ''];
+  const lines = [];
 
-  for (const p of activeProjects) {
-    let line = `  • ${p.name}（第 ${p.phase} 阶段）`;
-    if (p.lastDate) line += ` — 最后活动：${p.lastDate}`;
-    lines.push(line);
-    lines.push(`    恢复命令：/forge resume ${p.slug}`);
-    lines.push('');
+  // 活跃项目
+  if (activeProjects.length > 0) {
+    lines.push(`🔨 Forge 检测到 ${activeProjects.length} 个进行中的项目：`, '');
+
+    const FLOW_LABELS = {
+      new: '', evolve: '加功能', fix: '修bug', pivot: '需求变更',
+      maintain: '维护', adopt: '接管中', adopted: '已接管',
+    };
+
+    for (const p of activeProjects) {
+      const flowLabel   = FLOW_LABELS[p.flowType] || '';
+      const statusLabel = p.status === 'adopted' ? '已接管' : '';
+      const tag         = flowLabel || statusLabel;
+      let line = `  • ${p.name}（第 ${p.phase} 阶段${tag ? ' · ' + tag : ''}）`;
+      if (p.lastDate) line += ` — 最后活动：${p.lastDate}`;
+      lines.push(line);
+      lines.push(`    恢复命令：/forge resume ${p.slug}`);
+      lines.push('');
+    }
+
+    lines.push('如需继续，输入对应的 /forge resume 命令。');
+    lines.push('如需查看所有项目状态，输入 /forge:status');
   }
 
-  lines.push('如需继续，输入对应的 /forge resume 命令。');
-  lines.push('如需查看所有项目状态，输入 /forge:status');
+  // 孤儿候选（P2#13）
+  if (orphanCandidates.length > 0) {
+    if (lines.length > 0) lines.push('');
+    lines.push(`⚠️ 以下项目的路径不存在，可能已失效（${orphanCandidates.length} 个）：`, '');
+    for (const c of orphanCandidates) {
+      let line = `  • ${c.name}`;
+      if (c.lastDate) line += ` — 最后活动：${c.lastDate}`;
+      lines.push(line);
+      lines.push(`    路径：${c.path}（不存在）`);
+      lines.push(`    如确认不需要，运行：rm -rf ~/.forge/projects/${c.slug}`);
+      lines.push('');
+    }
+  }
 
   output(lines.join('\n'));
 }
 
+// ─── 限时清理（P3#17）────────────────────────────────────────────────────────
+
+function budgetedCleanup() {
+  const start  = Date.now();
+  const MAX_MS = 1500;
+
+  // 清理 ~/.forge/runtime/bridges/ 下的 stale lock 目录（>20min）
+  try {
+    const bridgesDir = path.join(os.homedir(), '.forge', 'runtime', 'bridges');
+    if (!fs.existsSync(bridgesDir)) return;
+    const dirs = fs.readdirSync(bridgesDir);
+    for (const d of dirs) {
+      if (Date.now() - start > MAX_MS) return;
+      const lockDir = path.join(bridgesDir, d, 'bridge.json.lock');
+      if (!fs.existsSync(lockDir)) continue;
+      try {
+        const stat = fs.statSync(lockDir);
+        if (Date.now() - stat.mtimeMs > 20 * 60 * 1000) {
+          fs.rmSync(lockDir, { recursive: true });
+        }
+      } catch (_) {}
+    }
+  } catch (_) {}
+
+  if (Date.now() - start > MAX_MS) return;
+
+  // 清理 ~/.forge/runtime/tmp/ 下 >48h 的 .tmp 文件
+  try {
+    const tmpDir = path.join(os.homedir(), '.forge', 'runtime', 'tmp');
+    if (!fs.existsSync(tmpDir)) return;
+    const files = fs.readdirSync(tmpDir);
+    for (const f of files) {
+      if (Date.now() - start > MAX_MS) return;
+      if (!f.endsWith('.tmp')) continue;
+      try {
+        const stat = fs.statSync(path.join(tmpDir, f));
+        if (Date.now() - stat.mtimeMs > 48 * 60 * 60 * 1000) {
+          fs.unlinkSync(path.join(tmpDir, f));
+        }
+      } catch (_) {}
+    }
+  } catch (_) {}
+
+  if (Date.now() - start > MAX_MS) return;
+
+  // 清理 snapshots（每个项目保留最近 20 个）
+  try {
+    const projectsDir = path.join(os.homedir(), '.forge', 'projects');
+    if (!fs.existsSync(projectsDir)) return;
+    const slugs = fs.readdirSync(projectsDir);
+    for (const slug of slugs) {
+      if (Date.now() - start > MAX_MS) return;
+      const snapsDir = path.join(projectsDir, slug, 'snapshots');
+      if (!fs.existsSync(snapsDir)) continue;
+      try {
+        const snaps = fs.readdirSync(snapsDir)
+          .filter(f => f.endsWith('.json'))
+          .sort()
+          .reverse();  // 最新在前
+        for (const old of snaps.slice(20)) {
+          fs.unlinkSync(path.join(snapsDir, old));
+        }
+      } catch (_) {}
+    }
+  } catch (_) {}
+}
+
+// ─── 输出 ─────────────────────────────────────────────────────────────────────
+
 function output(msg) {
   if (!msg) {
-    // 无活跃项目 — 静默退出
     process.exit(0);
   }
   const result = {
