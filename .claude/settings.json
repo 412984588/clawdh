@@ -15,7 +15,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"/Users/zhimingdeng/.claude/hooks/forge-session-start.sh\"",
+            "command": "node \"/Users/zhimingdeng/.claude/hooks/forge-session-start.js\"",
             "timeout": 10
           }
         ]
