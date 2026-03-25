@@ -53,7 +53,7 @@ function parseStateMd(content) {
                        content.match(/\*\*Phase\*\*[:\s]+(\d+)/i) ||
                        content.match(/Phase[:\s]+(\d+)/i) ||
                        content.match(/阶段[：:\s]+(\d+)/i);
-    if (phaseMatch) result._phase_current = parseInt(phaseMatch[1]);
+    if (phaseMatch) result._phase_current = Number(phaseMatch[1]);  // F14：Number 兼容小数阶段
   }
 
   // --- 总阶段数 ---
@@ -134,6 +134,11 @@ function parseProgressTxt(content) {
 
 function applyParsed(state, parsed) {
   const { _phase_current, _phase_total, _is_complete, ...rest } = parsed;
+  // F16 fix：删除 state 中已不再出现在 parsed 里的托管字段，防止旧值残留
+  const MANAGED_FIELDS = ['flow_type', 'gsd_status', 'gsd_last_updated', 'last_session', 'next_action'];
+  for (const key of MANAGED_FIELDS) {
+    if (!(key in rest)) delete state[key];
+  }
   Object.assign(state, rest);
   if (_phase_current !== undefined) {
     state.phase = { ...(state.phase || {}), current: _phase_current };

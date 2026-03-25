@@ -158,43 +158,40 @@ process.stdin.on('end', async () => {
     // P3#16：只在 Forge 项目中运行
     if (!isForgeProject(cwd)) process.exit(0);
 
-    // 读 bridge 快照（只读，不加锁）
+    // 读 bridge 快照（只读，用于获取 touchedFiles 进行锁外安全风险预评估）
     const { data: bridge, corrupt } = shared.readBridgeSnapshot(cwd);
     if (!bridge || corrupt) process.exit(0);
 
-    // 跳过旧 v1 schema（等 bridge hook 迁移后再用）
+    // 跳过旧 v1 schema
     if (bridge._schema_version !== 2) process.exit(0);
 
-    // 主动评估安全风险（基于 git diff，P2#9）
-    // 每次 pipeline 运行时更新一次，写回 bridge
+    // 在锁外预评估安全风险（execFileSync 无法在同步 mutator 内运行）
     const touchedFiles = bridge.change?.touchedFiles || [];
-    if (touchedFiles.length > 0) {  // 始终重新评估，不依赖旧状态（P2#4）
+    let externalRisk = null;
+    if (touchedFiles.length > 0) {
       const risk = evaluateSecurityRisk(cwd, touchedFiles);
-      if (risk.required) {
-        // 带锁更新安全风险字段
-        await shared.mutateBridge(cwd, (draft) => {
-          if (draft.change) draft.change.securityRisk = risk;
-        }).catch(() => {});
-        bridge.change.securityRisk = risk;  // 更新本地副本用于后续判断
-      }
+      if (risk.required) externalRisk = risk;
     }
 
-    // 选择下一个需要触发的质量门
-    const next = nextGateToInject(bridge);
-    if (!next) process.exit(0);
-
-    // 标记为 leased（F09 fix：lease 失败时阻断注入，防止重复触发）
-    const leaseUntil = new Date(Date.now() + LEASE_TTL_MS).toISOString();
+    // F13 fix：安全风险更新 + 门决策 + lease 写入合并到一次 mutateBridge（消除 TOCTOU 竞态）
+    let nextToInject = null;
     let leased = false;
     try {
       await shared.mutateBridge(cwd, (draft) => {
-        if (!draft.gates?.[next.name]) return;
-        draft.gates[next.name].status    = 'leased';
-        draft.gates[next.name].leaseUntil = leaseUntil;
+        if (draft._schema_version !== 2) return;
+        // 注入最新安全风险（若有，在持锁状态下写入，保证原子一致性）
+        if (externalRisk && draft.change) draft.change.securityRisk = externalRisk;
+        // 用最新 bridge 数据重新决策（持锁状态，无 TOCTOU 竞态窗口）
+        const candidate = nextGateToInject(draft);
+        if (!candidate) return;
+        if (!draft.gates?.[candidate.name]) return;
+        draft.gates[candidate.name].status    = 'leased';
+        draft.gates[candidate.name].leaseUntil = new Date(Date.now() + LEASE_TTL_MS).toISOString();
+        nextToInject = candidate;
       });
-      leased = true;
+      leased = nextToInject !== null;
     } catch (e) {
-      shared.logHookError('forge-quality-pipeline/lease', e, { gate: next.name });
+      shared.logHookError('forge-quality-pipeline/toctou', e);
     }
 
     if (!leased) process.exit(0);
@@ -203,7 +200,7 @@ process.stdin.on('end', async () => {
     process.stdout.write(JSON.stringify({
       hookSpecificOutput: {
         hookEventName: 'PostToolUse',
-        additionalContext: next.message,
+        additionalContext: nextToInject.message,
       },
     }));
   } catch (e) {

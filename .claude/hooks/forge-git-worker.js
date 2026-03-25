@@ -147,12 +147,13 @@ async function main() {
     await shared.withAdvisoryLock(LOCK_DIR, async () => {
       if (!fs.existsSync(QUEUE_PATH)) return;
 
-      // 读取队列
-      const lines = fs.readFileSync(QUEUE_PATH, 'utf8').trim().split('\n').filter(Boolean);
-      if (lines.length === 0) return;
+      // F11 fix：rename 后再处理，防止处理期间新追加的 job 被清空覆盖而丢失
+      const processingPath = QUEUE_PATH + '.processing';
+      try { fs.renameSync(QUEUE_PATH, processingPath); } catch (_) { return; }
 
-      // 清空队列（先清空，再处理，失败的 job 不重入）
-      fs.writeFileSync(QUEUE_PATH, '');
+      const content = fs.readFileSync(processingPath, 'utf8');
+      try { fs.unlinkSync(processingPath); } catch (_) {}
+      const lines = content.trim().split('\n').filter(Boolean);
 
       // 处理每个 job
       for (const line of lines) {

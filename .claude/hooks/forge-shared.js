@@ -143,9 +143,15 @@ async function withAdvisoryLock(lockDir, fn, opts = {}) {
     }
   }
 
+  // F12：持锁心跳，定期 touch mtime 防止长操作被误判 stale 导致锁被偷
+  const heartbeat = setInterval(() => {
+    try { fs.utimesSync(lockDir, new Date(), new Date()); } catch (_) {}
+  }, Math.floor(staleMs / 4));
+
   try {
     return await fn();
   } finally {
+    clearInterval(heartbeat);
     try { fs.rmSync(lockDir, { recursive: true }); } catch (_) {}
   }
 }

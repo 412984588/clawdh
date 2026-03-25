@@ -59,7 +59,7 @@ function defaultBridge(cwd, slug) {
     );
     if (data && !corrupt) {  // F08：使用 safeReadJson 返回的 corrupt 标志
       flowType   = data.flow_type || 'new';
-      phaseNum   = data.phase?.current || 1;
+      phaseNum   = data.phase?.current ?? 1;  // F14：?? 允许 phase 0（|| 会把 0 当 falsy）
       phaseTotal = data.phase?.total   || null;
     }
   } catch (_) {}
@@ -236,7 +236,7 @@ function inferAndUpdate(draft, toolName, toolInput, toolResponse) {
       path.join(os.homedir(), '.forge', 'projects', draft.project.slug, 'state.json'), null
     );
     if (data && !corrupt) {  // F08：使用 safeReadJson 返回的 corrupt 标志
-      if (data.phase?.current) draft.phase.current = data.phase.current;
+      if (data.phase?.current != null) draft.phase.current = data.phase.current;  // F14：!= null 允许 phase 0
       if (data.phase?.total)   draft.phase.total   = data.phase.total;
       if (data.flow_type)      draft.project.flowType = data.flow_type;
     }
@@ -306,12 +306,12 @@ function checkContextWarning(cwd, slug, sessionId, bridge) {
   const isCritical  = remaining <= CRITICAL_THRESHOLD;
   const escalated   = isCritical && wd.lastLevel === 'warning';
   if (wd.callsSinceWarn > 1 && wd.callsSinceWarn < DEBOUNCE_CALLS && !escalated) {
-    fs.writeFileSync(warnKey, JSON.stringify(wd));
+    shared.writeJsonAtomic(warnKey, wd);  // F15：原子写防并发损坏 warned.json
     return null;
   }
   wd.callsSinceWarn = 0;
   wd.lastLevel      = isCritical ? 'critical' : 'warning';
-  fs.writeFileSync(warnKey, JSON.stringify(wd));
+  shared.writeJsonAtomic(warnKey, wd);  // F15：原子写防并发损坏 warned.json
 
   const usedPct = metrics.used_pct != null ? metrics.used_pct : (100 - remaining);
   const acts    = [];
