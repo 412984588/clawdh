@@ -255,6 +255,9 @@ async function mutateForgeState(slug, mutator) {
   const sp      = path.join(os.homedir(), '.forge', 'projects', slug, 'state.json');
   const lockDir = sp + '.lock';
 
+  // F21 fix: 确保父目录存在，防止 withAdvisoryLock 的 mkdirSync(lockDir) 因父目录缺失而 ENOENT
+  fs.mkdirSync(path.dirname(sp), { recursive: true });
+
   return withAdvisoryLock(lockDir, async () => {
     const { data, corrupt } = safeReadJson(sp, {});
     if (corrupt) {

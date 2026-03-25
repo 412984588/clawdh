@@ -185,37 +185,46 @@ process.stdin.on('end', async () => {
     // OPT-9: 用 resolveProjectRoot 归一化 cwd，防止子目录 session 导致 path.relative 返回 ../. 前缀
     const rawCwd = data.cwd || findProjectRoot(filePath);
     const cwd    = shared.resolveProjectRoot(rawCwd);
-    const rel    = path.relative(cwd, filePath);
+    // F22 fix: filePath 同步规范化（macOS /var → /private/var 符号链接），
+    // 避免 path.relative(canonical-cwd, symlinked-filePath) 产生 ../ 前缀导致误退出
+    // F23 fix: 在 cwd 和 filePath 上都做 realpathSync，确保 path.relative 两端路径一致，
+    // 消除分类阶段与实际读取阶段的 TOCTOU 竞态（Codex Finding #1）
+    // F24 fix: cwd 也规范化，保护 git-rev-parse fallback 路径（Codex Finding #4）
+    let realCwd = cwd;
+    try { realCwd = fs.realpathSync(cwd); } catch (_) {}
+    let realFilePath = filePath;
+    try { realFilePath = fs.realpathSync(filePath); } catch (_) {}
+    const rel    = path.relative(realCwd, realFilePath);
 
     // 检查是否是目标文件（path.relative 确保路径语义正确）
     const isStateMd     = rel === path.join('.planning', 'STATE.md');
     const isInPlanning  = (rel.startsWith('.planning' + path.sep) || rel === '.planning') &&
                           !rel.startsWith('..');
-    const isProgressTxt = path.basename(filePath) === 'claude-progress.txt' ||
-                          path.basename(filePath) === 'PROGRESS.md';
+    const isProgressTxt = path.basename(realFilePath) === 'claude-progress.txt' ||
+                          path.basename(realFilePath) === 'PROGRESS.md';
 
     // 只处理 .planning/ 文件或 progress.txt
     if (!isInPlanning && !isProgressTxt) process.exit(0);
 
-    if (!fs.existsSync(filePath)) process.exit(0);
+    if (!fs.existsSync(realFilePath)) process.exit(0);
 
     // 碰撞安全 slug
-    const slug = shared.resolveSlug(cwd);
+    const slug = shared.resolveSlug(realCwd);
 
     // 使用 shared.mutateForgeState 带锁读改写（防止并发损坏）
     await shared.mutateForgeState(slug, (state) => {
-      state.project_path   = cwd;
+      state.project_path   = realCwd;
       state.last_activity  = new Date().toISOString();
 
       if (isStateMd) {
-        const content = fs.readFileSync(filePath, 'utf8');
+        const content = fs.readFileSync(realFilePath, 'utf8');
         applyParsed(state, parseStateMd(content));
         // 记录 STATE.md mtime，用于主动轮询的基准
-        state._state_md_mtime = fs.statSync(filePath).mtimeMs;
+        state._state_md_mtime = fs.statSync(realFilePath).mtimeMs;
 
       } else if (isInPlanning) {
         // 主动轮询：检查 STATE.md 是否被 worktree 合并等外部操作更新
-        const changed = checkStateMdChanged(cwd, state);
+        const changed = checkStateMdChanged(realCwd, state);
         if (changed) {
           applyParsed(state, parseStateMd(changed.content));
           state._state_md_mtime = changed.mtime;
@@ -223,7 +232,7 @@ process.stdin.on('end', async () => {
       }
 
       if (isProgressTxt) {
-        const content = fs.readFileSync(filePath, 'utf8');
+        const content = fs.readFileSync(realFilePath, 'utf8');
         const parsed  = parseProgressTxt(content);
         if (parsed.last_session) state.last_session = parsed.last_session;
         if (parsed.next_action)  state.next_action  = parsed.next_action;

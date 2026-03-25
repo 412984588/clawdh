@@ -64,6 +64,120 @@ function mkTmpDir(suffix = '') {
 
 const HOOKS_DIR = path.join(__dirname, '..');
 
+// ─── 集成测试辅助（组 15-20 专用）────────────────────────────────────────────
+
+const _cp      = require('child_process');
+const _shared  = require(path.join(HOOKS_DIR, 'forge-shared'));
+
+// 向 hook 进程发送 stdin JSON，同步捕获 stdout/stderr/exitCode
+function spawnHook(hookFile, stdinData, opts = {}) {
+  const r = _cp.spawnSync(
+    process.execPath,
+    [path.join(HOOKS_DIR, hookFile)],
+    {
+      input:    typeof stdinData === 'string' ? stdinData : JSON.stringify(stdinData),
+      encoding: 'utf8',
+      timeout:  opts.timeout || 15000,
+      env:      { ...process.env, ...(opts.env || {}) },
+    }
+  );
+  return {
+    exitCode: r.status !== null ? r.status : -1,
+    stdout:   r.stdout || '',
+    stderr:   r.stderr || '',
+    timedOut: r.signal === 'SIGTERM',
+  };
+}
+
+// 创建带 .planning/STATE.md 和 git repo 的临时 Forge 项目目录
+function setupForgeTmpDir() {
+  const d = mkTmpDir('-forge');
+  fs.mkdirSync(path.join(d, '.planning'), { recursive: true });
+  fs.writeFileSync(path.join(d, '.planning', 'STATE.md'), '# State\nPhase: 1\n');
+  try {
+    _cp.execFileSync('git', ['init'], { cwd: d, stdio: 'ignore' });
+    _cp.execFileSync('git', [
+      '-c', 'user.email=test@test.com', '-c', 'user.name=Test',
+      'commit', '--allow-empty', '-m', 'init',
+    ], { cwd: d, stdio: 'ignore' });
+  } catch (_) {}
+  return d;
+}
+
+// git rev-parse → realpath fallback，确保与 hook 内部保持一致
+function getRealRoot(dir) {
+  try {
+    return _cp.execFileSync('git', ['rev-parse', '--show-toplevel'],
+      { cwd: dir, encoding: 'utf8' }).trim();
+  } catch (_) {
+    try { return fs.realpathSync(dir); } catch (_2) { return dir; }
+  }
+}
+
+function getBridgePathForDir(realRoot) {
+  const h = crypto.createHash('md5').update(realRoot).digest('hex').slice(0, 12);
+  return path.join(os.homedir(), '.forge', 'runtime', 'bridges', h, 'bridge.json');
+}
+
+function getSlugForDir(realRoot) {
+  // 使用 path.basename 与 resolveSlug 保持一致（resolveSlug 只对 basename 做 slugify）
+  const base = path.basename(realRoot).replace(/[^a-zA-Z0-9\u4e00-\u9fff]+/g, '-').replace(/^-|-$/g, '').slice(0, 40);
+  const h    = crypto.createHash('md5').update(realRoot).digest('hex').slice(0, 8);
+  return `${base}-${h}`;
+}
+
+// 清理 tmpDir + 对应 bridge 和 forge state
+function cleanupForgeTmpDir(dir) {
+  try {
+    const root = getRealRoot(dir);
+    const bp   = getBridgePathForDir(root);
+    try { fs.rmSync(bp + '.lock',          { recursive: true, force: true }); } catch (_) {}
+    try { fs.rmSync(path.dirname(bp),      { recursive: true, force: true }); } catch (_) {}
+    const slug = getSlugForDir(root);
+    try { fs.rmSync(path.join(os.homedir(), '.forge', 'projects', slug),
+                    { recursive: true, force: true }); } catch (_) {}
+  } catch (_) {}
+  try { fs.rmSync(dir, { recursive: true, force: true }); } catch (_) {}
+}
+
+// 构建标准 bridge.json（v2 schema，含完整 gates 结构）用于 pipeline 测试
+// 命名为 makeFullBridge 避免与组 2 内部的 makeBridge 发生 JS 函数提升遮蔽冲突
+function makeFullBridge(overrides) {
+  const base = {
+    _schema_version: 2,
+    project: { cwd: '/tmp/test', slug: 'test', isWeb: false, flowType: 'new' },
+    phase:   { current: 1, total: 3, phaseEpoch: 1 },
+    change:  { changeEpoch: 1, touchedFiles: [], planWrittenAt: null,
+               summaryWrittenAt: null, securityRisk: { required: false, reasons: [], files: [] } },
+    gates: {
+      plan_review: { status: 'idle', epoch: null, leaseUntil: null },
+      tests:       { status: 'idle', epoch: null, leaseUntil: null },
+      code_review: { status: 'idle', epoch: null, leaseUntil: null },
+      qa:          { status: 'idle', epoch: null, leaseUntil: null },
+      security:    { status: 'idle', epoch: null, leaseUntil: null },
+      benchmark:   { status: 'idle', epoch: null, leaseUntil: null },
+      ship:        { status: 'idle', epoch: null, leaseUntil: null },
+    },
+    context: { warningLevel: null, lastSaveAt: null },
+    audit:   { lastToolName: null, updatedAt: null },
+  };
+  // 浅合并顶层字段，深合并 gates/project/phase/change
+  // F25 fix: gates 需要逐条目深合并（Codex Finding #7）
+  // 直接 { ...base.gates, ...overrides.gates } 会完整替换每个 gate 对象，
+  // 导致测试中传入 { tests: { status: 'passed' } } 后，tests 缺少 epoch/leaseUntil 字段
+  const r = { ...base, ...overrides };
+  if (overrides?.gates) {
+    r.gates = { ...base.gates };
+    for (const [k, v] of Object.entries(overrides.gates)) {
+      r.gates[k] = { ...base.gates[k], ...v };
+    }
+  }
+  if (overrides?.project) r.project = { ...base.project, ...overrides.project };
+  if (overrides?.phase)   r.phase   = { ...base.phase,   ...overrides.phase };
+  if (overrides?.change)  r.change  = { ...base.change,  ...overrides.change };
+  return r;
+}
+
 async function main() {
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1011,6 +1125,598 @@ test('14-4: D10 isLastPhase 有 Number.isFinite 守卫', () => {
   const src = fs.readFileSync(path.join(HOOKS_DIR, 'forge-quality-pipeline.js'), 'utf8');
   const isLastBody = src.slice(src.indexOf('function isLastPhase('), src.indexOf('\n}\n', src.indexOf('function isLastPhase(')));
   assert(isLastBody.includes('Number.isFinite'), 'D10：isLastPhase 应有 Number.isFinite 守卫，防止 Infinity 误触发 ship 门');
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 组 15: Stdin Pipe Happy Path（6 个）
+// ─────────────────────────────────────────────────────────────────────────────
+console.log('\n【组 15】Stdin Pipe Happy Path');
+
+test('15-1: bridge.js Write 事件写入 bridge.json（_schema_version=2，changeEpoch=1）', () => {
+  const tmpDir = setupForgeTmpDir();
+  try {
+    const realRoot = getRealRoot(tmpDir);
+    const r = spawnHook('forge-context-bridge.js', {
+      cwd: tmpDir, session_id: 'test-15-1', tool_name: 'Write',
+      tool_input: { file_path: path.join(tmpDir, 'src', 'app.ts') },
+      tool_response: {},
+    });
+    assertEqual(r.exitCode, 0, '15-1: exitCode 应为 0');
+    const bp = getBridgePathForDir(realRoot);
+    assert(fs.existsSync(bp), '15-1: bridge.json 应被创建');
+    const b = JSON.parse(fs.readFileSync(bp, 'utf8'));
+    assertEqual(b._schema_version, 2, '15-1: _schema_version 应为 2');
+    assertEqual(b.change.changeEpoch, 1, '15-1: changeEpoch 应为 1（一次源码写入）');
+    assert(b.change.touchedFiles.some(f => f.endsWith('app.ts')), '15-1: touchedFiles 应含 app.ts');
+  } finally {
+    cleanupForgeTmpDir(tmpDir);
+  }
+});
+
+test('15-2: auto-fix.js Bash 失败 → stdout 含修复指令（additionalContext）', () => {
+  const tmpDir = setupForgeTmpDir();
+  try {
+    const r = spawnHook('forge-auto-fix.js', {
+      cwd: tmpDir, tool_name: 'Bash',
+      tool_input: { command: 'npm test' },
+      tool_response: { exit_code: 1, stderr: 'npm ERR: not found' },
+    });
+    assertEqual(r.exitCode, 0, '15-2: exitCode 应为 0');
+    const out = JSON.parse(r.stdout);
+    assert(out.hookSpecificOutput?.additionalContext?.includes('FORGE'), '15-2: 应含 FORGE 修复指令');
+  } finally {
+    cleanupForgeTmpDir(tmpDir);
+  }
+});
+
+test('15-3: auto-fix.js 同一错误第 3 次 → 升级到诊断模式', () => {
+  const tmpDir = setupForgeTmpDir();
+  try {
+    const realRoot = getRealRoot(tmpDir);
+    const bp       = getBridgePathForDir(realRoot);
+    const stderr   = 'npm ERR: not found';
+    // hashError = sha256(stderr).slice(0,16)
+    const errHash  = crypto.createHash('sha256').update(stderr).digest('hex').slice(0, 16);
+    // 预写 bridge.json：同一错误已尝试 2 次
+    fs.mkdirSync(path.dirname(bp), { recursive: true });
+    fs.writeFileSync(bp, JSON.stringify({ auto_fix: { issue_hash: errHash, attempts: 2, max: 3 } }));
+    const r = spawnHook('forge-auto-fix.js', {
+      cwd: tmpDir, tool_name: 'Bash',
+      tool_input: { command: 'npm test' },
+      tool_response: { exit_code: 1, stderr },
+    });
+    assertEqual(r.exitCode, 0, '15-3: exitCode 应为 0');
+    const out = JSON.parse(r.stdout);
+    const ctx = out.hookSpecificOutput?.additionalContext || '';
+    assert(ctx.includes('升级') || ctx.includes('上限') || ctx.includes('诊断'),
+           '15-3: 第 3 轮应包含升级/上限关键词');
+  } finally {
+    cleanupForgeTmpDir(tmpDir);
+  }
+});
+
+test('15-4: state-sync Write STATE.md → state.json 含正确 phase 信息', () => {
+  const tmpDir = setupForgeTmpDir();
+  try {
+    const realRoot  = getRealRoot(tmpDir);
+    const stateMd   = path.join(tmpDir, '.planning', 'STATE.md');
+    const content   = '---\ncurrent_phase: 3\ntotal_phases: 5\nstatus: active\n---\n# State\n';
+    fs.writeFileSync(stateMd, content);
+    const r = spawnHook('forge-state-sync.js', {
+      cwd: tmpDir,
+      tool_input: { file_path: stateMd },
+      tool_response: {},
+    });
+    assertEqual(r.exitCode, 0, '15-4: exitCode 应为 0');
+    const slug   = getSlugForDir(realRoot);
+    const sp     = path.join(os.homedir(), '.forge', 'projects', slug, 'state.json');
+    assert(fs.existsSync(sp), '15-4: state.json 应被创建');
+    const state  = JSON.parse(fs.readFileSync(sp, 'utf8'));
+    assertEqual(state.phase?.current, 3, '15-4: phase.current 应为 3');
+    assertEqual(state.phase?.total,   5, '15-4: phase.total 应为 5');
+  } finally {
+    cleanupForgeTmpDir(tmpDir);
+  }
+});
+
+test('15-5: state-sync Write claude-progress.txt → state.json 含 last_session', () => {
+  const tmpDir = setupForgeTmpDir();
+  try {
+    const realRoot   = getRealRoot(tmpDir);
+    const progFile   = path.join(tmpDir, 'claude-progress.txt');
+    const content    = '# Progress\n\n## [2026-03-25] - Session 1\nStarted development\n下一步：开发主页面\n';
+    fs.writeFileSync(progFile, content);
+    const r = spawnHook('forge-state-sync.js', {
+      cwd: tmpDir,
+      tool_input: { file_path: progFile },
+      tool_response: {},
+    });
+    assertEqual(r.exitCode, 0, '15-5: exitCode 应为 0');
+    const slug  = getSlugForDir(realRoot);
+    const sp    = path.join(os.homedir(), '.forge', 'projects', slug, 'state.json');
+    const state = JSON.parse(fs.readFileSync(sp, 'utf8'));
+    assert(state.last_session?.includes('2026-03-25'), '15-5: last_session 应含日期');
+  } finally {
+    cleanupForgeTmpDir(tmpDir);
+  }
+});
+
+test('15-6: pipeline.js 读到 tests=passed → 注入 code_review 门（stdout 含 hookSpecificOutput）', () => {
+  const tmpDir = setupForgeTmpDir();
+  try {
+    const realRoot = getRealRoot(tmpDir);
+    const bp       = getBridgePathForDir(realRoot);
+    const bridge   = makeFullBridge({
+      project: { cwd: realRoot },
+      gates: { tests: { status: 'passed', epoch: 1 } },
+    });
+    fs.mkdirSync(path.dirname(bp), { recursive: true });
+    fs.writeFileSync(bp, JSON.stringify(bridge));
+    const r = spawnHook('forge-quality-pipeline.js', { cwd: tmpDir });
+    assertEqual(r.exitCode, 0, '15-6: exitCode 应为 0');
+    assert(r.stdout.includes('hookSpecificOutput'), '15-6: 应输出 hookSpecificOutput');
+    const out = JSON.parse(r.stdout);
+    assert(out.hookSpecificOutput?.additionalContext?.includes('code_review') ||
+           out.hookSpecificOutput?.additionalContext?.includes('代码审查'),
+           '15-6: 应注入 code_review 门');
+  } finally {
+    cleanupForgeTmpDir(tmpDir);
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 组 16: 文件系统副作用验证（5 个）
+// ─────────────────────────────────────────────────────────────────────────────
+console.log('\n【组 16】文件系统副作用验证');
+
+await testAsync('16-1: bridge.js 写入的 bridge.json 含所有必需顶层字段', async () => {
+  const tmpDir = setupForgeTmpDir();
+  try {
+    const realRoot = getRealRoot(tmpDir);
+    spawnHook('forge-context-bridge.js', {
+      cwd: tmpDir, session_id: 'test-16-1', tool_name: 'Write',
+      tool_input: { file_path: path.join(tmpDir, 'x.ts') },
+      tool_response: {},
+    });
+    const bp = getBridgePathForDir(realRoot);
+    assert(fs.existsSync(bp), '16-1: bridge.json 应存在');
+    const b = JSON.parse(fs.readFileSync(bp, 'utf8'));
+    for (const key of ['_schema_version', 'project', 'phase', 'change', 'gates', 'audit']) {
+      assert(key in b, `16-1: bridge.json 缺字段 ${key}`);
+    }
+    for (const g of ['tests', 'code_review', 'qa', 'security', 'benchmark', 'ship']) {
+      assert(g in b.gates, `16-1: gates 缺 ${g}`);
+    }
+  } finally {
+    cleanupForgeTmpDir(tmpDir);
+  }
+});
+
+await testAsync('16-2: writeJsonAtomic → safeReadJson roundtrip 无损', async () => {
+  const tmpFile = path.join(_shared.getTmpDir(), `test-rt-${Date.now()}.json`);
+  try {
+    const obj = { x: 1, arr: [1, null, 'hi'], nested: { a: true, b: null } };
+    _shared.writeJsonAtomic(tmpFile, obj);
+    const { data, corrupt } = _shared.safeReadJson(tmpFile, null);
+    assert(!corrupt, '16-2: 不应 corrupt');
+    assertEqual(JSON.stringify(data), JSON.stringify(obj), '16-2: roundtrip 无损');
+  } finally {
+    try { fs.unlinkSync(tmpFile); } catch (_) {}
+  }
+});
+
+await testAsync('16-3: appendJsonlQueue 顺序写入 5 条 → 恰好 5 行有效 JSON', async () => {
+  const qPath = path.join(_shared.getTmpDir(), `test-q-${Date.now()}.jsonl`);
+  try {
+    for (let i = 0; i < 5; i++) {
+      await _shared.appendJsonlQueue(qPath, { idx: i, cwd: '/tmp/test', slug: 'sl' });
+    }
+    const lines = fs.readFileSync(qPath, 'utf8').trim().split('\n').filter(Boolean);
+    assertEqual(lines.length, 5, '16-3: 应有恰好 5 行');
+    lines.forEach((l, i) => {
+      const obj = JSON.parse(l);
+      assertEqual(obj.idx, i, `16-3: 第 ${i} 行 idx 应为 ${i}`);
+      assert('queued_at' in obj, `16-3: 第 ${i} 行缺 queued_at`);
+    });
+  } finally {
+    try { fs.unlinkSync(qPath); } catch (_) {}
+    try { fs.rmSync(qPath + '.lock', { recursive: true, force: true }); } catch (_) {}
+  }
+});
+
+await testAsync('16-4: logHookError 写入 errors.jsonl 格式正确（含 ts/hook/error/context）', async () => {
+  const marker = `test-16-4-${Date.now()}`;
+  _shared.logHookError(marker, new Error('test-err'), { testCtx: true });
+  const logFile = path.join(os.homedir(), '.forge', 'logs', 'hooks', 'errors.jsonl');
+  assert(fs.existsSync(logFile), '16-4: errors.jsonl 应存在');
+  const lines = fs.readFileSync(logFile, 'utf8').trim().split('\n').filter(Boolean);
+  const last  = JSON.parse(lines[lines.length - 1]);
+  assertEqual(last.hook, marker, '16-4: hook 字段应匹配');
+  assertEqual(last.error, 'test-err', '16-4: error 字段应匹配');
+  assert(last.ts && last.ts.includes('T'), '16-4: ts 字段应为 ISO 时间');
+  assert('context' in last, '16-4: 应有 context 字段');
+});
+
+await testAsync('16-5: mutateForgeState 写入 state.json 含 project_path 和 last_activity', async () => {
+  const slug = `test-state-16-5-${Date.now()}`;
+  try {
+    await _shared.mutateForgeState(slug, s => {
+      s.project_path  = '/test/project';
+      s.last_activity = new Date().toISOString();
+    });
+    const sp    = path.join(os.homedir(), '.forge', 'projects', slug, 'state.json');
+    const state = JSON.parse(fs.readFileSync(sp, 'utf8'));
+    assertEqual(state.project_path, '/test/project', '16-5: project_path 应正确');
+    assert(state.last_activity && state.last_activity.includes('T'), '16-5: last_activity 应为 ISO 时间');
+  } finally {
+    try { fs.rmSync(path.join(os.homedir(), '.forge', 'projects', slug),
+                    { recursive: true, force: true }); } catch (_) {}
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 组 17: 错误恢复（5 个）
+// ─────────────────────────────────────────────────────────────────────────────
+console.log('\n【组 17】错误恢复');
+
+await testAsync('17-1: safeReadJson 读取损坏 JSON → corrupt:true，data:null，不崩溃', async () => {
+  const tmpFile = path.join(_shared.getTmpDir(), `corrupt-${Date.now()}.json`);
+  try {
+    fs.writeFileSync(tmpFile, '{invalid json here');
+    const { corrupt, data } = _shared.safeReadJson(tmpFile, 'fallback');
+    assertEqual(corrupt, true, '17-1: 应为 corrupt:true');
+    assert(data === null, '17-1: corrupt 时 data 应为 null');
+  } finally {
+    try { fs.unlinkSync(tmpFile); } catch (_) {}
+  }
+});
+
+await testAsync('17-2: mutateBridge 目标目录不存在 → 自动创建并写入成功', async () => {
+  const fakeDir  = path.join(os.tmpdir(), `forge-nomkdir-${Date.now()}`);
+  try {
+    await _shared.mutateBridge(fakeDir, d => { d.autoCreated = true; });
+    const bp       = _shared.getBridgePath(fakeDir);
+    assert(fs.existsSync(bp), '17-2: bridge.json 应被创建');
+    const { data } = _shared.safeReadJson(bp, null);
+    assert(data?.autoCreated === true, '17-2: 写入内容应正确');
+  } finally {
+    try {
+      const bp = _shared.getBridgePath(fakeDir);
+      fs.rmSync(bp + '.lock',     { recursive: true, force: true });
+      fs.rmSync(path.dirname(bp), { recursive: true, force: true });
+    } catch (_) {}
+  }
+});
+
+await testAsync('17-3: writeJsonAtomic 目标多层目录不存在 → 自动创建并写入成功', async () => {
+  const deepDir  = mkTmpDir('-atomic');
+  const deepFile = path.join(deepDir, 'a', 'b', 'c', 'test.json');
+  try {
+    _shared.writeJsonAtomic(deepFile, { ok: true });
+    assert(fs.existsSync(deepFile), '17-3: 多层目录文件应被创建');
+    const parsed = JSON.parse(fs.readFileSync(deepFile, 'utf8'));
+    assertEqual(parsed.ok, true, '17-3: 内容应正确');
+  } finally {
+    try { fs.rmSync(deepDir, { recursive: true, force: true }); } catch (_) {}
+  }
+});
+
+test('17-4: bridge.js 收到截断 JSON → exitCode=0，无 UnhandledPromiseRejection', () => {
+  const tmpDir = setupForgeTmpDir();
+  try {
+    // 故意发送不完整 JSON
+    const r = spawnHook('forge-context-bridge.js', '{"cwd":"' + tmpDir, { timeout: 6000 });
+    assertEqual(r.exitCode, 0, '17-4: 截断 JSON 应优雅退出（exitCode=0）');
+    assert(!r.stderr.includes('UnhandledPromiseRejection'), '17-4: 无 unhandled rejection');
+    assert(!r.stderr.includes('Error:'), '17-4: 无 Error 崩溃输出');
+  } finally {
+    cleanupForgeTmpDir(tmpDir);
+  }
+});
+
+await testAsync('17-5: mutateForgeState 读到损坏 state.json → 返回 null，损坏文件保持不变', async () => {
+  const slug      = `test-corrupt-17-5-${Date.now()}`;
+  const stateDir  = path.join(os.homedir(), '.forge', 'projects', slug);
+  const stateFile = path.join(stateDir, 'state.json');
+  try {
+    fs.mkdirSync(stateDir, { recursive: true });
+    fs.writeFileSync(stateFile, '{corrupt');
+    const { state } = await _shared.mutateForgeState(slug, s => { s.recovered = true; });
+    assert(state === null, '17-5: corrupt state.json 应跳过 mutation，返回 null');
+    const still = fs.readFileSync(stateFile, 'utf8');
+    assertEqual(still, '{corrupt', '17-5: 损坏文件应原样保留，不被覆写');
+  } finally {
+    try { fs.rmSync(stateDir, { recursive: true, force: true }); } catch (_) {}
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 组 18: 跨 Hook 数据流（5 个）
+// ─────────────────────────────────────────────────────────────────────────────
+console.log('\n【组 18】跨 Hook 数据流');
+
+test('18-1: bridge.js Bash(npm test 成功) → pipeline.js 读到 tests=passed → 注入 code_review', () => {
+  const tmpDir = setupForgeTmpDir();
+  try {
+    const realRoot = getRealRoot(tmpDir);
+    // Step 1: bridge.js 标记 tests=passed
+    spawnHook('forge-context-bridge.js', {
+      cwd: tmpDir, session_id: 'test-18-1', tool_name: 'Bash',
+      tool_input: { command: 'npm test' },
+      tool_response: { exit_code: 0 },
+    });
+    // 验证 bridge.json 已写入 tests=passed
+    const bp = getBridgePathForDir(realRoot);
+    const b1 = JSON.parse(fs.readFileSync(bp, 'utf8'));
+    assertEqual(b1.gates?.tests?.status, 'passed', '18-1: bridge 应有 tests=passed');
+    // Step 2: pipeline.js 应注入 code_review 门
+    const r = spawnHook('forge-quality-pipeline.js', { cwd: tmpDir });
+    assertEqual(r.exitCode, 0, '18-1: pipeline exitCode 应为 0');
+    assert(r.stdout.includes('hookSpecificOutput'), '18-1: pipeline 应输出 hookSpecificOutput');
+    assert(r.stdout.includes('code_review') || r.stdout.includes('代码审查'),
+           '18-1: pipeline 应注入 code_review 门');
+  } finally {
+    cleanupForgeTmpDir(tmpDir);
+  }
+});
+
+test('18-2: state-sync 写 state.json → session-start 检测到活跃项目并输出恢复提示', () => {
+  const tmpDir = setupForgeTmpDir();
+  try {
+    const realRoot = getRealRoot(tmpDir);
+    const slug     = getSlugForDir(realRoot);
+    const stateMd  = path.join(tmpDir, '.planning', 'STATE.md');
+    fs.writeFileSync(stateMd, '---\ncurrent_phase: 2\ntotal_phases: 4\nstatus: active\n---\n');
+    // Step 1: state-sync 写 state.json
+    spawnHook('forge-state-sync.js', {
+      cwd: tmpDir, tool_input: { file_path: stateMd }, tool_response: {},
+    });
+    const sp = path.join(os.homedir(), '.forge', 'projects', slug, 'state.json');
+    assert(fs.existsSync(sp), '18-2: state.json 应存在');
+    const st = JSON.parse(fs.readFileSync(sp, 'utf8'));
+    assert(st.phase?.current === 2, '18-2: state.json phase.current 应为 2');
+    // Step 2: session-start 应检测到此项目
+    const r = spawnHook('forge-session-start.js', '{}');
+    // 可能无 stdout（若进程在其他活跃项目先退出）；只需不崩溃且 exitCode=0
+    assertEqual(r.exitCode, 0, '18-2: session-start exitCode 应为 0');
+    // 若有 stdout，应包含该 slug 的恢复命令
+    if (r.stdout) {
+      const out = JSON.parse(r.stdout);
+      const ctx = out.hookSpecificOutput?.additionalContext || '';
+      assert(ctx.includes(slug) || ctx.includes('Forge'), '18-2: session-start 输出应含 slug 或 Forge');
+    }
+  } finally {
+    cleanupForgeTmpDir(tmpDir);
+  }
+});
+
+await testAsync('18-3: appendJsonlQueue 写入 job → 每行符合 git-worker 期望格式（含 cwd/slug/reason/queued_at）', async () => {
+  const qPath = path.join(_shared.getTmpDir(), `test-q-18-3-${Date.now()}.jsonl`);
+  try {
+    await _shared.appendJsonlQueue(qPath, { cwd: '/test/project', slug: 'my-slug-abc1', reason: 'context_critical', touchedFiles: ['src/app.ts'] });
+    const line = fs.readFileSync(qPath, 'utf8').trim();
+    const job  = JSON.parse(line);
+    assert('cwd'         in job, '18-3: 应有 cwd');
+    assert('slug'        in job, '18-3: 应有 slug');
+    assert('reason'      in job, '18-3: 应有 reason');
+    assert('queued_at'   in job, '18-3: 应有 queued_at（自动附加）');
+    assert('touchedFiles' in job, '18-3: 应有 touchedFiles');
+    assert(Array.isArray(job.touchedFiles), '18-3: touchedFiles 应为数组');
+  } finally {
+    try { fs.unlinkSync(qPath); } catch (_) {}
+    try { fs.rmSync(qPath + '.lock', { recursive: true, force: true }); } catch (_) {}
+  }
+});
+
+test('18-4: bridge.js 3 次 Write 不同文件 → changeEpoch 累加到 3', () => {
+  const tmpDir = setupForgeTmpDir();
+  try {
+    const realRoot = getRealRoot(tmpDir);
+    for (const fname of ['a.ts', 'b.ts', 'c.ts']) {
+      spawnHook('forge-context-bridge.js', {
+        cwd: tmpDir, session_id: `test-18-4`, tool_name: 'Write',
+        tool_input: { file_path: path.join(tmpDir, fname) },
+        tool_response: {},
+      });
+    }
+    const bp = getBridgePathForDir(realRoot);
+    const b  = JSON.parse(fs.readFileSync(bp, 'utf8'));
+    assertEqual(b.change.changeEpoch, 3, '18-4: 3 次 Write → changeEpoch=3');
+    assertEqual(b.change.touchedFiles.length, 3, '18-4: touchedFiles 应有 3 条');
+  } finally {
+    cleanupForgeTmpDir(tmpDir);
+  }
+});
+
+test('18-5: pipeline.js 读到 code_review=leased（未过期）→ 不重复注入（stdout 空）', () => {
+  const tmpDir = setupForgeTmpDir();
+  try {
+    const realRoot = getRealRoot(tmpDir);
+    const bp       = getBridgePathForDir(realRoot);
+    const future   = new Date(Date.now() + 10 * 60 * 1000).toISOString();  // 10分钟后
+    const bridge   = makeFullBridge({
+      project: { cwd: realRoot },
+      gates: {
+        tests:       { status: 'passed', epoch: 1 },
+        code_review: { status: 'leased', epoch: null, leaseUntil: future },
+      },
+    });
+    fs.mkdirSync(path.dirname(bp), { recursive: true });
+    fs.writeFileSync(bp, JSON.stringify(bridge));
+    const r = spawnHook('forge-quality-pipeline.js', { cwd: tmpDir });
+    assertEqual(r.exitCode, 0, '18-5: exitCode 应为 0');
+    assertEqual(r.stdout.trim(), '', '18-5: leased 未过期时不应再注入（stdout 应为空）');
+  } finally {
+    cleanupForgeTmpDir(tmpDir);
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 组 19: 边界与异常输入（5 个）
+// ─────────────────────────────────────────────────────────────────────────────
+console.log('\n【组 19】边界与异常输入');
+
+test('19-1: resolveSlug 超长路径（200 字符）→ slug ≤49 字符，无非法字符', () => {
+  const longPath = path.join(os.tmpdir(), 'a'.repeat(200));
+  const slug     = _shared.resolveSlug(longPath);
+  assert(slug.length <= 49, `19-1: slug 长度 ${slug.length} 超过 49`);
+  assert(/^[a-zA-Z0-9\u4e00-\u9fff\-]+$/.test(slug), `19-1: slug 含非法字符: ${slug}`);
+});
+
+test('19-2: sanitizeSessionId — 路径穿越/null bytes 拒绝，合法 ID 通过', () => {
+  assert(_shared.sanitizeSessionId('../../../etc/passwd') === null,
+         '19-2: 路径穿越 ID 应被拒绝');
+  assert(_shared.sanitizeSessionId('test\x00session') === null,
+         '19-2: 含 null byte 的 ID 应被拒绝');
+  assert(_shared.sanitizeSessionId('a'.repeat(65)) === null,
+         '19-2: 超过 64 字符的 ID 应被拒绝');
+  const valid = _shared.sanitizeSessionId('valid-session.123_abc');
+  assertEqual(valid, 'valid-session.123_abc', '19-2: 合法 ID 应原样返回');
+});
+
+test('19-3: state-sync 接收空 STATE.md → exitCode=0，不崩溃', () => {
+  const tmpDir = setupForgeTmpDir();
+  try {
+    const emptyMd = path.join(tmpDir, '.planning', 'STATE.md');
+    fs.writeFileSync(emptyMd, '');  // 覆盖为空
+    const r = spawnHook('forge-state-sync.js', {
+      cwd: tmpDir, tool_input: { file_path: emptyMd }, tool_response: {},
+    });
+    assertEqual(r.exitCode, 0, '19-3: 空 STATE.md 应优雅处理，exitCode=0');
+    assert(!r.stderr.includes('TypeError'), '19-3: 无 TypeError 崩溃');
+  } finally {
+    cleanupForgeTmpDir(tmpDir);
+  }
+});
+
+test('19-4: state-sync STATE.md frontmatter current_phase:NaN → state.json 无 NaN phase', () => {
+  const tmpDir = setupForgeTmpDir();
+  try {
+    const realRoot = getRealRoot(tmpDir);
+    const stateMd  = path.join(tmpDir, '.planning', 'STATE.md');
+    fs.writeFileSync(stateMd, '---\ncurrent_phase: NaN\ntotal_phases: 5\n---\n');
+    spawnHook('forge-state-sync.js', {
+      cwd: tmpDir, tool_input: { file_path: stateMd }, tool_response: {},
+    });
+    const slug  = getSlugForDir(realRoot);
+    const sp    = path.join(os.homedir(), '.forge', 'projects', slug, 'state.json');
+    if (fs.existsSync(sp)) {
+      const state = JSON.parse(fs.readFileSync(sp, 'utf8'));
+      const ph    = state.phase?.current;
+      assert(ph == null || !Number.isNaN(ph), '19-4: state.json phase.current 不应为 NaN');
+    }
+  } finally {
+    cleanupForgeTmpDir(tmpDir);
+  }
+});
+
+test('19-5: evaluateSecurityRisk 源码守卫：touchedFiles=[] 时有短路返回', () => {
+  const src = fs.readFileSync(path.join(HOOKS_DIR, 'forge-quality-pipeline.js'), 'utf8');
+  assert(
+    src.includes('touchedFiles.length === 0') || src.includes("touchedFiles || []).length === 0"),
+    '19-5: evaluateSecurityRisk 应有空数组短路返回守卫'
+  );
+  // pipeline 主流程也应有 touchedFiles.length > 0 条件
+  assert(src.includes('touchedFiles.length > 0'), '19-5: 主流程应先检查 touchedFiles 非空再调用 evaluateSecurityRisk');
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 组 20: 质量门 FSM 完整路径（4 个）
+// ─────────────────────────────────────────────────────────────────────────────
+console.log('\n【组 20】质量门 FSM 完整路径');
+
+test('20-1: nextGateToInject — tests=passed → 注入 code_review（非 Web，phase 1）', () => {
+  const tmpDir = setupForgeTmpDir();
+  try {
+    const realRoot = getRealRoot(tmpDir);
+    const bp       = getBridgePathForDir(realRoot);
+    const bridge   = makeFullBridge({
+      project: { cwd: realRoot, isWeb: false },
+      gates: { tests: { status: 'passed', epoch: 1 } },
+    });
+    fs.mkdirSync(path.dirname(bp), { recursive: true });
+    fs.writeFileSync(bp, JSON.stringify(bridge));
+    const r = spawnHook('forge-quality-pipeline.js', { cwd: tmpDir });
+    assert(r.stdout.includes('code_review') || r.stdout.includes('代码审查'),
+           '20-1: 应注入 code_review 门');
+    // 验证 bridge.json 中 code_review 已 leased
+    const b2 = JSON.parse(fs.readFileSync(bp, 'utf8'));
+    assertEqual(b2.gates.code_review.status, 'leased', '20-1: code_review 应变为 leased');
+  } finally {
+    cleanupForgeTmpDir(tmpDir);
+  }
+});
+
+test('20-2: nextGateToInject — code_review=passed + isWeb=true → 注入 qa 门', () => {
+  const tmpDir = setupForgeTmpDir();
+  try {
+    const realRoot = getRealRoot(tmpDir);
+    const bp       = getBridgePathForDir(realRoot);
+    const bridge   = makeFullBridge({
+      project: { cwd: realRoot, isWeb: true },
+      gates: {
+        tests:       { status: 'passed', epoch: 1 },
+        code_review: { status: 'passed', epoch: 1 },
+        qa:          { status: 'idle',   epoch: null, leaseUntil: null },
+      },
+    });
+    fs.mkdirSync(path.dirname(bp), { recursive: true });
+    fs.writeFileSync(bp, JSON.stringify(bridge));
+    const r = spawnHook('forge-quality-pipeline.js', { cwd: tmpDir });
+    assert(r.stdout.includes('qa') || r.stdout.includes('QA') || r.stdout.includes('浏览器'),
+           '20-2: Web 项目应注入 qa 门');
+  } finally {
+    cleanupForgeTmpDir(tmpDir);
+  }
+});
+
+test('20-3: nextGateToInject — 所有核心门 passed + isLastPhase → 注入 ship 门', () => {
+  const tmpDir = setupForgeTmpDir();
+  try {
+    const realRoot = getRealRoot(tmpDir);
+    const bp       = getBridgePathForDir(realRoot);
+    const bridge   = makeFullBridge({
+      project: { cwd: realRoot, isWeb: false },
+      phase:   { current: 3, total: 3, phaseEpoch: 1 },
+      gates: {
+        tests:       { status: 'passed', epoch: 1 },
+        code_review: { status: 'passed', epoch: 1 },
+      },
+    });
+    fs.mkdirSync(path.dirname(bp), { recursive: true });
+    fs.writeFileSync(bp, JSON.stringify(bridge));
+    const r = spawnHook('forge-quality-pipeline.js', { cwd: tmpDir });
+    assert(r.stdout.includes('ship') || r.stdout.includes('PR') || r.stdout.includes('部署'),
+           '20-3: 最后阶段全部通过应注入 ship 门');
+  } finally {
+    cleanupForgeTmpDir(tmpDir);
+  }
+});
+
+test('20-4: nextGateToInject — leased 门已过期 → 重新注入（lease TTL 失效）', () => {
+  const tmpDir = setupForgeTmpDir();
+  try {
+    const realRoot = getRealRoot(tmpDir);
+    const bp       = getBridgePathForDir(realRoot);
+    const pastTime = new Date(Date.now() - 100).toISOString();  // 100ms 前（已过期）
+    const bridge   = makeFullBridge({
+      project: { cwd: realRoot },
+      gates: {
+        tests:       { status: 'passed', epoch: 1 },
+        code_review: { status: 'leased', epoch: null, leaseUntil: pastTime },
+      },
+    });
+    fs.mkdirSync(path.dirname(bp), { recursive: true });
+    fs.writeFileSync(bp, JSON.stringify(bridge));
+    const r = spawnHook('forge-quality-pipeline.js', { cwd: tmpDir });
+    assertEqual(r.exitCode, 0, '20-4: exitCode 应为 0');
+    assert(r.stdout.includes('hookSpecificOutput'), '20-4: 过期 lease 应被重新注入');
+    const b2 = JSON.parse(fs.readFileSync(bp, 'utf8'));
+    assertEqual(b2.gates.code_review.status, 'leased', '20-4: code_review 应重新 leased');
+    assert(new Date(b2.gates.code_review.leaseUntil) > new Date(), '20-4: 新 leaseUntil 应在未来');
+  } finally {
+    cleanupForgeTmpDir(tmpDir);
+  }
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
