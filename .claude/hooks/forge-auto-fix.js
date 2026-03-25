@@ -18,9 +18,10 @@ const shared = require('./forge-shared');
 
 // ─── 命令分类 ─────────────────────────────────────────────────────────────────
 
-const TEST_PATTERN  = /\b(npm test|npm run test|jest|vitest|pytest|py\.test|go test|cargo test|yarn test|bun test)\b/;
-const BUILD_PATTERN = /\b(npm run build|tsc|tsc --noEmit|yarn build|bun run build|next build|vite build)\b/;
-const LINT_PATTERN  = /\b(npm run lint|eslint|tslint|pylint|flake8|ruff)\b/;
+// OPT-10: 补充 pnpm/cargo-nextest 模式
+const TEST_PATTERN  = /\b(npm test|npm run test|pnpm test|pnpm run test|jest|vitest|pytest|py\.test|go test|cargo test|cargo nextest|yarn test|bun test)\b/;
+const BUILD_PATTERN = /\b(npm run build|pnpm build|pnpm run build|tsc|tsc --noEmit|yarn build|bun run build|next build|vite build)\b/;
+const LINT_PATTERN  = /\b(npm run lint|pnpm lint|eslint|tslint|pylint|flake8|ruff)\b/;
 
 function classifyCommand(cmd) {
   if (TEST_PATTERN.test(cmd))  return 'test';
@@ -58,16 +59,6 @@ function hashError(stderr) {
   return crypto.createHash('sha256').update(stderr.slice(0, 500)).digest('hex').slice(0, 16);
 }
 
-// ─── Forge 项目检测 ────────────────────────────────────────────────────────────
-
-function isForgeProject(cwd) {
-  // F17: 先解析到 repo root，防止 worktree/子目录 miss .planning/
-  const root = shared.resolveProjectRoot(cwd);
-  if (fs.existsSync(path.join(root, '.planning', 'STATE.md'))) return true;
-  const slug = shared.resolveSlug(cwd);
-  return fs.existsSync(path.join(os.homedir(), '.forge', 'projects', slug, 'state.json'));
-}
-
 // ─── 主流程 ───────────────────────────────────────────────────────────────────
 
 let input = '';
@@ -89,9 +80,10 @@ process.stdin.on('end', async () => {
     const cmd  = (data.tool_input || {}).command || '';
     const type = classifyCommand(cmd);
 
-    // 只处理已知命令类型（test/build/lint），通用 other 仅限 Forge 项目
-    if (type === 'other' && !isForgeProject(cwd)) process.exit(0);
-    if (!isForgeProject(cwd)) process.exit(0);
+    // OPT-2+3: 改用 shared.isForgeProject，缓存结果避免双重调用
+    const isForge = shared.isForgeProject(cwd);
+    if (type === 'other' && !isForge) process.exit(0);
+    if (!isForge) process.exit(0);
 
     const stderr  = toolResp?.stderr || toolResp?.output || '';
     const snippet = stderr.slice(-600).trim() || `（命令：${cmd.slice(0, 80)}，退出码：${exitCode}）`;

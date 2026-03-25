@@ -179,8 +179,10 @@ process.stdin.on('end', async () => {
     if (!filePath) process.exit(0);
 
     // P3#18：使用 path.relative 做路径判断，替代字符串 includes
-    const cwd = data.cwd || findProjectRoot(filePath);
-    const rel = path.relative(cwd, filePath);
+    // OPT-9: 用 resolveProjectRoot 归一化 cwd，防止子目录 session 导致 path.relative 返回 ../. 前缀
+    const rawCwd = data.cwd || findProjectRoot(filePath);
+    const cwd    = shared.resolveProjectRoot(rawCwd);
+    const rel    = path.relative(cwd, filePath);
 
     // 检查是否是目标文件（path.relative 确保路径语义正确）
     const isStateMd     = rel === path.join('.planning', 'STATE.md');

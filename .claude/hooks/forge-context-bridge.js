@@ -36,16 +36,6 @@ function loadForgeConfig() {
 const { WARNING_THRESHOLD, CRITICAL_THRESHOLD, DEBOUNCE_CALLS } = loadForgeConfig();
 const STALE_SECONDS = 60;
 
-// ─── Forge 项目检测（P3#16：非 Forge 项目提前退出）────────────────────────────
-
-function isForgeProject(cwd) {
-  // F17: 先解析到 repo root，防止 worktree/子目录 miss .planning/
-  const root = shared.resolveProjectRoot(cwd);
-  if (fs.existsSync(path.join(root, '.planning', 'STATE.md'))) return true;
-  const slug = shared.resolveSlug(cwd);  // resolveSlug 内部已调用 resolveProjectRoot
-  return fs.existsSync(path.join(os.homedir(), '.forge', 'projects', slug, 'state.json'));
-}
-
 // ─── Bridge 默认结构（v2.0 新 schema）────────────────────────────────────────
 
 function emptyGate() {
@@ -139,8 +129,8 @@ function markGatePassed(draft, name) {
   draft.gates[name].leaseUntil = null;
 }
 
-// 测试命令匹配
-const TEST_CMD = /\b(npm test|npm run test|jest|vitest|pytest|py\.test|go test|cargo test|yarn test|bun test)\b/;
+// 测试命令匹配（OPT-10：补充 pnpm/cargo-nextest 模式）
+const TEST_CMD = /\b(npm test|npm run test|pnpm test|pnpm run test|jest|vitest|pytest|py\.test|go test|cargo test|cargo nextest|yarn test|bun test)\b/;
 
 // ─── 事件归约（inferAndUpdate）────────────────────────────────────────────────
 
@@ -190,8 +180,9 @@ function inferAndUpdate(draft, toolName, toolInput, toolResponse) {
     if (skill === 'gsd:plan-phase') {
       // P2#10：只在阶段号真正变化时重置（phaseEpoch 驱动）
       const args     = String(toolInput?.args || '');
-      const phaseNum = parseFloat(args) || null;  // parseFloat 支持 5.1 等小数阶段
-      if (phaseNum && phaseNum !== draft.phase.current) {
+      const _parsed  = parseFloat(args);
+      const phaseNum = Number.isNaN(_parsed) ? null : _parsed;  // OPT-11：phase=0 不再被 || null 截断
+      if (phaseNum != null && phaseNum !== draft.phase.current) {
         draft.phase.current = phaseNum;
         draft.phase.phaseEpoch++;
         resetAllGates(draft);
@@ -232,17 +223,19 @@ function inferAndUpdate(draft, toolName, toolInput, toolResponse) {
     if (!isError && st === 'gsd-verifier')               markGatePassed(draft, 'tests');
   }
 
-  // 同步 phase/isWeb（从 forge state.json 保持一致）
-  try {
-    const { data, corrupt } = shared.safeReadJson(
-      path.join(os.homedir(), '.forge', 'projects', draft.project.slug, 'state.json'), null
-    );
-    if (data && !corrupt) {  // F08：使用 safeReadJson 返回的 corrupt 标志
-      if (data.phase?.current != null) draft.phase.current = data.phase.current;  // F14：!= null 允许 phase 0
-      if (data.phase?.total)   draft.phase.total   = data.phase.total;
-      if (data.flow_type)      draft.project.flowType = data.flow_type;
-    }
-  } catch (_) {}
+  // 同步 phase/isWeb（OPT-4：只在 Skill/Write/Edit/MultiEdit 时读，减少~60% I/O）
+  if (toolName === 'Skill' || toolName === 'Write' || toolName === 'Edit' || toolName === 'MultiEdit') {
+    try {
+      const { data, corrupt } = shared.safeReadJson(
+        path.join(os.homedir(), '.forge', 'projects', draft.project.slug, 'state.json'), null
+      );
+      if (data && !corrupt) {  // F08：使用 safeReadJson 返回的 corrupt 标志
+        if (data.phase?.current != null) draft.phase.current = data.phase.current;  // F14：!= null 允许 phase 0
+        if (data.phase?.total)   draft.phase.total   = data.phase.total;
+        if (data.flow_type)      draft.project.flowType = data.flow_type;
+      }
+    } catch (_) {}
+  }
 
   draft.audit.updatedAt = new Date().toISOString();
 }
@@ -382,8 +375,8 @@ process.stdin.on('end', async () => {
     const toolInput    = data.tool_input || {};
     const toolResponse = data.tool_response || data.tool_result || {};
 
-    // P3#16：非 Forge 项目提前退出，不写任何文件
-    if (!isForgeProject(cwd)) process.exit(0);
+    // P3#16：非 Forge 项目提前退出，不写任何文件（OPT-2：改用 shared.isForgeProject）
+    if (!shared.isForgeProject(cwd)) process.exit(0);
 
     const slug = shared.resolveSlug(cwd);
 

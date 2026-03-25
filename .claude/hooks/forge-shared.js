@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// forge-shared.js - v1.1.0
+// forge-shared.js - v1.2.0
 // 所有 Forge hooks 的共享存储层
 //
 // 修复：
@@ -81,6 +81,14 @@ function resolveSlug(cwd) {
 
   // 3. 新项目：F18 fix — 使用 hashed slug 保证全局唯一，消除初始化竞态碰撞
   return hashedSlug;
+}
+
+// OPT-2: Forge 项目检测（从 bridge/pipeline/auto-fix 提取，消除3处重复定义）
+function isForgeProject(cwd) {
+  const root = resolveProjectRoot(cwd);
+  if (fs.existsSync(path.join(root, '.planning', 'STATE.md'))) return true;
+  const slug = resolveSlug(cwd);
+  return fs.existsSync(path.join(os.homedir(), '.forge', 'projects', slug, 'state.json'));
 }
 
 // bridge 路径：从 /tmp 迁移到 ~/.forge/runtime/bridges/（P1#7：消除 /tmp 预测风险）
@@ -319,6 +327,7 @@ async function appendJsonlQueue(queuePath, job) {
 exports.slugify             = slugify;
 exports.resolveProjectRoot  = resolveProjectRoot;  // F17: 新增导出
 exports.resolveSlug         = resolveSlug;
+exports.isForgeProject      = isForgeProject;      // OPT-2: 从3个hook提取
 exports.getBridgePath       = getBridgePath;
 exports.getTmpDir         = getTmpDir;
 exports.sanitizeSessionId = sanitizeSessionId;

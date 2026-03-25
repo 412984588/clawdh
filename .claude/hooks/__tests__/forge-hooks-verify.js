@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// forge-hooks-verify.js — Forge v2.0 hooks 验证脚本（35 场景）
+// forge-hooks-verify.js — Forge v2.0 hooks 验证脚本（55 场景）
 // 纯 Node.js，无外部依赖
 // 运行：node forge-hooks-verify.js
 
@@ -582,6 +582,297 @@ test('6-4 events.jsonl 轮转 + worker spawn 限制（F20）', () => {
   const returnIdx    = bridgeSrc.indexOf('return;', lockCheckIdx);
   assert(returnIdx > lockCheckIdx && returnIdx - lockCheckIdx < 150,
     'F20：检测到 worker.lock 后应立即 return 跳过 spawn');
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 组 7：OPT 回归验证（6 个场景）
+// ─────────────────────────────────────────────────────────────────────────────
+console.log('\n【组 7】OPT 回归验证');
+
+test('7-1 forge-context-save.js 已删除（OPT-1）', () => {
+  assert(!fs.existsSync(path.join(HOOKS_DIR, 'forge-context-save.js')),
+    'forge-context-save.js 不应存在（死代码，OPT-1 已删除）');
+});
+
+test('7-2 shared.isForgeProject 已导出可调用（OPT-2）', () => {
+  const shared = require(path.join(HOOKS_DIR, 'forge-shared.js'));
+  assert(typeof shared.isForgeProject === 'function',
+    'shared.isForgeProject 应为可调用函数');
+  const tmpDir = mkTmpDir();
+  const result = shared.isForgeProject(tmpDir);
+  assertEqual(result, false, '非 Forge 目录 isForgeProject 应返回 false');
+  fs.rmSync(tmpDir, { recursive: true });
+});
+
+test('7-3 三文件无本地 isForgeProject 定义（OPT-2）', () => {
+  const files = ['forge-context-bridge.js', 'forge-quality-pipeline.js', 'forge-auto-fix.js'];
+  for (const f of files) {
+    const src = fs.readFileSync(path.join(HOOKS_DIR, f), 'utf8');
+    assert(!src.match(/^function isForgeProject/m) && !src.match(/^const isForgeProject/m),
+      `${f} 不应含本地 isForgeProject 定义`);
+  }
+});
+
+test('7-4 auto-fix.js 中 isForgeProject 仅被调用一次（OPT-3）', () => {
+  const src = fs.readFileSync(path.join(HOOKS_DIR, 'forge-auto-fix.js'), 'utf8');
+  // 只统计非注释行中的调用次数
+  const codeLines = src.split('\n').filter(l => !l.trimStart().startsWith('//'));
+  const calls = (codeLines.join('\n').match(/isForgeProject\s*\(/g) || []).length;
+  assertEqual(calls, 1, `auto-fix.js 非注释行中 isForgeProject( 应出现 1 次，得到 ${calls} 次`);
+});
+
+test('7-5 SECURITY_PATTERN 不含高误报词（OPT-5）', () => {
+  const src = fs.readFileSync(path.join(HOOKS_DIR, 'forge-quality-pipeline.js'), 'utf8');
+  const m = src.match(/const SECURITY_PATTERN\s*=\s*(\/[^\n]+\/\w*)/);
+  assert(m, 'SECURITY_PATTERN 应存在');
+  const patStr = m[1];
+  assert(!patStr.includes('hash'), `SECURITY_PATTERN 不应含 hash，实际：${patStr}`);
+  assert(!patStr.includes('migration'), `SECURITY_PATTERN 不应含 migration`);
+  assert(!patStr.includes('database'), `SECURITY_PATTERN 不应含 database`);
+  assert(patStr.includes('auth'), 'SECURITY_PATTERN 仍应含 auth');
+  assert(patStr.includes('hmac'), 'SECURITY_PATTERN 应含 hmac（OPT-5 新增）');
+});
+
+test('7-6 bridge.js inferAndUpdate 含 toolName 条件守卫（OPT-4）', () => {
+  const src = fs.readFileSync(path.join(HOOKS_DIR, 'forge-context-bridge.js'), 'utf8');
+  assert(
+    src.includes("toolName === 'Skill'") || src.includes('toolName === "Skill"'),
+    'inferAndUpdate 应在 toolName === Skill 时才读 state.json（OPT-4）'
+  );
+  assert(src.includes("'Write'") || src.includes('"Write"'), 'toolName 守卫应含 Write');
+  assert(src.includes("'Edit'") || src.includes('"Edit"'), 'toolName 守卫应含 Edit');
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 组 8：forge-state-sync.js 功能测试（4 个场景）
+// ─────────────────────────────────────────────────────────────────────────────
+console.log('\n【组 8】forge-state-sync.js 功能测试');
+
+test('8-1 parseStateMd：YAML frontmatter 正确提取关键字段', () => {
+  const src = fs.readFileSync(path.join(HOOKS_DIR, 'forge-state-sync.js'), 'utf8');
+  assert(src.includes('parseYamlFrontmatter'), 'forge-state-sync.js 应含 parseYamlFrontmatter 函数');
+  assert(src.includes('completed_phases'), 'parseStateMd 应处理 completed_phases 字段');
+  assert(src.includes('total_phases'), 'parseStateMd 应处理 total_phases 字段');
+  assert(src.includes('flow_type'), 'parseStateMd 应处理 flow_type 字段');
+  assert(src.includes('\\bcompleted\\b'), 'parseStateMd 应用单词边界匹配 completed，防止 incomplete 误判');
+});
+
+test('8-2 parseStateMd：prose fallback 能从正文提取 phase', () => {
+  const src = fs.readFileSync(path.join(HOOKS_DIR, 'forge-state-sync.js'), 'utf8');
+  assert(src.includes('Phase[:\\s]'), 'parseStateMd prose fallback 应含 Phase 匹配');
+  assert(src.includes('阶段[：:\\s]'), 'parseStateMd prose fallback 应支持中文"阶段"');
+  assert(src.includes('Number('), 'parseStateMd 应用 Number() 确保 phase 为数字（F14 小数兼容）');
+});
+
+test('8-3 applyParsed：MANAGED_FIELDS 清理旧字段逻辑存在（F16）', () => {
+  const src = fs.readFileSync(path.join(HOOKS_DIR, 'forge-state-sync.js'), 'utf8');
+  assert(src.includes('MANAGED_FIELDS'), 'applyParsed 应定义 MANAGED_FIELDS 数组');
+  assert(src.includes('gsd_status'), 'MANAGED_FIELDS 应含 gsd_status');
+  assert(src.includes('next_action'), 'MANAGED_FIELDS 应含 next_action');
+  assert(
+    src.includes('delete state[key]') || src.includes('delete state['),
+    'applyParsed 应删除不再出现的托管字段'
+  );
+});
+
+test('8-4 parseProgressTxt：提取最新 session 和 next_action', () => {
+  const src = fs.readFileSync(path.join(HOOKS_DIR, 'forge-state-sync.js'), 'utf8');
+  assert(src.includes('parseProgressTxt'), 'forge-state-sync.js 应含 parseProgressTxt 函数');
+  assert(src.includes('lines.length - 1'), 'parseProgressTxt 应从末尾向前搜索最新 session');
+  assert(src.includes('last_session'), 'parseProgressTxt 应更新 last_session');
+  assert(src.includes('next_action'), 'parseProgressTxt 应尝试提取 next_action');
+  assert(
+    src.includes('下一步') && (src.includes('next') || src.includes('TODO')),
+    'parseProgressTxt 应识别"下一步/next/TODO"等关键词'
+  );
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 组 9：真实 stdin pipe 调用（4 个场景）
+// ─────────────────────────────────────────────────────────────────────────────
+console.log('\n【组 9】真实 stdin pipe 调用');
+
+await testAsync('9-1 bridge.js：非 Forge 项目 → exitCode=0，stdout 空', async () => {
+  const { spawnSync } = require('child_process');
+  const tmpDir = mkTmpDir();
+  const payload = {
+    cwd: tmpDir,
+    tool_name: 'Bash',
+    tool_input: { command: 'echo hello' },
+    tool_response: { exit_code: 0, stdout: 'hello', stderr: '' },
+  };
+  const result = spawnSync(process.execPath, [path.join(HOOKS_DIR, 'forge-context-bridge.js')], {
+    input: JSON.stringify(payload),
+    encoding: 'utf8',
+    timeout: 8000,
+  });
+  assertEqual(result.status, 0, `exitCode 应为 0，得到 ${result.status}；stderr: ${(result.stderr||'').slice(0,100)}`);
+  assertEqual((result.stdout || '').trim(), '', `非 Forge 项目 stdout 应为空，得到：${result.stdout}`);
+  fs.rmSync(tmpDir, { recursive: true });
+});
+
+await testAsync('9-2 pipeline.js：无有效 bridge 文件 → exitCode=0，stdout 空', async () => {
+  const { spawnSync } = require('child_process');
+  const tmpDir = mkTmpDir();
+  // 创建 Forge 项目标志（isForgeProject 返回 true）
+  fs.mkdirSync(path.join(tmpDir, '.planning'), { recursive: true });
+  fs.writeFileSync(path.join(tmpDir, '.planning', 'STATE.md'), '# State\n');
+  const payload = {
+    cwd: tmpDir,
+    tool_name: 'Skill',
+    tool_input: { skill: 'review' },
+    tool_response: {},
+  };
+  const result = spawnSync(process.execPath, [path.join(HOOKS_DIR, 'forge-quality-pipeline.js')], {
+    input: JSON.stringify(payload),
+    encoding: 'utf8',
+    timeout: 8000,
+  });
+  assertEqual(result.status, 0, `exitCode 应为 0，得到 ${result.status}；stderr: ${(result.stderr||'').slice(0,100)}`);
+  assertEqual((result.stdout || '').trim(), '', `无 bridge 时 stdout 应为空，得到：${result.stdout}`);
+  fs.rmSync(tmpDir, { recursive: true });
+});
+
+await testAsync('9-3 auto-fix.js：exit_code=0 → 不触发修复', async () => {
+  const { spawnSync } = require('child_process');
+  const tmpDir = mkTmpDir();
+  const payload = {
+    cwd: tmpDir,
+    tool_name: 'Bash',
+    tool_input: { command: 'npm test' },
+    tool_response: { exit_code: 0, stdout: 'PASS', stderr: '' },
+  };
+  const result = spawnSync(process.execPath, [path.join(HOOKS_DIR, 'forge-auto-fix.js')], {
+    input: JSON.stringify(payload),
+    encoding: 'utf8',
+    timeout: 8000,
+  });
+  assertEqual(result.status, 0, `exitCode 应为 0，得到 ${result.status}`);
+  assertEqual((result.stdout || '').trim(), '', `exit_code=0 时 stdout 应为空，得到：${result.stdout}`);
+  fs.rmSync(tmpDir, { recursive: true });
+});
+
+await testAsync('9-4 auto-fix.js：截断 JSON 输入 → exitCode=0（graceful）', async () => {
+  const { spawnSync } = require('child_process');
+  const result = spawnSync(process.execPath, [path.join(HOOKS_DIR, 'forge-auto-fix.js')], {
+    input: '{"cwd":"/tmp","tool_name":"Bash","tool_input":{',  // 截断 JSON
+    encoding: 'utf8',
+    timeout: 8000,
+  });
+  assertEqual(result.status, 0, `截断 JSON 时 exitCode 应为 0（graceful），得到 ${result.status}`);
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 组 10：并发与边界（4 个场景）
+// ─────────────────────────────────────────────────────────────────────────────
+console.log('\n【组 10】并发与边界');
+
+await testAsync('10-1 3 个并行 mutateBridge 不丢失更新（并发安全）', async () => {
+  const shared = require(path.join(HOOKS_DIR, 'forge-shared.js'));
+  const tmpDir = mkTmpDir();
+  await Promise.all([
+    shared.mutateBridge(tmpDir, (d) => { d.count = (d.count || 0) + 1; }),
+    shared.mutateBridge(tmpDir, (d) => { d.count = (d.count || 0) + 1; }),
+    shared.mutateBridge(tmpDir, (d) => { d.count = (d.count || 0) + 1; }),
+  ]);
+  const bp = shared.getBridgePath(tmpDir);
+  const { data } = shared.safeReadJson(bp, {});
+  assertEqual(data?.count, 3, `3 次并行 mutateBridge 后 count 应为 3，得到 ${data?.count}`);
+  try { fs.rmSync(path.dirname(bp), { recursive: true }); } catch (_) {}
+  fs.rmSync(tmpDir, { recursive: true });
+});
+
+await testAsync('10-2 5 个并行 appendJsonlQueue 无丢失（原子追加）', async () => {
+  const shared = require(path.join(HOOKS_DIR, 'forge-shared.js'));
+  const tmpDir = mkTmpDir();
+  const queuePath = path.join(tmpDir, 'queue.jsonl');
+  await Promise.all([1, 2, 3, 4, 5].map(i => shared.appendJsonlQueue(queuePath, { idx: i })));
+  const lines = fs.readFileSync(queuePath, 'utf8').trim().split('\n').filter(Boolean);
+  assertEqual(lines.length, 5, `5 次并行追加后应有 5 行，得到 ${lines.length} 行`);
+  for (const line of lines) {
+    const obj = JSON.parse(line);
+    assert(obj.idx >= 1 && obj.idx <= 5, `条目 idx 超出范围：${obj.idx}`);
+  }
+  fs.rmSync(tmpDir, { recursive: true });
+});
+
+test('10-3 writeJsonAtomic 自动创建多层目录', () => {
+  const shared = require(path.join(HOOKS_DIR, 'forge-shared.js'));
+  const tmpDir = mkTmpDir();
+  const deepPath = path.join(tmpDir, 'a', 'b', 'c', 'data.json');
+  shared.writeJsonAtomic(deepPath, { hello: 'world' });
+  assert(fs.existsSync(deepPath), 'writeJsonAtomic 应自动创建多层目录');
+  const content = JSON.parse(fs.readFileSync(deepPath, 'utf8'));
+  assertEqual(content.hello, 'world', '写入内容应可读回');
+  fs.rmSync(tmpDir, { recursive: true });
+});
+
+test('10-4 resolveSlug 同名不同路径 → 不同 slug（碰撞安全）', () => {
+  const shared = require(path.join(HOOKS_DIR, 'forge-shared.js'));
+  const tmpDir = mkTmpDir();
+  const dir1 = path.join(tmpDir, 'myproject');
+  const dir2 = path.join(tmpDir, 'sub', 'myproject');
+  fs.mkdirSync(dir1, { recursive: true });
+  fs.mkdirSync(dir2, { recursive: true });
+  const slug1 = shared.resolveSlug(dir1);
+  const slug2 = shared.resolveSlug(dir2);
+  assert(slug1 !== slug2, `同名不同路径应产生不同 slug，但两者均为：${slug1}`);
+  assert(slug1.includes('myproject'), `slug1 应含 myproject，得到：${slug1}`);
+  assert(slug2.includes('myproject'), `slug2 应含 myproject，得到：${slug2}`);
+  fs.rmSync(tmpDir, { recursive: true });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 组 11：安全边界（2 个场景）
+// ─────────────────────────────────────────────────────────────────────────────
+console.log('\n【组 11】安全边界');
+
+test('11-1 SECURITY_PATTERN 命中安全词、不误报前端常见词', () => {
+  const src = fs.readFileSync(path.join(HOOKS_DIR, 'forge-quality-pipeline.js'), 'utf8');
+  const m = src.match(/const SECURITY_PATTERN\s*=\s*(\/[^\n]+\/\w*)/);
+  assert(m, 'SECURITY_PATTERN 应存在');
+  // eslint-disable-next-line no-eval
+  const SECURITY_PATTERN = eval(m[1]);  // 安全：仅用于测试自己代码中的 RegExp 字面量
+  // 应命中（关键词后跟非单词字符，\b 边界可匹配）
+  assert(SECURITY_PATTERN.test('auth.ts'),             'auth 应命中');
+  assert(SECURITY_PATTERN.test('jwt-helper.ts'),       'jwt 应命中');
+  assert(SECURITY_PATTERN.test('password.ts'),         'password 应命中');
+  assert(SECURITY_PATTERN.test('sql-query.ts'),        'sql 应命中');
+  assert(SECURITY_PATTERN.test('apikey.ts'),           'apikey 应命中');
+  // 不应命中（OPT-5 移除的高误报词）
+  assert(!SECURITY_PATTERN.test('hashRouter.ts'),      'hash（URL/CSS hash）不应命中');
+  assert(!SECURITY_PATTERN.test('migrationRunner.ts'), 'migration 不应命中');
+  assert(!SECURITY_PATTERN.test('databaseConfig.ts'),  'database 不应命中');
+  assert(!SECURITY_PATTERN.test('stylesheet.css'),     '普通 CSS 文件不应命中');
+});
+
+test('11-2 sanitizeSessionId 全面防护路径穿越与注入', () => {
+  const shared = require(path.join(HOOKS_DIR, 'forge-shared.js'));
+  // 合法 ID 通过
+  const valid = [
+    'conv-1234567890-abc',
+    'session.abc123',
+    'abc_XYZ-123',
+    'a',
+    'a'.repeat(64),   // 最大长度
+  ];
+  for (const id of valid) {
+    assertEqual(shared.sanitizeSessionId(id), id, `合法 ID 应通过：${id}`);
+  }
+  // 非法 ID 全部拒绝
+  const invalid = [
+    '../../../etc/passwd',
+    'foo/bar',
+    'foo bar',
+    '',
+    null,
+    'a'.repeat(65),   // 超过最大长度
+    '../../secret',
+    'id\x00null',     // null 字节
+  ];
+  for (const id of invalid) {
+    assert(!shared.sanitizeSessionId(id), `非法 ID 应返回 null/falsy：${JSON.stringify(id)}`);
+  }
 });
 
 // ─────────────────────────────────────────────────────────────────────────────

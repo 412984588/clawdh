@@ -9,9 +9,11 @@
 
 'use strict';
 
-const fs = require('fs');
+const fs   = require('fs');
 const path = require('path');
-const os = require('os');
+const os   = require('os');
+
+const shared = require('./forge-shared');  // OPT-7: 用 safeReadJson 替代裸 JSON.parse
 
 // 消耗 stdin（SessionStart hook 要求）
 process.stdin.resume();
@@ -47,12 +49,9 @@ function main() {
     const stateFile = path.join(forgeDir, slug, 'state.json');
     if (!fs.existsSync(stateFile)) continue;
 
-    let state;
-    try {
-      state = JSON.parse(fs.readFileSync(stateFile, 'utf8'));
-    } catch (e) {
-      continue;
-    }
+    // OPT-7: 改用 safeReadJson，损坏 state.json 记录到 errors.jsonl 并跳过
+    const { data: state, corrupt } = shared.safeReadJson(stateFile, null);
+    if (!state || corrupt) continue;
 
     const status = state.status || 'active';
 
@@ -182,6 +181,23 @@ function budgetedCleanup() {
           fs.unlinkSync(path.join(tmpDir, f));
         }
       } catch (_) {}
+    }
+  } catch (_) {}
+
+  if (Date.now() - start > MAX_MS) return;
+
+  // OPT-8: 清理孤儿 bridge 目录（无 bridge.json 的空目录）
+  try {
+    const bridgesDir = path.join(os.homedir(), '.forge', 'runtime', 'bridges');
+    if (fs.existsSync(bridgesDir)) {
+      const dirs = fs.readdirSync(bridgesDir);
+      for (const d of dirs) {
+        if (Date.now() - start > MAX_MS) return;
+        const bridgeFile = path.join(bridgesDir, d, 'bridge.json');
+        if (!fs.existsSync(bridgeFile)) {
+          try { fs.rmSync(path.join(bridgesDir, d), { recursive: true }); } catch (_) {}
+        }
+      }
     }
   } catch (_) {}
 

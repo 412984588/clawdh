@@ -26,11 +26,17 @@ const PREAMBLE_SKIP = `（gstack 执行说明：读取 SKILL.md 后从 "## Step 
 
 // ─── 安全检测（P2#9：改用 git diff 而非 output_tail）─────────────────────────
 
-const SECURITY_PATTERN = /\b(auth|token|password|secret|session|cookie|jwt|sql|database|migration|encrypt|hash|bcrypt|argon|oauth|permission|rbac)\b/i;
+// OPT-5: 移除 hash/migration/database（高频前端词，导致安全门误触发）
+// 保留真正的加密/认证关键词；hmac/keyring/presign/apikey 为 Codex 新发现的漏报词
+const SECURITY_PATTERN = /\b(auth|token|password|secret|session|cookie|jwt|sql|encrypt|bcrypt|argon|oauth|permission|rbac|hmac|apikey|api_key|keyring|presign)\b/i;
 
-function evaluateSecurityRisk(cwd, touchedFiles) {
+function evaluateSecurityRisk(cwd, touchedFiles, cachedEpoch, changeEpoch) {
   if (!touchedFiles || touchedFiles.length === 0) {
-    return { required: false, reasons: [], files: [] };
+    return { required: false, reasons: [], files: [], evaluatedAtEpoch: changeEpoch };
+  }
+  // OPT-6: epoch 缓存 — 同一 changeEpoch 不重复 git diff spawn
+  if (cachedEpoch != null && cachedEpoch === changeEpoch) {
+    return null;  // 返回 null 表示使用已有缓存结果
   }
   try {
     const diff = execFileSync(
@@ -44,21 +50,12 @@ function evaluateSecurityRisk(cwd, touchedFiles) {
       required: pathHit || diffHit,
       reasons:  [pathHit && 'path', diffHit && 'diff'].filter(Boolean),
       files:    touchedFiles,
+      evaluatedAtEpoch: changeEpoch,
     };
   } catch (_) {
     // F10 fix：git 失败时无法判断风险，保守策略触发安全门而非静默放行
-    return { required: true, reasons: ['git_error'], files: touchedFiles.slice(0, 20) };
+    return { required: true, reasons: ['git_error'], files: touchedFiles.slice(0, 20), evaluatedAtEpoch: changeEpoch };
   }
-}
-
-// ─── Forge 项目检测（P3#16）──────────────────────────────────────────────────
-
-function isForgeProject(cwd) {
-  // F17: 先解析到 repo root，防止 worktree/子目录 miss .planning/
-  const root = shared.resolveProjectRoot(cwd);
-  if (fs.existsSync(path.join(root, '.planning', 'STATE.md'))) return true;
-  const slug = shared.resolveSlug(cwd);
-  return fs.existsSync(path.join(os.homedir(), '.forge', 'projects', slug, 'state.json'));
 }
 
 // ─── 辅助判断 ─────────────────────────────────────────────────────────────────
@@ -157,8 +154,8 @@ process.stdin.on('end', async () => {
     const data = JSON.parse(input);
     const cwd  = data.cwd || process.cwd();
 
-    // P3#16：只在 Forge 项目中运行
-    if (!isForgeProject(cwd)) process.exit(0);
+    // P3#16：只在 Forge 项目中运行（OPT-2：改用 shared.isForgeProject）
+    if (!shared.isForgeProject(cwd)) process.exit(0);
 
     // 读 bridge 快照（只读，用于获取 touchedFiles 进行锁外安全风险预评估）
     const { data: bridge, corrupt } = shared.readBridgeSnapshot(cwd);
@@ -168,11 +165,14 @@ process.stdin.on('end', async () => {
     if (bridge._schema_version !== 2) process.exit(0);
 
     // 在锁外预评估安全风险（execFileSync 无法在同步 mutator 内运行）
+    // OPT-6: 传入已缓存 epoch，相同 changeEpoch 则跳过 git diff
     const touchedFiles = bridge.change?.touchedFiles || [];
+    const cachedEpoch  = bridge.change?.securityRisk?.evaluatedAtEpoch ?? null;
+    const changeEpoch  = bridge.change?.changeEpoch ?? 0;
     let externalRisk = null;
     if (touchedFiles.length > 0) {
-      const risk = evaluateSecurityRisk(cwd, touchedFiles);
-      if (risk.required) externalRisk = risk;
+      const risk = evaluateSecurityRisk(cwd, touchedFiles, cachedEpoch, changeEpoch);
+      if (risk !== null && risk.required) externalRisk = risk;
     }
 
     // F13 fix：安全风险更新 + 门决策 + lease 写入合并到一次 mutateBridge（消除 TOCTOU 竞态）
