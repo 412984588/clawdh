@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// forge-session-start.js - v2.1.0
+// forge-session-start.js - v2.2.0
 // SessionStart hook: 检测进行中的 Forge 项目 + 孤儿候选标记 + 限时清理
 //
 // 修复（相比 v1.x）：
@@ -14,6 +14,9 @@ const path = require('path');
 const os   = require('os');
 
 const shared = require('./forge-shared');  // OPT-7: 用 safeReadJson 替代裸 JSON.parse
+
+// DUP-2: budgetedCleanup 中出现 3 次的 20 分钟阈值提取为常量
+const STALE_TIMEOUT_MS = 20 * 60 * 1000;
 
 // 消耗 stdin（SessionStart hook 要求）
 process.stdin.resume();
@@ -152,7 +155,7 @@ function budgetedCleanup() {
     const workerLock = path.join(os.homedir(), '.forge', 'runtime', 'git', 'worker.lock');
     if (fs.existsSync(workerLock)) {
       const lockAge = Date.now() - fs.statSync(workerLock).mtimeMs;
-      if (lockAge > 20 * 60 * 1000) fs.rmSync(workerLock, { recursive: true });
+      if (lockAge > STALE_TIMEOUT_MS) fs.rmSync(workerLock, { recursive: true });
     }
   } catch (_) {}
 
@@ -165,7 +168,7 @@ function budgetedCleanup() {
     const processingPath = path.join(gitDir, 'queue.jsonl.processing');
     if (fs.existsSync(processingPath)) {
       const age = Date.now() - fs.statSync(processingPath).mtimeMs;
-      if (age > 20 * 60 * 1000) {
+      if (age > STALE_TIMEOUT_MS) {
         const content   = fs.readFileSync(processingPath, 'utf8');
         const queuePath = path.join(gitDir, 'queue.jsonl');
         // 追加到 queue.jsonl（末尾补换行防止行粘连）
@@ -188,7 +191,7 @@ function budgetedCleanup() {
       if (!fs.existsSync(lockDir)) continue;
       try {
         const stat = fs.statSync(lockDir);
-        if (Date.now() - stat.mtimeMs > 20 * 60 * 1000) {
+        if (Date.now() - stat.mtimeMs > STALE_TIMEOUT_MS) {
           fs.rmSync(lockDir, { recursive: true });
         }
       } catch (_) {}

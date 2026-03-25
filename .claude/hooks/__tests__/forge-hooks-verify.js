@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// forge-hooks-verify.js — Forge v2.0 hooks 验证脚本（119 场景）
+// forge-hooks-verify.js — Forge v2.0 hooks 验证脚本（133 场景）
 // 纯 Node.js，无外部依赖
 // 运行：node forge-hooks-verify.js
 
@@ -696,7 +696,8 @@ test('6-3 forge-state-sync 使用 shared.resolveProjectRoot（F19）', () => {
 test('6-4 events.jsonl 轮转 + worker spawn 限制（F20/C3）', () => {
   const sharedSrc = fs.readFileSync(path.join(HOOKS_DIR, 'forge-shared.js'), 'utf8');
   assert(sharedSrc.includes('MAX_EVENTS_BYTES'), 'F20：events.jsonl 应有大小上限');
-  assert(sharedSrc.includes('EVENTS_FILE + \'.1\''), 'F20：events.jsonl 应有轮转逻辑');
+  // DUP-6 重构后轮转逻辑提取到 _appendLog，使用通用 file + '.1' 模式
+  assert(sharedSrc.includes('file + \'.1\'') || sharedSrc.includes('EVENTS_FILE + \'.1\''), 'F20：events.jsonl 应有轮转逻辑');
 
   const bridgeSrc = fs.readFileSync(path.join(HOOKS_DIR, 'forge-context-bridge.js'), 'utf8');
   assert(bridgeSrc.includes('worker.lock'), 'F20：spawnDetachedWorker 应检查 worker.lock');
@@ -2091,6 +2092,195 @@ test('24-5: HIGH forge-git-worker.js — preStagedPatch capture + git apply --ca
     src.includes('restored = false') || (src.includes('restored') && src.includes('add')),
     'HIGH：patch apply 失败时应 fallback 到 git add'
   );
+});
+
+console.log('\n【组 25】Round 2 优化验证（DUP/PERF/安全边界/FSM）');
+
+// 25-1: DUP-1 — shared.js 导出命令分类正则，auto-fix/context-bridge 使用引用
+test('25-1: DUP-1 forge-shared.js — 导出 TEST/BUILD/LINT_PATTERN', () => {
+  const sharedSrc = fs.readFileSync(path.join(HOOKS_DIR, 'forge-shared.js'), 'utf8');
+  assert(sharedSrc.includes("exports.TEST_PATTERN"), 'DUP-1：shared.js 应导出 TEST_PATTERN');
+  assert(sharedSrc.includes("exports.BUILD_PATTERN"), 'DUP-1：shared.js 应导出 BUILD_PATTERN');
+  assert(sharedSrc.includes("exports.LINT_PATTERN"), 'DUP-1：shared.js 应导出 LINT_PATTERN');
+  const autoFixSrc = fs.readFileSync(path.join(HOOKS_DIR, 'forge-auto-fix.js'), 'utf8');
+  // auto-fix 不应再有本地正则定义（已移至 shared）
+  assert(!autoFixSrc.includes('/\\b(npm test|npm run test'), 'DUP-1：auto-fix 不应有本地 TEST_PATTERN 定义');
+  assert(autoFixSrc.includes('shared') && (autoFixSrc.includes('TEST_PATTERN') || autoFixSrc.includes('shared.TEST_PATTERN')), 'DUP-1：auto-fix 应引用 shared 的正则');
+});
+
+// 25-2: DUP-3 — shared.js 导出 _normReal，git-worker/state-sync 使用
+test('25-2: DUP-3 forge-shared.js — 导出 _normReal', () => {
+  const sharedSrc = fs.readFileSync(path.join(HOOKS_DIR, 'forge-shared.js'), 'utf8');
+  assert(sharedSrc.includes('exports._normReal'), 'DUP-3：shared.js 应导出 _normReal');
+  const workerSrc = fs.readFileSync(path.join(HOOKS_DIR, 'forge-git-worker.js'), 'utf8');
+  assert(workerSrc.includes('shared._normReal'), 'DUP-3：git-worker 应使用 shared._normReal');
+  const syncSrc = fs.readFileSync(path.join(HOOKS_DIR, 'forge-state-sync.js'), 'utf8');
+  assert(syncSrc.includes('shared._normReal'), 'DUP-3：state-sync 应使用 shared._normReal');
+});
+
+// 25-3: DUP-6 — shared.js 含 _appendLog，logHookError/Event 复用
+test('25-3: DUP-6 forge-shared.js — _appendLog 抽取公共日志逻辑', () => {
+  const sharedSrc = fs.readFileSync(path.join(HOOKS_DIR, 'forge-shared.js'), 'utf8');
+  assert(sharedSrc.includes('function _appendLog'), 'DUP-6：shared.js 应有 _appendLog 辅助函数');
+  // logHookError 和 logHookEvent 都调用 _appendLog
+  const errIdx = sharedSrc.indexOf('function logHookError');
+  const evtIdx = sharedSrc.indexOf('function logHookEvent');
+  const errBody = sharedSrc.slice(errIdx, errIdx + 300);
+  const evtBody = sharedSrc.slice(evtIdx, evtIdx + 200);
+  assert(errBody.includes('_appendLog'), 'DUP-6：logHookError 应调用 _appendLog');
+  assert(evtBody.includes('_appendLog'), 'DUP-6：logHookEvent 应调用 _appendLog');
+});
+
+// 25-4: PERF-2 — resolveProjectRoot 含进程级 Map 缓存
+test('25-4: PERF-2 forge-shared.js — resolveProjectRoot 含 _rootCache 缓存', () => {
+  const sharedSrc = fs.readFileSync(path.join(HOOKS_DIR, 'forge-shared.js'), 'utf8');
+  assert(sharedSrc.includes('_rootCache'), 'PERF-2：shared.js 应有 _rootCache Map');
+  assert(sharedSrc.includes('_rootCache.has('), 'PERF-2：resolveProjectRoot 应检查缓存');
+  assert(sharedSrc.includes('_rootCache.set('), 'PERF-2：resolveProjectRoot 应写入缓存');
+});
+
+// 25-5: PERF-1 — getBridgePath/getTmpDir/getGitQueuePath 使用 _mkdirOnce
+test('25-5: PERF-1 forge-shared.js — _mkdirOnce 避免重复 mkdirSync', () => {
+  const sharedSrc = fs.readFileSync(path.join(HOOKS_DIR, 'forge-shared.js'), 'utf8');
+  assert(sharedSrc.includes('function _mkdirOnce'), 'PERF-1：shared.js 应有 _mkdirOnce 辅助函数');
+  assert(sharedSrc.includes('_createdDirs'), 'PERF-1：应有 _createdDirs Set 作为缓存');
+  // getBridgePath 和 getTmpDir 应使用 _mkdirOnce 而不是裸 mkdirSync
+  const bridgePathIdx = sharedSrc.indexOf('function getBridgePath');
+  const bridgeBody = sharedSrc.slice(bridgePathIdx, bridgePathIdx + 300);
+  assert(bridgeBody.includes('_mkdirOnce'), 'PERF-1：getBridgePath 应使用 _mkdirOnce');
+  const tmpDirIdx = sharedSrc.indexOf('function getTmpDir');
+  const tmpBody = sharedSrc.slice(tmpDirIdx, tmpDirIdx + 200);
+  assert(tmpBody.includes('_mkdirOnce'), 'PERF-1：getTmpDir 应使用 _mkdirOnce');
+});
+
+// 25-6: DUP-2 — session-start.js 含 STALE_TIMEOUT_MS 常量（不再有裸 20*60*1000）
+test('25-6: DUP-2 forge-session-start.js — STALE_TIMEOUT_MS 常量', () => {
+  const src = fs.readFileSync(path.join(HOOKS_DIR, 'forge-session-start.js'), 'utf8');
+  assert(src.includes('STALE_TIMEOUT_MS'), 'DUP-2：session-start 应有 STALE_TIMEOUT_MS 常量');
+  // 常量定义处允许出现字面值，使用处不应再有裸字面值
+  const lines = src.split('\n');
+  const bareUsages = lines.filter(l =>
+    l.includes('20 * 60 * 1000') && !l.includes('STALE_TIMEOUT_MS') && !l.trim().startsWith('//')
+  );
+  assert(bareUsages.length === 0, `DUP-2：裸字面值 20 * 60 * 1000 不应出现在常量定义之外（实际：${bareUsages.length} 处）`);
+});
+
+// 25-7: DEAD-3 — state-sync 不再有 findProjectRoot 本地 wrapper 函数
+test('25-7: DEAD-3 forge-state-sync.js — findProjectRoot wrapper 已移除', () => {
+  const src = fs.readFileSync(path.join(HOOKS_DIR, 'forge-state-sync.js'), 'utf8');
+  assert(!src.includes('function findProjectRoot'), 'DEAD-3：state-sync 不应再有本地 findProjectRoot 函数定义');
+  assert(src.includes('shared.resolveProjectRoot'), 'DEAD-3：应直接调用 shared.resolveProjectRoot');
+});
+
+// 25-8: C-NEW-1（行为）— markGatePassed 清零 failCount，连续失败后可再次通过
+test('25-8: C-NEW-1 行为 — markGatePassed 清零 failCount，不永久阻断', () => {
+  const { nextGateToInject } = (() => {
+    // 内联 nextGateToInject 的最小实现来验证行为
+    // 用实际的 context-bridge 模块读 bridge 状态来验证
+    const src = fs.readFileSync(path.join(HOOKS_DIR, 'forge-context-bridge.js'), 'utf8');
+    return { nextGateToInject: null, src };
+  })();
+  const src = fs.readFileSync(path.join(HOOKS_DIR, 'forge-context-bridge.js'), 'utf8');
+  // markGatePassed 应显式将 failCount 设为 0
+  const fnIdx = src.indexOf('function markGatePassed');
+  assert(fnIdx !== -1, 'C-NEW-1：应有 markGatePassed 函数');
+  const fnBody = src.slice(fnIdx, fnIdx + 400);
+  assert(
+    fnBody.includes('failCount') && (fnBody.includes('= 0') || fnBody.includes('=0')),
+    'C-NEW-1：markGatePassed 应将 failCount 清零'
+  );
+});
+
+// 25-9: isDenied — 路径穿越和敏感文件名拒绝
+test('25-9: forge-git-worker.js — isDenied 拒绝敏感路径', () => {
+  const src = fs.readFileSync(path.join(HOOKS_DIR, 'forge-git-worker.js'), 'utf8');
+  // isDenied 函数应存在
+  assert(src.includes('function isDenied'), 'isDenied 函数应存在');
+  // 验证 DENY_PATTERNS 包含 secret/credential/password/private_key
+  assert(src.includes('/secret/i') || src.includes('secret'), 'isDenied 应拒绝含 secret 的文件名');
+  assert(src.includes('credential') || src.includes('/credential/i'), 'isDenied 应拒绝含 credential 的文件名');
+  assert(src.includes('private') || src.includes('/private'), 'isDenied 应拒绝含 private_key 的文件名');
+  // DENY_SUFFIXES 应包含 .pem/.key/.p12/.pfx
+  assert(src.includes('.pem') && src.includes('.key'), 'isDenied 应拒绝 .pem/.key 扩展名');
+  assert(src.includes('.p12') && src.includes('.pfx'), 'isDenied 应拒绝 .p12/.pfx 扩展名');
+});
+
+// 25-10: isDenied — 白名单过滤中 .env/node_modules/.git 被拒
+test('25-10: forge-git-worker.js — isDenied 拒绝 .env 和 node_modules/.git', () => {
+  const src = fs.readFileSync(path.join(HOOKS_DIR, 'forge-git-worker.js'), 'utf8');
+  assert(src.includes("'.env'") || src.includes('DENY_BASENAMES'), 'isDenied 应拒绝 .env');
+  assert(src.includes("'.env.'") || src.includes('DENY_PREFIXES'), 'isDenied 应拒绝 .env.* 前缀');
+  assert(src.includes('node_modules'), 'isDenied 应拒绝 node_modules 路径下的文件');
+  assert(src.includes('\\.git'), 'isDenied 应拒绝 .git 路径下的文件');
+});
+
+// 25-11: shared._normReal 行为 — 有效路径正常返回，不存在路径 fallback
+test('25-11: forge-shared.js _normReal — 有效路径返回 realpath，异常 fallback 原值', () => {
+  const normReal = _shared._normReal;
+  assert(typeof normReal === 'function', '_normReal 应是导出函数');
+  // 现有目录应能正常返回
+  const home = os.homedir();
+  const result = normReal(home);
+  assert(typeof result === 'string' && result.length > 0, '_normReal 应返回非空字符串');
+  // 不存在的路径应 fallback 为原始值
+  const nonExistent = '/this/path/does/not/exist/ever/12345';
+  const fallback = normReal(nonExistent);
+  assertEqual(fallback, nonExistent, '_normReal 对不存在路径应 fallback 返回原值');
+});
+
+// 25-12: TEST_PATTERN 行为 — 识别主流测试命令
+test('25-12: forge-shared.js TEST_PATTERN — 识别主流测试命令', () => {
+  const { TEST_PATTERN, BUILD_PATTERN, LINT_PATTERN } = _shared;
+  assert(TEST_PATTERN instanceof RegExp, 'TEST_PATTERN 应是 RegExp');
+  // 测试命令应匹配
+  assert(TEST_PATTERN.test('npm test'),           'TEST_PATTERN 应匹配 npm test');
+  assert(TEST_PATTERN.test('pnpm test'),          'TEST_PATTERN 应匹配 pnpm test');
+  assert(TEST_PATTERN.test('jest --watch'),       'TEST_PATTERN 应匹配 jest');
+  assert(TEST_PATTERN.test('cargo nextest run'),  'TEST_PATTERN 应匹配 cargo nextest');
+  assert(TEST_PATTERN.test('bun test'),           'TEST_PATTERN 应匹配 bun test');
+  // 非测试命令不应匹配
+  assert(!TEST_PATTERN.test('echo test'),         'TEST_PATTERN 不应匹配 echo test');
+  assert(!TEST_PATTERN.test('npm install'),       'TEST_PATTERN 不应匹配 npm install');
+  // BUILD_PATTERN
+  assert(BUILD_PATTERN instanceof RegExp, 'BUILD_PATTERN 应是 RegExp');
+  assert(BUILD_PATTERN.test('pnpm build'),        'BUILD_PATTERN 应匹配 pnpm build');
+  assert(BUILD_PATTERN.test('next build'),        'BUILD_PATTERN 应匹配 next build');
+  // LINT_PATTERN
+  assert(LINT_PATTERN instanceof RegExp, 'LINT_PATTERN 应是 RegExp');
+  assert(LINT_PATTERN.test('pnpm lint'),          'LINT_PATTERN 应匹配 pnpm lint');
+  assert(LINT_PATTERN.test('ruff check .'),       'LINT_PATTERN 应匹配 ruff');
+});
+
+// 25-13: prototype pollution — safeReadJson 对 __proto__ key 不污染全局
+test('25-13: prototype pollution — bridge JSON 含 __proto__ key 不崩溃', () => {
+  const tmpDir = mkTmpDir('-proto');
+  const p = path.join(tmpDir, 'test.json');
+  // 含 __proto__ key 的 JSON
+  fs.writeFileSync(p, '{"__proto__": {"polluted": true}, "normal": 1}');
+  // safeReadJson 应返回解析结果而不崩溃
+  let result;
+  try {
+    result = _shared.safeReadJson(p, null);
+  } catch (e) {
+    throw new Error('safeReadJson 对 __proto__ key 不应抛出: ' + e.message);
+  }
+  // 注意：JSON.parse 本身不会真正设置 __proto__（会作为普通 key 处理）
+  assert(result.data !== null && !result.corrupt, 'safeReadJson 应正常解析含 __proto__ key 的 JSON');
+  // 全局 Object.prototype 不应被污染
+  assert(({}).polluted === undefined, '__proto__ key 不应污染 Object.prototype');
+  fs.rmSync(tmpDir, { recursive: true });
+});
+
+// 25-14: FSM — escalation 门在有门 failCount >= 3 时触发
+test('25-14: FSM escalation 门 — 任意前置门 failCount>=3 时触发 escalation', () => {
+  const pipelineSrc = fs.readFileSync(path.join(HOOKS_DIR, 'forge-quality-pipeline.js'), 'utf8');
+  // escalation 门的 requires 应检查其他门的 failCount >= 3
+  const escIdx = pipelineSrc.indexOf("name:     'escalation'");
+  assert(escIdx !== -1, 'FSM：应有 escalation 门定义');
+  const escBody = pipelineSrc.slice(escIdx, escIdx + 500);
+  assert(escBody.includes('failCount') && escBody.includes('>= 3'), 'FSM：escalation.requires 应检查 failCount >= 3');
+  // escalation 消息应包含阻塞门信息
+  assert(escBody.includes('blocked') || escBody.includes('卡死'), 'FSM：escalation 消息应说明哪些门被阻塞');
 });
 
 // ─────────────────────────────────────────────────────────────────────────────

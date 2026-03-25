@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// forge-git-worker.js - v1.0.0
+// forge-git-worker.js - v1.1.0
 // 独立异步进程：处理 git checkpoint 队列
 //
 // 修复（P1#6, P2#15）：
@@ -141,7 +141,8 @@ function processJob(job) {
       { cwd, encoding: 'utf8', timeout: 3000 });
     const allStaged = staged.trim().split('\n').filter(Boolean);
     // HIGH fix (symlink): 用 realpathSync(cwd) 作为基准，防止 touchedFiles 已 canonicalize 但 cwd 含符号链接
-    const realCwd = (() => { try { return fs.realpathSync(cwd); } catch (_) { return cwd; } })();
+    // DUP-3: 使用 shared._normReal 统一实现
+    const realCwd = shared._normReal(cwd);
     const touchedRel = (touchedFiles || []).map(f => {
       try { return path.relative(realCwd, f); } catch (_) { return null; }
     }).filter(Boolean);

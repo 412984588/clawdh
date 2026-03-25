@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// forge-shared.js - v1.4.0
+// forge-shared.js - v1.6.0
 // 所有 Forge hooks 的共享存储层
 //
 // 修复：
@@ -20,6 +20,27 @@ const path   = require('path');
 const crypto = require('crypto');
 const { execFileSync } = require('child_process');
 
+// ─── 进程级缓存（PERF-1/2）────────────────────────────────────────────────────
+
+// PERF-1: 进程内目录创建缓存，避免对同一目录重复调用 mkdirSync
+// PERF-1 fix: 命中缓存时仍做 existsSync，防止目录被外部进程删除后静默 ENOENT
+const _createdDirs = new Set();
+function _mkdirOnce(dir) {
+  if (_createdDirs.has(dir) && fs.existsSync(dir)) return;
+  _createdDirs.delete(dir);  // 目录可能已被删除，清除旧缓存
+  fs.mkdirSync(dir, { recursive: true });
+  _createdDirs.add(dir);
+}
+
+// PERF-2: resolveProjectRoot 进程级缓存，避免对同一 cwd 重复 spawn git rev-parse
+const _rootCache = new Map();
+
+// ─── 命令分类正则（DUP-1：auto-fix/context-bridge 共享，消除两处重复定义）─────
+// OPT-10: 补充 pnpm/cargo-nextest 模式
+const TEST_PATTERN  = /\b(npm test|npm run test|pnpm test|pnpm run test|jest|vitest|pytest|py\.test|go test|cargo test|cargo nextest|yarn test|bun test)\b/;
+const BUILD_PATTERN = /\b(npm run build|pnpm build|pnpm run build|tsc|tsc --noEmit|yarn build|bun run build|next build|vite build)\b/;
+const LINT_PATTERN  = /\b(npm run lint|pnpm lint|eslint|tslint|pylint|flake8|ruff)\b/;
+
 // ─── 路径 / slug ───────────────────────────────────────────────────────────────
 
 function slugify(p) {
@@ -36,24 +57,37 @@ function _normReal(p) {
 
 function resolveProjectRoot(cwd) {
   const resolved = path.resolve(cwd);
+  // PERF-2: 进程级缓存，同一 cwd 只 spawn 一次 git rev-parse
+  if (_rootCache.has(resolved)) return _rootCache.get(resolved);
+
+  let result;
   // 1. git rev-parse --show-toplevel（最可靠：worktrees 也返回主 repo root）
   try {
     const root = execFileSync(
       'git', ['rev-parse', '--show-toplevel'],
       { cwd: resolved, encoding: 'utf8', timeout: 2000 }
     ).trim();
-    if (root && fs.existsSync(root)) return _normReal(root);
+    if (root && fs.existsSync(root)) result = _normReal(root);
   } catch (_) {}
   // 2. 走 .planning/ 向上查找（最多 12 层，F19 同步修复）
-  let dir = resolved;
-  for (let i = 0; i < 12; i++) {
-    if (fs.existsSync(path.join(dir, '.planning'))) return _normReal(dir);
-    const parent = path.dirname(dir);
-    if (parent === dir) break;
-    dir = parent;
+  if (!result) {
+    let dir = resolved;
+    for (let i = 0; i < 12; i++) {
+      if (fs.existsSync(path.join(dir, '.planning'))) { result = _normReal(dir); break; }
+      const parent = path.dirname(dir);
+      if (parent === dir) break;
+      dir = parent;
+    }
   }
   // 3. fallback
-  return _normReal(resolved);
+  if (!result) result = _normReal(resolved);
+
+  // PERF-2 fix: 只缓存经 git 验证的结果（result !== resolved 说明找到了 git root 或 .planning 目录）
+  // 不缓存 fallback 到 cwd 的结果，允许下次 git 恢复后重试
+  if (result !== _normReal(resolved)) {
+    _rootCache.set(resolved, result);
+  }
+  return result;
 }
 
 // F18: resolveSlug 保证全局唯一
@@ -106,14 +140,14 @@ function getBridgePath(cwd) {
   const root = resolveProjectRoot(cwd);  // F17
   const h    = crypto.createHash('md5').update(root).digest('hex').slice(0, 12);
   const dir  = path.join(os.homedir(), '.forge', 'runtime', 'bridges', h);
-  fs.mkdirSync(dir, { recursive: true });
+  _mkdirOnce(dir);  // PERF-1
   return path.join(dir, 'bridge.json');
 }
 
 // 安全临时目录：~/.forge/runtime/tmp/（仅所有者可读写，P1#7）
 function getTmpDir() {
   const d = path.join(os.homedir(), '.forge', 'runtime', 'tmp');
-  fs.mkdirSync(d, { recursive: true });
+  _mkdirOnce(d);  // PERF-1
   try { fs.chmodSync(d, 0o700); } catch (_) {}
   return d;
 }
@@ -148,7 +182,7 @@ function safeReadJson(p, fallback) {
 // 原子写：PID+ts 唯一 tmp 名，rename 替换（P1#1 并发安全）
 function writeJsonAtomic(p, value) {
   const dir = path.dirname(p);
-  fs.mkdirSync(dir, { recursive: true });
+  _mkdirOnce(dir);  // PERF-1
   const tmp = `${p}.${process.pid}.${Date.now()}.tmp`;
   fs.writeFileSync(tmp, JSON.stringify(value, null, 2));
   try {
@@ -264,7 +298,7 @@ async function mutateForgeState(slug, mutator) {
   const lockDir = sp + '.lock';
 
   // F21 fix: 确保父目录存在，防止 withAdvisoryLock 的 mkdirSync(lockDir) 因父目录缺失而 ENOENT
-  fs.mkdirSync(path.dirname(sp), { recursive: true });
+  _mkdirOnce(path.dirname(sp));  // PERF-1
 
   return withAdvisoryLock(lockDir, async () => {
     const { data, corrupt } = safeReadJson(sp, {});
@@ -281,45 +315,41 @@ async function mutateForgeState(slug, mutator) {
 
 // ─── 错误日志（P2#14：替代静默 catch exit(0)）────────────────────────────────
 
-const LOG_DIR     = path.join(os.homedir(), '.forge', 'logs', 'hooks');
-const LOG_FILE    = path.join(LOG_DIR, 'errors.jsonl');
-const MAX_LOG_BYTES = 2 * 1024 * 1024;  // 2MB 后轮转
+const LOG_DIR          = path.join(os.homedir(), '.forge', 'logs', 'hooks');
+const LOG_FILE         = path.join(LOG_DIR, 'errors.jsonl');
+const EVENTS_FILE      = path.join(LOG_DIR, 'events.jsonl');
+const MAX_LOG_BYTES    = 2 * 1024 * 1024;  // 2MB 后轮转
+const MAX_EVENTS_BYTES = 5 * 1024 * 1024;  // 5MB 后轮转（F20）
+
+// DUP-6: 公共追加日志逻辑（logHookError/logHookEvent 共享）
+function _appendLog(file, maxBytes, entry) {
+  _mkdirOnce(LOG_DIR);  // PERF-1
+  if (fs.existsSync(file) && fs.statSync(file).size > maxBytes) {
+    try { fs.renameSync(file, file + '.1'); } catch (_) {}
+  }
+  fs.appendFileSync(file, entry + '\n');
+}
 
 function logHookError(hook, error, context) {
   try {
-    fs.mkdirSync(LOG_DIR, { recursive: true });
-    // 轮转：超过 2MB 改名为 errors.jsonl.1
-    if (fs.existsSync(LOG_FILE) && fs.statSync(LOG_FILE).size > MAX_LOG_BYTES) {
-      try { fs.renameSync(LOG_FILE, LOG_FILE + '.1'); } catch (_) {}
-    }
-    const entry = JSON.stringify({
+    _appendLog(LOG_FILE, MAX_LOG_BYTES, JSON.stringify({
       ts:      new Date().toISOString(),
       hook,
       error:   error?.message || String(error),
       stack:   error?.stack?.slice(0, 500),
       context: context || {},
-    });
-    fs.appendFileSync(LOG_FILE, entry + '\n');
+    }));
   } catch (_) {
     // 日志写入失败时静默降级：不能因日志挂起 hook
   }
 }
 
-const EVENTS_FILE      = path.join(LOG_DIR, 'events.jsonl');
-const MAX_EVENTS_BYTES = 5 * 1024 * 1024;  // 5MB 后轮转（F20）
-
 function logHookEvent(hook, event, data) {
   try {
-    fs.mkdirSync(LOG_DIR, { recursive: true });
-    // F20: events.jsonl 轮转（超过 5MB 改名为 .1）
-    if (fs.existsSync(EVENTS_FILE) && fs.statSync(EVENTS_FILE).size > MAX_EVENTS_BYTES) {
-      try { fs.renameSync(EVENTS_FILE, EVENTS_FILE + '.1'); } catch (_) {}
-    }
-    const entry = JSON.stringify({
+    _appendLog(EVENTS_FILE, MAX_EVENTS_BYTES, JSON.stringify({
       ts: new Date().toISOString(),
       hook, event, data: data || {},
-    });
-    fs.appendFileSync(EVENTS_FILE, entry + '\n');
+    }));
   } catch (_) {}
 }
 
@@ -327,7 +357,7 @@ function logHookEvent(hook, event, data) {
 
 function getGitQueuePath() {
   const dir = path.join(os.homedir(), '.forge', 'runtime', 'git');
-  fs.mkdirSync(dir, { recursive: true });
+  _mkdirOnce(dir);  // PERF-1
   return path.join(dir, 'queue.jsonl');
 }
 
@@ -364,3 +394,8 @@ exports.logHookEvent = logHookEvent;
 
 exports.getGitQueuePath   = getGitQueuePath;
 exports.appendJsonlQueue  = appendJsonlQueue;
+
+exports._normReal     = _normReal;      // DUP-3: git-worker/state-sync 共享
+exports.TEST_PATTERN  = TEST_PATTERN;   // DUP-1: auto-fix/context-bridge 共享
+exports.BUILD_PATTERN = BUILD_PATTERN;  // DUP-1
+exports.LINT_PATTERN  = LINT_PATTERN;   // DUP-1

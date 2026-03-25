@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// forge-state-sync.js - v2.3.0
+// forge-state-sync.js - v2.4.0
 // PostToolUse hook (Write|Edit): 同步 GSD 状态到 Forge State Hub
 //
 // 监控：
@@ -157,14 +157,6 @@ function applyParsed(state, parsed) {
   }
 }
 
-// ─── 查找项目根目录 ───────────────────────────────────────────────────────────
-// F17/F19: 改用 shared.resolveProjectRoot（git rev-parse → 向上12层 → fallback）
-// 保留此 wrapper 以保持原调用兼容性
-
-function findProjectRoot(filePath) {
-  return shared.resolveProjectRoot(path.dirname(filePath));
-}
-
 // ─── 主流程 ───────────────────────────────────────────────────────────────────
 
 let input = '';
@@ -183,17 +175,17 @@ process.stdin.on('end', async () => {
 
     // P3#18：使用 path.relative 做路径判断，替代字符串 includes
     // OPT-9: 用 resolveProjectRoot 归一化 cwd，防止子目录 session 导致 path.relative 返回 ../. 前缀
-    const rawCwd = data.cwd || findProjectRoot(filePath);
+    // DEAD-3: 内联 findProjectRoot wrapper（仅此一处调用，无需单独函数）
+    const rawCwd = data.cwd || shared.resolveProjectRoot(path.dirname(filePath));
     const cwd    = shared.resolveProjectRoot(rawCwd);
     // F22 fix: filePath 同步规范化（macOS /var → /private/var 符号链接），
     // 避免 path.relative(canonical-cwd, symlinked-filePath) 产生 ../ 前缀导致误退出
     // F23 fix: 在 cwd 和 filePath 上都做 realpathSync，确保 path.relative 两端路径一致，
     // 消除分类阶段与实际读取阶段的 TOCTOU 竞态（Codex Finding #1）
     // F24 fix: cwd 也规范化，保护 git-rev-parse fallback 路径（Codex Finding #4）
-    let realCwd = cwd;
-    try { realCwd = fs.realpathSync(cwd); } catch (_) {}
-    let realFilePath = filePath;
-    try { realFilePath = fs.realpathSync(filePath); } catch (_) {}
+    // DUP-3: 使用 shared._normReal 统一实现
+    const realCwd      = shared._normReal(cwd);
+    const realFilePath = shared._normReal(filePath);
     const rel    = path.relative(realCwd, realFilePath);
 
     // 检查是否是目标文件（path.relative 确保路径语义正确）

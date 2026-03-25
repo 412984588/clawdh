@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// forge-context-bridge.js - v2.3.0
+// forge-context-bridge.js - v2.4.0
 // PostToolUse hook: 事件归约层
 //
 // 修复（相比 v1.x）：
@@ -131,6 +131,9 @@ function markGatePassed(draft, name) {
   draft.gates[name].status    = 'passed';
   draft.gates[name].epoch     = draft.change.changeEpoch;
   draft.gates[name].leaseUntil = null;
+  // C-NEW-1 fix: 清零 failCount，否则 3 次失败后 ship/escalation 会永久阻断，
+  // 即使后续成功也无法解锁
+  draft.gates[name].failCount  = 0;
 }
 
 // M2 fix: Skill/Agent 失败时标记质量门为 failed，避免 lease 卡住 10 分钟 + 无限重试
@@ -141,8 +144,8 @@ function markGateFailed(draft, name) {
   draft.gates[name].failCount  = (draft.gates[name].failCount || 0) + 1;
 }
 
-// 测试命令匹配（OPT-10：补充 pnpm/cargo-nextest 模式）
-const TEST_CMD = /\b(npm test|npm run test|pnpm test|pnpm run test|jest|vitest|pytest|py\.test|go test|cargo test|cargo nextest|yarn test|bun test)\b/;
+// DUP-1: 测试命令匹配正则移至 forge-shared.js 统一维护
+const TEST_CMD = shared.TEST_PATTERN;
 
 // ─── 事件归约（inferAndUpdate）────────────────────────────────────────────────
 

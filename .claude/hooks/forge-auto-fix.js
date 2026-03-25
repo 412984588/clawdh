@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// forge-auto-fix.js - v2.0.0
+// forge-auto-fix.js - v2.1.0
 // PostToolUse hook（Bash）: 检测失败并注入修复指令
 //
 // 机制：
@@ -9,19 +9,14 @@
 
 'use strict';
 
-const fs   = require('fs');
-const os   = require('os');
-const path = require('path');
 const crypto = require('crypto');
 
 const shared = require('./forge-shared');
 
 // ─── 命令分类 ─────────────────────────────────────────────────────────────────
 
-// OPT-10: 补充 pnpm/cargo-nextest 模式
-const TEST_PATTERN  = /\b(npm test|npm run test|pnpm test|pnpm run test|jest|vitest|pytest|py\.test|go test|cargo test|cargo nextest|yarn test|bun test)\b/;
-const BUILD_PATTERN = /\b(npm run build|pnpm build|pnpm run build|tsc|tsc --noEmit|yarn build|bun run build|next build|vite build)\b/;
-const LINT_PATTERN  = /\b(npm run lint|pnpm lint|eslint|tslint|pylint|flake8|ruff)\b/;
+// DUP-1: 正则移至 forge-shared.js 统一维护，此处直接引用
+const { TEST_PATTERN, BUILD_PATTERN, LINT_PATTERN } = shared;
 
 function classifyCommand(cmd) {
   if (TEST_PATTERN.test(cmd))  return 'test';
@@ -80,10 +75,8 @@ process.stdin.on('end', async () => {
     const cmd  = (data.tool_input || {}).command || '';
     const type = classifyCommand(cmd);
 
-    // OPT-2+3: 改用 shared.isForgeProject，缓存结果避免双重调用
-    const isForge = shared.isForgeProject(cwd);
-    if (type === 'other' && !isForge) process.exit(0);
-    if (!isForge) process.exit(0);
+    // 非 Forge 项目提前退出（无论命令类型）
+    if (!shared.isForgeProject(cwd)) process.exit(0);
 
     const stderr  = toolResp?.stderr || toolResp?.output || '';
     const snippet = stderr.slice(-600).trim() || `（命令：${cmd.slice(0, 80)}，退出码：${exitCode}）`;
