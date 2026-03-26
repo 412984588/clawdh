@@ -147,6 +147,16 @@ function processJob(job) {
       try { return path.relative(realCwd, f); } catch (_) { return null; }
     }).filter(Boolean);
     preStagedToRestore = allStaged.filter(f => !touchedRel.includes(f));
+    // PARTIAL-STAGING FIX: 同时在 allStaged（用户部分暂存）和 touchedRel（forge 触碰）的文件
+    // 不能直接 git add（会把整个文件暂存，覆盖用户刻意留出的 hunk）
+    // 策略：从 git add 目标中排除这些文件，保留用户暂存意图，forge 更改留给下次 checkpoint
+    const partialStagingConflicts = allStaged.filter(f => touchedRel.includes(f));
+    if (partialStagingConflicts.length > 0) {
+      shared.logHookEvent('forge-git-worker', 'partial_staging_skipped', {
+        cwd, files: partialStagingConflicts,
+        reason: 'user has partial staging on forge-touched files; skipping git add to preserve intent',
+      });
+    }
     if (preStagedToRestore.length > 0) {
       // 先保存精确 patch（防止 partial hunk 在恢复时被整文件 add 覆盖）
       try {
@@ -159,7 +169,14 @@ function processJob(job) {
         { cwd, timeout: 3000 });
     }
   } catch (_) {}
-  const added    = safeGitAdd(cwd, touchedFiles);
+  // PARTIAL-STAGING FIX: 从 git add 目标中排除 partialStagingConflicts（用户部分暂存的文件）
+  const touchedFilesForAdd = (touchedFiles || []).filter(f => {
+    try {
+      const rel = path.relative(shared._normReal(cwd), path.isAbsolute(f) ? f : path.resolve(cwd, f));
+      return !partialStagingConflicts.includes(rel);
+    } catch (_) { return true; }
+  });
+  const added    = safeGitAdd(cwd, touchedFilesForAdd);
   const committed = added && tryGitCommit(cwd);
   // 恢复用户原有的暂存文件：优先用 patch apply（保留 partial hunk），否则 fallback 整文件 add
   if (preStagedToRestore.length > 0) {
