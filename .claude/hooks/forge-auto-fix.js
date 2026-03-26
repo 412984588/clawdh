@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// forge-auto-fix.js - v2.1.0
+// forge-auto-fix.js - v2.2.0
 // PostToolUse hook（Bash）: 检测失败并注入修复指令
 //
 // 机制：
@@ -41,11 +41,13 @@ function buildFixMessage(type, errorSnippet, attempts, max) {
   return base[type] || base.other;
 }
 
-function buildEscalateMessage(type, errorSnippet) {
+// R3-OPT-4: max 参数动态化，文案不再硬编码 "3 轮"
+function buildEscalateMessage(type, errorSnippet, max) {
+  const rounds = max || 3;
   if (type === 'lint') {
-    return `⚠️ FORGE：Lint 错误经过 3 轮自动修复仍未解决。记录并继续（lint 为非阻断性）。\n请在完成核心功能后再处理剩余 lint 问题。`;
+    return `⚠️ FORGE：Lint 错误经过 ${rounds} 轮自动修复仍未解决。记录并继续（lint 为非阻断性）。\n请在完成核心功能后再处理剩余 lint 问题。`;
   }
-  return `⛔ FORGE 自动修复已达上限：经过 3 轮自动修复仍未解决。\n升级到诊断模式：请调用 Skill("gsd:debug") 进行系统性 debug（并行 debug agent，找出根本原因）。\n错误片段：\n\`\`\`\n${errorSnippet}\n\`\`\``;
+  return `⛔ FORGE 自动修复已达上限：经过 ${rounds} 轮自动修复仍未解决。\n升级到诊断模式：请调用 Skill("gsd:debug") 进行系统性 debug（并行 debug agent，找出根本原因）。\n错误片段：\n\`\`\`\n${errorSnippet}\n\`\`\``;
 }
 
 // ─── 错误签名（防止不同错误被当作同一问题计数）────────────────────────────────
@@ -99,11 +101,14 @@ process.stdin.on('end', async () => {
 
       draft.auto_fix = fix;
       fixResult      = fix;
+      // R3-MED-4: 确保 _schema_version 存在，防止 migrateIfNeeded 在 context-bridge 执行时
+      // 因缺少版本字段而重建整个 bridge，清除此处写入的 auto_fix 计数
+      if (!draft._schema_version) draft._schema_version = 2;
     });
 
     let msg;
     if (fixResult.attempts >= fixResult.max) {
-      msg = buildEscalateMessage(type, snippet);
+      msg = buildEscalateMessage(type, snippet, fixResult.max);
     } else {
       msg = buildFixMessage(type, snippet, fixResult.attempts, fixResult.max);
     }

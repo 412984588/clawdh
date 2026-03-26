@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// forge-session-start.js - v2.2.0
+// forge-session-start.js - v2.3.0
 // SessionStart hook: 检测进行中的 Forge 项目 + 孤儿候选标记 + 限时清理
 //
 // 修复（相比 v1.x）：
@@ -15,13 +15,15 @@ const os   = require('os');
 
 const shared = require('./forge-shared');  // OPT-7: 用 safeReadJson 替代裸 JSON.parse
 
-// DUP-2: budgetedCleanup 中出现 3 次的 20 分钟阈值提取为常量
-const STALE_TIMEOUT_MS = 20 * 60 * 1000;
+// R3-OPT-3: STALE_TIMEOUT_MS 移至 forge-shared.js 统一维护，此处直接引用
+const STALE_TIMEOUT_MS = shared.STALE_TIMEOUT_MS;
 
 // 消耗 stdin（SessionStart hook 要求）
+// R3-OPT-5: 添加超时守卫，防止调用方不关闭 stdin 时进程永久挂起
+const _stdinTimeout = setTimeout(() => process.exit(0), 10000);
 process.stdin.resume();
 process.stdin.on('data', () => {});
-process.stdin.on('end', main);
+process.stdin.on('end', () => { clearTimeout(_stdinTimeout); main(); });
 
 function main() {
   const forgeDir = path.join(os.homedir(), '.forge', 'projects');
@@ -136,7 +138,13 @@ function main() {
       if (c.lastDate) line += ` — 最后活动：${c.lastDate}`;
       lines.push(line);
       lines.push(`    路径：${c.path}（不存在）`);
-      lines.push(`    如确认不需要，运行：rm -rf ~/.forge/projects/${c.slug}`);
+      // R3-HIGH-4: 白名单过滤 slug，防止恶意目录名含 shell 元字符注入命令
+      const _safeSlug = /^[a-zA-Z0-9_\-.]+$/.test(c.slug) ? c.slug : null;
+      if (_safeSlug) {
+        lines.push(`    如确认不需要，运行：rm -rf ~/.forge/projects/${_safeSlug}`);
+      } else {
+        lines.push(`    如确认不需要，手动删除 ~/.forge/projects/ 目录下对应文件夹`);
+      }
       lines.push('');
     }
   }
@@ -163,17 +171,24 @@ function budgetedCleanup() {
 
   // P2 fix: 恢复崩溃遗留的 .processing 文件（worker 崩溃后 jobs 永远不会被处理）
   // 超过 20 分钟的 .processing → worker 已挂，追加回 queue.jsonl 重新入队
+  // R3-HIGH-3: 追加前先检查 worker 锁是否活跃，避免与运行中 worker 竞争导致重复入队
   try {
     const gitDir        = path.join(os.homedir(), '.forge', 'runtime', 'git');
     const processingPath = path.join(gitDir, 'queue.jsonl.processing');
     if (fs.existsSync(processingPath)) {
       const age = Date.now() - fs.statSync(processingPath).mtimeMs;
       if (age > STALE_TIMEOUT_MS) {
-        const content   = fs.readFileSync(processingPath, 'utf8');
-        const queuePath = path.join(gitDir, 'queue.jsonl');
-        // 追加到 queue.jsonl（末尾补换行防止行粘连）
-        fs.appendFileSync(queuePath, content.endsWith('\n') ? content : content + '\n');
-        fs.unlinkSync(processingPath);
+        // 检查 worker 锁：锁存在且未超时 → worker 仍活跃 → 跳过恢复，避免重复入队
+        const workerLock = path.join(gitDir, 'worker.lock');
+        const workerActive = fs.existsSync(workerLock) &&
+          (Date.now() - fs.statSync(workerLock).mtimeMs) < STALE_TIMEOUT_MS;
+        if (!workerActive) {
+          const content   = fs.readFileSync(processingPath, 'utf8');
+          const queuePath = path.join(gitDir, 'queue.jsonl');
+          // 追加到 queue.jsonl（末尾补换行防止行粘连）
+          fs.appendFileSync(queuePath, content.endsWith('\n') ? content : content + '\n');
+          fs.unlinkSync(processingPath);
+        }
       }
     }
   } catch (_) {}

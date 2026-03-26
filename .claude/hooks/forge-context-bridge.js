@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// forge-context-bridge.js - v2.4.0
+// forge-context-bridge.js - v2.5.0
 // PostToolUse hook: 事件归约层
 //
 // 修复（相比 v1.x）：
@@ -107,9 +107,12 @@ function defaultBridge(cwd, slug) {
 // 如果是旧 v1 schema（有 quality_gates 字段），重置为新 schema
 function migrateIfNeeded(draft, cwd, slug) {
   if (draft._schema_version === 2) return;
+  // R3-MED-4: 保留 auto_fix 状态，防止迁移清除 forge-auto-fix 写入的计数
+  const savedAutoFix = draft.auto_fix;
   // 旧 bridge → 重建，保留 cwd/slug 信息避免 defaultBridge 重读慢路径
   Object.keys(draft).forEach(k => delete draft[k]);
   Object.assign(draft, defaultBridge(cwd, slug));
+  if (savedAutoFix) draft.auto_fix = savedAutoFix;
 }
 
 // ─── 下游门列表（源码变更时失效）──────────────────────────────────────────────
@@ -162,7 +165,20 @@ function inferAndUpdate(draft, toolName, toolInput, toolResponse) {
     // 否则 path.relative('/repo', 'src/app.ts') 会得到 '../../src/app.ts' 等错误结果
     const projectCwd = draft.project?.cwd || '';
     const absFp = projectCwd && !path.isAbsolute(fp) ? path.resolve(projectCwd, fp) : fp;
-    const rel = projectCwd ? path.relative(projectCwd, absFp) : absFp;
+    // R3-MED-3 symlink fix: 解析 absFp 的符号链接（如 macOS /tmp→/private/tmp）
+    // 目标文件尚不存在时沿目录树向上找最近真实祖先，防止与 git-realpathSync'd projectCwd 误比
+    const canonAbsFp = (() => {
+      try { return fs.realpathSync(absFp); } catch (_) {}
+      let p = path.dirname(absFp);
+      const tail = [path.basename(absFp)];
+      while (p !== path.dirname(p)) {
+        try { return path.join(fs.realpathSync(p), ...tail); } catch (_) {}
+        tail.unshift(path.basename(p));
+        p = path.dirname(p);
+      }
+      return absFp;
+    })();
+    const rel = projectCwd ? path.relative(projectCwd, canonAbsFp) : canonAbsFp;
     const isInPlanning = rel.startsWith('.planning' + path.sep) && !rel.startsWith('..');
     const isInClaude   = rel.startsWith('.claude'   + path.sep) && !rel.startsWith('..');
 
@@ -176,8 +192,9 @@ function inferAndUpdate(draft, toolName, toolInput, toolResponse) {
       draft.gates.tests.status      = 'required';
       draft.change.summaryWrittenAt = new Date().toISOString();
 
-    } else if (!isInPlanning && !isInClaude && fp !== '') {
+    } else if (!isInPlanning && !isInClaude && fp !== '' && !(projectCwd && rel.startsWith('..'))) {
       // 源码变更 → changeEpoch++，下游门全部失效
+      // R3-MED-3: rel.startsWith('..') 表示写入项目外路径（如 /tmp/debug.txt），不计入 changeEpoch
       draft.change.changeEpoch++;
       // M5 fix: touchedFiles 存入时规范化路径（消除 /var→/private/var symlink 身份分裂）
       // safeGitAdd 依赖 path.relative 边界检查，若 cwd 已 realpathSync 而 fp 未规范化，会被误判为越界
@@ -226,7 +243,8 @@ function inferAndUpdate(draft, toolName, toolInput, toolResponse) {
     } else if (!isError) {
       // 成功的 Skill 调用 → 标记对应质量门通过
       if (/autoplan/.test(skill))                          markGatePassed(draft, 'plan_review');
-      else if (/\breview\b/.test(skill) && !/qa-review/.test(skill)) markGatePassed(draft, 'code_review');
+      // R3-MED-1: 排除 plan-*-review / design-review / qa-* 防止误解锁 code_review 门
+      else if (/\breview\b/.test(skill) && !/plan-|design-|qa-/.test(skill)) markGatePassed(draft, 'code_review');
       else if (/\bqa\b/.test(skill))                       markGatePassed(draft, 'qa');
       else if (/\bcso\b/.test(skill))                      markGatePassed(draft, 'security');
       else if (/\bbenchmark\b/.test(skill))                markGatePassed(draft, 'benchmark');
@@ -270,15 +288,19 @@ function inferAndUpdate(draft, toolName, toolInput, toolResponse) {
   }
 
   // 同步 phase/isWeb（OPT-4：只在 Skill/Write/Edit/MultiEdit 时读，减少~60% I/O）
+  // R3-OPT-6: mtime 守卫 — 只在 state.json 文件变更时才重读，减少高频路径冗余 I/O
   if (toolName === 'Skill' || toolName === 'Write' || toolName === 'Edit' || toolName === 'MultiEdit') {
     try {
-      const { data, corrupt } = shared.safeReadJson(
-        path.join(os.homedir(), '.forge', 'projects', draft.project.slug, 'state.json'), null
-      );
-      if (data && !corrupt) {  // F08：使用 safeReadJson 返回的 corrupt 标志
-        if (data.phase?.current != null) draft.phase.current = data.phase.current;  // F14：!= null 允许 phase 0
-        if (data.phase?.total)   draft.phase.total   = data.phase.total;
-        if (data.flow_type)      draft.project.flowType = data.flow_type;
+      const statePath = path.join(os.homedir(), '.forge', 'projects', draft.project.slug, 'state.json');
+      const curMtime  = (() => { try { return fs.statSync(statePath).mtimeMs; } catch (_) { return 0; } })();
+      if (curMtime !== (draft._stateMtime || 0)) {
+        draft._stateMtime = curMtime;
+        const { data, corrupt } = shared.safeReadJson(statePath, null);
+        if (data && !corrupt) {  // F08：使用 safeReadJson 返回的 corrupt 标志
+          if (data.phase?.current != null) draft.phase.current = data.phase.current;  // F14：!= null 允许 phase 0
+          if (data.phase?.total)   draft.phase.total   = data.phase.total;
+          if (data.flow_type)      draft.project.flowType = data.flow_type;
+        }
       }
     } catch (_) {}
   }
@@ -295,12 +317,13 @@ function spawnDetachedWorker(workerPath) {
   try {
     // F20: 检查 worker 是否已在运行（锁存在 → 跳过，防止无限 spawn）
     // C3 fix: 同时检查 stale lock（>20min），防止 worker 崩溃后永久堵塞 git 队列
+    // R3-OPT-3: 使用 shared.STALE_TIMEOUT_MS 替代魔法数字 20 * 60 * 1000
     const workerLockDir = path.join(os.homedir(), '.forge', 'runtime', 'git', 'worker.lock');
     if (fs.existsSync(workerLockDir)) {
       try {
         const lockAge = Date.now() - fs.statSync(workerLockDir).mtimeMs;
-        if (lockAge < 20 * 60 * 1000) return;  // 新鲜锁 → worker 仍在运行，跳过
-        // stale 锁（>20min）→ worker 已死，清除后继续 spawn
+        if (lockAge < shared.STALE_TIMEOUT_MS) return;  // 新鲜锁 → worker 仍在运行，跳过
+        // stale 锁（>STALE_TIMEOUT_MS）→ worker 已死，清除后继续 spawn
         fs.rmSync(workerLockDir, { recursive: true });
       } catch (_) { return; }  // 无法读取锁状态 → 保守跳过
     }
@@ -313,7 +336,8 @@ function spawnDetachedWorker(workerPath) {
 
 function writeHandoff(cwd, slug) {
   try {
-    const planDir = path.join(cwd, '.planning');
+    // R3-MED-2: 用 resolveProjectRoot 而非裸 cwd，防止子目录 session 找不到 .planning/
+    const planDir = path.join(shared.resolveProjectRoot(cwd), '.planning');
     if (!fs.existsSync(planDir)) return;
     const stateMd  = path.join(planDir, 'STATE.md');
     const summary  = fs.existsSync(stateMd) ? fs.readFileSync(stateMd, 'utf8').slice(0, 500) : '';
@@ -328,6 +352,18 @@ function writeHandoff(cwd, slug) {
   } catch (e) {
     shared.logHookError('forge-context-bridge/writeHandoff', e, { cwd, slug });
   }
+}
+
+// R3-OPT-2: 提取公共入队函数，消除 critical/warning 分支 ~15 行重复逻辑
+function enqueueCheckpoint(rootCwd, slug, reason, touchedFiles) {
+  const qPath = shared.getGitQueuePath();
+  shared.appendJsonlQueue(qPath, {
+    cwd: rootCwd, slug, reason,
+    touchedFiles: touchedFiles || [],
+  }).then(() => {
+    const workerPath = path.join(__dirname, 'forge-git-worker.js');
+    if (fs.existsSync(workerPath)) spawnDetachedWorker(workerPath);
+  }).catch(e => shared.logHookError('forge-context-bridge/gitQueue', e, { cwd: rootCwd }));
 }
 
 function checkContextWarning(cwd, slug, sessionId, bridge) {
@@ -356,7 +392,9 @@ function checkContextWarning(cwd, slug, sessionId, bridge) {
   // 防抖（safeId 已在函数顶部 F06 处声明）
   const warnKey = path.join(shared.getTmpDir(), `forge-ctx-${safeId}-warned.json`);
   let wd = { callsSinceWarn: 0, lastLevel: null };
-  try { wd = JSON.parse(fs.readFileSync(warnKey, 'utf8')); } catch (_) {}
+  // R3-MED-6: 改用 safeReadJson，损坏的 warned.json 不再抛出异常
+  const { data: _wdData, corrupt: _wdCorrupt } = shared.safeReadJson(warnKey, wd);
+  if (_wdData && !_wdCorrupt) wd = _wdData;
   wd.callsSinceWarn = (wd.callsSinceWarn || 0) + 1;
   const isCritical  = remaining <= CRITICAL_THRESHOLD;
   const escalated   = isCritical && wd.lastLevel === 'warning';
@@ -377,14 +415,7 @@ function checkContextWarning(cwd, slug, sessionId, bridge) {
 
   if (isCritical) {
     // 入队 git checkpoint（P2#15：不内联同步执行）
-    const qPath = shared.getGitQueuePath();
-    shared.appendJsonlQueue(qPath, {
-      cwd: rootCwd, slug, reason: 'context_critical',
-      touchedFiles: bridge.change?.touchedFiles || [],
-    }).then(() => {
-      const workerPath = path.join(__dirname, 'forge-git-worker.js');
-      if (fs.existsSync(workerPath)) spawnDetachedWorker(workerPath);
-    }).catch(e => shared.logHookError('forge-context-bridge/gitQueue', e, { cwd }));
+    enqueueCheckpoint(rootCwd, slug, 'context_critical', bridge.change?.touchedFiles);
 
     writeHandoff(cwd, slug);
     acts.push('✅ 已写入恢复文件 (.planning/HANDOFF.json)');
@@ -406,14 +437,7 @@ function checkContextWarning(cwd, slug, sessionId, bridge) {
     return `⛔ CONTEXT CRITICAL: 上下文已用 ${usedPct}%，剩余 ${remaining}%。\n已自动保存工作进度。\n${acts.join('\n')}\n请立即完成当前原子任务后停止。下次继续用：/forge resume ${slug}`;
   } else {
     // 入队 warning checkpoint
-    const qPath = shared.getGitQueuePath();
-    shared.appendJsonlQueue(qPath, {
-      cwd: rootCwd, slug, reason: 'context_warning',
-      touchedFiles: bridge.change?.touchedFiles || [],
-    }).then(() => {
-      const workerPath = path.join(__dirname, 'forge-git-worker.js');
-      if (fs.existsSync(workerPath)) spawnDetachedWorker(workerPath);
-    }).catch(e => shared.logHookError('forge-context-bridge/gitQueueWarn', e, { cwd }));
+    enqueueCheckpoint(rootCwd, slug, 'context_warning', bridge.change?.touchedFiles);
     acts.push('✅ 已入队 git checkpoint（异步执行）');
 
     return `⚠️ CONTEXT WARNING: 上下文已用 ${usedPct}%，剩余 ${remaining}%。\n${acts.join('\n')}\n避免开始新的复杂任务，尽快完成当前阶段。`;

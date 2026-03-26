@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// forge-shared.js - v1.6.0
+// forge-shared.js - v1.7.0
 // 所有 Forge hooks 的共享存储层
 //
 // 修复：
@@ -11,6 +11,8 @@
 // - F17:  resolveProjectRoot：统一 worktree/子目录 → git repo root，消除身份分裂
 // - F18:  resolveSlug：新项目用 hashed slug，保证首次创建无竞态碰撞
 // - F20:  logHookEvent：events.jsonl 加 5MB 轮转
+// - R3-HIGH-1: mutateBridge/mutateForgeState 数组形状守卫，防止静默数据损坏
+// - R3-OPT-3:  导出 STALE_TIMEOUT_MS 常量，消除各 hook 重复的魔法数字
 
 'use strict';
 
@@ -34,6 +36,11 @@ function _mkdirOnce(dir) {
 
 // PERF-2: resolveProjectRoot 进程级缓存，避免对同一 cwd 重复 spawn git rev-parse
 const _rootCache = new Map();
+
+// ─── 共享常量（R3-OPT-3：消除各 hook 重复的魔法数字）────────────────────────────
+// stale lock 判定阈值（20 分钟）：session-start 的 budgetedCleanup 和 context-bridge 的
+// spawnDetachedWorker 都用同一阈值，现在统一由 shared 导出
+const STALE_TIMEOUT_MS = 20 * 60 * 1000;
 
 // ─── 命令分类正则（DUP-1：auto-fix/context-bridge 共享，消除两处重复定义）─────
 // OPT-10: 补充 pnpm/cargo-nextest 模式
@@ -279,7 +286,8 @@ async function mutateBridge(cwd, mutator) {
       logHookError('mutateBridge', new Error('Bridge file corrupt, skipping mutation'), { path: bp });
       return { bridge: null };
     }
-    const draft      = data || {};
+    // R3-HIGH-1: 防止 bridge.json 被外部损坏为 [] 后 mutator 对数组设属性导致静默丢失
+    const draft      = (!data || Array.isArray(data)) ? {} : data;
     const beforeJson = JSON.stringify(draft);
     await Promise.resolve(mutator(draft));
     // C1 fix: 脏检查 — 无变更时跳过 writeJsonAtomic，消除无意义 disk 写入
@@ -306,7 +314,8 @@ async function mutateForgeState(slug, mutator) {
       logHookError('mutateForgeState', new Error('State file corrupt, skipping mutation'), { path: sp });
       return { state: null };
     }
-    const draft = data || {};
+    // R3-HIGH-1: 同 mutateBridge，防止 state.json 损坏为数组时静默损坏
+    const draft = (!data || Array.isArray(data)) ? {} : data;
     await Promise.resolve(mutator(draft));
     writeJsonAtomic(sp, draft);
     return { state: draft };
@@ -403,8 +412,9 @@ exports.logHookEvent = logHookEvent;
 exports.getGitQueuePath   = getGitQueuePath;
 exports.appendJsonlQueue  = appendJsonlQueue;
 
-exports._normReal     = _normReal;      // DUP-3: git-worker/state-sync 共享
-exports.TEST_PATTERN  = TEST_PATTERN;   // DUP-1: auto-fix/context-bridge 共享
-exports.BUILD_PATTERN = BUILD_PATTERN;  // DUP-1
-exports.LINT_PATTERN  = LINT_PATTERN;   // DUP-1
-exports.parseExitCode = parseExitCode;  // DUP-4: auto-fix/context-bridge 共享
+exports._normReal        = _normReal;      // DUP-3: git-worker/state-sync 共享
+exports.TEST_PATTERN     = TEST_PATTERN;   // DUP-1: auto-fix/context-bridge 共享
+exports.BUILD_PATTERN    = BUILD_PATTERN;  // DUP-1
+exports.LINT_PATTERN     = LINT_PATTERN;   // DUP-1
+exports.parseExitCode    = parseExitCode;  // DUP-4: auto-fix/context-bridge 共享
+exports.STALE_TIMEOUT_MS = STALE_TIMEOUT_MS;  // R3-OPT-3: session-start/context-bridge 共享

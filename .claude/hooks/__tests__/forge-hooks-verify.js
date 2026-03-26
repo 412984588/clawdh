@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// forge-hooks-verify.js — Forge v2.0 hooks 验证脚本（133 场景）
+// forge-hooks-verify.js — Forge v2.0 hooks 验证脚本（143 场景）
 // 纯 Node.js，无外部依赖
 // 运行：node forge-hooks-verify.js
 
@@ -1824,8 +1824,8 @@ test('21-4: M3 context_warning queue job 使用 rootCwd 而非裸 cwd', () => {
     'M3：两处 queue job 均不应使用裸 cwd'
   );
   assert(
-    bridgeSrc.includes('rootCwd, slug, reason:'),
-    'M3：queue job 应使用 rootCwd'
+    bridgeSrc.includes('enqueueCheckpoint(rootCwd,') || bridgeSrc.includes('cwd: rootCwd'),
+    'M3：queue job 应使用 rootCwd（通过 enqueueCheckpoint 或直接写入）'
   );
 });
 
@@ -2284,6 +2284,188 @@ test('25-14: FSM escalation 门 — 任意前置门 failCount>=3 时触发 escal
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
+// 组 26：Round 3 深度审计修复验证（10 个场景）
+// ─────────────────────────────────────────────────────────────────────────────
+console.log('\n【组 26】Round 3 双AI深度审计修复');
+
+// T-1 (R3-HIGH-1): mutateBridge 输入 [] 形状 → 自动重置为默认对象
+await testAsync('26-T1: R3-HIGH-1 mutateBridge 输入 [] → 重置为 {} 防止静默数据损坏', async () => {
+  const shared = require(path.join(HOOKS_DIR, 'forge-shared'));
+  const tmpDir = mkTmpDir('-r3-h1');
+  const bp = shared.getBridgePath(tmpDir);
+  fs.mkdirSync(path.dirname(bp), { recursive: true });
+  // 模拟 bridge.json 被外部损坏为数组
+  fs.writeFileSync(bp, '[]');
+  let resultDraft;
+  await shared.mutateBridge(tmpDir, (d) => {
+    d.testKey = 'r3-fixed';
+    resultDraft = d;
+  });
+  assert(resultDraft !== null && resultDraft !== undefined, 'mutateBridge: [] 输入后不应返回 null');
+  assert(!Array.isArray(resultDraft), 'mutateBridge: [] 输入后 draft 不应是数组');
+  assert(typeof resultDraft === 'object', 'mutateBridge: [] 输入后 draft 应是普通对象');
+  assertEqual(resultDraft.testKey, 'r3-fixed', 'mutateBridge: [] 输入后 draft 应可正常写入属性');
+  const { data } = shared.safeReadJson(bp, null);
+  assert(data && !Array.isArray(data) && data.testKey === 'r3-fixed', '写入后 bridge.json 应是对象而非数组');
+  try { fs.rmSync(path.dirname(bp), { recursive: true }); } catch (_) {}
+  fs.rmSync(tmpDir, { recursive: true });
+});
+
+// T-2 (R3-HIGH-3): .processing 恢复在 worker 活跃时跳过（防重复入队）
+test('26-T2: R3-HIGH-3 budgetedCleanup .processing 恢复前检查 worker 锁', () => {
+  const src = fs.readFileSync(path.join(HOOKS_DIR, 'forge-session-start.js'), 'utf8');
+  // 应在恢复 .processing 前检查 worker.lock 是否活跃
+  assert(src.includes('workerActive'), 'budgetedCleanup 应有 workerActive 检查');
+  assert(src.includes('worker.lock'), 'budgetedCleanup 应检查 worker.lock');
+  // 只在 worker 不活跃时才恢复
+  assert(
+    src.includes('if (!workerActive)') || src.includes('!workerActive'),
+    'budgetedCleanup 应在 worker 不活跃时才恢复 .processing'
+  );
+});
+
+// T-3 (R3-HIGH-4): slug 含 shell 元字符时输出安全（防注入）
+test('26-T3: R3-HIGH-4 孤儿项目 slug 含 shell 元字符 → 输出安全转义', () => {
+  const src = fs.readFileSync(path.join(HOOKS_DIR, 'forge-session-start.js'), 'utf8');
+  // 应有白名单过滤
+  assert(
+    src.includes('[a-zA-Z0-9_') || src.includes('_safeSlug'),
+    'forge-session-start 应对 slug 做白名单过滤'
+  );
+  // 不安全 slug 应有 fallback 提示
+  assert(
+    src.includes('手动删除') || src.includes('_safeSlug'),
+    'forge-session-start 应在 slug 不安全时提供 fallback 提示'
+  );
+});
+
+// T-4 (R3-MED-1): gate 正则不被 plan-eng-review / qa-only / design-review 触发
+test('26-T4: R3-MED-1 code_review 门不被 plan-*-review / design-review / qa-* 误触发', () => {
+  const src = fs.readFileSync(path.join(HOOKS_DIR, 'forge-context-bridge.js'), 'utf8');
+  // gate 正则应排除 plan-/design-/qa-
+  const gateRegex = src.match(/\/\\breview\\b\/.*markGatePassed\(draft, 'code_review'\)/);
+  assert(gateRegex || src.includes("!/plan-|design-|qa-/.test(skill)"),
+    'R3-MED-1：code_review 门应排除 plan-/design-/qa- 前缀的 skill');
+  // 旧的 qa-review 排除不应是唯一保护
+  assert(
+    src.includes("!/plan-|design-|qa-/.test(skill)"),
+    'R3-MED-1：应用更宽的排除正则 !/plan-|design-|qa-/'
+  );
+});
+
+// T-5 (R3-MED-2): writeHandoff 使用 resolveProjectRoot 而非裸 cwd
+test('26-T5: R3-MED-2 writeHandoff 使用 resolveProjectRoot 定位 .planning/', () => {
+  const src = fs.readFileSync(path.join(HOOKS_DIR, 'forge-context-bridge.js'), 'utf8');
+  // writeHandoff 函数体中不应再用 path.join(cwd, '.planning')
+  const fnMatch = src.match(/function writeHandoff[\s\S]*?^}/m);
+  assert(fnMatch, 'R3-MED-2：应能提取 writeHandoff 函数体');
+  const fnBody = fnMatch[0];
+  assert(
+    fnBody.includes('resolveProjectRoot'),
+    'R3-MED-2：writeHandoff 应通过 resolveProjectRoot 找 .planning/'
+  );
+  assert(
+    !fnBody.includes("path.join(cwd, '.planning')"),
+    'R3-MED-2：writeHandoff 不应直接 path.join(cwd, ".planning")（会在子目录 cwd 下找不到）'
+  );
+});
+
+// T-6 (R3-MED-3): 外部路径 Write（rel 以 .. 开头）不增加 changeEpoch
+test('26-T6: R3-MED-3 外部路径写入（rel startsWith ".."）不触发 changeEpoch++', () => {
+  const src = fs.readFileSync(path.join(HOOKS_DIR, 'forge-context-bridge.js'), 'utf8');
+  // 在 Write/Edit/MultiEdit 分支的 else-if 里应检查 rel.startsWith('..')
+  assert(
+    src.includes("rel.startsWith('..')") || src.includes('rel.startsWith("..")'),
+    'R3-MED-3：inferAndUpdate 应检查 rel.startsWith("..")，拒绝外部路径触发 changeEpoch'
+  );
+  // 应有注释说明外部路径的含义
+  assert(
+    src.includes('外部路径') || src.includes('项目外'),
+    'R3-MED-3：应有注释说明外部路径守卫的意图'
+  );
+});
+
+// T-7 (R3-MED-4): migrateIfNeeded 保留 auto_fix 字段
+test('26-T7: R3-MED-4 migrateIfNeeded 保留 auto_fix 防止计数被重置', () => {
+  const src = fs.readFileSync(path.join(HOOKS_DIR, 'forge-context-bridge.js'), 'utf8');
+  assert(src.includes('savedAutoFix'), 'R3-MED-4：migrateIfNeeded 应保存 savedAutoFix');
+  assert(
+    src.includes('if (savedAutoFix) draft.auto_fix = savedAutoFix'),
+    'R3-MED-4：migrateIfNeeded 应在迁移后恢复 auto_fix'
+  );
+  // forge-auto-fix.js 也应设置 _schema_version
+  const autoFixSrc = fs.readFileSync(path.join(HOOKS_DIR, 'forge-auto-fix.js'), 'utf8');
+  assert(
+    autoFixSrc.includes('_schema_version') && autoFixSrc.includes('2'),
+    'R3-MED-4：forge-auto-fix.js 写 auto_fix 时应同时设置 _schema_version = 2'
+  );
+});
+
+// T-8 (R3-MED-5): git-worker restore 失败有日志（不再静默丢失预暂存内容）
+test('26-T8: R3-MED-5 forge-git-worker.js restore 失败调用 logHookError', () => {
+  const src = fs.readFileSync(path.join(HOOKS_DIR, 'forge-git-worker.js'), 'utf8');
+  // patch apply 失败应记录
+  assert(
+    src.includes("logHookError('forge-git-worker/restore-patch'"),
+    'R3-MED-5：git apply --cached 失败应调用 logHookError("restore-patch")'
+  );
+  // 整文件 add 失败也应记录
+  assert(
+    src.includes("logHookError('forge-git-worker/restore-add'"),
+    'R3-MED-5：git add fallback 失败应调用 logHookError("restore-add")'
+  );
+  // 不应再有静默 catch (_) {}（在 restore 分支内）
+  const restoreBlock = src.match(/preStagedToRestore\.length > 0[\s\S]*?^  \}/m);
+  if (restoreBlock) {
+    const blockText = restoreBlock[0];
+    // 只允许有 logHookError，不允许裸 catch (_) {}
+    const catchBlocks = blockText.match(/\} catch \(_\) \{\}/g) || [];
+    assertEqual(catchBlocks.length, 0, 'R3-MED-5：restore 分支内不应有静默 catch(_) {}');
+  }
+});
+
+// T-9 (R3-HIGH-2): git-worker 每个 job 完成后手动 touch LOCK_DIR 防心跳失效
+test('26-T9: R3-HIGH-2 forge-git-worker.js 每个 job 后手动 utimesSync 更新锁 mtime', () => {
+  const src = fs.readFileSync(path.join(HOOKS_DIR, 'forge-git-worker.js'), 'utf8');
+  // 应在 for 循环内 processJob 后有 utimesSync
+  assert(
+    src.includes('utimesSync(LOCK_DIR') || src.includes('utimesSync(LOCK_DIR,'),
+    'R3-HIGH-2：main() 的 for 循环内应有 fs.utimesSync(LOCK_DIR, ...) 更新心跳'
+  );
+  // 应在 processJob(job) 之后
+  const forLoopMatch = src.match(/for \(const line of lines\)[\s\S]*?^\s{6}\}/m);
+  if (forLoopMatch) {
+    const loopBody = forLoopMatch[0];
+    const pjIdx     = loopBody.indexOf('processJob(job)');
+    const utimesIdx = loopBody.indexOf('utimesSync');
+    assert(pjIdx !== -1 && utimesIdx !== -1 && utimesIdx > pjIdx,
+      'R3-HIGH-2：utimesSync 应在 processJob 之后执行');
+  }
+});
+
+// T-10 (R3-OPT-4): buildEscalateMessage 使用动态 max 参数
+test('26-T10: R3-OPT-4 buildEscalateMessage 文案使用动态 max（不硬编码 "3 轮"）', () => {
+  const src = fs.readFileSync(path.join(HOOKS_DIR, 'forge-auto-fix.js'), 'utf8');
+  assert(
+    src.includes('buildEscalateMessage(type, errorSnippet, max)'),
+    'R3-OPT-4：buildEscalateMessage 应有 max 参数'
+  );
+  const fnMatch = src.match(/function buildEscalateMessage[\s\S]*?^}/m);
+  assert(fnMatch, 'R3-OPT-4：应能提取 buildEscalateMessage 函数体');
+  const fnBody = fnMatch[0];
+  assert(
+    fnBody.includes('rounds') || (fnBody.includes('max') && !fnBody.includes('"3 轮"')),
+    'R3-OPT-4：函数体应使用 rounds/max 变量'
+  );
+  assert(!fnBody.includes('3 轮'), 'R3-OPT-4：函数体不应硬编码 "3 轮"');
+  // 调用处应传入 fixResult.max
+  assert(
+    src.includes('buildEscalateMessage(type, snippet, fixResult.max)'),
+    'R3-OPT-4：调用处应传入 fixResult.max'
+  );
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
 // 结果
 // ─────────────────────────────────────────────────────────────────────────────
 console.log(`\n${'─'.repeat(56)}`);
@@ -2297,7 +2479,7 @@ if (failures.length > 0) {
   console.log('');
   process.exit(1);
 } else {
-  console.log('  全部通过！Forge v2.0 hooks 验证完成。');
+  console.log('  全部通过！Forge v2.0 hooks Round 3 验证完成（143 场景）。');
   console.log('');
   process.exit(0);
 }

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// forge-quality-pipeline.js - v2.2.0
+// forge-quality-pipeline.js - v2.3.0
 // PostToolUse hook（Skill|Agent|Task）: 质量门 FSM
 //
 // 修复（相比 v1.x）：
@@ -10,7 +10,7 @@
 
 'use strict';
 
-const fs   = require('fs');
+// R3-OPT-1: 已删除死代码 `const fs = require('fs')`（经 grep 验证 fs. 无直接调用）
 const { execFileSync } = require('child_process');
 
 const shared = require('./forge-shared');

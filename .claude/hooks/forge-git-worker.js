@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// forge-git-worker.js - v1.1.0
+// forge-git-worker.js - v1.2.0
 // 独立异步进程：处理 git checkpoint 队列
 //
 // 修复（P1#6, P2#15）：
@@ -169,10 +169,19 @@ function processJob(job) {
         execFileSync('git', ['apply', '--cached', '--whitespace=nowarn'],
           { cwd, input: preStagedPatch, encoding: 'utf8', timeout: 5000 });
         restored = true;
-      } catch (_) { /* patch apply 失败，fallback 到整文件 add */ }
+      } catch (e) {
+        // R3-MED-5: patch apply 失败需记录，用户预暂存内容可能丢失
+        shared.logHookError('forge-git-worker/restore-patch', e, { cwd, files: preStagedToRestore });
+        /* fallback 到整文件 add */
+      }
     }
     if (!restored) {
-      try { execFileSync('git', ['add', '--', ...preStagedToRestore], { cwd, timeout: 3000 }); } catch (_) {}
+      try {
+        execFileSync('git', ['add', '--', ...preStagedToRestore], { cwd, timeout: 3000 });
+      } catch (e) {
+        // R3-MED-5: 整文件 add 也失败 → 用户预暂存内容已丢失，必须记录
+        shared.logHookError('forge-git-worker/restore-add', e, { cwd, files: preStagedToRestore });
+      }
     }
   }
   if (committed) {
@@ -206,6 +215,9 @@ async function main() {
         try {
           const job = JSON.parse(line);
           processJob(job);
+          // R3-HIGH-2: processJob 全程 execFileSync 阻塞事件循环，setInterval 心跳无法触发
+          // 每个 job 完成后手动 touch worker.lock mtime，防止锁被误判 stale 后第二个 worker 启动
+          try { fs.utimesSync(LOCK_DIR, new Date(), new Date()); } catch (_) {}
         } catch (e) {
           shared.logHookError('forge-git-worker/parseJob', e, { line: line.slice(0, 100) });
         }
