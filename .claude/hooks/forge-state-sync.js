@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// forge-state-sync.js - v2.4.0
+// forge-state-sync.js - v2.5.0
 // PostToolUse hook (Write|Edit): 同步 GSD 状态到 Forge State Hub
 //
 // 监控：
@@ -245,4 +245,8 @@ process.stdin.on('end', async () => {
   }
 });
 
+} else {
+  // H4 fix: 导出解析函数供 Cursor after-file-edit.mjs require() 使用
+  // 只在被 require() 导入时生效，不影响 CC 直接执行的行为
+  module.exports = { parseStateMd, parseProgressTxt, applyParsed };
 } // end if (require.main === module)
