@@ -41,6 +41,8 @@ const _rootCache = new Map();
 // stale lock 判定阈值（20 分钟）：session-start 的 budgetedCleanup 和 context-bridge 的
 // spawnDetachedWorker 都用同一阈值，现在统一由 shared 导出
 const STALE_TIMEOUT_MS = 20 * 60 * 1000;
+// M3 fix: 质量门 lease 时长（10 分钟），消除 after-shell/after-file-edit/quality-pipeline 三处重复定义
+const LEASE_TTL_MS = 10 * 60 * 1000;
 
 // ─── 命令分类正则（DUP-1：auto-fix/context-bridge 共享，消除两处重复定义）─────
 // OPT-10: 补充 pnpm/cargo-nextest 模式
@@ -420,9 +422,23 @@ exports.logHookEvent = logHookEvent;
 exports.getGitQueuePath   = getGitQueuePath;
 exports.appendJsonlQueue  = appendJsonlQueue;
 
+// M2 fix: 提取 signalPath/ensureSignalsDir（after-shell/after-file-edit 重复定义，统一到 shared）
+function signalPath(cwd, name) {
+  const projectRoot = resolveProjectRoot(cwd);
+  return path.join(projectRoot, '.planning', '.cursor-signals', name);
+}
+function ensureSignalsDir(cwd) {
+  const dir = path.join(resolveProjectRoot(cwd), '.planning', '.cursor-signals');
+  fs.mkdirSync(dir, { recursive: true });
+  return dir;
+}
+
 exports._normReal        = _normReal;      // DUP-3: git-worker/state-sync 共享
 exports.TEST_PATTERN     = TEST_PATTERN;   // DUP-1: auto-fix/context-bridge 共享
 exports.BUILD_PATTERN    = BUILD_PATTERN;  // DUP-1
 exports.LINT_PATTERN     = LINT_PATTERN;   // DUP-1
 exports.parseExitCode    = parseExitCode;  // DUP-4: auto-fix/context-bridge 共享
 exports.STALE_TIMEOUT_MS = STALE_TIMEOUT_MS;  // R3-OPT-3: session-start/context-bridge 共享
+exports.LEASE_TTL_MS     = LEASE_TTL_MS;       // M3: after-shell/after-file-edit/quality-pipeline 共享
+exports.signalPath       = signalPath;         // M2: after-shell/after-file-edit 共享
+exports.ensureSignalsDir = ensureSignalsDir;   // M2

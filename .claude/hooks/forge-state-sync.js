@@ -158,6 +158,9 @@ function applyParsed(state, parsed) {
 }
 
 // ─── 主流程 ───────────────────────────────────────────────────────────────────
+// H1 fix: 包裹 require.main 守卫，与 context-bridge/quality-pipeline/auto-fix 保持一致
+// 被 require() 导入时不启动 stdin 监听，防止 10s timeout 泄漏
+if (require.main === module) {
 
 let input = '';
 const stdinTimeout = setTimeout(() => process.exit(0), 10000);
@@ -241,3 +244,5 @@ process.stdin.on('end', async () => {
     process.exit(0);
   }
 });
+
+} // end if (require.main === module)

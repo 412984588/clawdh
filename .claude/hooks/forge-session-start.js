@@ -185,8 +185,15 @@ function budgetedCleanup() {
         if (!workerActive) {
           const content   = fs.readFileSync(processingPath, 'utf8');
           const queuePath = path.join(gitDir, 'queue.jsonl');
-          // 追加到 queue.jsonl（末尾补换行防止行粘连）
-          fs.appendFileSync(queuePath, content.endsWith('\n') ? content : content + '\n');
+          // M5 fix: 改用 shared.appendJsonlQueue 逐条追加（自带锁保护）
+          // 原 fs.appendFileSync 无锁，与其他进程的 appendJsonlQueue 并发时可能行粘连
+          const lines = content.trim().split('\n').filter(Boolean);
+          for (const line of lines) {
+            try {
+              const job = JSON.parse(line);
+              shared.appendJsonlQueue(queuePath, job).catch(() => {});
+            } catch (_) {}
+          }
           fs.unlinkSync(processingPath);
         }
       }

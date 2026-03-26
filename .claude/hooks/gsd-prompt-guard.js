@@ -48,8 +48,13 @@ process.stdin.on('end', () => {
 
     const filePath = data.tool_input?.file_path || '';
 
-    // Only scan files going into .planning/ (agent context files)
-    if (!filePath.includes('.planning/') && !filePath.includes('.planning\\')) {
+    // L1 fix: 改用 path.relative + startsWith 做路径检查（对齐 forge hooks 的 path.relative 模式）
+    // 原 includes('.planning/') 可被 /fake/.planning/../other/ 等路径绕过
+    const cwd = data.cwd || process.cwd();
+    const rel = path.relative(cwd, path.isAbsolute(filePath) ? filePath : path.resolve(cwd, filePath));
+    const isInPlanning = (rel.startsWith('.planning' + path.sep) || rel === '.planning') &&
+                         !rel.startsWith('..');
+    if (!isInPlanning) {
       process.exit(0);
     }
 

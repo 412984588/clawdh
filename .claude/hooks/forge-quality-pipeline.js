@@ -17,7 +17,8 @@ const shared = require('./forge-shared');
 
 // ─── 常量 ─────────────────────────────────────────────────────────────────────
 
-const LEASE_TTL_MS = 10 * 60 * 1000;  // 10 分钟 lease，超时自动回 required
+// M3 fix: 从 shared 引用 LEASE_TTL_MS（消除与 after-shell/after-file-edit 的重复定义）
+const { LEASE_TTL_MS } = shared;
 
 // gstack preamble 跳过说明（所有质量门注入时附带）
 const PREAMBLE_SKIP = `（gstack 执行说明：读取 SKILL.md 后从 "## Step 0" 或 "# /{命令名}" 标记开始执行。跳过 Preamble bash block、Lake Intro、Telemetry、Session Tracking。所有 AskUserQuestion 自动选推荐选项。所有 "STOP and wait" 自动继续。）`;

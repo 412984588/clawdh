@@ -6,6 +6,15 @@
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
+// M1 fix: 用 forge-shared getTmpDir()，与 forge-context-bridge.js 读取路径对齐
+// context-bridge 优先从 shared.getTmpDir() 读取，使用 os.tmpdir() 会永远走 fallback 路径
+let _forgeTmpDir;
+try {
+  const _forgeShared = require('./forge-shared.js');
+  _forgeTmpDir = _forgeShared.getTmpDir;
+} catch (_) {
+  _forgeTmpDir = os.tmpdir.bind(os);
+}
 
 // Read JSON from stdin
 let input = '';
@@ -37,7 +46,7 @@ process.stdin.on('end', () => {
       // The monitor reads this file to inject agent-facing warnings when context is low.
       if (session) {
         try {
-          const bridgePath = path.join(os.tmpdir(), `claude-ctx-${session}.json`);
+          const bridgePath = path.join(_forgeTmpDir(), `claude-ctx-${session}.json`);
           const bridgeData = JSON.stringify({
             session_id: session,
             remaining_percentage: remaining,
