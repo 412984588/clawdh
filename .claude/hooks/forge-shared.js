@@ -345,7 +345,13 @@ function logHookError(hook, error, context) {
       ts:      new Date().toISOString(),
       hook,
       error:   error?.message || String(error),
-      stack:   error?.stack?.slice(0, 500),
+      // Issue 12 fix: 在换行处截断，避免在行中间切断堆栈信息
+      stack:   (() => {
+        const s = error?.stack || '';
+        if (s.length <= 500) return s;
+        const cut = s.indexOf('\n', 500);
+        return cut === -1 ? s.slice(0, 500) : s.slice(0, cut);
+      })(),
       context: context || {},
     }));
   } catch (_) {
@@ -385,7 +391,9 @@ async function appendJsonlQueue(queuePath, job) {
 // DUP-4: 退出码解析，统一处理各平台/框架的字段名差异
 // auto-fix.js 和 context-bridge.js 曾各自内联此逻辑
 function parseExitCode(resp) {
-  return resp?.exit_code ?? resp?.exitCode ?? resp?.returncode ?? (resp?.isError ? 1 : 0);
+  const raw = resp?.exit_code ?? resp?.exitCode ?? resp?.returncode ?? (resp?.isError ? 1 : 0);
+  // 处理字符串退出码（部分框架/Cursor 返回 "1" 而非 1）
+  return typeof raw === 'string' ? (parseInt(raw, 10) || 0) : (raw ?? 0);
 }
 
 // ─── 导出 ──────────────────────────────────────────────────────────────────────

@@ -136,6 +136,8 @@ function processJob(job) {
   // 原 git reset HEAD 会清除全部暂存区，包括用户有意暂存的合法文件（甚至含 secrets）
   let preStagedToRestore = [];
   let preStagedPatch     = '';  // HIGH fix: 保留精确 patch，防止 git add 破坏 partial staging
+  // Codex Finding 1 fix: 提升到 try 块外，避免 try 内 const 声明在 try 外引用时 ReferenceError
+  let partialStagingConflicts = [];
   try {
     const staged = execFileSync('git', ['diff', '--name-only', '--cached'],
       { cwd, encoding: 'utf8', timeout: 3000 });
@@ -150,7 +152,7 @@ function processJob(job) {
     // PARTIAL-STAGING FIX: 同时在 allStaged（用户部分暂存）和 touchedRel（forge 触碰）的文件
     // 不能直接 git add（会把整个文件暂存，覆盖用户刻意留出的 hunk）
     // 策略：从 git add 目标中排除这些文件，保留用户暂存意图，forge 更改留给下次 checkpoint
-    const partialStagingConflicts = allStaged.filter(f => touchedRel.includes(f));
+    partialStagingConflicts = allStaged.filter(f => touchedRel.includes(f));
     if (partialStagingConflicts.length > 0) {
       shared.logHookEvent('forge-git-worker', 'partial_staging_skipped', {
         cwd, files: partialStagingConflicts,
@@ -218,11 +220,43 @@ async function main() {
   // 获取单例锁（确保同时只有一个 worker 在跑）
   try {
     await shared.withAdvisoryLock(LOCK_DIR, async () => {
-      if (!fs.existsSync(QUEUE_PATH)) return;
+      if (!fs.existsSync(QUEUE_PATH)) {
+        // Issue 7 fix：检查 stale .processing 文件（worker 上次崩溃遗留）
+        // 超过 60s 未被清理的 .processing 视为崩溃残留，回收为新队列重新处理
+        const processingPath = QUEUE_PATH + '.processing';
+        if (fs.existsSync(processingPath)) {
+          try {
+            const stat = fs.statSync(processingPath);
+            const age = Date.now() - stat.mtimeMs;
+            if (age > 60 * 1000) {
+              // Codex Finding 4 fix: stale rename 必须持 QUEUE_PATH + '.lock'（与 appendJsonlQueue 同一域）
+              // 否则 appendJsonlQueue 在 rename 前写入 QUEUE_PATH，rename 后被覆盖丢失 job
+              await shared.withAdvisoryLock(QUEUE_PATH + '.lock', async () => {
+                // 二次检查：lock 内 QUEUE_PATH 是否已存在（appendJsonlQueue 刚写入）
+                if (!fs.existsSync(QUEUE_PATH)) {
+                  fs.renameSync(processingPath, QUEUE_PATH);
+                  shared.logHookEvent('forge-git-worker', 'stale_processing_recovered', { age_ms: age });
+                }
+              }, { waitMs: 500, staleMs: 5000 });
+            }
+          } catch (_) {}
+        }
+        if (!fs.existsSync(QUEUE_PATH)) return;
+      }
 
       // F11 fix：rename 后再处理，防止处理期间新追加的 job 被清空覆盖而丢失
+      // Issue 3 fix：rename 必须持 QUEUE_PATH + '.lock'（与 appendJsonlQueue 同一域），
+      // 消除 append 和 rename 之间的竞态窗口（否则 append 写入后 rename 清空，job 丢失）
       const processingPath = QUEUE_PATH + '.processing';
-      try { fs.renameSync(QUEUE_PATH, processingPath); } catch (_) { return; }
+      let renamed = false;
+      try {
+        await shared.withAdvisoryLock(QUEUE_PATH + '.lock', async () => {
+          if (!fs.existsSync(QUEUE_PATH)) return;  // append 与本次 rename 之间队列被清空
+          fs.renameSync(QUEUE_PATH, processingPath);
+          renamed = true;
+        }, { waitMs: 1000, staleMs: 5000 });
+      } catch (_) { return; }  // lock 超时 → 另一线程正在追加，跳过本轮
+      if (!renamed) return;
 
       const content = fs.readFileSync(processingPath, 'utf8');
       const lines = content.trim().split('\n').filter(Boolean);

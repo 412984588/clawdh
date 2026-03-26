@@ -258,7 +258,8 @@ function inferAndUpdate(draft, toolName, toolInput, toolResponse) {
         if (draft.gates?.[name]?.status === 'leased') markGateFailed(draft, name);
       }
       if (/autoplan/.test(skill))                          _failIfLeased('plan_review');
-      else if (/\breview\b/.test(skill) && !/qa-review/.test(skill)) _failIfLeased('code_review');
+      // Issue 8 fix: 与成功路径对齐，统一排除 plan-*/design-*/qa-* 防止误 fail code_review 门
+      else if (/\breview\b/.test(skill) && !/plan-|design-|qa-/.test(skill)) _failIfLeased('code_review');
       else if (/\bqa\b/.test(skill))                       _failIfLeased('qa');
       else if (/\bcso\b/.test(skill))                      _failIfLeased('security');
       else if (/\bbenchmark\b/.test(skill))                _failIfLeased('benchmark');
@@ -331,7 +332,10 @@ function spawnDetachedWorker(workerPath) {
       detached: true, stdio: 'ignore',
     });
     child.unref();  // 立即解除引用，hook 进程不等待 worker 完成
-  } catch (_) {}
+  } catch (e) {
+    // Issue 6 fix: spawn 失败时记录日志（git checkpoint 队列不会被清空，下次仍可处理）
+    shared.logHookError('forge-context-bridge/spawnDetachedWorker', e);
+  }
 }
 
 function writeHandoff(cwd, slug) {
@@ -444,58 +448,65 @@ function checkContextWarning(cwd, slug, sessionId, bridge) {
   }
 }
 
-// ─── 主流程 ───────────────────────────────────────────────────────────────────
+// ─── 主流程 / 可复用导出 ──────────────────────────────────────────────────────
+// require.main === module: 作为 CC hook 直接执行，启动 stdin 监听
+// require.main !== module: 被 Cursor hooks require()，只导出函数，不执行副作用
 
-let input = '';
-const timeout = setTimeout(() => process.exit(0), 10000);
-process.stdin.setEncoding('utf8');
-process.stdin.on('data', c => (input += c));
-process.stdin.on('end', async () => {
-  clearTimeout(timeout);
-  try {
-    const data         = JSON.parse(input);
-    const cwd          = data.cwd || process.cwd();
-    const sessionId    = data.session_id || '';
-    const toolName     = data.tool_name  || '';
-    const toolInput    = data.tool_input || {};
-    const toolResponse = data.tool_response || data.tool_result || {};
-
-    // P3#16：非 Forge 项目提前退出，不写任何文件（OPT-2：改用 shared.isForgeProject）
-    if (!shared.isForgeProject(cwd)) process.exit(0);
-
-    const slug = shared.resolveSlug(cwd);
-
-    // 带锁更新 bridge
-    const { bridge } = await shared.mutateBridge(cwd, (draft) => {
-      // 如果是旧 v1 schema，先迁移
-      migrateIfNeeded(draft, cwd, slug);
-      // 确保必要字段存在（防御性初始化）
-      if (!draft.project) Object.assign(draft, defaultBridge(cwd, slug));
-      draft.project.slug = slug;
-      // D4 fix: 和 defaultBridge 保持一致，project.cwd 用 resolveProjectRoot
-      draft.project.cwd  = shared.resolveProjectRoot(cwd);
-      inferAndUpdate(draft, toolName, toolInput, toolResponse);
-    });
-
-    // 上下文保存（只对有 session 的情况）
-    const safeId = shared.sanitizeSessionId(sessionId);
-    if (!safeId || !bridge) process.exit(0);
-
-    // 检查是否被 .planning/config.json 禁用（C5 fix：用 resolveProjectRoot 统一路径）
+if (require.main === module) {
+  let input = '';
+  const timeout = setTimeout(() => process.exit(0), 10000);
+  process.stdin.setEncoding('utf8');
+  process.stdin.on('data', c => (input += c));
+  process.stdin.on('end', async () => {
+    clearTimeout(timeout);
     try {
-      const cfgRoot = shared.resolveProjectRoot(cwd);
-      const { data: cfg } = shared.safeReadJson(path.join(cfgRoot, '.planning', 'config.json'), {});
-      if (cfg?.hooks?.context_warnings === false) process.exit(0);
-    } catch (_) {}
+      const data         = JSON.parse(input);
+      const cwd          = data.cwd || process.cwd();
+      const sessionId    = data.session_id || '';
+      const toolName     = data.tool_name  || '';
+      const toolInput    = data.tool_input || {};
+      const toolResponse = data.tool_response || data.tool_result || {};
 
-    const msg = checkContextWarning(cwd, slug, safeId, bridge);
-    if (!msg) process.exit(0);
+      // P3#16：非 Forge 项目提前退出，不写任何文件（OPT-2：改用 shared.isForgeProject）
+      if (!shared.isForgeProject(cwd)) process.exit(0);
 
-    process.stdout.write(JSON.stringify({
-      hookSpecificOutput: { hookEventName: 'PostToolUse', additionalContext: msg },
-    }));
-  } catch (e) {
-    shared.logHookError('forge-context-bridge', e);
-    process.exit(0);
-  }
-});
+      const slug = shared.resolveSlug(cwd);
+
+      // 带锁更新 bridge
+      const { bridge } = await shared.mutateBridge(cwd, (draft) => {
+        // 如果是旧 v1 schema，先迁移
+        migrateIfNeeded(draft, cwd, slug);
+        // 确保必要字段存在（防御性初始化）
+        if (!draft.project) Object.assign(draft, defaultBridge(cwd, slug));
+        draft.project.slug = slug;
+        // D4 fix: 和 defaultBridge 保持一致，project.cwd 用 resolveProjectRoot
+        draft.project.cwd  = shared.resolveProjectRoot(cwd);
+        inferAndUpdate(draft, toolName, toolInput, toolResponse);
+      });
+
+      // 上下文保存（只对有 session 的情况）
+      const safeId = shared.sanitizeSessionId(sessionId);
+      if (!safeId || !bridge) process.exit(0);
+
+      // 检查是否被 .planning/config.json 禁用（C5 fix：用 resolveProjectRoot 统一路径）
+      try {
+        const cfgRoot = shared.resolveProjectRoot(cwd);
+        const { data: cfg } = shared.safeReadJson(path.join(cfgRoot, '.planning', 'config.json'), {});
+        if (cfg?.hooks?.context_warnings === false) process.exit(0);
+      } catch (_) {}
+
+      const msg = checkContextWarning(cwd, slug, safeId, bridge);
+      if (!msg) process.exit(0);
+
+      process.stdout.write(JSON.stringify({
+        hookSpecificOutput: { hookEventName: 'PostToolUse', additionalContext: msg },
+      }));
+    } catch (e) {
+      shared.logHookError('forge-context-bridge', e);
+      process.exit(0);
+    }
+  });
+} else {
+  // ─── 可复用导出（供 Cursor hooks 调用）────────────────────────────────────
+  module.exports = { inferAndUpdate, markGatePassed, markGateFailed, enqueueCheckpoint };
+}

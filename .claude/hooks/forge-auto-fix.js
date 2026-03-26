@@ -56,71 +56,78 @@ function hashError(stderr) {
   return crypto.createHash('sha256').update(stderr.slice(0, 500)).digest('hex').slice(0, 16);
 }
 
-// ─── 主流程 ───────────────────────────────────────────────────────────────────
+// ─── 主流程 / 可复用导出 ──────────────────────────────────────────────────────
+// require.main === module: 作为 CC hook 直接执行，启动 stdin 监听
+// require.main !== module: 被 Cursor hooks require()，只导出函数，不执行副作用
 
-let input = '';
-const timeout = setTimeout(() => process.exit(0), 10000);
-process.stdin.setEncoding('utf8');
-process.stdin.on('data', c => (input += c));
-process.stdin.on('end', async () => {
-  clearTimeout(timeout);
-  try {
-    const data     = JSON.parse(input);
-    const cwd      = data.cwd || process.cwd();
-    const toolResp = data.tool_response || data.tool_result || {};
+if (require.main === module) {
+  let input = '';
+  const timeout = setTimeout(() => process.exit(0), 10000);
+  process.stdin.setEncoding('utf8');
+  process.stdin.on('data', c => (input += c));
+  process.stdin.on('end', async () => {
+    clearTimeout(timeout);
+    try {
+      const data     = JSON.parse(input);
+      const cwd      = data.cwd || process.cwd();
+      const toolResp = data.tool_response || data.tool_result || {};
 
-    // 只处理失败的 Bash 命令
-    // DUP-4: 退出码解析统一用 shared.parseExitCode
-    const exitCode = shared.parseExitCode(toolResp);
-    if (exitCode === 0) process.exit(0);
+      // 只处理失败的 Bash 命令
+      // DUP-4: 退出码解析统一用 shared.parseExitCode
+      const exitCode = shared.parseExitCode(toolResp);
+      if (exitCode === 0) process.exit(0);
 
-    const cmd  = (data.tool_input || {}).command || '';
-    const type = classifyCommand(cmd);
+      const cmd  = (data.tool_input || {}).command || '';
+      const type = classifyCommand(cmd);
 
-    // 非 Forge 项目提前退出（无论命令类型）
-    if (!shared.isForgeProject(cwd)) process.exit(0);
+      // 非 Forge 项目提前退出（无论命令类型）
+      if (!shared.isForgeProject(cwd)) process.exit(0);
 
-    const stderr  = toolResp?.stderr || toolResp?.output || '';
-    const snippet = stderr.slice(-600).trim() || `（命令：${cmd.slice(0, 80)}，退出码：${exitCode}）`;
-    const errHash = hashError(stderr || cmd);
+      const stderr  = toolResp?.stderr || toolResp?.output || '';
+      const snippet = stderr.slice(-600).trim() || `（命令：${cmd.slice(0, 80)}，退出码：${exitCode}）`;
+      const errHash = hashError(stderr || cmd);
 
-    // 带锁读改写 auto_fix 状态（P1#1 并发安全，P2#14 升级 catch）
-    let fixResult = { issue_hash: null, attempts: 1, max: 3 };
+      // 带锁读改写 auto_fix 状态（P1#1 并发安全，P2#14 升级 catch）
+      let fixResult = { issue_hash: null, attempts: 1, max: 3 };
 
-    await shared.mutateBridge(cwd, (draft) => {
-      const fix = draft.auto_fix || { issue_hash: null, attempts: 0, max: 3 };
+      await shared.mutateBridge(cwd, (draft) => {
+        const fix = draft.auto_fix || { issue_hash: null, attempts: 0, max: 3 };
 
-      if (fix.issue_hash === errHash) {
-        // 同一问题，累加计数
-        fix.attempts = (fix.attempts || 0) + 1;
+        if (fix.issue_hash === errHash) {
+          // 同一问题，累加计数
+          fix.attempts = (fix.attempts || 0) + 1;
+        } else {
+          // 新问题，重置
+          fix.issue_hash = errHash;
+          fix.attempts   = 1;
+        }
+
+        draft.auto_fix = fix;
+        fixResult      = fix;
+        // R3-MED-4: 确保 _schema_version 存在，防止 migrateIfNeeded 在 context-bridge 执行时
+        // 因缺少版本字段而重建整个 bridge，清除此处写入的 auto_fix 计数
+        if (!draft._schema_version) draft._schema_version = 2;
+      });
+
+      let msg;
+      if (fixResult.attempts >= fixResult.max) {
+        msg = buildEscalateMessage(type, snippet, fixResult.max);
       } else {
-        // 新问题，重置
-        fix.issue_hash = errHash;
-        fix.attempts   = 1;
+        msg = buildFixMessage(type, snippet, fixResult.attempts, fixResult.max);
       }
 
-      draft.auto_fix = fix;
-      fixResult      = fix;
-      // R3-MED-4: 确保 _schema_version 存在，防止 migrateIfNeeded 在 context-bridge 执行时
-      // 因缺少版本字段而重建整个 bridge，清除此处写入的 auto_fix 计数
-      if (!draft._schema_version) draft._schema_version = 2;
-    });
-
-    let msg;
-    if (fixResult.attempts >= fixResult.max) {
-      msg = buildEscalateMessage(type, snippet, fixResult.max);
-    } else {
-      msg = buildFixMessage(type, snippet, fixResult.attempts, fixResult.max);
+      process.stdout.write(JSON.stringify({
+        hookSpecificOutput: {
+          hookEventName: 'PostToolUse',
+          additionalContext: msg,
+        },
+      }));
+    } catch (e) {
+      shared.logHookError('forge-auto-fix', e);
+      process.exit(0);
     }
-
-    process.stdout.write(JSON.stringify({
-      hookSpecificOutput: {
-        hookEventName: 'PostToolUse',
-        additionalContext: msg,
-      },
-    }));
-  } catch (e) {
-    shared.logHookError('forge-auto-fix', e);
-    process.exit(0);
-  }
-});
+  });
+} else {
+  // ─── 可复用导出（供 Cursor hooks 调用）────────────────────────────────────
+  module.exports = { classifyCommand, hashError, buildFixMessage, buildEscalateMessage };
+}

@@ -94,6 +94,10 @@ function nextGateToInject(bridge) {
   const ce  = bridge.change?.changeEpoch ?? 0;
   const g   = bridge.gates || {};
 
+  // Issue 9 fix: 终态门（不参与 failCount 封锁判断）用显式名称集合，避免 slice 位置依赖
+  // 定义在 gateDefs 之前，使 ship.requires/escalation 闭包可直接引用（前向引用 gateDefs 但只在调用时求值）
+  const TERMINAL_GATE_NAMES = new Set(['ship', 'escalation']);
+
   // 按优先级排序的门定义
   const gateDefs = [
     {
@@ -127,7 +131,7 @@ function nextGateToInject(bridge) {
         if (!allCoreGatesPassed(bridge) || !isLastPhase(bridge)) return false;
         // N2 fix: 任意前置门永久失败（failCount>=3）时禁止 ship，由 escalation 优先接管
         // 原代码 allCoreGatesPassed 不检查 security/benchmark，导致 ship 可在安全门卡死时触发
-        return !gateDefs.slice(0, -2).some(def => (g[def.name]?.failCount || 0) >= 3);
+        return !nonTerminalDefs.some(def => (g[def.name]?.failCount || 0) >= 3);
       },
       msg:      () => `⚡ FORGE 质量门：所有阶段完成，全部质量门通过！\n最后步骤：创建 PR 并准备部署。\n请调用 Skill("ship") 执行 gstack /ship（全量测试 + 版本 + PR）。\n${PREAMBLE_SKIP}`,
     },
@@ -135,17 +139,19 @@ function nextGateToInject(bridge) {
     // 防止流水线卡死后无声停止，用 10min lease 避免每次 PostToolUse 都重复注入
     {
       name:     'escalation',
-      requires: () => gateDefs.slice(0, -1).some(
+      requires: () => nonTerminalDefs.some(
         def => def.requires() && (g[def.name]?.failCount || 0) >= 3
       ),
       msg: () => {
-        const blocked = gateDefs.slice(0, -1)
+        const blocked = nonTerminalDefs
           .filter(def => def.requires() && (g[def.name]?.failCount || 0) >= 3)
           .map(d => d.name);
         return `⚠️ FORGE 质量门卡死：以下质量门连续失败 3 次，自动重试已停止：\n${blocked.map(n => `• ${n}`).join('\n')}\n请手动运行对应质量检查命令后重试，或运行 /forge:status 查看详情。\n${PREAMBLE_SKIP}`;
       },
     },
   ];
+
+  const nonTerminalDefs = gateDefs.filter(d => !TERMINAL_GATE_NAMES.has(d.name));
 
   for (const def of gateDefs) {
     if (!def.requires()) continue;
@@ -166,78 +172,85 @@ function nextGateToInject(bridge) {
   return null;
 }
 
-// ─── 主流程 ───────────────────────────────────────────────────────────────────
+// ─── 主流程 / 可复用导出 ──────────────────────────────────────────────────────
+// require.main === module: 作为 CC hook 直接执行，启动 stdin 监听
+// require.main !== module: 被 Cursor hooks require()，只导出函数，不执行副作用
 
-let input = '';
-const timeout = setTimeout(() => process.exit(0), 15000);
-process.stdin.setEncoding('utf8');
-process.stdin.on('data', c => (input += c));
-process.stdin.on('end', async () => {
-  clearTimeout(timeout);
-  try {
-    const data = JSON.parse(input);
-    const cwd  = data.cwd || process.cwd();
-
-    // P3#16：只在 Forge 项目中运行（OPT-2：改用 shared.isForgeProject）
-    if (!shared.isForgeProject(cwd)) process.exit(0);
-
-    // 读 bridge 快照（只读，用于获取 touchedFiles 进行锁外安全风险预评估）
-    const { data: bridge, corrupt } = shared.readBridgeSnapshot(cwd);
-    if (!bridge || corrupt) process.exit(0);
-
-    // 跳过旧 v1 schema
-    if (bridge._schema_version !== 2) process.exit(0);
-
-    // 在锁外预评估安全风险（execFileSync 无法在同步 mutator 内运行）
-    // OPT-6: 传入已缓存 epoch，相同 changeEpoch 则跳过 git diff
-    const touchedFiles = bridge.change?.touchedFiles || [];
-    const cachedEpoch  = bridge.change?.securityRisk?.evaluatedAtEpoch ?? null;
-    const changeEpoch  = bridge.change?.changeEpoch ?? 0;
-    let externalRisk = null;
-    if (touchedFiles.length > 0) {
-      const risk = evaluateSecurityRisk(cwd, touchedFiles, cachedEpoch, changeEpoch);
-      // L1 fix: 无论 required=true/false，都存回缓存，确保 evaluatedAtEpoch 被写入
-      // 原代码只在 required=true 时赋值，导致安全结果每次重跑 git diff
-      if (risk !== null) externalRisk = risk;
-    }
-
-    // F13 fix：安全风险更新 + 门决策 + lease 写入合并到一次 mutateBridge（消除 TOCTOU 竞态）
-    let nextToInject = null;
-    let leased = false;
+if (require.main === module) {
+  let input = '';
+  const timeout = setTimeout(() => process.exit(0), 15000);
+  process.stdin.setEncoding('utf8');
+  process.stdin.on('data', c => (input += c));
+  process.stdin.on('end', async () => {
+    clearTimeout(timeout);
     try {
-      await shared.mutateBridge(cwd, (draft) => {
-        if (draft._schema_version !== 2) return;
-        // 注入最新安全风险（H4 fix：epoch 守卫，并发写入更新了 changeEpoch 时跳过过期 risk）
-        if (externalRisk && draft.change && draft.change.changeEpoch === changeEpoch) {
-          draft.change.securityRisk = externalRisk;
-        }
-        // 用最新 bridge 数据重新决策（持锁状态，无 TOCTOU 竞态窗口）
-        const candidate = nextGateToInject(draft);
-        if (!candidate) return;
-        // P2 fix: 门不存在时（如 escalation 首次出现于旧 bridge）自动初始化，不再直接 return
-        if (!draft.gates[candidate.name]) {
-          draft.gates[candidate.name] = { status: 'idle', epoch: null, leaseUntil: null, failCount: 0 };
-        }
-        draft.gates[candidate.name].status    = 'leased';
-        draft.gates[candidate.name].leaseUntil = new Date(Date.now() + LEASE_TTL_MS).toISOString();
-        nextToInject = candidate;
-      });
-      leased = nextToInject !== null;
+      const data = JSON.parse(input);
+      const cwd  = data.cwd || process.cwd();
+
+      // P3#16：只在 Forge 项目中运行（OPT-2：改用 shared.isForgeProject）
+      if (!shared.isForgeProject(cwd)) process.exit(0);
+
+      // 读 bridge 快照（只读，用于获取 touchedFiles 进行锁外安全风险预评估）
+      const { data: bridge, corrupt } = shared.readBridgeSnapshot(cwd);
+      if (!bridge || corrupt) process.exit(0);
+
+      // 跳过旧 v1 schema
+      if (bridge._schema_version !== 2) process.exit(0);
+
+      // 在锁外预评估安全风险（execFileSync 无法在同步 mutator 内运行）
+      // OPT-6: 传入已缓存 epoch，相同 changeEpoch 则跳过 git diff
+      const touchedFiles = bridge.change?.touchedFiles || [];
+      const cachedEpoch  = bridge.change?.securityRisk?.evaluatedAtEpoch ?? null;
+      const changeEpoch  = bridge.change?.changeEpoch ?? 0;
+      let externalRisk = null;
+      if (touchedFiles.length > 0) {
+        const risk = evaluateSecurityRisk(cwd, touchedFiles, cachedEpoch, changeEpoch);
+        // L1 fix: 无论 required=true/false，都存回缓存，确保 evaluatedAtEpoch 被写入
+        // 原代码只在 required=true 时赋值，导致安全结果每次重跑 git diff
+        if (risk !== null) externalRisk = risk;
+      }
+
+      // F13 fix：安全风险更新 + 门决策 + lease 写入合并到一次 mutateBridge（消除 TOCTOU 竞态）
+      let nextToInject = null;
+      let leased = false;
+      try {
+        await shared.mutateBridge(cwd, (draft) => {
+          if (draft._schema_version !== 2) return;
+          // 注入最新安全风险（H4 fix：epoch 守卫，并发写入更新了 changeEpoch 时跳过过期 risk）
+          if (externalRisk && draft.change && draft.change.changeEpoch === changeEpoch) {
+            draft.change.securityRisk = externalRisk;
+          }
+          // 用最新 bridge 数据重新决策（持锁状态，无 TOCTOU 竞态窗口）
+          const candidate = nextGateToInject(draft);
+          if (!candidate) return;
+          // P2 fix: 门不存在时（如 escalation 首次出现于旧 bridge）自动初始化，不再直接 return
+          if (!draft.gates[candidate.name]) {
+            draft.gates[candidate.name] = { status: 'idle', epoch: null, leaseUntil: null, failCount: 0 };
+          }
+          draft.gates[candidate.name].status    = 'leased';
+          draft.gates[candidate.name].leaseUntil = new Date(Date.now() + LEASE_TTL_MS).toISOString();
+          nextToInject = candidate;
+        });
+        leased = nextToInject !== null;
+      } catch (e) {
+        shared.logHookError('forge-quality-pipeline/toctou', e);
+      }
+
+      if (!leased) process.exit(0);
+
+      // 注入质量命令到对话上下文
+      process.stdout.write(JSON.stringify({
+        hookSpecificOutput: {
+          hookEventName: 'PostToolUse',
+          additionalContext: nextToInject.message,
+        },
+      }));
     } catch (e) {
-      shared.logHookError('forge-quality-pipeline/toctou', e);
+      shared.logHookError('forge-quality-pipeline', e);
+      process.exit(0);
     }
-
-    if (!leased) process.exit(0);
-
-    // 注入质量命令到对话上下文
-    process.stdout.write(JSON.stringify({
-      hookSpecificOutput: {
-        hookEventName: 'PostToolUse',
-        additionalContext: nextToInject.message,
-      },
-    }));
-  } catch (e) {
-    shared.logHookError('forge-quality-pipeline', e);
-    process.exit(0);
-  }
-});
+  });
+} else {
+  // ─── 可复用导出（供 Cursor hooks 调用）────────────────────────────────────
+  module.exports = { nextGateToInject, evaluateSecurityRisk };
+}
