@@ -46,9 +46,10 @@ const LEASE_TTL_MS = 10 * 60 * 1000;
 
 // ─── 命令分类正则（DUP-1：auto-fix/context-bridge 共享，消除两处重复定义）─────
 // OPT-10: 补充 pnpm/cargo-nextest 模式
-const TEST_PATTERN  = /\b(npm test|npm run test|pnpm test|pnpm run test|jest|vitest|pytest|py\.test|go test|cargo test|cargo nextest|yarn test|bun test)\b/;
-const BUILD_PATTERN = /\b(npm run build|pnpm build|pnpm run build|tsc|tsc --noEmit|yarn build|bun run build|next build|vite build)\b/;
-const LINT_PATTERN  = /\b(npm run lint|pnpm lint|eslint|tslint|pylint|flake8|ruff)\b/;
+// MED-4 fix: 补充 cargo build / bun build / uv 系列（原先分类为 other，errHash 计数丢失）
+const TEST_PATTERN  = /\b(npm test|npm run test|pnpm test|pnpm run test|jest|vitest|pytest|py\.test|go test|cargo test|cargo nextest|yarn test|bun test|uv run pytest|uv run test)\b/;
+const BUILD_PATTERN = /\b(npm run build|pnpm build|pnpm run build|tsc|tsc --noEmit|yarn build|bun run build|bun build|next build|vite build|cargo build|uv build|uv run build)\b/;
+const LINT_PATTERN  = /\b(npm run lint|pnpm lint|eslint|tslint|pylint|flake8|ruff|uv run ruff)\b/;
 
 // ─── 路径 / slug ───────────────────────────────────────────────────────────────
 
@@ -392,10 +393,35 @@ async function appendJsonlQueue(queuePath, job) {
 
 // DUP-4: 退出码解析，统一处理各平台/框架的字段名差异
 // auto-fix.js 和 context-bridge.js 曾各自内联此逻辑
+// MED-5 fix: 补充 {status: N} / {code: N} 字段（部分工具/版本用这些字段）
 function parseExitCode(resp) {
-  const raw = resp?.exit_code ?? resp?.exitCode ?? resp?.returncode ?? (resp?.isError ? 1 : 0);
+  const raw = resp?.exit_code ?? resp?.exitCode ?? resp?.returncode
+              ?? resp?.status ?? resp?.code
+              ?? (resp?.isError ? 1 : 0);
   // 处理字符串退出码（部分框架/Cursor 返回 "1" 而非 1）
   return typeof raw === 'string' ? (parseInt(raw, 10) || 0) : (raw ?? 0);
+}
+
+// ─── OpenCode 工具名规范化（OC-FIX-1）────────────────────────────────────────────
+// oh-my-opencode 的 transformToolName 只特殊处理 WebFetch/WebSearch/TodoRead/TodoWrite，
+// 对 multiedit 仅做首字母大写 → 'Multiedit'，但 CC hooks 内部检查 === 'MultiEdit'。
+// P2-B fix: write_file/edit_file 含下划线，首字母大写后变 'Write_file'/'Edit_file'，
+//           需显式映射到 CC 的 PascalCase 名称，否则 context-bridge 写操作识别失效。
+// 本函数在接收端修正大小写，确保 CC hooks 正确路由 OpenCode 工具事件。
+const TOOL_NAME_CANONICAL = {
+  multiedit:  'MultiEdit',
+  webfetch:   'WebFetch',
+  websearch:  'WebSearch',
+  todoread:   'TodoRead',
+  todowrite:  'TodoWrite',
+  use_skill:  'Skill',    // OpenCode 使用 use_skill，CC 使用 Skill，统一规范化
+  write_file: 'Write',    // OC snake_case → CC PascalCase（P2-B）
+  edit_file:  'Edit',     // OC snake_case → CC PascalCase（P2-B）
+};
+function normalizeToolName(name) {
+  if (!name) return name;
+  const lower = name.toLowerCase();
+  return TOOL_NAME_CANONICAL[lower] || (lower.charAt(0).toUpperCase() + lower.slice(1));
 }
 
 // ─── 导出 ──────────────────────────────────────────────────────────────────────
@@ -442,3 +468,4 @@ exports.STALE_TIMEOUT_MS = STALE_TIMEOUT_MS;  // R3-OPT-3: session-start/context
 exports.LEASE_TTL_MS     = LEASE_TTL_MS;       // M3: after-shell/after-file-edit/quality-pipeline 共享
 exports.signalPath       = signalPath;         // M2: after-shell/after-file-edit 共享
 exports.ensureSignalsDir = ensureSignalsDir;   // M2
+exports.normalizeToolName = normalizeToolName; // OC-FIX-1: OpenCode Multiedit→MultiEdit
