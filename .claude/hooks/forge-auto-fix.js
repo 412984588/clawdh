@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// forge-auto-fix.js - v2.2.0
+// forge-auto-fix.js - v2.4.0
 // PostToolUse hook（Bash）: 检测失败并注入修复指令
 //
 // 机制：
@@ -16,7 +16,7 @@ const shared = require('./forge-shared');
 // ─── 命令分类 ─────────────────────────────────────────────────────────────────
 
 // DUP-1: 正则移至 forge-shared.js 统一维护，此处直接引用
-const { TEST_PATTERN, BUILD_PATTERN, LINT_PATTERN } = shared;
+const { TEST_PATTERN, BUILD_PATTERN, LINT_PATTERN, MAX_FAIL_COUNT } = shared;
 
 function classifyCommand(cmd) {
   if (TEST_PATTERN.test(cmd))  return 'test';
@@ -42,18 +42,22 @@ function buildFixMessage(type, errorSnippet, attempts, max) {
 }
 
 // R3-OPT-4: max 参数动态化，文案不再硬编码 "3 轮"
-function buildEscalateMessage(type, errorSnippet, max) {
-  const rounds = max || 3;
+// HIGH-2 fix: 新增 clientType 参数，路由到正确的 Skill 调用方式（cc→Skill / oc→use_skill）
+function buildEscalateMessage(type, errorSnippet, max, clientType = 'cc') {
+  const rounds    = max || MAX_FAIL_COUNT;
+  const skillCall = clientType === 'cc' ? 'Skill("gsd:debug")' : 'use_skill("gsd:debug")';
   if (type === 'lint') {
     return `⚠️ FORGE：Lint 错误经过 ${rounds} 轮自动修复仍未解决。记录并继续（lint 为非阻断性）。\n请在完成核心功能后再处理剩余 lint 问题。`;
   }
-  return `⛔ FORGE 自动修复已达上限：经过 ${rounds} 轮自动修复仍未解决。\n升级到诊断模式：请调用 Skill("gsd:debug") 进行系统性 debug（并行 debug agent，找出根本原因）。\n错误片段：\n\`\`\`\n${errorSnippet}\n\`\`\``;
+  return `⛔ FORGE 自动修复已达上限：经过 ${rounds} 轮自动修复仍未解决。\n升级到诊断模式：请调用 ${skillCall} 进行系统性 debug（并行 debug agent，找出根本原因）。\n错误片段：\n\`\`\`\n${errorSnippet}\n\`\`\``;
 }
 
 // ─── 错误签名（防止不同错误被当作同一问题计数）────────────────────────────────
+// MED-4 fix: 加入 cmdType 前缀，避免 cargo build / npm test 输出相似时共享 failCount
 
-function hashError(stderr) {
-  return crypto.createHash('sha256').update(stderr.slice(0, 500)).digest('hex').slice(0, 16);
+function hashError(stderr, cmdType = '') {
+  const prefix = cmdType ? cmdType + ':' : '';
+  return crypto.createHash('sha256').update(prefix + stderr.slice(0, 500)).digest('hex').slice(0, 16);
 }
 
 // ─── 主流程 / 可复用导出 ──────────────────────────────────────────────────────
@@ -80,18 +84,23 @@ if (require.main === module) {
       const cmd  = (data.tool_input || {}).command || '';
       const type = classifyCommand(cmd);
 
+      // OPT-2: 只处理有意义的失败类型（test/build/lint）
+      // 跳过 'other'，防止 ls/cat 等探测命令误触发修复循环（上下文噪音 + 无效 failCount 计数）
+      if (type === 'other') process.exit(0);
+
       // 非 Forge 项目提前退出（无论命令类型）
       if (!shared.isForgeProject(cwd)) process.exit(0);
 
       const stderr  = toolResp?.stderr || toolResp?.output || '';
       const snippet = stderr.slice(-600).trim() || `（命令：${cmd.slice(0, 80)}，退出码：${exitCode}）`;
-      const errHash = hashError(stderr || cmd);
+      const errHash = hashError(stderr || cmd, type);
 
       // 带锁读改写 auto_fix 状态（P1#1 并发安全，P2#14 升级 catch）
-      let fixResult = { issue_hash: null, attempts: 1, max: 3 };
+      let fixResult  = { issue_hash: null, attempts: 1, max: MAX_FAIL_COUNT };
+      let clientType = 'cc';  // HIGH-2 fix: 默认 cc，从 bridge 读取实际客户端类型
 
       await shared.mutateBridge(cwd, (draft) => {
-        const fix = draft.auto_fix || { issue_hash: null, attempts: 0, max: 3 };
+        const fix = draft.auto_fix || { issue_hash: null, attempts: 0, max: MAX_FAIL_COUNT };
 
         if (fix.issue_hash === errHash) {
           // 同一问题，累加计数
@@ -104,6 +113,7 @@ if (require.main === module) {
 
         draft.auto_fix = fix;
         fixResult      = fix;
+        clientType     = draft.project?.client || 'cc';  // HIGH-2 fix: 读取客户端类型
         // R3-MED-4: 确保 _schema_version 存在，防止 migrateIfNeeded 在 context-bridge 执行时
         // 因缺少版本字段而重建整个 bridge，清除此处写入的 auto_fix 计数
         if (!draft._schema_version) draft._schema_version = 2;
@@ -111,7 +121,7 @@ if (require.main === module) {
 
       let msg;
       if (fixResult.attempts >= fixResult.max) {
-        msg = buildEscalateMessage(type, snippet, fixResult.max);
+        msg = buildEscalateMessage(type, snippet, fixResult.max, clientType);
       } else {
         msg = buildFixMessage(type, snippet, fixResult.attempts, fixResult.max);
       }

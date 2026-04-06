@@ -1,5 +1,12 @@
 {
   "env": {},
+  "permissions": {
+    "allow": [
+      "Bash(*)",
+      "WebSearch",
+      "WebFetch"
+    ]
+  },
   "hooks": {
     "SessionStart": [
       {
@@ -17,6 +24,14 @@
             "type": "command",
             "command": "node \"/Users/zhimingdeng/.claude/hooks/forge-session-start.js\"",
             "timeout": 10
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /Users/zhimingdeng/.claude/hooks/gsd-session-state.sh"
           }
         ]
       }
@@ -61,6 +76,26 @@
             "timeout": 10
           }
         ]
+      },
+      {
+        "matcher": "Bash|Edit|Write|MultiEdit|Agent|Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"/Users/zhimingdeng/.claude/hooks/gsd-context-monitor.js\"",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /Users/zhimingdeng/.claude/hooks/gsd-phase-boundary.sh",
+            "timeout": 5
+          }
+        ]
       }
     ],
     "PreToolUse": [
@@ -75,21 +110,11 @@
         ]
       },
       {
-        "matcher": "Bash",
+        "matcher": "Write|Edit",
         "hooks": [
           {
             "type": "command",
-            "command": "\"/Users/zhimingdeng/.claude/hooks/git-safety.sh\"",
-            "timeout": 5
-          }
-        ]
-      },
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"/Users/zhimingdeng/.claude/hooks/pre-tool-use-guard.sh\"",
+            "command": "node \"/Users/zhimingdeng/.claude/hooks/gsd-read-guard.js\"",
             "timeout": 5
           }
         ]
@@ -109,16 +134,22 @@
     "github@claude-plugins-official": true,
     "skill-creator@claude-plugins-official": true,
     "hookify@claude-plugins-official": true,
-    "playwright@claude-plugins-official": true,
+    "playwright@claude-plugins-official": false,
     "frontend-design@claude-plugins-official": true,
     "code-review@claude-plugins-official": true,
     "ralph-loop@claude-plugins-official": true,
     "pyright-lsp@claude-plugins-official": true,
     "claude-hud@jarrodwatts": true,
     "pua@pua-skills": true,
-    "discord@claude-plugins-official": true
+    "discord@claude-plugins-official": false
   },
+  "language": "chinese",
   "effortLevel": "high",
+  "autoCompactWindow": 200000,
+  "fastModePerSessionOptIn": true,
+  "autoUpdatesChannel": "latest",
+  "autoDreamEnabled": true,
+  "showThinkingSummaries": true,
   "skipDangerousModePermissionPrompt": true,
   "model": "opusplan"
 }

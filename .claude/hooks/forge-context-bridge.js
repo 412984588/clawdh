@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// forge-context-bridge.js - v2.5.0
+// forge-context-bridge.js - v2.7.0
 // PostToolUse hook: 事件归约层
 //
 // 修复（相比 v1.x）：
@@ -24,16 +24,19 @@ function loadForgeConfig() {
   try {
     const raw = JSON.parse(fs.readFileSync(path.join(os.homedir(), '.forge', 'config.json'), 'utf8'));
     return {
-      WARNING_THRESHOLD:  raw.context_thresholds?.warning       ?? 35,
-      CRITICAL_THRESHOLD: raw.context_thresholds?.critical      ?? 25,
-      DEBOUNCE_CALLS:     raw.context_thresholds?.debounce_calls ?? 5,
+      WARNING_THRESHOLD:  raw.context_thresholds?.warning          ?? 35,
+      CRITICAL_THRESHOLD: raw.context_thresholds?.critical         ?? 25,
+      DEBOUNCE_CALLS:     raw.context_thresholds?.debounce_calls   ?? 5,
+      // OPT-3: proxy 阈值移至模块级，避免在 checkContextWarning 内重复读取 config.json
+      PROXY_WARN:         raw.context_thresholds?.proxy_warning    ?? 200,
+      PROXY_CRITICAL:     raw.context_thresholds?.proxy_critical   ?? 350,
     };
   } catch (_) {
-    return { WARNING_THRESHOLD: 35, CRITICAL_THRESHOLD: 25, DEBOUNCE_CALLS: 5 };
+    return { WARNING_THRESHOLD: 35, CRITICAL_THRESHOLD: 25, DEBOUNCE_CALLS: 5, PROXY_WARN: 200, PROXY_CRITICAL: 350 };
   }
 }
 
-const { WARNING_THRESHOLD, CRITICAL_THRESHOLD, DEBOUNCE_CALLS } = loadForgeConfig();
+const { WARNING_THRESHOLD, CRITICAL_THRESHOLD, DEBOUNCE_CALLS, PROXY_WARN, PROXY_CRITICAL } = loadForgeConfig();
 const STALE_SECONDS = 60;
 
 // ─── Bridge 默认结构（v2.0 新 schema）────────────────────────────────────────
@@ -97,6 +100,7 @@ function defaultBridge(cwd, slug) {
       ship:        emptyGate(),
       escalation:  emptyGate(),  // P2 fix: 质量门全卡死时的人工介入告警门
     },
+    contextProxy: { sessionId: null, toolCallCount: 0 },
     context: { warningLevel: null, lastSaveAt: null },
     audit:   { lastToolName: null, updatedAt: null },
     // v1→v2 迁移标记，供 pipeline 判断 schema 版本
@@ -137,6 +141,14 @@ function markGatePassed(draft, name) {
   // C-NEW-1 fix: 清零 failCount，否则 3 次失败后 ship/escalation 会永久阻断，
   // 即使后续成功也无法解锁
   draft.gates[name].failCount  = 0;
+}
+
+// HIGH-1 fix: FSM 守卫 — Skill/Agent 成功只能把 leased 门标记为 passed
+// 防止 idle→passed 直接跳过（绕过 quality pipeline 注入）
+function markGatePassedIfLeased(draft, name) {
+  if (!draft.gates?.[name]) return;
+  if (draft.gates[name].status !== 'leased') return;
+  markGatePassed(draft, name);
 }
 
 // M2 fix: Skill/Agent 失败时标记质量门为 failed，避免 lease 卡住 10 分钟 + 无限重试
@@ -222,7 +234,9 @@ function inferAndUpdate(draft, toolName, toolInput, toolResponse) {
 
   // ── Skill 调用 ────────────────────────────────────────────────────────────
   if (toolName === 'Skill') {
-    const skill   = toolInput?.skill || '';
+    // CC 使用 Skill 工具，toolInput = { skill: "review" }
+    // OC 使用 use_skill 工具（经 normalizeToolName 映射到 'Skill'），toolInput = { name: "review" }
+    const skill   = toolInput?.skill || toolInput?.name || '';
     const isError = toolResponse?.isError === true;
     draft.audit.lastToolName = 'Skill:' + skill;
 
@@ -242,13 +256,13 @@ function inferAndUpdate(draft, toolName, toolInput, toolResponse) {
       // 无论是否切换阶段，PLAN.md 将由 Write 事件触发 plan_review
     } else if (!isError) {
       // 成功的 Skill 调用 → 标记对应质量门通过
-      if (/autoplan/.test(skill))                          markGatePassed(draft, 'plan_review');
+      if (/autoplan/.test(skill))                          markGatePassedIfLeased(draft, 'plan_review');
       // R3-MED-1: 排除 plan-*-review / design-review / qa-* 防止误解锁 code_review 门
-      else if (/\breview\b/.test(skill) && !/plan-|design-|qa-/.test(skill)) markGatePassed(draft, 'code_review');
-      else if (/\bqa\b/.test(skill))                       markGatePassed(draft, 'qa');
-      else if (/\bcso\b/.test(skill))                      markGatePassed(draft, 'security');
-      else if (/\bbenchmark\b/.test(skill))                markGatePassed(draft, 'benchmark');
-      else if (/\bship\b/.test(skill))                     markGatePassed(draft, 'ship');
+      else if (/\breview\b/.test(skill) && !/plan-|design-|qa-/.test(skill)) markGatePassedIfLeased(draft, 'code_review');
+      else if (/\bqa\b/.test(skill))                       markGatePassedIfLeased(draft, 'qa');
+      else if (/\bcso\b/.test(skill))                      markGatePassedIfLeased(draft, 'security');
+      else if (/\bbenchmark\b/.test(skill))                markGatePassedIfLeased(draft, 'benchmark');
+      else if (/\bship\b/.test(skill))                     markGatePassedIfLeased(draft, 'ship');
     } else {
       // M2 fix: Skill 失败时将 leased 门标记为 failed，防止 TTL 卡住 + 无限重试
       // Bug3 fix: 只在门实际处于 leased 状态时才标记 failed，防止 plan-eng-review 等
@@ -284,7 +298,7 @@ function inferAndUpdate(draft, toolName, toolInput, toolResponse) {
     const isError = toolResponse?.isError === true;  // F02：失败的 Agent 不能标记门通过
     draft.audit.lastToolName = toolName + ':' + st;
     if (!isError && st === 'gsd-executor')               markGatePassed(draft, 'tests');    // verifier 已内嵌
-    if (!isError && st === 'superpowers:code-reviewer')  markGatePassed(draft, 'code_review');
+    if (!isError && st === 'superpowers:code-reviewer')  markGatePassedIfLeased(draft, 'code_review');
     if (!isError && st === 'gsd-verifier')               markGatePassed(draft, 'tests');
   }
 
@@ -380,17 +394,38 @@ function checkContextWarning(cwd, slug, sessionId, bridge) {
   const legacyPath  = path.join(os.tmpdir(), `claude-ctx-${safeId}.json`);
   const mPath       = fs.existsSync(metricsPath) ? metricsPath :
                       fs.existsSync(legacyPath)  ? legacyPath  : null;
-  if (!mPath) return null;
 
-  const { data: metrics, corrupt } = shared.safeReadJson(mPath, null);
-  if (!metrics || corrupt) return null;
+  let remaining, usedPctOverride;
 
-  // 验证 remaining 合法性
-  const remaining = metrics.remaining_percentage;
-  if (typeof remaining !== 'number' || remaining < 0 || remaining > 100 || isNaN(remaining)) return null;
+  if (mPath) {
+    // 主路径：CC runtime 写入的 claude-ctx-{session}.json（精确）
+    const { data: metrics, corrupt } = shared.safeReadJson(mPath, null);
+    if (!metrics || corrupt) return null;
+    // 验证 remaining 合法性
+    remaining = metrics.remaining_percentage;
+    if (typeof remaining !== 'number' || remaining < 0 || remaining > 100 || isNaN(remaining)) return null;
+    usedPctOverride = metrics.used_pct != null ? metrics.used_pct : (100 - remaining);
 
-  const now = Math.floor(Date.now() / 1000);
-  if (metrics.timestamp && (now - metrics.timestamp) > STALE_SECONDS) return null;
+    const now = Math.floor(Date.now() / 1000);
+    if (metrics.timestamp && (now - metrics.timestamp) > STALE_SECONDS) return null;
+  } else {
+    // C2 fix: OpenCode 降级路径 — 用 bridge.contextProxy.toolCallCount 做启发式估算
+    // 阈值参考：200 次工具调用 ≈ 35% 已用（warning），350 次 ≈ 25% 已用（critical）
+    // 可通过 ~/.forge/config.json 的 context_thresholds.proxy_warning / proxy_critical 覆盖
+    // MED-3 fix: CC 客户端有精确的 metrics 文件，proxy 阈值仅校准了 OC 行为；
+    // CC 场景下 mPath 不存在时宁可不告警，也不要用 OC 阈值误报
+    if (bridge?.project?.client === 'cc') return null;
+    const proxy = bridge?.contextProxy;
+    if (!proxy || proxy.sessionId !== safeId) return null;
+    const count = proxy.toolCallCount || 0;
+    // OPT-3: 使用模块级 PROXY_WARN / PROXY_CRITICAL（避免重复读取 config.json）
+    if (count < PROXY_WARN) return null;
+    // 合成 remaining/used 供后续统一处理
+    remaining      = count >= PROXY_CRITICAL ? CRITICAL_THRESHOLD - 1 : WARNING_THRESHOLD - 1;
+    usedPctOverride = count >= PROXY_CRITICAL ? 100 - (CRITICAL_THRESHOLD - 1) : 100 - (WARNING_THRESHOLD - 1);
+  }
+
+  // remaining 已在 if/else 块中验证并赋值，直接检查阈值
   if (remaining > WARNING_THRESHOLD) return null;
 
   // 防抖（safeId 已在函数顶部 F06 处声明）
@@ -410,7 +445,7 @@ function checkContextWarning(cwd, slug, sessionId, bridge) {
   wd.lastLevel      = isCritical ? 'critical' : 'warning';
   shared.writeJsonAtomic(warnKey, wd);  // F15：原子写防并发损坏 warned.json
 
-  const usedPct = metrics.used_pct != null ? metrics.used_pct : (100 - remaining);
+  const usedPct = usedPctOverride;
   const acts    = [];
 
   // M3 fix: queue job 的 cwd 用 repo root，防止子目录 session 导致 safeGitAdd 路径边界误判
@@ -463,7 +498,10 @@ if (require.main === module) {
       const data         = JSON.parse(input);
       const cwd          = data.cwd || process.cwd();
       const sessionId    = data.session_id || '';
-      const toolName     = data.tool_name  || '';
+      // OPT-1: 保留原始 tool_name 用于检测 CC/OC 客户端类型
+      // CC 工具名为 PascalCase（Bash, Write, Skill），OC 为 snake_case（bash, write_file, use_skill）
+      const rawToolName  = data.tool_name || '';
+      const toolName     = shared.normalizeToolName(rawToolName);
       const toolInput    = data.tool_input || {};
       const toolResponse = data.tool_response || data.tool_result || {};
 
@@ -482,6 +520,27 @@ if (require.main === module) {
         // D4 fix: 和 defaultBridge 保持一致，project.cwd 用 resolveProjectRoot
         draft.project.cwd  = shared.resolveProjectRoot(cwd);
         inferAndUpdate(draft, toolName, toolInput, toolResponse);
+
+        // OPT-1: 检测并存储 CC/OC 客户端类型（供 forge-quality-pipeline.js 自适应门消息）
+        // CC 工具名首字母大写（PascalCase），OC 工具名全小写或含下划线（snake_case）
+        // 每次 hook 都更新（session 内 client 恒定，此举确保 bridge 始终保持最新检测结果）
+        if (rawToolName && /^[A-Z]/.test(rawToolName)) {
+          draft.project.client = 'cc';
+        } else if (rawToolName && /^[a-z]/.test(rawToolName)) {
+          draft.project.client = 'oc';
+        }
+
+        // C2 fix: OpenCode 没有 claude-ctx-{session}.json，用 toolCallCount 作为降级指标
+        // 确保 contextProxy 存在并做 session 作用域隔离（跨 session 重置计数）
+        const safeIdForProxy = shared.sanitizeSessionId(sessionId);
+        if (safeIdForProxy) {
+          if (!draft.contextProxy) draft.contextProxy = {};
+          // session 切换时重置计数
+          if (draft.contextProxy.sessionId !== safeIdForProxy) {
+            draft.contextProxy = { sessionId: safeIdForProxy, toolCallCount: 0 };
+          }
+          draft.contextProxy.toolCallCount = (draft.contextProxy.toolCallCount || 0) + 1;
+        }
       });
 
       // 上下文保存（只对有 session 的情况）

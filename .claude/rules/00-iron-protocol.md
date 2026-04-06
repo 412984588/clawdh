@@ -4,7 +4,7 @@
 
 ## 会话启动（自动，无需手动执行）
 
-forge-session-start.sh 已自动检测进行中的项目并注入恢复提示。
+forge-session-start.js 已自动检测进行中的项目并注入恢复提示。
 
 如需手动恢复：
 1. `/forge:status` — 查看所有项目状态

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// gsd-hook-version: 1.28.0
+// gsd-hook-version: 1.32.0
 // GSD Prompt Injection Guard — PreToolUse hook
 // Scans file content being written to .planning/ for prompt injection patterns.
 // Defense-in-depth: catches injected instructions before they enter agent context.
@@ -48,13 +48,8 @@ process.stdin.on('end', () => {
 
     const filePath = data.tool_input?.file_path || '';
 
-    // L1 fix: 改用 path.relative + startsWith 做路径检查（对齐 forge hooks 的 path.relative 模式）
-    // 原 includes('.planning/') 可被 /fake/.planning/../other/ 等路径绕过
-    const cwd = data.cwd || process.cwd();
-    const rel = path.relative(cwd, path.isAbsolute(filePath) ? filePath : path.resolve(cwd, filePath));
-    const isInPlanning = (rel.startsWith('.planning' + path.sep) || rel === '.planning') &&
-                         !rel.startsWith('..');
-    if (!isInPlanning) {
+    // Only scan files going into .planning/ (agent context files)
+    if (!filePath.includes('.planning/') && !filePath.includes('.planning\\')) {
       process.exit(0);
     }
 

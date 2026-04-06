@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// forge-git-worker.js - v1.2.0
+// forge-git-worker.js - v1.3.0
 // 独立异步进程：处理 git checkpoint 队列
 //
 // 修复（P1#6, P2#15）：
@@ -27,7 +27,10 @@ const shared = require('./forge-shared');
 const RUNTIME_DIR  = path.join(os.homedir(), '.forge', 'runtime', 'git');
 const QUEUE_PATH   = path.join(RUNTIME_DIR, 'queue.jsonl');
 const LOCK_DIR     = path.join(RUNTIME_DIR, 'worker.lock');
-const COMMIT_MSG   = 'chore(forge): auto checkpoint [forge-hook]';
+// OPT-4: commit message 包含 reason，方便 git log 区分触发原因（warn/critical/etc.）
+function buildCommitMsg(reason) {
+  return `chore(forge): auto checkpoint [${reason || 'forge-hook'}]`;
+}
 
 // 禁止 add 的文件模式（P1#6：安全 add）
 // 使用 basename 匹配 + 扩展名匹配，无需 minimatch 依赖
@@ -85,7 +88,7 @@ function safeGitAdd(cwd, touchedFiles) {
   }
 }
 
-function tryGitCommit(cwd) {
+function tryGitCommit(cwd, reason) {
   try {
     // 检查是否有已暂存的变更
     const staged = execFileSync('git', ['diff', '--cached', '--name-only'], { cwd, encoding: 'utf8', timeout: 3000 });
@@ -93,7 +96,7 @@ function tryGitCommit(cwd) {
 
     execFileSync('git', [
       '-c', 'core.hooksPath=/dev/null',
-      'commit', '--no-verify', '-m', COMMIT_MSG,
+      'commit', '--no-verify', '-m', buildCommitMsg(reason),
     ], { cwd, timeout: 10000 });
     return true;
   } catch (e) {
@@ -179,7 +182,7 @@ function processJob(job) {
     } catch (_) { return true; }
   });
   const added    = safeGitAdd(cwd, touchedFilesForAdd);
-  const committed = added && tryGitCommit(cwd);
+  const committed = added && tryGitCommit(cwd, reason);
   // 恢复用户原有的暂存文件：优先用 patch apply（保留 partial hunk），否则 fallback 整文件 add
   if (preStagedToRestore.length > 0) {
     let restored = false;

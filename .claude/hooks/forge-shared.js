@@ -43,6 +43,8 @@ const _rootCache = new Map();
 const STALE_TIMEOUT_MS = 20 * 60 * 1000;
 // M3 fix: 质量门 lease 时长（10 分钟），消除 after-shell/after-file-edit/quality-pipeline 三处重复定义
 const LEASE_TTL_MS = 10 * 60 * 1000;
+// 自动修复/质量门 failCount 上限（auto-fix 重试 + quality-pipeline escalation 共 10 处使用）
+const MAX_FAIL_COUNT = 3;
 
 // ─── 命令分类正则（DUP-1：auto-fix/context-bridge 共享，消除两处重复定义）─────
 // OPT-10: 补充 pnpm/cargo-nextest 模式
@@ -75,7 +77,7 @@ function resolveProjectRoot(cwd) {
   try {
     const root = execFileSync(
       'git', ['rev-parse', '--show-toplevel'],
-      { cwd: resolved, encoding: 'utf8', timeout: 2000 }
+      { cwd: resolved, encoding: 'utf8', timeout: 2000, stdio: ['pipe', 'pipe', 'ignore'] }
     ).trim();
     if (root && fs.existsSync(root)) result = _normReal(root);
   } catch (_) {}
@@ -466,6 +468,7 @@ exports.LINT_PATTERN     = LINT_PATTERN;   // DUP-1
 exports.parseExitCode    = parseExitCode;  // DUP-4: auto-fix/context-bridge 共享
 exports.STALE_TIMEOUT_MS = STALE_TIMEOUT_MS;  // R3-OPT-3: session-start/context-bridge 共享
 exports.LEASE_TTL_MS     = LEASE_TTL_MS;       // M3: after-shell/after-file-edit/quality-pipeline 共享
+exports.MAX_FAIL_COUNT   = MAX_FAIL_COUNT;     // auto-fix/quality-pipeline 共享
 exports.signalPath       = signalPath;         // M2: after-shell/after-file-edit 共享
 exports.ensureSignalsDir = ensureSignalsDir;   // M2
 exports.normalizeToolName = normalizeToolName; // OC-FIX-1: OpenCode Multiedit→MultiEdit

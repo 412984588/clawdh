@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// forge-quality-pipeline.js - v2.3.0
+// forge-quality-pipeline.js - v2.5.0
 // PostToolUse hook（Skill|Agent|Task）: 质量门 FSM
 //
 // 修复（相比 v1.x）：
@@ -18,7 +18,7 @@ const shared = require('./forge-shared');
 // ─── 常量 ─────────────────────────────────────────────────────────────────────
 
 // M3 fix: 从 shared 引用 LEASE_TTL_MS（消除与 after-shell/after-file-edit 的重复定义）
-const { LEASE_TTL_MS } = shared;
+const { LEASE_TTL_MS, MAX_FAIL_COUNT } = shared;
 
 // gstack preamble 跳过说明（所有质量门注入时附带）
 const PREAMBLE_SKIP = `（gstack 执行说明：读取 SKILL.md 后从 "## Step 0" 或 "# /{命令名}" 标记开始执行。跳过 Preamble bash block、Lake Intro、Telemetry、Session Tracking。所有 AskUserQuestion 自动选推荐选项。所有 "STOP and wait" 自动继续。）`;
@@ -99,32 +99,40 @@ function nextGateToInject(bridge) {
   // 定义在 gateDefs 之前，使 ship.requires/escalation 闭包可直接引用（前向引用 gateDefs 但只在调用时求值）
   const TERMINAL_GATE_NAMES = new Set(['ship', 'escalation']);
 
+  // OPT-1: 客户端自适应指令
+  // CC 用户（PascalCase 工具名）需要 "Skill 工具"；OC 用户需要 "use_skill 工具"
+  // HIGH-2 fix: 默认 'cc'（本 hooks 目录的主要运行环境），OC 用户需显式设置 project.client='oc'
+  const CLIENT     = bridge.project?.client || 'cc';
+  const SKILL_INSTR = CLIENT === 'cc' ? 'Skill 工具' : 'use_skill 工具';
+
   // 按优先级排序的门定义
   const gateDefs = [
     {
       name:     'plan_review',
       requires: () => bridge.change?.planWrittenAt != null,
-      msg:      () => `⚡ FORGE 质量门：阶段规划完成（PLAN.md 已创建）。\n质量门要求：立即执行计划审查。\n请调用 Skill("autoplan") 执行 gstack /autoplan（CEO + 设计 + 工程三重审查）。\n${PREAMBLE_SKIP}`,
+      // C3 fix: OpenCode 使用 use_skill 工具（不是 CC 的 Skill()）
+      // OPT-1: SKILL_INSTR 根据 bridge.project.client 自动选择（cc→Skill/oc→use_skill）
+      msg:      () => `⚡ FORGE 质量门：阶段规划完成（PLAN.md 已创建）。\n质量门要求：立即执行计划审查。\n请使用 ${SKILL_INSTR} 调用 autoplan，执行 gstack /autoplan（CEO + 设计 + 工程三重审查）。\n${PREAMBLE_SKIP}`,
     },
     {
       name:     'code_review',
       requires: () => g.tests?.status === 'passed',
-      msg:      () => `⚡ FORGE 质量门：阶段代码执行完成（测试通过）。\n质量门要求：立即执行代码审查。\n请调用 Skill("review") 执行 gstack /review（diff-aware 模式，只看本次变更）。\n${PREAMBLE_SKIP}`,
+      msg:      () => `⚡ FORGE 质量门：阶段代码执行完成（测试通过）。\n质量门要求：立即执行代码审查。\n请使用 ${SKILL_INSTR} 调用 review，执行 gstack /review（diff-aware 模式，只看本次变更）。\n${PREAMBLE_SKIP}`,
     },
     {
       name:     'qa',
       requires: () => g.code_review?.status === 'passed' && bridge.project?.isWeb,
-      msg:      () => `⚡ FORGE 质量门：代码审查完成，Web 项目需执行浏览器 QA。\n请调用 Skill("qa") 执行 gstack /qa（diff-aware 模式，只测本次变更页面）。\n${PREAMBLE_SKIP}`,
+      msg:      () => `⚡ FORGE 质量门：代码审查完成，Web 项目需执行浏览器 QA。\n请使用 ${SKILL_INSTR} 调用 qa，执行 gstack /qa（diff-aware 模式，只测本次变更页面）。\n${PREAMBLE_SKIP}`,
     },
     {
       name:     'security',
       requires: () => g.code_review?.status === 'passed' && bridge.change?.securityRisk?.required,
-      msg:      () => `⚡ FORGE 质量门：检测到安全敏感代码变更（auth/token/password/sql 等）。\n请调用 Skill("cso") 执行 gstack /cso --diff（仅审计本次变更）。\n${PREAMBLE_SKIP}`,
+      msg:      () => `⚡ FORGE 质量门：检测到安全敏感代码变更（auth/token/password/sql 等）。\n请使用 ${SKILL_INSTR} 调用 cso，执行 gstack /cso --diff（仅审计本次变更）。\n${PREAMBLE_SKIP}`,
     },
     {
       name:     'benchmark',
       requires: () => g.code_review?.status === 'passed' && bridge.project?.isWeb && (bridge.phase?.current || 0) >= 2,
-      msg:      (b) => `⚡ FORGE 质量门：阶段 ${b.phase?.current} Web 项目代码审查完成，需执行性能基准测试。\n请调用 Skill("benchmark") 执行 gstack /benchmark。\n${PREAMBLE_SKIP}`,
+      msg:      (b) => `⚡ FORGE 质量门：阶段 ${b.phase?.current} Web 项目代码审查完成，需执行性能基准测试。\n请使用 ${SKILL_INSTR} 调用 benchmark，执行 gstack /benchmark。\n${PREAMBLE_SKIP}`,
     },
     {
       name:     'ship',
@@ -132,22 +140,22 @@ function nextGateToInject(bridge) {
         if (!allCoreGatesPassed(bridge) || !isLastPhase(bridge)) return false;
         // N2 fix: 任意前置门永久失败（failCount>=3）时禁止 ship，由 escalation 优先接管
         // 原代码 allCoreGatesPassed 不检查 security/benchmark，导致 ship 可在安全门卡死时触发
-        return !nonTerminalDefs.some(def => (g[def.name]?.failCount || 0) >= 3);
+        return !nonTerminalDefs.some(def => (g[def.name]?.failCount || 0) >= MAX_FAIL_COUNT);
       },
-      msg:      () => `⚡ FORGE 质量门：所有阶段完成，全部质量门通过！\n最后步骤：创建 PR 并准备部署。\n请调用 Skill("ship") 执行 gstack /ship（全量测试 + 版本 + PR）。\n${PREAMBLE_SKIP}`,
+      msg:      () => `⚡ FORGE 质量门：所有阶段完成，全部质量门通过！\n最后步骤：创建 PR 并准备部署。\n请使用 ${SKILL_INSTR} 调用 ship，执行 gstack /ship（全量测试 + 版本 + PR）。\n${PREAMBLE_SKIP}`,
     },
     // P2 fix: 升级告警门 — 有任何质量门被 failCount>=3 封锁时注入人工介入提示
     // 防止流水线卡死后无声停止，用 10min lease 避免每次 PostToolUse 都重复注入
     {
       name:     'escalation',
       requires: () => nonTerminalDefs.some(
-        def => def.requires() && (g[def.name]?.failCount || 0) >= 3
+        def => def.requires() && (g[def.name]?.failCount || 0) >= MAX_FAIL_COUNT
       ),
       msg: () => {
         const blocked = nonTerminalDefs
-          .filter(def => def.requires() && (g[def.name]?.failCount || 0) >= 3)
+          .filter(def => def.requires() && (g[def.name]?.failCount || 0) >= MAX_FAIL_COUNT)
           .map(d => d.name);
-        return `⚠️ FORGE 质量门卡死：以下质量门连续失败 3 次，自动重试已停止：\n${blocked.map(n => `• ${n}`).join('\n')}\n请手动运行对应质量检查命令后重试，或运行 /forge:status 查看详情。\n${PREAMBLE_SKIP}`;
+        return `⚠️ FORGE 质量门卡死：以下质量门连续失败 ${MAX_FAIL_COUNT} 次，自动重试已停止：\n${blocked.map(n => `• ${n}`).join('\n')}\n请手动运行对应质量检查命令后重试，或运行 /forge:status 查看详情。\n${PREAMBLE_SKIP}`;
       },
     },
   ];
@@ -165,7 +173,7 @@ function nextGateToInject(bridge) {
     if (gate.status === 'leased' && !isLeaseExpired(gate)) continue;
 
     // M2 fix: 失败次数 >= 3 → 跳过，防止无限重试卡住整个流水线
-    if (gate.status === 'failed' && (gate.failCount || 0) >= 3) continue;
+    if (gate.status === 'failed' && (gate.failCount || 0) >= MAX_FAIL_COUNT) continue;
 
     // 其他情况（idle/required/failed/expired lease/epoch 不匹配）→ 需要注入
     return { name: def.name, message: def.msg(bridge) };

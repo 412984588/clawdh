@@ -1,20 +1,11 @@
 #!/usr/bin/env node
-// gsd-hook-version: 1.28.0
+// gsd-hook-version: 1.32.0
 // Claude Code Statusline - GSD Edition
 // Shows: model | current task | directory | context usage
 
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
-// M1 fix: 用 forge-shared getTmpDir()，与 forge-context-bridge.js 读取路径对齐
-// context-bridge 优先从 shared.getTmpDir() 读取，使用 os.tmpdir() 会永远走 fallback 路径
-let _forgeTmpDir;
-try {
-  const _forgeShared = require('./forge-shared.js');
-  _forgeTmpDir = _forgeShared.getTmpDir;
-} catch (_) {
-  _forgeTmpDir = os.tmpdir.bind(os);
-}
 
 // Read JSON from stdin
 let input = '';
@@ -44,9 +35,12 @@ process.stdin.on('end', () => {
 
       // Write context metrics to bridge file for the context-monitor PostToolUse hook.
       // The monitor reads this file to inject agent-facing warnings when context is low.
-      if (session) {
+      // Reject session IDs with path separators or traversal sequences to prevent
+      // a malicious session_id from writing files outside the temp directory.
+      const sessionSafe = session && !/[/\\]|\.\./.test(session);
+      if (sessionSafe) {
         try {
-          const bridgePath = path.join(_forgeTmpDir(), `claude-ctx-${session}.json`);
+          const bridgePath = path.join(os.tmpdir(), `claude-ctx-${session}.json`);
           const bridgeData = JSON.stringify({
             session_id: session,
             remaining_percentage: remaining,
@@ -101,16 +95,20 @@ process.stdin.on('end', () => {
     }
 
     // GSD update available?
+    // Check shared cache first (#1421), fall back to runtime-specific cache for
+    // backward compatibility with older gsd-check-update.js versions.
     let gsdUpdate = '';
-    const cacheFile = path.join(claudeDir, 'cache', 'gsd-update-check.json');
+    const sharedCacheFile = path.join(homeDir, '.cache', 'gsd', 'gsd-update-check.json');
+    const legacyCacheFile = path.join(claudeDir, 'cache', 'gsd-update-check.json');
+    const cacheFile = fs.existsSync(sharedCacheFile) ? sharedCacheFile : legacyCacheFile;
     if (fs.existsSync(cacheFile)) {
       try {
         const cache = JSON.parse(fs.readFileSync(cacheFile, 'utf8'));
         if (cache.update_available) {
-          gsdUpdate = '\x1b[33m⬆ /gsd:update\x1b[0m │ ';
+          gsdUpdate = '\x1b[33m⬆ /gsd-update\x1b[0m │ ';
         }
         if (cache.stale_hooks && cache.stale_hooks.length > 0) {
-          gsdUpdate += '\x1b[31m⚠ stale hooks — run /gsd:update\x1b[0m │ ';
+          gsdUpdate += '\x1b[31m⚠ stale hooks — run /gsd-update\x1b[0m │ ';
         }
       } catch (e) {}
     }
